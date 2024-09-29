@@ -29,6 +29,12 @@ The users claiming copyright, if they wish to be known, can list their names her
 ## Heroku Details
 * Dashboard link: https://dashboard.heroku.com/apps/f24-project-chartreuse
 
+## Tests
+To run the tests, run the following command in the root directory of the project:
+```
+python manage.py test chartreuse
+```
+
 ## Citations
 
 ### Stack Overflow Citations

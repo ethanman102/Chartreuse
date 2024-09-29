@@ -1,8 +1,8 @@
 from django.http import JsonResponse
 from django.core.paginator import Paginator
-from .models import User
+from ..models import User
 from django.shortcuts import get_object_or_404
-from . import views
+from .. import views
 import json
 
 def get_users(request):

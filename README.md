@@ -14,7 +14,7 @@ MIT License
 
 ## Copyright
 
-The users claiming copyright, if they wish to be known, can list their names here...
+The authors claiming copyright, if they wish to be known, can list their names here...
 
 * 
 

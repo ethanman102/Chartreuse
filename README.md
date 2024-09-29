@@ -25,3 +25,47 @@ The authors claiming copyright, if they wish to be known, can list their names h
 * Shaan Adatia
 * Casper Nguyen
 * Theresa Gabrielle Tian
+
+## Heroku Details
+* Dashboard link: https://dashboard.heroku.com/apps/f24-project-chartreuse
+
+## Tests
+To run the tests, run the following command in the root directory of the project:
+```
+python manage.py test chartreuse
+```
+
+## Citations
+
+### Stack Overflow Citations
+
+#### Citation 1
+From https://stackoverflow.com/questions/150505/how-to-get-get-request-values-in-django by camflan, Downloaded on 2024-09-28
+This citation helped us understand how to get queries from a GET request in Django. This was used in chartreuse/users.py to get the query parameters from the GET request on lines _ to _.
+
+#### Citation 2
+From https://stackoverflow.com/questions/25963552/json-response-list-with-django by Majid Zandi, Downloaded on 2024-09-28
+This citation helped us understand how to return a JSON response in Django for lists of objects.  This was used in chartreuse/users.py to return a JSON response of a list of users on lines _ to _.
+
+#### Citation 3
+From https://stackoverflow.com/questions/4994789/django-where-are-the-params-stored-on-a-put-delete-request by Ni Xiaoni, Downloaded on 2024-09-28
+This citation helped us understand how to get the parameters from a PUT request in Django. This was used in chartreuse/users.py to get the parameters from the PUT request on lines _ to _.
+
+### Django Documentation Citations
+
+#### Citation 1
+This https://docs.djangoproject.com/en/5.1/topics/pagination/ helped us to understand how to paginate objects in Django. This was used in chartreuse/users.py to paginate the users on lines _ to _.
+
+#### Citation 2
+* https://docs.djangoproject.com/en/5.1/topics/testing/overview/
+* https://docs.djangoproject.com/en/5.1/topics/testing/tools/#overview-and-a-quick-example
+<br>
+These sources helped us to understand how to write tests in Django. This was used in chartreuse/tests.py to write tests for the User model on lines _ to _.
+
+### AI / LLM Citations
+
+### Other Citations
+
+#### Citation 1
+This https://www.w3schools.com/python/python_json.asp helped with figuring out how to put a string into a JSON object. 
+This was used in chartreuse/users.py to convert a string into a JSON object on lines _ to _.

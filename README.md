@@ -25,3 +25,6 @@ The authors claiming copyright, if they wish to be known, can list their names h
 * Shaan Adatia
 * Casper Nguyen
 * Theresa Gabrielle Tian
+
+## Heroku Details
+* Dashboard link: https://dashboard.heroku.com/apps/f24-project-chartreuse

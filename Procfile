@@ -1,0 +1,1 @@
+web: gunicorn chartreuse_admin.wsgi

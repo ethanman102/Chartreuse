@@ -19,16 +19,11 @@ def get_image_post(request, author_id, post_id):
         post = models.Post.objects.filter(user__user__id=author_id, id=post_id).first()
 
         # Check if there is image data
-        if (post.content and ((post.contentType == 'image/jpeg;base64') or (post.contentType == 'image/png;base64'))):
+        if (post.content and (post.contentType in ['image/jpeg;base64', 'image/png;base64'])):
             try:
                 imageData = decode_image(post.content)
 
-                if (post.contentType == 'image/jpeg;base64'):
-                    return HttpResponse(imageData, content_type='image/jpeg')
-                
-                elif (post.contentType == 'image/png;base64'):
-                    return HttpResponse(imageData, content_type='image/png')
-                
+                return HttpResponse(imageData, content_type=post.contentType[:-7])
             except (base64.binascii.Error, ValueError):
                 return JsonResponse({'error': 'Invalid image data'}, status=404)
         else:

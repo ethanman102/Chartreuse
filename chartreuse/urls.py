@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .api_handling import likes, users
+from .api_handling import likes, users, images
 
 app_name = "chartreuse"
 urlpatterns = [
@@ -14,6 +14,8 @@ urlpatterns = [
 
     path("authors/<str:user_id>/liked/", likes.liked, name="get_liked"),
     path("authors/<str:user_id>/liked/<str:like_id>", likes.like_object, name="get_like_object"),
+
+    path('authors/<int:author_id>/posts/<int:post_id>/image', images.get_image_post, name='get_image_post'),
 
     path('accounts/', include('django.contrib.auth.urls')),
 ]

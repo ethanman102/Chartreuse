@@ -3,7 +3,6 @@ from django.core.paginator import Paginator
 from ..models import User
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User as AuthUser
 from .. import views
 import json
@@ -41,7 +40,7 @@ def get_users(request):
         # Since we have some additional fields, we only want to return the required ones
         filtered_user_attributes = []
         for user in page_users:
-            id = user.host + "authors/" + str(user.id)
+            id = user.host + "authors/" + str(user.user.id)
             page = user.host + "authors/" + user.user.username
 
             filtered_user_attributes.append({
@@ -54,7 +53,12 @@ def get_users(request):
                 "page": page
             })
 
-        return JsonResponse(filtered_user_attributes, safe=False)
+        authors = {
+            "type": "authors",
+            "authors": filtered_user_attributes
+        }
+
+        return JsonResponse(authors, safe=False)
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
 
@@ -72,7 +76,7 @@ def user(request, user_id):
     if request.method == "GET":
         user = get_object_or_404(User, pk=user_id)
 
-        id = user.host + "authors/" + str(user.id)
+        id = user.host + "authors/" + str(user.user.id)
         page = user.host + "authors/" + user.user.username
 
         # We only want to return the required fields
@@ -89,7 +93,7 @@ def user(request, user_id):
     elif request.method == "PUT":
         user = get_object_or_404(User, pk=user_id)
 
-        id = user.host + "authors/" + str(user.id)
+        id = user.host + "authors/" + str(user.user.id)
         page = user.host + "authors/" + user.user.username
 
         put = json.loads(request.body.decode('utf-8'))
@@ -190,7 +194,7 @@ def create_user(request):
         # Save the user
         user.save()
 
-        id = user.host + "authors/" + str(user.id)
+        id = user.host + "authors/" + str(user.user.id)
         page = user.host + "authors/" + user.user.username
 
         return JsonResponse({

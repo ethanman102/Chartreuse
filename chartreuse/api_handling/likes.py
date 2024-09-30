@@ -18,20 +18,64 @@ def like(request, user_id):
     Returns:
         JsonResponse containing the like object.
     '''
-    if request.method == 'POST':
-        currentUser = request.user
-
+    if request.method == 'POST':        
+        # Get the post URL from the request body
         postUrl = request.POST.get('post')
-        userLiking = get_object_or_404(User, user=currentUser)
+        
+        # Ensure the user liking the post is the current user
+        userLiking = get_object_or_404(User, id=user_id)
+        
+        # Check if the user has already liked this post
+        if Like.objects.filter(user=userLiking, post=postUrl).exists():
+            return JsonResponse({"error": "Like already exists."}, status=400)
+        
+        # Create and save the like
+        like = Like(user=userLiking, post=postUrl)
+        like.save()
 
-        request.user = userLiking.user
         request.method = 'GET'
         response = users.user(request, user_id)
-
         data = json.loads(response.content)
+        
+        # Construct the like object to return in the response
+        likeObject = {
+            "type": "like",
+            "author": {
+                "type": "author",
+                "id": data["id"],
+                "page": data["page"],
+                "host": data["host"],
+                "displayName": data["displayName"],
+                "github": data["github"],
+                "profileImage": data["profileImage"]
+            },
+            "published": like.dateCreated,
+            "id": userLiking.host + "authors/" + str(userLiking.id) + "/liked/" + str(like.id),
+            "object": postUrl
+        }
+        
+        return JsonResponse(likeObject, status=200)
+    
+    if request.method == 'DELETE':
+        # Get the post URL from the request body
+        postUrl = request.POST.get('post')
+        
+        # Ensure the user liking the post is the current user
+        userLiking = get_object_or_404(User, id=user_id)
+        
+        # Check if the user has already liked this post
+        if not Like.objects.filter(user=userLiking, post=postUrl).exists():
+            return JsonResponse({"error": "Like does not exist."}, status=400)
+        
+        # Create and save the like
+        like = Like.objects.filter(user=userLiking, post=postUrl)
+        like.delete()
 
-        like = Like.objects.create(user=userLiking, post=postUrl)
-
+        request.method = 'GET'
+        response = users.user(request, user_id)
+        data = json.loads(response.content)
+        
+        # Construct the like object to return in the response
         likeObject = {
             "type": "like",
             "author": {
@@ -48,7 +92,47 @@ def like(request, user_id):
             "object": postUrl
         }
 
-        return JsonResponse(likeObject, status = 200)
+        return JsonResponse(likeObject, status=200)
+    else:
+        return JsonResponse({"error": "Method not allowed."}, status=405)
+
+def like_object(request, user_id, like_id):
+    '''
+    Gets a specific like object from a user.
+
+    Parameters:
+        request: HttpRequest object containing the request and query parameters.
+        user_id: The id of the user who is liking the posts.
+        like_id: The id of the like object.
+
+    Returns:
+        JsonResponse containing the like object.
+    '''
+    if request.method == 'GET':
+        user = get_object_or_404(User, id=user_id)
+
+        request.method = 'GET'
+        response = users.user(request, user_id)
+
+        data = json.loads(response.content)
+        like = Like.objects.filter(user=user, id=like_id)[0]
+
+        likeObject = {
+            "type": "like",
+            "author": {
+                "type": "author",
+                "id": data["id"],
+                "page": data["page"],
+                "host": data["host"],
+                "displayName": data["displayName"],
+                "github": data["github"],
+                "profileImage": data["profileImage"]
+            },
+            "published": like.dateCreated,
+            "id": user.host + "authors/" + str(user.id) + "/liked/" + str(like.id),
+            "object": like.post
+        }
+        return JsonResponse(likeObject, safe=False)
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
 

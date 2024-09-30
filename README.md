@@ -65,6 +65,9 @@ These sources helped us to understand how to write tests in Django. This was use
 #### Citation 3
 This https://docs.djangoproject.com/en/3.2/_modules/django/contrib/auth/password_validation/ helped us to understand how to validate passwords in Django. This was used in chartreuse/users.py to validate passwords on lines _ to _.
 
+#### Citation 4
+This https://docs.djangoproject.com/en/5.1/ref/models/fields/#choices helped us to understand how to use choices in Django models. This was used in chartreuse/models.py to use choices in the User model on lines _ to _.
+
 ### AI / LLM Citations
 
 #### Citation 1

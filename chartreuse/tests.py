@@ -78,12 +78,12 @@ class UserTestCases(TestCase):
 
         # Successfully got all users
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()), 3)
+        self.assertEqual(len(response.json()["authors"]), 3)
 
         # Check if the users are correct
-        self.assertEqual(response.json()[0]['displayName'], 'Greg Johnson')
-        self.assertEqual(response.json()[1]['displayName'], 'John Smith')
-        self.assertEqual(response.json()[2]['displayName'], 'Benjamin Stanley')
+        self.assertEqual(response.json()["authors"][0]['displayName'], 'Greg Johnson')
+        self.assertEqual(response.json()["authors"][1]['displayName'], 'John Smith')
+        self.assertEqual(response.json()["authors"][2]['displayName'], 'Benjamin Stanley')
     
     def test_create_user_invalid_password(self):
         '''
@@ -275,7 +275,7 @@ class LikeTestCases(TestCase):
         })
 
         response = self.client.post(reverse('chartreuse:like', args=[1]), {
-            'post': "http://nodebbbb/authors/222/posts/249"
+            'post': "http://nodebbbb/authors/3/posts/230"
         })
 
         # Successfully liked post
@@ -283,7 +283,28 @@ class LikeTestCases(TestCase):
         self.assertEqual(response.json()['type'], 'like')
         self.assertEqual(response.json()['author']['displayName'], 'Greg Johnson')
         self.assertEqual(response.json()['id'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/api/authors/1/liked/5")
-        self.assertEqual(response.json()['object'], "http://nodebbbb/authors/222/posts/249")
+        self.assertEqual(response.json()['object'], "http://nodebbbb/authors/3/posts/230")
+    
+    def test_like_post_twice_invalid(self):
+        '''
+        This tests liking a post twice.
+        '''
+        # login as user 1
+        response = self.client.post(reverse('chartreuse:login_user'), {
+            'username': 'greg',
+            'password': 'ABC123!!!'
+        })
+
+        response = self.client.post(reverse('chartreuse:like', args=[1]), {
+            'post': "http://nodebbbb/authors/222/posts/2"
+        })
+
+        response = self.client.post(reverse('chartreuse:like', args=[1]), {
+            'post': "http://nodebbbb/authors/222/posts/2"
+        })
+
+        # Cannot like post twice
+        self.assertEqual(response.status_code, 400)
     
     def test_get_like(self):
         '''

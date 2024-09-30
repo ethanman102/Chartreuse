@@ -2,8 +2,13 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator
 from ..models import User
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User as AuthUser
 from .. import views
 import json
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
 def get_users(request):
     '''
@@ -37,7 +42,7 @@ def get_users(request):
         filtered_user_attributes = []
         for user in page_users:
             id = user.host + "authors/" + str(user.id)
-            page = user.host + "authors/" + user.username
+            page = user.host + "authors/" + user.user.username
 
             filtered_user_attributes.append({
                 "type": "author",
@@ -68,7 +73,7 @@ def user(request, user_id):
         user = get_object_or_404(User, pk=user_id)
 
         id = user.host + "authors/" + str(user.id)
-        page = user.host + "authors/" + user.username
+        page = user.host + "authors/" + user.user.username
 
         # We only want to return the required fields
         return JsonResponse({
@@ -85,7 +90,7 @@ def user(request, user_id):
         user = get_object_or_404(User, pk=user_id)
 
         id = user.host + "authors/" + str(user.id)
-        page = user.host + "authors/" + user.username
+        page = user.host + "authors/" + user.user.username
 
         put = json.loads(request.body.decode('utf-8'))
 
@@ -104,7 +109,7 @@ def user(request, user_id):
             user.profileImage = profileImage
         
         if (username is not None):
-            user.username = username
+            user.user.username = username
 
         # Save the updated user
         user.save()
@@ -121,6 +126,12 @@ def user(request, user_id):
     
     elif request.method == "DELETE":
         user = get_object_or_404(User, pk=user_id)
+
+        logged_in_user = request.user
+
+        if logged_in_user != user.user:
+            return JsonResponse({"error": "You do not have permission to delete this user."}, status=403)
+
         user.delete()
 
         return JsonResponse({"success": "User deleted successfully."})
@@ -139,33 +150,52 @@ def create_user(request):
         JsonResponse containing the newly created user.
     '''
     if request.method == "POST":
+        firstName = request.POST.get('firstName')
+        lastName = request.POST.get('lastName')
         displayName = request.POST.get('displayName')
         github = request.POST.get('github')
         profileImage = request.POST.get('profileImage')
         username = request.POST.get('username')
         password = request.POST.get('password')
         host = views.Host.host
+    
+        authUser = AuthUser.objects.filter(username=username)
 
-        if (validate_password(password) == False):
-            return JsonResponse({"error": "Password does not meet the requirements. Your password must contain at least 8 characters and at least 1 special character (!@#$%^&*)"}, status=400)
+        if authUser.exists():
+            return JsonResponse({"error": "Username already exists."}, status=400)
+
+        # Validate password
+        try:
+            validate_password(password)
+        except ValidationError as e:
+            return JsonResponse({"error": e.messages}, status=400)
+    
+        authUser = AuthUser.objects.create(
+            first_name = firstName,
+            last_name = lastName,
+            username = username,
+        )
+
+        authUser.set_password(password)
+        authUser.save()
 
         user = User.objects.create(
             displayName = displayName,
             github = github,
             profileImage = profileImage,
-            username = username,
-            password = password,
-            host = host
+            host = host,
+            user=authUser
         )
 
         # Save the user
         user.save()
 
-        page = user.host + "authors/" + user.username
+        id = user.host + "authors/" + str(user.id)
+        page = user.host + "authors/" + user.user.username
 
         return JsonResponse({
             "type": "author",
-            "id": user.id,
+            "id": id,
             "host": user.host,
             "displayName": user.displayName,
             "github": user.github,
@@ -176,55 +206,30 @@ def create_user(request):
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
 
-def change_password(request, user_id):
+def login_user(request):
     '''
-    Changes the password of an user.
+    Logs in a user.
 
     Parameters:
-        request: HttpRequest object containing the request with the new password.
-        user_id: The id of the user to change the password.
+        request: HttpRequest object containing the request with the user details.
     
     Returns:
-        JsonResponse containing the success message if the password was updated successfully.
+        JsonResponse containing the user details.
     '''
-    if request.method == "PUT":
-        user = get_object_or_404(User, pk=user_id)
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
-        put = json.loads(request.body.decode('utf-8'))
+        if not username or not password:
+            return JsonResponse({"error": "Username and password are required."}, status=400)
 
-        password = put.get('password')
+        user = authenticate(request, username=username, password=password)
 
-        if (validate_password(password) == False):
-            return JsonResponse({"error": "Password does not meet the requirements. Your password must contain at least 8 characters and at least 1 special character (!@#$%^&*)"}, status=400)
-
-        user.password = password
-        user.save()
-
-        return JsonResponse({"success": "Password updated successfully."})
+        if user is not None:
+            login(request, user)
+            return JsonResponse({"success": "User logged in successfully."})
+        else:
+            return JsonResponse({"error": "Invalid credentials."}, status=400)
     
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
-
-
-def validate_password(password):
-    '''
-    Validates the password based on the following rules:
-    - At least 8 characters
-    - At least 1 special character (!@#$%^&*)
-
-    Parameters:
-        password: The password to be validated.
-
-    Returns:
-        True if the password is valid, False otherwise.
-    '''
-    if len(password) < 8:
-        return False
-    
-    special_characters = "!@#$%^&*"
-
-    for character in password:
-        if character in special_characters:
-            return True
-        
-    return False

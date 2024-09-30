@@ -62,10 +62,27 @@ This https://docs.djangoproject.com/en/5.1/topics/pagination/ helped us to under
 <br>
 These sources helped us to understand how to write tests in Django. This was used in chartreuse/tests.py to write tests for the User model on lines _ to _.
 
+#### Citation 3
+This https://docs.djangoproject.com/en/3.2/_modules/django/contrib/auth/password_validation/ helped us to understand how to validate passwords in Django. This was used in chartreuse/users.py to validate passwords on lines _ to _.
+
+#### Citation 4
+This https://docs.djangoproject.com/en/5.1/ref/models/fields/#choices helped us to understand how to use choices in Django models. This was used in chartreuse/models.py to use choices in the User model on lines _ to _.
+
 ### AI / LLM Citations
+
+#### Citation 1
+Generated a response uing OpenAI, ChatGPT using the prompt "How to set up Django auth?"
+The response was used in chartreuse/users.py to help set up Django auth on lines _ to _.
+
+#### Citation 2
+Generated a response using OpenAI, ChatGPT using the prompt "How to validate passwords in Django?"
+The response was used in chartreuse/users.py to help validate passwords in Django on lines _ to _.
 
 ### Other Citations
 
 #### Citation 1
 This https://www.w3schools.com/python/python_json.asp helped with figuring out how to put a string into a JSON object. 
 This was used in chartreuse/users.py to convert a string into a JSON object on lines _ to _.
+
+#### Citation 2
+This https://www.geeksforgeeks.org/user-authentication-system-using-django/ helped with understanding how to set up user authentication in Django.

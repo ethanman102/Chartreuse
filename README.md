@@ -93,3 +93,6 @@ This https://www.geeksforgeeks.org/user-authentication-system-using-django/ help
 
 #### Citation 3
 This https://www.geeksforgeeks.org/how-to-open-an-image-from-the-url-in-pil/ helped with understanding how to open an image from a URL in PIL. This was used in chartreuse/api_handling/users.py to open an image from a URL on lines _ to _.
+
+#### Citation 4
+This https://getbootstrap.com/docs/5.3/getting-started/introduction/ helped step up bootstrap for the project. This was used in chartreuse/templates/base.html and the resulting CSS and HTML files that will be made for the site

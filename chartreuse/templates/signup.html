@@ -1,0 +1,14 @@
+<form method="POST" action="/chartreuse/signup/save">
+    <label>Username</label>
+    <input name="username" required type="text"/><br>
+    <label>Password</label>
+    <input name="password1" required type="password"/><br>
+    <label>Type your password again</label>
+    <input name="password2" required type="password"/><br>
+    <label>Display Name</label>
+    <input name="displayname" required type="text"/><br>
+    <label>Github (Optional)</label>
+    <input name="github" type="url" value=""/><br>
+    <input type="submit" value="Signup"/>
+    {% csrf_token %}
+</form>

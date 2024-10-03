@@ -1,8 +1,24 @@
 from urllib.request import urlopen
 import base64
 from django.http import HttpResponse, JsonResponse
+from rest_framework.decorators import api_view
 from .. import models
 
+from django.http import JsonResponse
+from drf_spectacular.utils import extend_schema, OpenApiResponse
+from rest_framework.decorators import action, api_view
+
+
+@extend_schema(
+    summary="Gets the image data from a post",
+    description=("Gets the image data from a post. The image data is returned as a base64 encoded string."),
+    responses={
+        200: OpenApiResponse(description="Successfully retrieved post image.",),
+        405: OpenApiResponse(description="Method not allowed."),
+    }
+)
+@action(detail=True, methods=("GET",))
+@api_view(["GET"])
 def get_image_post(request, author_id, post_id):
     '''
     Get the image data of a post.

@@ -319,3 +319,32 @@ def login_user(request):
     
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
+
+
+def login_user(request):
+    '''
+    Logs in a user.
+
+    Parameters:
+        request: HttpRequest object containing the request with the user details.
+    
+    Returns:
+        JsonResponse containing the user details.
+    '''
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        if not username or not password:
+            return JsonResponse({"error": "Username and password are required."}, status=400)
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return JsonResponse({"success": "User logged in successfully."}, status=200)
+        else:
+            return JsonResponse({"error": "Invalid credentials."}, status=400)
+    
+    else:
+        return JsonResponse({"error": "Method not allowed."}, status=405)

@@ -107,16 +107,14 @@ This https://www.geeksforgeeks.org/how-to-open-an-image-from-the-url-in-pil/ hel
 #### Citation 4
 This https://getbootstrap.com/docs/5.3/getting-started/introduction/ helped step up bootstrap for the project. This was used in chartreuse/templates/base.html and the resulting CSS and HTML files that will be made for the site
 
-#### Citation 4
-
-#### Citation 4
+#### Citation 5
 This https://getbootstrap.com/docs/5.3/getting-started/introduction/ helped step up bootstrap for the project. This was used in chartreuse/templates/base.html and the resulting CSS and HTML files that will be made for the site
 
-#### Citation 5
+#### Citation 6
 This https://docs.github.com/en/rest/activity?apiVersion=2022-11-28 helped with understanding how to use the GitHub API. This was used in chartreuse/api_handling/github.py to use the GitHub API on lines _ to _.
 
-### Citation 6
+### Citation 7
 Used Bootstrap Documentation https://getbootstrap.com/docs/5.0/components/navs-tabs/ for tabs and nav bars to construct a tab navaigation bar in chartreuse/templates/profile.html using one of their examples on lines _ to _.  
 
-### Citation 7
-Used this YouTube Video https://www.youtube.com/watch?v=dXkmPAnqnTE (Posted August 27, 2020) to learn how to use different generic views (specifically Detail View) and learn the theory of thing's it overrides. Used on lines _ to _.
+### Citation 8
+Used this YouTube Video https://www.youtube.com/watch?v=dXkmPAnqnTE (Posted August 27, 2020) to learn how to use different generic views (specifically Detail View) and learn the theory of thing's it overrides. Used on lines _ to _ on chartreuse/views.py.

@@ -2,7 +2,19 @@ import requests
 from django.shortcuts import get_object_or_404
 from ..models import User
 from django.http import JsonResponse
+from drf_spectacular.utils import extend_schema, OpenApiResponse
+from rest_framework.decorators import action, api_view
 
+@extend_schema(
+    summary="Gets the public events for a user from github",
+    description=("Gets the public events for a user from github. The events are returned as a JSON object."),
+    responses={
+        200: OpenApiResponse(description="Successfully retrieved the public events.",),
+        405: OpenApiResponse(description="Method not allowed."),
+    }
+)
+@action(detail=True, methods=("GET",))
+@api_view(["GET"])
 def get_events(request, user_id):
     '''
     This function gets public events for a user from github. 
@@ -27,6 +39,16 @@ def get_events(request, user_id):
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
     
+@extend_schema(
+    summary="Gets the repositories starred by a user on github",
+    description=("Gets the repositories starred by a user on github. The repositories are returned as a JSON object."),
+    responses={
+        200: OpenApiResponse(description="Successfully retrieved the public events.",),
+        405: OpenApiResponse(description="Method not allowed."),
+    }
+)
+@action(detail=True, methods=("GET",))
+@api_view(["GET"])
 def get_starred(request, user_id):
     '''
     This function gets the repositories starred by a user on github. 
@@ -51,6 +73,16 @@ def get_starred(request, user_id):
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
 
+@extend_schema(
+    summary="Gets the repositories watched by a user on github",
+    description=("Gets the repositories watched by a user on github. The repositories are returned as a JSON object."),
+    responses={
+        200: OpenApiResponse(description="Successfully retrieved the public events.",),
+        405: OpenApiResponse(description="Method not allowed."),
+    }
+)
+@action(detail=True, methods=("GET",))
+@api_view(["GET"])
 def get_subscriptions(request, user_id):
     '''
     This function gets the repositories watched by a user on github. 

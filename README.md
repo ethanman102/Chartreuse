@@ -35,6 +35,9 @@ To run the tests, run the following command in the root directory of the project
 python manage.py test chartreuse
 ```
 
+## API Documentation
+To view the API documentation, go to the following link after running the server locally: http://127.0.0.1:8000/chartreuse/schema/swagger-ui/
+
 ## Citations
 
 ### Stack Overflow Citations
@@ -82,6 +85,15 @@ The response was used in chartreuse/api_handling/users.py to help set up Django 
 Generated a response using OpenAI, ChatGPT using the prompt "How to validate passwords in Django?"
 The response was used in chartreuse/api_handling/users.py to help validate passwords in Django on lines _ to _.
 
+#### Citation 3
+Generated a response using OpenAI, ChatGPT using the prompt "How to use swagger api documentation in Django?" and "How to create documentation using swagger to add additional information to the API, like a description, response, parameters, etc?" These responses were used in chartreuse/urls.py and chartreuse_admin/settings.py and chartreuse_admin/urls.py to set up the swagger routes on lines _ to _.
+We also used these generated responses in chartreuse/api_handling/users.py to add additional information to the API on lines _ to _.
+
+We additionally used the following resources:
+* https://www.rootstrap.com/blog/automating-django-rest-apis-documentation-made-easy-with-drf-spectacular-part-2
+* https://drf-spectacular.readthedocs.io/en/latest/
+* https://rohitkrgupta.medium.com/swagger-with-django-made-easy-a-drf-spectacular-explainer-20b18bb4c33c
+
 ### Other Citations
 
 #### Citation 1
@@ -95,4 +107,9 @@ This https://www.geeksforgeeks.org/user-authentication-system-using-django/ help
 This https://www.geeksforgeeks.org/how-to-open-an-image-from-the-url-in-pil/ helped with understanding how to open an image from a URL in PIL. This was used in chartreuse/api_handling/users.py to open an image from a URL on lines _ to _.
 
 #### Citation 4
+
+Used https://www.linkedin.com/pulse/creating-api-documentation-django-swagger-atomixweb-15twf/ and
+https://www.515tech.com/post/swagger-for-django-creating-useable-api-documentation to understand how to create API documentation in Django. This was used in chartreuse/urls.py and chartreuse_admin/settings.py and chartreuse_admin/urls.py to create API documentation on lines _ to _.
+
+#### Citation 5
 This https://docs.github.com/en/rest/activity?apiVersion=2022-11-28 helped with understanding how to use the GitHub API. This was used in chartreuse/api_handling/github.py to use the GitHub API on lines _ to _.

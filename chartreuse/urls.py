@@ -1,6 +1,6 @@
-from django.urls import path, include
-from .api_handling import likes, users, images, github
-from . import views
+from django.urls import path
+from .api_handling import users
+from .api_handling import followers, follow_requests
 
 app_name = "chartreuse"
 urlpatterns = [
@@ -40,5 +40,7 @@ urlpatterns = [
     path("api/follow-requests/<int:request_id>/accept/", follow_requests.accept_follow_request, name="accept_follow_request"),
     path("api/follow-requests/<int:request_id>/reject/", follow_requests.reject_follow_request, name="reject_follow_request"),
     path("api/follow-requests/", follow_requests.get_follow_requests, name="get_follow_requests"),
+
+    path("api/authors/<str:author_id>/friends/", friends.get_friends, name="get_friends"),
 
 ]

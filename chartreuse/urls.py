@@ -1,5 +1,6 @@
 from django.urls import path, include
 from .api_handling import likes, users, images, github
+from . import views
 
 app_name = "chartreuse"
 urlpatterns = [
@@ -21,5 +22,10 @@ urlpatterns = [
     path("github/<str:user_id>/starred/", github.get_starred, name="get_starred"),
     path("github/<str:user_id>/subscriptions/", github.get_subscriptions, name="get_subscriptions"),
 
-    path('accounts/', include('django.contrib.auth.urls')),
+    # path('accounts/', include('django.contrib.auth.urls')),
+    # For registering a new account
+    path("signup", views.signup, name="signup"),
+    path("signup/save", views.save_signup, name="save_signup"),
+    # For logging in
+    path("login", views.login, name="login"),
 ]

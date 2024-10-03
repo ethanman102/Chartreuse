@@ -55,6 +55,16 @@ This citation helped us understand how to get the parameters from a PUT request 
 From https://stackoverflow.com/questions/68595593/how-to-base64-encode-an-image-from-url-rather-than-file, Downloaded on 2024-09-30
 This citation helped us understand how to base64 encode an image from a URL in Python. This was used in chartreuse/api_handling/images.py to base64 encode an image from a URL on lines _ to _.
 
+### Citation 5
+From https://stackoverflow.com/questions/23154525/django-generic-detail-view-must-be-called-with-either-an-object-pk-or-a-slug#:~:text=But%20as%20addition,%20issue%20Generic%20detail by Alex downloaded 2024-10-02
+This citation helped us to understand the generic detail view being unable to retrieve a user due to a lack of pk specified directly in the Model class. Alex's response helped us to understand to override get_object()
+From the detail view. Used on lines _ to _.
+
+We furthermore used:
+* https://medium.com/@katheller/how-to-use-get-object-in-drf-generics-views-examples-a7b879ff2d50#:~:text=In%20Django%20REST%20Framework%2C%20if%20you%20override%20the,expected%20because%20any%20permission%20was%20taken%20into%20consideration. (Author Katarzyna Antonik-Heller May 19,2023) To learn how to override get_object
+
+
+
 ### Django Documentation Citations
 
 #### Citation 1
@@ -95,14 +105,18 @@ This https://www.geeksforgeeks.org/user-authentication-system-using-django/ help
 This https://www.geeksforgeeks.org/how-to-open-an-image-from-the-url-in-pil/ helped with understanding how to open an image from a URL in PIL. This was used in chartreuse/api_handling/users.py to open an image from a URL on lines _ to _.
 
 #### Citation 4
-<<<<<<< HEAD
 This https://getbootstrap.com/docs/5.3/getting-started/introduction/ helped step up bootstrap for the project. This was used in chartreuse/templates/base.html and the resulting CSS and HTML files that will be made for the site
+
+#### Citation 4
 
 #### Citation 4
 This https://getbootstrap.com/docs/5.3/getting-started/introduction/ helped step up bootstrap for the project. This was used in chartreuse/templates/base.html and the resulting CSS and HTML files that will be made for the site
 
 #### Citation 5
 This https://docs.github.com/en/rest/activity?apiVersion=2022-11-28 helped with understanding how to use the GitHub API. This was used in chartreuse/api_handling/github.py to use the GitHub API on lines _ to _.
-=======
-This https://getbootstrap.com/docs/5.3/getting-started/introduction/ helped step up bootstrap for the project. This was used in chartreuse/templates/base.html and the resulting CSS and HTML files that will be made for the site
->>>>>>> 8714397 (Created templates folder and base.html,)
+
+### Citation 6
+Used Bootstrap Documentation https://getbootstrap.com/docs/5.0/components/navs-tabs/ for tabs and nav bars to construct a tab navaigation bar in chartreuse/templates/profile.html using one of their examples on lines _ to _.  
+
+### Citation 7
+Used this YouTube Video https://www.youtube.com/watch?v=dXkmPAnqnTE (Posted August 27, 2020) to learn how to use different generic views (specifically Detail View) and learn the theory of thing's it overrides. Used on lines _ to _.

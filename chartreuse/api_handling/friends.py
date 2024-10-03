@@ -32,3 +32,14 @@ def get_friends(request, author_id):
     }
 
     return JsonResponse(response, status=200)
+
+def check_friendship(request, author_id):
+    author = get_object_or_404(User, id=author_id)
+
+    # Check if the current user follows the author and vice versa
+    is_friend = (
+        Follow.objects.filter(follower=request.user, followed=author).exists() and
+        Follow.objects.filter(follower=author, followed=request.user).exists()
+    )
+
+    return JsonResponse({'is_friend': is_friend})

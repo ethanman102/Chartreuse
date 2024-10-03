@@ -42,5 +42,6 @@ urlpatterns = [
     path("api/follow-requests/", follow_requests.get_follow_requests, name="get_follow_requests"),
 
     path("api/authors/<str:author_id>/friends/", friends.get_friends, name="get_friends"),
+    path("api/authors/<str:author_id>/check_friendship/", friends.check_friendship, name="check_friendship"),
 
 ]

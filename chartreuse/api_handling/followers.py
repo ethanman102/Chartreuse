@@ -52,7 +52,7 @@ def remove_follower(request, author_id, foreign_author_id):
         # Check if the user is following the author
         follow = Follow.objects.filter(follower=foreign_author, followed=author)
 
-        if not follower.exists():
+        if not follow.exists():
             return JsonResponse({"error": "Not a follower."}, status=400)
 
         # Remove the follower

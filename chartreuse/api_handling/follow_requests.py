@@ -95,7 +95,7 @@ def get_follow_requests(request):
     Returns:
         JsonResponse with the list of follow requests.
     '''
-    author = User.objects.get(id=author_id)
+    author = request.user
 
     follow_requests = FollowRequest.objects.filter(requestee=author, approved=False)
 
@@ -123,4 +123,4 @@ def get_follow_requests(request):
         for follow_request in follow_requests
     ]
 
-    return JsonResponse(requests_list, status=200)
+    return JsonResponse({"follow_requests": requests_list}, status=200)

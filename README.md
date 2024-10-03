@@ -100,5 +100,5 @@ This https://getbootstrap.com/docs/5.3/getting-started/introduction/ helped step
 #### Citation 4
 This https://getbootstrap.com/docs/5.3/getting-started/introduction/ helped step up bootstrap for the project. This was used in chartreuse/templates/base.html and the resulting CSS and HTML files that will be made for the site
 
-#### Citation 4
+#### Citation 5
 This https://docs.github.com/en/rest/activity?apiVersion=2022-11-28 helped with understanding how to use the GitHub API. This was used in chartreuse/api_handling/github.py to use the GitHub API on lines _ to _.

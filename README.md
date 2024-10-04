@@ -99,6 +99,9 @@ The response was used in chartreuse/api_handling/users.py to help validate passw
 Generated a response using OpenAI, ChatGPT using the prompt "How to use swagger api documentation in Django?" and "How to create documentation using swagger to add additional information to the API, like a description, response, parameters, etc?" These responses were used in chartreuse/urls.py and chartreuse_admin/settings.py and chartreuse_admin/urls.py to set up the swagger routes on lines _ to _.
 We also used these generated responses in chartreuse/api_handling/users.py to add additional information to the API on lines _ to _.
 
+#### Citation 4
+Generated a response using OpenAI, ChatGPT using the prompt "How to use the filter method to find users who exist in both the followers and following lists". The response was used in chartreuse/api_handling/friends.py to find the mutual followers/friends of a particular author.
+
 We additionally used the following resources:
 * https://www.rootstrap.com/blog/automating-django-rest-apis-documentation-made-easy-with-drf-spectacular-part-2
 * https://drf-spectacular.readthedocs.io/en/latest/

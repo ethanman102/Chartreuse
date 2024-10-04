@@ -41,3 +41,21 @@ class Comment(models.Model):
     comment = models.TextField()
     commentType = models.CharField(max_length=50, choices=CONTENT_TYPE_CHOICES, default='text/markdown')
     dateCreated = models.DateTimeField(auto_now_add=True)
+    username = models.CharField(max_length=100)
+    password = models.CharField(max_length=100)
+    date_created  = models.DateTimeField(auto_now_add=True)
+
+class Follow(models.Model):
+    follower = models.ForeignKey(User, related_name="following", on_delete=models.CASCADE) # Use user.following to get all the users that a user is following
+    followed = models.ForeignKey(User, related_name="followers", on_delete=models.CASCADE) # Use user.followers to get all the users following that particular user
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('follower', 'followed')
+
+
+class FollowRequest(models.Model):
+    requester = models.ForeignKey(User, related_name="follow_requests_sent", on_delete=models.CASCADE)
+    requestee = models.ForeignKey(User, related_name="follow_requests_received", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    approved = models.BooleanField(default=False)

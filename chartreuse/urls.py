@@ -1,5 +1,6 @@
-from django.urls import path, include
-from .api_handling import likes, users, images, github
+from django.urls import path
+from .api_handling import users, likes, images, github, friends
+from .api_handling import followers, follow_requests
 from . import views
 from .views import ProfileDetailView
 
@@ -34,4 +35,20 @@ urlpatterns = [
     path("signup/save", views.save_signup, name="save_signup"),
     # For logging in
     path("login", views.login, name="login"),
+
+    # Follower URLs
+    path("api/authors/<str:author_id>/followers/<str:foreign_author_id>/", followers.add_follower, name="add_follower"),
+    path("api/authors/<str:author_id>/followers/<str:foreign_author_id>/remove/", followers.remove_follower, name="remove_follower"),
+    path("api/authors/<str:author_id>/followers/", followers.get_followers, name="get_followers"),
+    path("api/authors/<str:author_id>/followers/<str:foreign_author_id>/is_follower/", followers.is_follower, name="is_follower"),
+
+    # Follow Request URLs
+    path("api/authors/<str:author_id>/follow-requests/send/", follow_requests.send_follow_request, name="send_follow_request"),
+    path("api/follow-requests/<int:request_id>/accept/", follow_requests.accept_follow_request, name="accept_follow_request"),
+    path("api/follow-requests/<int:request_id>/reject/", follow_requests.reject_follow_request, name="reject_follow_request"),
+    path("api/follow-requests/", follow_requests.get_follow_requests, name="get_follow_requests"),
+
+    path("api/authors/<str:author_id>/friends/", friends.get_friends, name="get_friends"),
+    path('api/authors/<str:author_id>/friends/<str:foreign_author_id>/check_friendship/', friends.check_friendship, name='check_friendship'),
+
 ]

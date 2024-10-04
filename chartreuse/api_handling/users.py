@@ -1,14 +1,43 @@
-from django.http import JsonResponse
-from django.core.paginator import Paginator
-from ..models import User
-from django.shortcuts import get_object_or_404
+import json
+
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User as AuthUser
-from .. import views
-import json
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse, extend_schema_view
+from rest_framework import serializers
+from rest_framework.decorators import action, api_view
+from rest_framework.response import Response
+from .. import views
+from ..models import User
 
+class AuthorSerializer(serializers.Serializer):
+    type = serializers.CharField(default="author")
+    id = serializers.CharField()
+    host = serializers.CharField()
+    displayName = serializers.CharField()
+    github = serializers.URLField(required=False, allow_null=True)
+    profileImage = serializers.URLField(required=False, allow_null=True)
+    page = serializers.CharField()
+
+class AuthorsSerializer(serializers.Serializer):
+    type = serializers.CharField(default="authors")
+    authors = AuthorSerializer(many=True)
+
+@extend_schema(
+    summary="Get a paginated list of authors",
+    description=("Returns a paginated list of authors on the query parameters. Accepts page and size as query parameters."),
+    responses={
+        200: OpenApiResponse(description="Paginated list of authors.", response=AuthorsSerializer,),
+        405: OpenApiResponse(description="Method not allowed."),
+    }
+)
+@action(detail=True, methods=("GET",))
+@api_view(["GET"])
 def get_users(request):
     '''
     Gets a paginated list of users based on the provided query parameters.
@@ -58,13 +87,45 @@ def get_users(request):
             "authors": filtered_user_attributes
         }
 
-        return JsonResponse(authors, safe=False)
+        return Response(authors, safe=False)
     else:
-        return JsonResponse({"error": "Method not allowed."}, status=405)
+        return Response({"error": "Method not allowed."}, status=405)
 
+@extend_schema_view(
+    get=extend_schema(
+        summary="Get a user",
+        description="Retrieve user details based on the provided user ID.",
+        responses={
+            200: OpenApiResponse(description="User details retrieved successfully.", response=AuthorSerializer),
+            404: OpenApiResponse(description="User not found."),
+            405: OpenApiResponse(description="Method not allowed."),
+        }
+    ),
+    put=extend_schema(
+        summary="Update a user",
+        description="Update user details based on the provided user ID.",
+        responses={
+            200: OpenApiResponse(description="User updated successfully.", response=AuthorSerializer),
+            405: OpenApiResponse(description="Method not allowed."),
+            404: OpenApiResponse(description="User not found."),
+        }
+    ),
+    delete=extend_schema(
+        summary="Delete a user",
+        description="Delete a user based on the provided user ID.",
+        responses={
+            200: OpenApiResponse(description="User deleted successfully."),
+            404: OpenApiResponse(description="User not found."),
+            403: OpenApiResponse(description="Permission denied."),
+            405: OpenApiResponse(description="Method not allowed."),
+        }
+    )
+)
+@action(detail=True, methods=("GET", "PUT", "DELETE"))
+@api_view(["GET", "PUT", "DELETE"])
 def user(request, user_id):
     '''
-    Gets an user, updates an user, or deletes a user.
+    Gets a user, updates a user, or deletes a user.
 
     Parameters:
         request: HttpRequest object containing the request with the user id.
@@ -138,11 +199,21 @@ def user(request, user_id):
 
         user.delete()
 
-        return JsonResponse({"success": "User deleted successfully."})
+        return JsonResponse({"success": "User deleted successfully."}, status=200)
     
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
-    
+
+@extend_schema(
+    summary="Create a user",
+    description=("Creates a new user based on the provided user details."),
+    responses={
+        200: OpenApiResponse(description="Creates a new user.", response=AuthorSerializer,),
+        405: OpenApiResponse(description="Method not allowed."),
+    }
+)
+@action(detail=True, methods=("POST",))
+@api_view(["POST"])
 def create_user(request):
     '''
     Creates a new user.
@@ -210,6 +281,17 @@ def create_user(request):
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
 
+@extend_schema(
+    summary="Login a user",
+    description=("Logs in a user based on the provided user details."),
+    responses={
+        200: OpenApiResponse(description="User logged in successfully."),
+        405: OpenApiResponse(description="Method not allowed."),
+        400: OpenApiResponse(description="Invalid credentials."),
+    }
+)
+@action(detail=True, methods=("POST",))
+@api_view(["POST"])
 def login_user(request):
     '''
     Logs in a user.
@@ -231,7 +313,7 @@ def login_user(request):
 
         if user is not None:
             login(request, user)
-            return JsonResponse({"success": "User logged in successfully."})
+            return JsonResponse({"success": "User logged in successfully."}, status=200)
         else:
             return JsonResponse({"error": "Invalid credentials."}, status=400)
     

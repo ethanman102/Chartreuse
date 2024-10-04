@@ -5,6 +5,7 @@ from django.urls import reverse
 from .models import User,Like,Comment,Post
 from django.views.generic.detail import DetailView
 
+
 class Host():
     host = "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/api/"
 
@@ -64,3 +65,4 @@ class ProfileDetailView(DetailView):
         return user
 
         
+

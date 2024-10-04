@@ -1,8 +1,8 @@
 from django.urls import path, include
 from .api_handling import likes, users, images, github
 from . import views
-from .api_handling import likes, users, images
 from .views import ProfileDetailView
+
 
 app_name = "chartreuse"
 urlpatterns = [
@@ -10,6 +10,7 @@ urlpatterns = [
     path("api/authors/<str:user_id>/", users.user, name="user"),
     path("api/author/", users.create_user, name="create_user"),
     path("api/author/login/", users.login_user, name="login_user"),
+
 
     path("authors/<int:pk>/", ProfileDetailView.as_view(),name="profile"),
 
@@ -21,6 +22,7 @@ urlpatterns = [
     path("api/authors/<str:user_id>/liked/<str:like_id>", likes.like_object, name="get_like_object"),
 
     path('api/authors/<int:author_id>/posts/<int:post_id>/image', images.get_image_post, name='get_image_post'),
+
 
     path("github/<str:user_id>/events/", github.get_events, name="get_events"),
     path("github/<str:user_id>/starred/", github.get_starred, name="get_starred"),

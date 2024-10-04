@@ -1,9 +1,4 @@
-import json
-
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User as AuthUser
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
+from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -281,45 +276,58 @@ def create_user(request):
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
 
-@extend_schema(
-    summary="Login a user",
-    description=("Logs in a user based on the provided user details."),
-    responses={
-        200: OpenApiResponse(description="User logged in successfully."),
-        405: OpenApiResponse(description="Method not allowed."),
-        400: OpenApiResponse(description="Invalid credentials."),
-    }
-)
-@action(detail=True, methods=("POST",))
-@api_view(["POST"])
-def login_user(request):
+def change_password(request, user_id):
     '''
-    Logs in a user.
+    Changes the password of an user.
 
     Parameters:
-        request: HttpRequest object containing the request with the user details.
+        request: HttpRequest object containing the request with the new password.
+        user_id: The id of the user to change the password.
     
     Returns:
-        JsonResponse containing the user details.
+        JsonResponse containing the success message if the password was updated successfully.
     '''
-    if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+    if request.method == "PUT":
+        user = get_object_or_404(User, pk=user_id)
 
-        if not username or not password:
-            return JsonResponse({"error": "Username and password are required."}, status=400)
+        put = json.loads(request.body.decode('utf-8'))
 
-        user = authenticate(request, username=username, password=password)
+        password = put.get('password')
 
-        if user is not None:
-            login(request, user)
-            return JsonResponse({"success": "User logged in successfully."}, status=200)
-        else:
-            return JsonResponse({"error": "Invalid credentials."}, status=400)
+        if (validate_password(password) == False):
+            return JsonResponse({"error": "Password does not meet the requirements. Your password must contain at least 8 characters and at least 1 special character (!@#$%^&*)"}, status=400)
+
+        user.password = password
+        user.save()
+
+        return JsonResponse({"success": "Password updated successfully."})
     
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
 
+
+def validate_password(password):
+    '''
+    Validates the password based on the following rules:
+    - At least 8 characters
+    - At least 1 special character (!@#$%^&*)
+
+    Parameters:
+        password: The password to be validated.
+
+    Returns:
+        True if the password is valid, False otherwise.
+    '''
+    if len(password) < 8:
+        return False
+    
+    special_characters = "!@#$%^&*"
+
+    for character in password:
+        if character in special_characters:
+            return True
+        
+    return False
 
 def login_user(request):
     '''

@@ -46,6 +46,7 @@ class FollowRequestsTestCases(TestCase):
             'password': 'ABC123!!!'
         })
 
+        # Send follow request to user 2
         response = self.client.post(reverse('chartreuse:send_follow_request', args=[2]))
 
         # Successfully sent follow request

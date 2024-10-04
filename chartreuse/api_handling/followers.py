@@ -11,7 +11,8 @@ def add_follower(request, author_id, foreign_author_id):
 
     Parameters:
         request: HttpRequest object containing the request.
-        author_id: The id of the author to follow.
+        author_id: The id of the current author.
+        foreign_author_id: The id of the author to unfollow
 
     Returns:
         JsonResponse with the follow request/follower details.
@@ -40,7 +41,8 @@ def remove_follower(request, author_id, foreign_author_id):
 
     Parameters:
         request: HttpRequest object containing the request.
-        author_id: The id of the author to unfollow.
+        author_id: The id of the current author
+        foreign_author_id: The id of the author to unfollow
 
     Returns:
         JsonResponse with success message.
@@ -108,6 +110,17 @@ def get_followers(request, author_id):
     return JsonResponse(response, status=200)
 
 def is_follower(request, author_id, foreign_author_id):
+    '''
+    Checks if a particular author is a follower of current author
+
+    Parameters:
+        request: HttpRequest object containing the request.
+        author_id: The id of the current author
+        foreign_author_id: The id of the author to unfollow
+
+    Returns:
+        JsonResponse with success message.
+    '''
     author = get_object_or_404(User, id=author_id)
     foreign_author = get_object_or_404(User, id=foreign_author_id)
 

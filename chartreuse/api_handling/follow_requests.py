@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from ..models import User, FollowRequest
+from ..models import User, FollowRequest, Follow
 from django.contrib.auth.decorators import login_required
 import json
 
@@ -17,7 +17,7 @@ def send_follow_request(request, author_id):
         JsonResponse with the follow request details.
     '''
     if request.method == 'POST':
-        current_user = request.user
+        current_user = User.objects.get(user=request.user)
         author = get_object_or_404(User, id=author_id)
 
         # Check if a follow request already exists
@@ -95,7 +95,7 @@ def get_follow_requests(request):
     Returns:
         JsonResponse with the list of follow requests.
     '''
-    author = request.user
+    author = User.objects.get(user=request.user)
 
     follow_requests = FollowRequest.objects.filter(requestee=author, approved=False)
 

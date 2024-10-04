@@ -1,6 +1,8 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from . import models
+from .models import User, FollowRequest, Follow
+from django.shortcuts import get_object_or_404
 
 class FollowRequestsTestCases(TestCase):
     def setUp(self):
@@ -68,12 +70,15 @@ class FollowRequestsTestCases(TestCase):
 
         # Log back in as user 2 (who will approve the request)
         self.client.post(reverse('chartreuse:login_user'), {
-            'username': 'john',
-            'password': '87@398dh817b!'
+            'username': 'greg',
+            'password': 'ABC123!!!'
         })
 
+        greg = get_object_or_404(User, id=1)
+        john = get_object_or_404(User, id=2)
+
         # Approve the follow request as user 2
-        follow_request = FollowRequest.objects.get(requester=User.objects.get(username='greg'), requestee=User.objects.get(username='john'))
+        follow_request = FollowRequest.objects.get(requester=john, requestee=greg)
         response = self.client.post(reverse('chartreuse:accept_follow_request', args=[follow_request.id]))
 
         # Successfully approved follow request
@@ -102,8 +107,11 @@ class FollowRequestsTestCases(TestCase):
             'password': '87@398dh817b!'
         })
 
+        current_user = get_object_or_404(User, id=2)
+        author = get_object_or_404(User, id=1)
+
         # Reject the follow request as user 2
-        follow_request = FollowRequest.objects.get(requester=User.objects.get(username='greg'), requestee=User.objects.get(username='john'))
+        follow_request = FollowRequest.objects.get(requester=current_user, requestee=author)
         response = self.client.delete(reverse('chartreuse:reject_follow_request', args=[follow_request.id]))
 
         # Successfully rejected follow request
@@ -123,9 +131,14 @@ class FollowRequestsTestCases(TestCase):
         # User 1 sends a follow request
         self.client.post(reverse('chartreuse:send_follow_request', args=[1]))
 
+        self.client.post(reverse('chartreuse:login_user'), {
+            'username': 'greg',
+            'password': 'ABC123!!!'
+        })
+
         response = self.client.get(reverse('chartreuse:get_follow_requests'))
 
         # Successfully got follow requests
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.json()['follow_requests'], list)
-        self.assertEqual(len(response.json()['follow_requests']), 1)  # John has a follow request
+        self.assertEqual(len(response.json()['follow_requests']), 1)  # Greg has a follow request

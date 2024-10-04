@@ -83,7 +83,7 @@ class FollowersTestCases(TestCase):
         self.client.post(reverse('chartreuse:add_follower', args=[1, 2]))
 
         # Get the list of followers for John (user 2)
-        response = self.client.get(reverse('chartreuse:get_followers', args=[2]))
+        response = self.client.get(reverse('chartreuse:get_followers', args=[1]))
 
         # Successfully got followers
         self.assertEqual(response.status_code, 200)
@@ -104,7 +104,7 @@ class FollowersTestCases(TestCase):
         self.client.post(reverse('chartreuse:add_follower', args=[1, 2]))
 
         # Check if Greg is following John
-        response = self.client.get(reverse('chartreuse:is_follower', args=[2, 1]))  # John is author, Greg is foreign_author
+        response = self.client.get(reverse('chartreuse:is_follower', args=[1, 2]))  # John is author, Greg is foreign_author
 
         # Successfully verified follower status
         self.assertEqual(response.status_code, 200)

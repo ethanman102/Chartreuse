@@ -1,6 +1,7 @@
 from django.urls import path
-from .api_handling import users
+from .api_handling import users, likes, images, github, friends
 from .api_handling import followers, follow_requests
+from . import views
 
 app_name = "chartreuse"
 urlpatterns = [

@@ -1,4 +1,9 @@
-from django.http import JsonResponse
+import json
+
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User as AuthUser
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -23,16 +28,6 @@ class AuthorsSerializer(serializers.Serializer):
     type = serializers.CharField(default="authors")
     authors = AuthorSerializer(many=True)
 
-@extend_schema(
-    summary="Get a paginated list of authors",
-    description=("Returns a paginated list of authors on the query parameters. Accepts page and size as query parameters."),
-    responses={
-        200: OpenApiResponse(description="Paginated list of authors.", response=AuthorsSerializer,),
-        405: OpenApiResponse(description="Method not allowed."),
-    }
-)
-@action(detail=True, methods=("GET",))
-@api_view(["GET"])
 def get_users(request):
     '''
     Gets a paginated list of users based on the provided query parameters.
@@ -82,42 +77,10 @@ def get_users(request):
             "authors": filtered_user_attributes
         }
 
-        return Response(authors, safe=False)
+        return JsonResponse(authors, safe=False)
     else:
-        return Response({"error": "Method not allowed."}, status=405)
+        return JsonResponse({"error": "Method not allowed."}, status=405)
 
-@extend_schema_view(
-    get=extend_schema(
-        summary="Get a user",
-        description="Retrieve user details based on the provided user ID.",
-        responses={
-            200: OpenApiResponse(description="User details retrieved successfully.", response=AuthorSerializer),
-            404: OpenApiResponse(description="User not found."),
-            405: OpenApiResponse(description="Method not allowed."),
-        }
-    ),
-    put=extend_schema(
-        summary="Update a user",
-        description="Update user details based on the provided user ID.",
-        responses={
-            200: OpenApiResponse(description="User updated successfully.", response=AuthorSerializer),
-            405: OpenApiResponse(description="Method not allowed."),
-            404: OpenApiResponse(description="User not found."),
-        }
-    ),
-    delete=extend_schema(
-        summary="Delete a user",
-        description="Delete a user based on the provided user ID.",
-        responses={
-            200: OpenApiResponse(description="User deleted successfully."),
-            404: OpenApiResponse(description="User not found."),
-            403: OpenApiResponse(description="Permission denied."),
-            405: OpenApiResponse(description="Method not allowed."),
-        }
-    )
-)
-@action(detail=True, methods=("GET", "PUT", "DELETE"))
-@api_view(["GET", "PUT", "DELETE"])
 def user(request, user_id):
     '''
     Gets a user, updates a user, or deletes a user.
@@ -199,16 +162,6 @@ def user(request, user_id):
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
 
-@extend_schema(
-    summary="Create a user",
-    description=("Creates a new user based on the provided user details."),
-    responses={
-        200: OpenApiResponse(description="Creates a new user.", response=AuthorSerializer,),
-        405: OpenApiResponse(description="Method not allowed."),
-    }
-)
-@action(detail=True, methods=("POST",))
-@api_view(["POST"])
 def create_user(request):
     '''
     Creates a new user.
@@ -275,59 +228,6 @@ def create_user(request):
 
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
-
-def change_password(request, user_id):
-    '''
-    Changes the password of an user.
-
-    Parameters:
-        request: HttpRequest object containing the request with the new password.
-        user_id: The id of the user to change the password.
-    
-    Returns:
-        JsonResponse containing the success message if the password was updated successfully.
-    '''
-    if request.method == "PUT":
-        user = get_object_or_404(User, pk=user_id)
-
-        put = json.loads(request.body.decode('utf-8'))
-
-        password = put.get('password')
-
-        if (validate_password(password) == False):
-            return JsonResponse({"error": "Password does not meet the requirements. Your password must contain at least 8 characters and at least 1 special character (!@#$%^&*)"}, status=400)
-
-        user.password = password
-        user.save()
-
-        return JsonResponse({"success": "Password updated successfully."})
-    
-    else:
-        return JsonResponse({"error": "Method not allowed."}, status=405)
-
-
-def validate_password(password):
-    '''
-    Validates the password based on the following rules:
-    - At least 8 characters
-    - At least 1 special character (!@#$%^&*)
-
-    Parameters:
-        password: The password to be validated.
-
-    Returns:
-        True if the password is valid, False otherwise.
-    '''
-    if len(password) < 8:
-        return False
-    
-    special_characters = "!@#$%^&*"
-
-    for character in password:
-        if character in special_characters:
-            return True
-        
-    return False
 
 def login_user(request):
     '''

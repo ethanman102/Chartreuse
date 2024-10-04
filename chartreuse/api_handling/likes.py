@@ -6,7 +6,8 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, OpenApiResponse, extend_schema_view
 from rest_framework import serializers
-from rest_framework.decorators import action, api_view
+from rest_framework_swagger import renderers
+from rest_framework.decorators import api_view, renderer_classes, action
 from ..models import User, Like
 from . import users
 
@@ -17,28 +18,6 @@ class LikeSerializer(serializers.Serializer):
     id = serializers.CharField()
     object = serializers.URLField()
 
-@extend_schema_view(
-    put=extend_schema(
-        summary="Adds a like to a post",
-        description="Adds a like to a post based on the provided post URL.",
-        responses={
-            200: OpenApiResponse(description="Like added successfully.", response=LikeSerializer),
-            404: OpenApiResponse(description="User not found."),
-            405: OpenApiResponse(description="Method not allowed."),
-        }
-    ),
-    delete=extend_schema(
-        summary="Removes a like from a post",
-        description="Removes a like from a post based on the provided post URL.",
-        responses={
-            200: OpenApiResponse(description="Like deleted successfully."),
-            404: OpenApiResponse(description="User not found."),
-            405: OpenApiResponse(description="Method not allowed."),
-        }
-    )
-)
-@action(detail=True, methods=("PUT", "DELETE"))
-@api_view(["PUT", "DELETE"])
 @login_required
 def like(request, user_id):
     '''
@@ -129,16 +108,6 @@ def like(request, user_id):
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
 
-@extend_schema(
-    summary="Gets a specific like from a user",
-    description=("Gets a specific like object from a user based on the provided like ID and user ID."),
-    responses={
-        200: OpenApiResponse(description="Successfully retrieved like.", response=LikeSerializer,),
-        405: OpenApiResponse(description="Method not allowed."),
-    }
-)
-@action(detail=True, methods=("GET",))
-@api_view(["GET"])
 def like_object(request, user_id, like_id):
     '''
     Gets a specific like object from a user.
@@ -179,16 +148,6 @@ def like_object(request, user_id, like_id):
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
 
-@extend_schema(
-    summary="Gets all likes on a post",
-    description=("Gets all likes on a post based on the provided post ID and user ID."),
-    responses={
-        200: OpenApiResponse(description="Successfully retrieved all likes.", response=LikeSerializer,),
-        405: OpenApiResponse(description="Method not allowed."),
-    }
-)
-@action(detail=True, methods=("GET",))
-@api_view(["GET"])
 def likes(request, user_id, post_id):
     '''
     This function handles getting all likes on a post.
@@ -198,16 +157,6 @@ def likes(request, user_id, post_id):
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
 
-@extend_schema(
-    summary="Gets all likes on a comment from a post",
-    description=("Gets all likes on a comment from a post based on the provided post ID, comment ID, and user ID."),
-    responses={
-        200: OpenApiResponse(description="Successfully retrieved all likes.", response=LikeSerializer,),
-        405: OpenApiResponse(description="Method not allowed."),
-    }
-)
-@action(detail=True, methods=("GET",))
-@api_view(["GET"])
 def comment_likes(request, user_id, post_id, comment_id):
     '''
     This function handles getting all likes on a comment.
@@ -217,16 +166,6 @@ def comment_likes(request, user_id, post_id, comment_id):
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
 
-@extend_schema(
-    summary="Gets all likes made by a user",
-    description=("Gets all likes made by a user with the specified user ID."),
-    responses={
-        200: OpenApiResponse(description="Successfully retrieved all likes.", response=LikeSerializer,),
-        405: OpenApiResponse(description="Method not allowed."),
-    }
-)
-@action(detail=True, methods=("GET",))
-@api_view(["GET"])
 def liked(request, user_id):
     '''
     Gets all the likes of a user.
@@ -296,16 +235,6 @@ def liked(request, user_id):
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
 
-@extend_schema(
-    summary="Gets a specific like from a user",
-    description=("Gets a specific like from a user with the specified user ID."),
-    responses={
-        200: OpenApiResponse(description="Successfully retrieved the like.", response=LikeSerializer,),
-        405: OpenApiResponse(description="Method not allowed."),
-    }
-)
-@action(detail=True, methods=("GET",))
-@api_view(["GET"])
 def like_object(request, user_id, like_id):
     '''
     Gets a specific like object from a user.

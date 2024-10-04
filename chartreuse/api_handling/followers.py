@@ -79,21 +79,25 @@ def get_followers(request, author_id):
     author = get_object_or_404(User, id=author_id)
     
     # Get all followers for the author
-    followers = author.followers.all()
+    followers = Follow.objects.filter(followed=author)
+
+    followers_list = []
 
     # Create a list of follower details to be included in the response
-    followers_list = [
-        {
-            "type": "author",
-            "id": f"{follower.host}/authors/{follower.id}",
-            "host": follower.host,
-            "displayName": follower.displayName,
-            "page": f"{follower.host}/authors/{follower.id}",
-            "github": follower.github,
-            "profileImage": follower.profileImage
-        }
-        for follower in followers
-    ]
+    for follower in followers:
+        user = follower.follower
+        follower_attributes = [
+            {
+                "type": "author",
+                "id": f"{user.host}/authors/{user.user.id}",
+                "host": user.host,
+                "displayName": user.displayName,
+                "page": f"{user.host}/authors/{user.user.id}",
+                "github": user.github,
+                "profileImage": user.profileImage
+            }
+        ]
+        followers_list.append(follower_attributes)
 
     # Prepare the final response
     response = {

@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import serializers
 from rest_framework import viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 
 from ..models import Like, User
@@ -171,7 +171,7 @@ class LikeViewSet(viewsets.ViewSet):
             405: OpenApiResponse(description="Method not allowed."),
         }
     )
-    @action(detail=False, methods=["GET"])
+    @api_view(["GET"])
     def get_like(self, request, user_id, like_id):
         '''
         Gets a specific like object from a user.
@@ -218,7 +218,7 @@ class LikeViewSet(viewsets.ViewSet):
             405: OpenApiResponse(description="Method not allowed."),
         }
     )
-    @action(detail=False, methods=["GET"])
+    @api_view(["GET"])
     def get_post_likes(self, request, user_id, post_id):
         '''
         This function handles getting all likes on a post.
@@ -233,7 +233,7 @@ class LikeViewSet(viewsets.ViewSet):
             405: OpenApiResponse(description="Method not allowed."),
         }
     )
-    @action(detail=False, methods=["GET"])
+    @api_view(["GET"])
     def get_comment_likes(self, request, user_id, post_id, comment_id):
         '''
         This function handles getting all likes on a comment.
@@ -252,7 +252,7 @@ class LikeViewSet(viewsets.ViewSet):
             405: OpenApiResponse(description="Method not allowed."),
         }
     )
-    @action(detail=False, methods=["GET"])
+    @api_view(["GET"])
     def user_likes(request, user_id):
         '''
         Gets all the likes of a user.
@@ -328,7 +328,7 @@ class LikeViewSet(viewsets.ViewSet):
             405: OpenApiResponse(description="Method not allowed."),
         }
     )
-    @action(detail=False, methods=["GET"])
+    @api_view(["GET"])
     def like_object(request, user_id, like_id):
         '''
         Gets a specific like object from a user.

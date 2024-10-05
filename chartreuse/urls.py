@@ -14,15 +14,14 @@ urlpatterns = [
 
     path("authors/<int:pk>/", ProfileDetailView.as_view(),name="profile"),
 
-    path("api/authors/<str:user_id>/inbox/", likes.like, name="like"),
-    path("api/authors/<str:user_id>/posts/<str:post_id>/likes", likes.likes, name="likes"),
-    path("api/authors/<str:user_id>/posts/<str:post_id>/comments/<str:comment_id>/likes", likes.comment_likes, name="comment_likes"),
+    path("api/authors/<str:user_id>/inbox/", likes.LikeViewSet.as_view({'post': 'add_like', 'delete': 'remove_like'}), name="like"),
+    path("api/authors/<str:user_id>/posts/<str:post_id>/likes", likes.LikeViewSet.get_post_likes, name="post_likes"),
+    path("api/authors/<str:user_id>/posts/<str:post_id>/comments/<str:comment_id>/likes", likes.LikeViewSet.get_comment_likes, name="comment_likes"),
 
-    path("api/authors/<str:user_id>/liked/", likes.liked, name="get_liked"),
-    path("api/authors/<str:user_id>/liked/<str:like_id>", likes.like_object, name="get_like_object"),
+    path("api/authors/<str:user_id>/liked/", likes.LikeViewSet.user_likes, name="get_liked"),
+    path("api/authors/<str:user_id>/liked/<str:like_id>", likes.LikeViewSet.like_object, name="get_like_object"),
 
     path('api/authors/<int:author_id>/posts/<int:post_id>/image', images.get_image_post, name='get_image_post'),
-
 
     path("github/<str:user_id>/events/", github.get_events, name="get_events"),
     path("github/<str:user_id>/starred/", github.get_starred, name="get_starred"),

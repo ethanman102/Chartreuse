@@ -7,21 +7,27 @@ from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
-from rest_framework.decorators import action, api_view
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from rest_framework import serializers, viewsets
+from rest_framework.decorators import api_view
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+
 from .. import views
 from ..models import User
-from rest_framework.decorators import api_view
-from rest_framework import viewsets
-from rest_framework import serializers
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
 
 class UserSerializer(serializers.ModelSerializer):
+    type = serializers.CharField(default="author")
+    displayName = serializers.CharField()
+    host = serializers.URLField()
+    github = serializers.URLField()
+    profileImage = serializers.URLField()
+    page = serializers.URLField()
+
     class Meta:
         model = User
-        fields = ['id', 'host', 'displayName', 'github', 'profileImage']
-    
+        fields = ['type', 'displayName', 'host', 'github', 'profileImage', 'page', 'dateCreated']
+
     def validate_displayName(self, value):
         if not value:
             raise serializers.ValidationError("Display name cannot be empty.")
@@ -37,19 +43,11 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Profile image URL must start with 'http'.")
         return value
 
-    def validate_user(self, value):
-        # You can add more validation rules for the username here
-        username = value.get('username')
-        if not username:
-            raise serializers.ValidationError("Username cannot be empty.")
-        return value
-    
-class UsersSerializer(serializers.ModelSerializer):
+class UsersSerializer(serializers.Serializer):
     type = serializers.CharField(default="authors")
     authors = UserSerializer(many=True)
-    
+
     class Meta:
-        model = User
         fields = ['type', 'authors']
 
 class UserViewSet(viewsets.ViewSet):
@@ -167,7 +165,7 @@ class UserViewSet(viewsets.ViewSet):
                 description="Updated user details.",
             ),
             404: OpenApiResponse(description="User not found."),
-            403: OpenApiResponse(description="Permission denied."),
+            401: OpenApiResponse(description="Permission denied."),
             400: OpenApiResponse(description="Invalid data."),
         }
     )
@@ -200,7 +198,7 @@ class UserViewSet(viewsets.ViewSet):
                 "page": page
             }, safe=False)
         else:
-            return Response({"error": "Permission denied."}, status=403)
+            return Response({"error": "Permission denied."}, status=401)
         
     @extend_schema(
         summary="Delete a user",
@@ -208,7 +206,7 @@ class UserViewSet(viewsets.ViewSet):
         responses={
             200: OpenApiResponse(description="User deleted successfully."),
             404: OpenApiResponse(description="User not found."),
-            403: OpenApiResponse(description="You do not have permission to delete this user."),
+            401: OpenApiResponse(description="You do not have permission to delete this user."),
         }
     )
     def destroy(self, request, pk=None):
@@ -217,7 +215,7 @@ class UserViewSet(viewsets.ViewSet):
         logged_in_user = request.user
 
         if logged_in_user != user.user:
-            return Response({"error": "You do not have permission to delete this user."}, status=403)
+            return Response({"error": "You do not have permission to delete this user."}, status=401)
 
         user.delete()
         return Response({"success": "User deleted successfully."}, status=200)
@@ -303,7 +301,7 @@ class UserViewSet(viewsets.ViewSet):
             400: OpenApiResponse(description="Username and password are required."),
         }
     )
-    @action(detail=False, methods=["POST"])
+    @api_view(["POST"])
     def login_user(request):
         '''
         Logs in a user.

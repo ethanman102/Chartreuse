@@ -141,3 +141,5 @@ https://www.515tech.com/post/swagger-for-django-creating-useable-api-documentati
 
 
 https://www.linkedin.com/pulse/creating-api-documentation-django-swagger-atomixweb-15twf/
+
+https://www.django-rest-framework.org/api-guide/viewsets/#example_3

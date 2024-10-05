@@ -7,40 +7,77 @@ from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse, extend_schema_view
-from rest_framework import serializers
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
 from rest_framework.decorators import action, api_view
-from rest_framework.response import Response
 from .. import views
 from ..models import User
+from rest_framework.decorators import api_view
+from rest_framework import viewsets
+from rest_framework import serializers
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 
-class AuthorSerializer(serializers.Serializer):
-    type = serializers.CharField(default="author")
-    id = serializers.CharField()
-    host = serializers.CharField()
-    displayName = serializers.CharField()
-    github = serializers.URLField(required=False, allow_null=True)
-    profileImage = serializers.URLField(required=False, allow_null=True)
-    page = serializers.CharField()
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'host', 'displayName', 'github', 'profileImage']
+    
+    def validate_displayName(self, value):
+        if not value:
+            raise serializers.ValidationError("Display name cannot be empty.")
+        return value
 
-class AuthorsSerializer(serializers.Serializer):
+    def validate_github(self, value):
+        if not value.startswith("http"):
+            raise serializers.ValidationError("GitHub URL must start with 'http'.")
+        return value
+
+    def validate_profileImage(self, value):
+        if not value.startswith("http"):
+            raise serializers.ValidationError("Profile image URL must start with 'http'.")
+        return value
+
+    def validate_user(self, value):
+        # You can add more validation rules for the username here
+        username = value.get('username')
+        if not username:
+            raise serializers.ValidationError("Username cannot be empty.")
+        return value
+    
+class UsersSerializer(serializers.ModelSerializer):
     type = serializers.CharField(default="authors")
-    authors = AuthorSerializer(many=True)
+    authors = UserSerializer(many=True)
+    
+    class Meta:
+        model = User
+        fields = ['type', 'authors']
 
-def get_users(request):
-    '''
-    Gets a paginated list of users based on the provided query parameters.
+class UserViewSet(viewsets.ViewSet):
+    permission_classes = [AllowAny]
 
-    Parameters:
-        request: HttpRequest object containing the request and query parameters.
+    @extend_schema(
+        summary="Get a list of users",
+        description=("Gets a paginated list of users based on the provided query parameters (page and size)."),
+        parameters=[
+            OpenApiParameter(name='page', type=int, description="Page number for pagination (Default is 1)."),
+            OpenApiParameter(name='size', type=int, description="Number of users per page (Default is 50)."),
+        ],
+        responses={
+            200: OpenApiResponse( response=UsersSerializer(), description="A paginated list of users."),
+        }
+    )
+    def list(self, request):
+        '''
+        Gets a paginated list of users based on the provided query parameters.
 
-    Returns:
-        JsonResponse containing the paginated list of users.
-    '''
-    if request.method == "GET":
-        page = request.GET.get('page')
-        size = request.GET.get('size')
+        Parameters:
+            request: rest_framework object containing the request and query parameters.
+
+        Returns:
+            JsonResponse containing the paginated list of users.
+        '''
+        page = request.data.get('page')
+        size = request.data.get('size')
 
         if (page is None):
             page = 1 # Default page is 1
@@ -78,22 +115,32 @@ def get_users(request):
         }
 
         return JsonResponse(authors, safe=False)
-    else:
-        return JsonResponse({"error": "Method not allowed."}, status=405)
 
-def user(request, user_id):
-    '''
-    Gets a user, updates a user, or deletes a user.
+    @extend_schema(
+        summary="Get a specific user",
+        description=("Retrieves a user by their ID. Use this endpoint to get detailed information about a specific user."),
+        responses={
+            200: OpenApiResponse(
+                response=UserSerializer,
+                description="User details.",
+            ),
+            404: OpenApiResponse(
+                description="User not found."
+            )
+        }
+    )
+    def retrieve(self, request, pk=None):
+        '''
+        Gets a user.
 
-    Parameters:
-        request: HttpRequest object containing the request with the user id.
-        user_id: The id of the user to get, update, or delete
+        Parameters:
+            request: rest_framework object containing the request with the user id.
+            user_id: The id of the user to get, update, or delete
 
-    Returns:
-        JsonResponse containing the user. (optional)
-    '''
-    if request.method == "GET":
-        user = get_object_or_404(User, pk=user_id)
+        Returns:
+            JsonResponse containing the user.
+        '''
+        user = get_object_or_404(User, pk=pk)
 
         id = user.host + "authors/" + str(user.user.id)
         page = user.host + "authors/" + user.user.username
@@ -109,77 +156,98 @@ def user(request, user_id):
             "page": page
         }, safe=False)
 
-    elif request.method == "PUT":
-        user = get_object_or_404(User, pk=user_id)
+    @extend_schema(
+        summary="Update a user",
+        description=("Updates an existing user based on provided user details. "
+                     "Use this endpoint to modify user attributes."),
+        request=UserSerializer,
+        responses={
+            200: OpenApiResponse(
+                response=UserSerializer,
+                description="Updated user details.",
+            ),
+            404: OpenApiResponse(description="User not found."),
+            403: OpenApiResponse(description="Permission denied."),
+            400: OpenApiResponse(description="Invalid data."),
+        }
+    )
+    def update(self, request, pk=None):
+        if request.user.is_authenticated:
+            user = get_object_or_404(User, pk=pk)
 
-        id = user.host + "authors/" + str(user.user.id)
-        page = user.host + "authors/" + user.user.username
+            id = user.host + "authors/" + str(user.user.id)
+            page = user.host + "authors/" + user.user.username
 
-        put = json.loads(request.body.decode('utf-8'))
+            data = json.loads(request.body.decode('utf-8'))
 
-        displayName = put.get('displayName')
-        github = put.get('github')
-        profileImage = put.get('profileImage')
-        username = put.get('username')
+            serializer = UserSerializer(instance=user, data=data, partial=True)
 
-        if (displayName is not None):
-            user.displayName = displayName
+            # Save the updated user
+            if serializer.is_valid():
+                # If valid, save the updates
+                serializer.save()
+            
+            else:
+                return JsonResponse(serializer.errors, status=400)
+
+            return JsonResponse({
+                "type": "author",
+                "id": id,
+                "host": user.host,
+                "displayName": user.displayName,
+                "github": user.github,
+                "profileImage": user.profileImage,
+                "page": page
+            }, safe=False)
+        else:
+            return Response({"error": "Permission denied."}, status=403)
         
-        if (github is not None):
-            user.github = github
-        
-        if (profileImage is not None):
-            user.profileImage = profileImage
-        
-        if (username is not None):
-            user.user.username = username
-
-        # Save the updated user
-        user.save()
-
-        return JsonResponse({
-            "type": "author",
-            "id": id,
-            "host": user.host,
-            "displayName": user.displayName,
-            "github": user.github,
-            "profileImage": user.profileImage,
-            "page": page
-        }, safe=False)
-    
-    elif request.method == "DELETE":
-        user = get_object_or_404(User, pk=user_id)
+    @extend_schema(
+        summary="Delete a user",
+        description=("Deletes an existing user based on the provided user ID. "),
+        responses={
+            200: OpenApiResponse(description="User deleted successfully."),
+            404: OpenApiResponse(description="User not found."),
+            403: OpenApiResponse(description="You do not have permission to delete this user."),
+        }
+    )
+    def destroy(self, request, pk=None):
+        user = get_object_or_404(User, pk=pk)
 
         logged_in_user = request.user
 
         if logged_in_user != user.user:
-            return JsonResponse({"error": "You do not have permission to delete this user."}, status=403)
+            return Response({"error": "You do not have permission to delete this user."}, status=403)
 
         user.delete()
+        return Response({"success": "User deleted successfully."}, status=200)
 
-        return JsonResponse({"success": "User deleted successfully."}, status=200)
-    
-    else:
-        return JsonResponse({"error": "Method not allowed."}, status=405)
+    @extend_schema(
+        summary="Create a new user",
+        description=("Creates a new user with the provided details."),
+        request=UserSerializer,
+        responses={
+            200: OpenApiResponse(response=UserSerializer, description="Newly created user details."),
+            400: OpenApiResponse(description="Username already exists."),
+        }
+    )
+    def create(self, request):
+        '''
+        Creates a new user.
 
-def create_user(request):
-    '''
-    Creates a new user.
-
-    Parameters:
-        request: HttpRequest object containing the request with the user details.
-    
-    Returns:
-        JsonResponse containing the newly created user.
-    '''
-    if request.method == "POST":
-        firstName = request.POST.get('firstName')
-        lastName = request.POST.get('lastName')
-        displayName = request.POST.get('displayName')
-        github = request.POST.get('github')
-        profileImage = request.POST.get('profileImage')
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        Parameters:
+            request: rest_framework object containing the request with the user details.
+        
+        Returns:
+            JsonResponse containing the newly created user.
+        '''
+        firstName = request.data.get('firstName')
+        lastName = request.data.get('lastName')
+        displayName = request.data.get('displayName')
+        github = request.data.get('github')
+        profileImage = request.data.get('profileImage')
+        username = request.data.get('username')
+        password = request.data.get('password')
         host = views.Host.host
     
         authUser = AuthUser.objects.filter(username=username)
@@ -226,22 +294,28 @@ def create_user(request):
             "page": page
         }, safe=False, status=200)
 
-    else:
-        return JsonResponse({"error": "Method not allowed."}, status=405)
+    @extend_schema(
+        summary="Login a user",
+        description=("Logs in a user based on the provided user details."),
+        responses={
+            200: OpenApiResponse(description="User logged in successfully."),
+            400: OpenApiResponse(description="Invalid credentials."),
+            400: OpenApiResponse(description="Username and password are required."),
+        }
+    )
+    @action(detail=False, methods=["POST"])
+    def login_user(request):
+        '''
+        Logs in a user.
 
-def login_user(request):
-    '''
-    Logs in a user.
-
-    Parameters:
-        request: HttpRequest object containing the request with the user details.
-    
-    Returns:
-        JsonResponse containing the user details.
-    '''
-    if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        Parameters:
+            request: rest_framework object containing the request with the user details.
+        
+        Returns:
+            JsonResponse containing the user details.
+        '''
+        username = request.data.get('username')
+        password = request.data.get('password')
 
         if not username or not password:
             return JsonResponse({"error": "Username and password are required."}, status=400)
@@ -253,6 +327,3 @@ def login_user(request):
             return JsonResponse({"success": "User logged in successfully."}, status=200)
         else:
             return JsonResponse({"error": "Invalid credentials."}, status=400)
-    
-    else:
-        return JsonResponse({"error": "Method not allowed."}, status=405)

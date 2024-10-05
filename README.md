@@ -139,3 +139,5 @@ Used https://www.linkedin.com/pulse/creating-api-documentation-django-swagger-at
 https://www.515tech.com/post/swagger-for-django-creating-useable-api-documentation to understand how to create API documentation in Django. This was used in chartreuse/urls.py and chartreuse_admin/settings.py and chartreuse_admin/urls.py to create API documentation on lines _ to _.
 
 
+
+https://www.linkedin.com/pulse/creating-api-documentation-django-swagger-atomixweb-15twf/

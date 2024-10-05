@@ -1,10 +1,11 @@
-from django.test import TestCase, Client
+from rest_framework.test import APIClient
+from django.test import TestCase
 from django.urls import reverse
 import json
 
 class UserTestCases(TestCase):
     def setUp(self):
-        self.client = Client()
+        self.client = APIClient()
 
         # Test user data
         self.test_user_1_data = {
@@ -40,15 +41,15 @@ class UserTestCases(TestCase):
             'lastName': 'Stanley',
         }
 
-        self.client.post(reverse('chartreuse:create_user'), self.test_user_1_data, format='json')
-        self.client.post(reverse('chartreuse:create_user'), self.test_user_2_data, format='json')
-        self.client.post(reverse('chartreuse:create_user'), self.test_user_3_data, format='json')
+        self.client.post(reverse('chartreuse:user-list'), self.test_user_1_data, format='json')
+        self.client.post(reverse('chartreuse:user-list'), self.test_user_2_data, format='json')
+        self.client.post(reverse('chartreuse:user-list'), self.test_user_3_data, format='json')
     
     def test_create_user(self):
         '''
         This tests creating a user.
         '''
-        response = self.client.post(reverse('chartreuse:create_user'), {
+        response = self.client.post(reverse('chartreuse:user-list'), {
             'displayName': 'Jane Doe',
             'github': 'http://github.com/jdoe',
             'profileImage': 'https://i.imgur.com/1234.jpeg',
@@ -73,7 +74,7 @@ class UserTestCases(TestCase):
         '''
         This tests getting all users from the database.
         '''
-        response = self.client.get(reverse('chartreuse:get_users'))
+        response = self.client.get(reverse('chartreuse:user-list'))
 
         # Successfully got all users
         self.assertEqual(response.status_code, 200)
@@ -88,7 +89,7 @@ class UserTestCases(TestCase):
         '''
         This tests creating a user with an invalid password.
         '''
-        response = self.client.post(reverse('chartreuse:create_user'), {
+        response = self.client.post(reverse('chartreuse:user-list'), {
             'displayName': 'Jane Doe',
             'github': 'http://github.com/jdoe',
             'profileImage': 'https://i.imgur.com/1234.jpeg',
@@ -106,7 +107,7 @@ class UserTestCases(TestCase):
         '''
         This tests getting a specific user.
         '''
-        response = self.client.get(reverse('chartreuse:user', args=[1]))
+        response = self.client.get(reverse('chartreuse:user-detail', args=[1]))
 
         # Successfully got user
         self.assertEqual(response.status_code, 200)
@@ -122,7 +123,7 @@ class UserTestCases(TestCase):
         '''
         This tests getting a user with an invalid id.
         '''
-        response = self.client.get(reverse('chartreuse:user', args=[100]))
+        response = self.client.get(reverse('chartreuse:user-detail', args=[100]))
 
         # User does not exist
         self.assertEqual(response.status_code, 404)
@@ -137,7 +138,7 @@ class UserTestCases(TestCase):
             'password': 'ABC123!!!'
         })
 
-        response = self.client.delete(reverse('chartreuse:user', args=[1]))
+        response = self.client.delete(reverse('chartreuse:user-detail', args=[1]))
 
         # Successfully deleted user
         self.assertEqual(response.status_code, 200)
@@ -147,7 +148,7 @@ class UserTestCases(TestCase):
         '''
         This tests deleting a user with an invalid id.
         '''
-        response = self.client.delete(reverse('chartreuse:user', args=[100]))
+        response = self.client.delete(reverse('chartreuse:user-detail', args=[100]))
 
         # User does not exist
         self.assertEqual(response.status_code, 404)
@@ -156,14 +157,20 @@ class UserTestCases(TestCase):
         '''
         This tests updating a user.
         '''
-        url = reverse('chartreuse:user', args=[1])
+        url = reverse('chartreuse:user-detail', args=[1])
 
         data = {
             "github": "http://github.com/newgithub",
             "profileImage": "https://i.imgur.com/1234.jpeg",
             }
+        
+        # login as user 1
+        self.client.post(reverse('chartreuse:login_user'), {
+            'username': 'greg',
+            'password': 'ABC123!!!'
+        })
 
-        response = self.client.put(url, json.dumps(data))
+        response = self.client.put(url, data=json.dumps(data), content_type='application/json')
     
         # Successfully updated user
         self.assertEqual(response.status_code, 200)

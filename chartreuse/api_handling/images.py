@@ -1,51 +1,46 @@
-from urllib.request import urlopen
 import base64
+from urllib.request import urlopen
 from django.http import HttpResponse, JsonResponse
-from rest_framework.decorators import api_view
+from rest_framework import viewsets
+from rest_framework.decorators import action, api_view
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 from .. import models
 
-from django.http import JsonResponse
-from drf_spectacular.utils import extend_schema, OpenApiResponse
-from rest_framework.decorators import action, api_view
+class ImageViewSet(viewsets.ViewSet):
 
+    @extend_schema(
+        summary="Gets the image data from a post",
+        description=("Gets the image data from a post. The image data is returned as a base64 encoded string."),
+        responses={
+            200: OpenApiResponse(description="Successfully retrieved post image."),
+            404: OpenApiResponse(description="Image not found."),
+            405: OpenApiResponse(description="Method not allowed."),
+        }
+    )
+    @action(detail=True, methods=["GET"])
+    def retrieve(self, request, author_id, post_id):
+        '''
+        Get the image data of a post.
 
-@extend_schema(
-    summary="Gets the image data from a post",
-    description=("Gets the image data from a post. The image data is returned as a base64 encoded string."),
-    responses={
-        200: OpenApiResponse(description="Successfully retrieved post image.",),
-        405: OpenApiResponse(description="Method not allowed."),
-    }
-)
-@action(detail=True, methods=("GET",))
-@api_view(["GET"])
-def get_image_post(request, author_id, post_id):
-    '''
-    Get the image data of a post.
-
-    Parameters:
-        request: HttpRequest object containing the request and query parameters.
-        author_id: The ID of the author of the post.
-        post_id: The ID of the post.
-    
-    Returns:
-        HttpResponse containing the image data of the post.
-    '''
-    if request.method == 'GET':
+        Parameters:
+            request: HttpRequest object containing the request and query parameters.
+            author_id: The ID of the author of the post.
+            post_id: The ID of the post.
+        
+        Returns:
+            HttpResponse containing the image data of the post.
+        '''
         post = models.Post.objects.filter(user__user__id=author_id, id=post_id).first()
 
         # Check if there is image data
-        if (post.content and (post.contentType in ['image/jpeg;base64', 'image/png;base64'])):
+        if post and post.content and post.contentType in ['image/jpeg;base64', 'image/png;base64']:
             try:
-                imageData = decode_image(post.content)
-
-                return HttpResponse(imageData, content_type=post.contentType[:-7])
+                image_data = decode_image(post.content)
+                return HttpResponse(image_data, content_type=post.contentType[:-7])
             except (base64.binascii.Error, ValueError):
                 return JsonResponse({'error': 'Invalid image data'}, status=404)
         else:
             return JsonResponse({'error': 'Not an image'}, status=404)
-    else:
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 def encode_image(image_path):
     '''

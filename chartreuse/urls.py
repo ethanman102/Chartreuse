@@ -21,7 +21,7 @@ urlpatterns = [
     path("api/authors/<str:user_id>/liked/", likes.LikeViewSet.user_likes, name="get_liked"),
     path("api/authors/<str:user_id>/liked/<str:like_id>", likes.LikeViewSet.like_object, name="get_like_object"),
 
-    path('api/authors/<int:author_id>/posts/<int:post_id>/image', images.get_image_post, name='get_image_post'),
+    path('api/authors/<int:author_id>/posts/<int:post_id>/image', images.ImageViewSet.retrieve, name='get_image_post'),
 
     path("github/<str:user_id>/events/", github.get_events, name="get_events"),
     path("github/<str:user_id>/starred/", github.get_starred, name="get_starred"),

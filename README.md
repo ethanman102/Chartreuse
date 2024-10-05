@@ -144,8 +144,9 @@ Used this YouTube Video https://www.youtube.com/watch?v=dXkmPAnqnTE (Posted Augu
 Used https://www.linkedin.com/pulse/creating-api-documentation-django-swagger-atomixweb-15twf/ and
 https://www.515tech.com/post/swagger-for-django-creating-useable-api-documentation to understand how to create API documentation in Django. This was used in chartreuse/urls.py and chartreuse_admin/settings.py and chartreuse_admin/urls.py to create API documentation on lines _ to _.
 
+### Citation 9
+Used https://www.django-rest-framework.org/api-guide/viewsets/#example_3 to understand how to use viewsets in Django. This was used in chartreuse/api_handling/users.py and chartreuse/api_handling/likes.py to use viewsets on lines _ to _.
 
+### Citation 10
+Used https://www.linkedin.com/pulse/creating-api-documentation-django-swagger-atomixweb-15twf/ to understand how to create API documentation in Django. This was used in chartreuse/api_handling/users.py and chartreuse/api_handling/likes.py to create API documentation on lines _ to _.
 
-https://www.linkedin.com/pulse/creating-api-documentation-django-swagger-atomixweb-15twf/
-
-https://www.django-rest-framework.org/api-guide/viewsets/#example_3

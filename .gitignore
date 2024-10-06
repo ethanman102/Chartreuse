@@ -279,3 +279,5 @@ django/
 lab2/staticfiles
 lab2/wiki/static
 staticfiles
+
+migrations/

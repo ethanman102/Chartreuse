@@ -1,13 +1,32 @@
-from django.http import JsonResponse
-from django.core.paginator import Paginator
-from ..models import User
-from django.shortcuts import get_object_or_404
+import json
+
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User as AuthUser
-from .. import views
-import json
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse, extend_schema_view
+from rest_framework import serializers
+from rest_framework.decorators import action, api_view
+from rest_framework.response import Response
+from .. import views
+from ..models import User
+
+class AuthorSerializer(serializers.Serializer):
+    type = serializers.CharField(default="author")
+    id = serializers.CharField()
+    host = serializers.CharField()
+    displayName = serializers.CharField()
+    github = serializers.URLField(required=False, allow_null=True)
+    profileImage = serializers.URLField(required=False, allow_null=True)
+    page = serializers.CharField()
+
+class AuthorsSerializer(serializers.Serializer):
+    type = serializers.CharField(default="authors")
+    authors = AuthorSerializer(many=True)
 
 def get_users(request):
     '''
@@ -64,7 +83,7 @@ def get_users(request):
 
 def user(request, user_id):
     '''
-    Gets an user, updates an user, or deletes a user.
+    Gets a user, updates a user, or deletes a user.
 
     Parameters:
         request: HttpRequest object containing the request with the user id.
@@ -138,11 +157,11 @@ def user(request, user_id):
 
         user.delete()
 
-        return JsonResponse({"success": "User deleted successfully."})
+        return JsonResponse({"success": "User deleted successfully."}, status=200)
     
     else:
         return JsonResponse({"error": "Method not allowed."}, status=405)
-    
+
 def create_user(request):
     '''
     Creates a new user.
@@ -231,7 +250,7 @@ def login_user(request):
 
         if user is not None:
             login(request, user)
-            return JsonResponse({"success": "User logged in successfully."})
+            return JsonResponse({"success": "User logged in successfully."}, status=200)
         else:
             return JsonResponse({"error": "Invalid credentials."}, status=400)
     

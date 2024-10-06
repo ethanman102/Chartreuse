@@ -35,6 +35,9 @@ To run the tests, run the following command in the root directory of the project
 python manage.py test chartreuse
 ```
 
+## API Documentation
+To view the API documentation, go to the following link after running the server locally: http://127.0.0.1:8000/chartreuse/schema/swagger-ui/
+
 ## Citations
 
 ### Stack Overflow Citations
@@ -54,6 +57,16 @@ This citation helped us understand how to get the parameters from a PUT request 
 #### Citation 4
 From https://stackoverflow.com/questions/68595593/how-to-base64-encode-an-image-from-url-rather-than-file, Downloaded on 2024-09-30
 This citation helped us understand how to base64 encode an image from a URL in Python. This was used in chartreuse/api_handling/images.py to base64 encode an image from a URL on lines _ to _.
+
+### Citation 5
+From https://stackoverflow.com/questions/23154525/django-generic-detail-view-must-be-called-with-either-an-object-pk-or-a-slug#:~:text=But%20as%20addition,%20issue%20Generic%20detail by Alex downloaded 2024-10-02
+This citation helped us to understand the generic detail view being unable to retrieve a user due to a lack of pk specified directly in the Model class. Alex's response helped us to understand to override get_object()
+From the detail view. Used on lines _ to _.
+
+We furthermore used:
+* https://medium.com/@katheller/how-to-use-get-object-in-drf-generics-views-examples-a7b879ff2d50#:~:text=In%20Django%20REST%20Framework%2C%20if%20you%20override%20the,expected%20because%20any%20permission%20was%20taken%20into%20consideration. (Author Katarzyna Antonik-Heller May 19,2023) To learn how to override get_object
+
+
 
 ### Django Documentation Citations
 
@@ -82,6 +95,18 @@ The response was used in chartreuse/api_handling/users.py to help set up Django 
 Generated a response using OpenAI, ChatGPT using the prompt "How to validate passwords in Django?"
 The response was used in chartreuse/api_handling/users.py to help validate passwords in Django on lines _ to _.
 
+#### Citation 3
+Generated a response using OpenAI, ChatGPT using the prompt "How to use swagger api documentation in Django?" and "How to create documentation using swagger to add additional information to the API, like a description, response, parameters, etc?" These responses were used in chartreuse/urls.py and chartreuse_admin/settings.py and chartreuse_admin/urls.py to set up the swagger routes on lines _ to _.
+We also used these generated responses in chartreuse/api_handling/users.py to add additional information to the API on lines _ to _.
+
+#### Citation 4
+Generated a response using OpenAI, ChatGPT using the prompt "How to use the filter method to find users who exist in both the followers and following lists". The response was used in chartreuse/api_handling/friends.py to find the mutual followers/friends of a particular author.
+
+We additionally used the following resources:
+* https://www.rootstrap.com/blog/automating-django-rest-apis-documentation-made-easy-with-drf-spectacular-part-2
+* https://drf-spectacular.readthedocs.io/en/latest/
+* https://rohitkrgupta.medium.com/swagger-with-django-made-easy-a-drf-spectacular-explainer-20b18bb4c33c
+
 ### Other Citations
 
 #### Citation 1
@@ -93,3 +118,24 @@ This https://www.geeksforgeeks.org/user-authentication-system-using-django/ help
 
 #### Citation 3
 This https://www.geeksforgeeks.org/how-to-open-an-image-from-the-url-in-pil/ helped with understanding how to open an image from a URL in PIL. This was used in chartreuse/api_handling/users.py to open an image from a URL on lines _ to _.
+
+#### Citation 4
+This https://getbootstrap.com/docs/5.3/getting-started/introduction/ helped step up bootstrap for the project. This was used in chartreuse/templates/base.html and the resulting CSS and HTML files that will be made for the site
+
+#### Citation 5
+
+This https://getbootstrap.com/docs/5.3/getting-started/introduction/ helped step up bootstrap for the project. This was used in chartreuse/templates/base.html and the resulting CSS and HTML files that will be made for the site
+
+#### Citation 6
+This https://docs.github.com/en/rest/activity?apiVersion=2022-11-28 helped with understanding how to use the GitHub API. This was used in chartreuse/api_handling/github.py to use the GitHub API on lines _ to _.
+
+### Citation 7
+Used Bootstrap Documentation https://getbootstrap.com/docs/5.0/components/navs-tabs/ for tabs and nav bars to construct a tab navaigation bar in chartreuse/templates/profile.html using one of their examples on lines _ to _.  
+
+### Citation 8
+Used this YouTube Video https://www.youtube.com/watch?v=dXkmPAnqnTE (Posted August 27, 2020) to learn how to use different generic views (specifically Detail View) and learn the theory of thing's it overrides. Used on lines _ to _ on chartreuse/views.py.
+
+Used https://www.linkedin.com/pulse/creating-api-documentation-django-swagger-atomixweb-15twf/ and
+https://www.515tech.com/post/swagger-for-django-creating-useable-api-documentation to understand how to create API documentation in Django. This was used in chartreuse/urls.py and chartreuse_admin/settings.py and chartreuse_admin/urls.py to create API documentation on lines _ to _.
+
+

@@ -21,3 +21,6 @@ class UserAdmin(BaseUserAdmin):
 admin.site.unregister(AuthUser)
 admin.site.register(models.User)
 admin.site.register(AuthUser, UserAdmin)
+
+admin.site.register(models.Follow)
+admin.site.register(models.FollowRequest)

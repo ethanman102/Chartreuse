@@ -1,15 +1,27 @@
-from django.http import JsonResponse
-from django.core.paginator import Paginator
-from ..models import User, Like
-from django.shortcuts import get_object_or_404
-from django.contrib.auth.decorators import login_required
-from . import users
 import json
+
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema, OpenApiResponse, extend_schema_view
+from rest_framework import serializers
+from rest_framework_swagger import renderers
+from rest_framework.decorators import api_view, renderer_classes, action
+from ..models import User, Like
+from . import users
+
+class LikeSerializer(serializers.Serializer):
+    type = serializers.CharField(default="like")
+    author = users.AuthorSerializer()
+    published = serializers.DateTimeField()
+    id = serializers.CharField()
+    object = serializers.URLField()
 
 @login_required
 def like(request, user_id):
     '''
-    Adds a like to a post.
+    Adds a like to a post or deletes a like from a post.
 
     Parameters:
         request: HttpRequest object containing the request and query parameters.

@@ -30,8 +30,8 @@ class FollowersTestCases(TestCase):
         }
 
         # Create test users
-        self.client.post(reverse('chartreuse:create_user'), self.test_user_1_data, format='json')
-        self.client.post(reverse('chartreuse:create_user'), self.test_user_2_data, format='json')
+        self.client.post(reverse('chartreuse:user-list'), self.test_user_1_data, format='json')
+        self.client.post(reverse('chartreuse:user-list'), self.test_user_2_data, format='json')
 
 
     def test_get_friends(self):

@@ -1,10 +1,11 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from . import models
+from rest_framework.test import APIClient
 
 class LikeTestCases(TestCase):
     def setUp(self):
-        self.client = Client()
+        self.client = APIClient()
 
         # Test user data
         self.test_user_1_data = {
@@ -40,9 +41,9 @@ class LikeTestCases(TestCase):
             'lastName': 'Stanley',
         }
 
-        self.client.post(reverse('chartreuse:create_user'), self.test_user_1_data, format='json')
-        self.client.post(reverse('chartreuse:create_user'), self.test_user_2_data, format='json')
-        self.client.post(reverse('chartreuse:create_user'), self.test_user_3_data, format='json')
+        self.client.post(reverse('chartreuse:user-list'), self.test_user_1_data, format='json')
+        self.client.post(reverse('chartreuse:user-list'), self.test_user_2_data, format='json')
+        self.client.post(reverse('chartreuse:user-list'), self.test_user_3_data, format='json')
 
         models.Like.objects.create(user=models.User.objects.get(id=1), post='http://nodebbbb/authors/222/posts/249')
         models.Like.objects.create(user=models.User.objects.get(id=1), post='http://nodebbbb/authors/223/posts/1')
@@ -59,9 +60,7 @@ class LikeTestCases(TestCase):
             'password': 'ABC123!!!'
         })
 
-        response = self.client.post(reverse('chartreuse:like', args=[1]), {
-            'post': "http://nodebbbb/authors/3/posts/230"
-        })
+        response = self.client.post(reverse('chartreuse:like', args=[1]), {'post': "http://nodebbbb/authors/3/posts/230"})
 
         # Successfully liked post
         self.assertEqual(response.status_code, 200)
@@ -92,12 +91,13 @@ class LikeTestCases(TestCase):
         self.assertEqual(response.status_code, 400)
     
     def test_get_like(self):
-        '''
+        """
         This tests getting a like by an author.
-        '''
+        """
+        # Assuming you have a user and like objects created in your test setup
         response = self.client.get(reverse('chartreuse:get_like_object', args=[1, 1]))
 
-        # Successfully got the like
+        # Assertions to verify the response
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['type'], 'like')
         self.assertEqual(response.json()['author']['displayName'], 'Greg Johnson')

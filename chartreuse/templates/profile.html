@@ -80,7 +80,15 @@
                 <div class="tab-pane fade" id="nav-requests" role="tabpanel" aria-labelledby="nav-requests-tab" tabindex="0">
                     <!-- Loop through all follow requests using displaying a fixed number amount per page. -->
                     {% if profile.requests %}
-                    <h2>This is where the paginated profile requests will go to the user...</h2>
+                    <div class="follow-request" style="border: solid black 3px;">
+                        <img src="{{profile.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
+                        <h5 style="display: inline;">wants to follow you...</h5>
+                        <span id="decision-btns">
+                            <button type="button" class="btn btn-primary" id="accept-follow-btn">Accept</button>
+                            <button type="button" class="btn btn-primary" id="reject-follow-btn">Deny</button>
+                        </span>
+
+                    </div>
                     {% else %}
                     <h1 class="text-center">there's nothing here... :(</h1>
                     {% endif %}

@@ -51,8 +51,8 @@ def follow_accept(request,followee,follower):
     '''
 
     if request.method == "POST": # get the request body.
-        followed_used = get_object_or_404(User,user=followee)
-        following_user = get_object_or_404(User,user=follower)
+        followed_used = get_object_or_404(User,pk=followee)
+        following_user = get_object_or_404(User,pk=follower)
         follow_request = get_object_or_404(FollowRequest,requester=following_user,requestee=followed_used)
         follow = Follow(follower=following_user,followed=followed_used) # create the new follow!
         follow.save()
@@ -71,8 +71,8 @@ def follow_reject(request,followee,follower):
     follower: the primary key of the User object doing the following
     '''
     if request.method == "POST":
-        followed_used = get_object_or_404(User,user=followee)
-        following_user = get_object_or_404(User,user=follower)
+        followed_used = get_object_or_404(User,pk=followee)
+        following_user = get_object_or_404(User,pk=follower)
         follow_request = get_object_or_404(FollowRequest,requester=following_user,requestee=followed_used)
         follow_request.delete()
         return redirect("chartreuse:profile",pk=followee)
@@ -117,6 +117,6 @@ class ProfileDetailView(DetailView):
         # user's Id can't be obtained since the User model does not explicity state a primary key. Will retrieve the user by grabbing them by the URL pk param.
         
         user_id = self.kwargs['pk']
-        return get_object_or_404(User,user=user_id)
+        return get_object_or_404(User,pk=user_id)
         
 

@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import generic
 from django.contrib.auth.models import User as AuthUser
 from django.urls import reverse
-from .models import User,Like,Comment,Post
+from .models import User,Like,Comment,Post,Follow
 from django.views.generic.detail import DetailView
 
 
@@ -34,6 +34,23 @@ def login(request):
     return render(request, 'login.html')
 
 
+
+def follow_accept(request):
+    if request.POST:
+
+        data = request.POST
+        follow_request = get_object_or_404(requester=data.follower_id,requestee=data.followee_id)
+        if Follow.objects.filter(follower=data.follower_id,followed=data.followee_id).exists():
+            follow_request.delete() # follow already exists...
+        else:
+            follow = Follow(follower=data.follower_id,followed=data.followee_id)
+            follow.save()
+            follow_request.delete()
+            return redirect('profile')
+    
+    return redirect('profile')
+
+
 class ProfileDetailView(DetailView):
 
     '''
@@ -63,6 +80,5 @@ class ProfileDetailView(DetailView):
         # user's Id can't be obtained since the User model does not explicity state a primary key. Will retrieve the user by grabbing them by the URL pk param.
         user = super().get_object()
         return user
-
         
 

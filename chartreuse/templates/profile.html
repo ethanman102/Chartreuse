@@ -82,12 +82,15 @@
                     {% if profile.requests %}
                     {% for follow_request in profile.requests %}
                     <div class="follow-request" style="border: solid black 3px;">
-                        <img src="{{profile.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
+                        <img src="{{follow_request.requester.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
                         <h5 style="display: inline;">{{follow_request.displayName}} wants to follow you...</h5>
-                        <span id="decision-btns">
-                            <button type="button" class="btn btn-primary" id="accept-follow-btn">Accept</button>
-                            <button type="button" class="btn btn-primary" id="reject-follow-btn">Deny</button>
-                        </span>
+                        <!-- Accept follow request form -->
+                        <form action="{% url 'profile_follow_accept' follow_request.requester.id follow_request.requestee.id}" method="POST">
+                            <input type="hidden" name="followee_id" value="{{follow_request.requestee.id}}">
+                            <input type="hidden" name="followee_id" value="{{follow_request.requester.id}}">
+                            <button type="submit" class="btn btn-primary">Accept</button>
+                        </form>
+                        <!-- Reject follow request form-->
                     </div>
                     {% endfor %}
 

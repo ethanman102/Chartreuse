@@ -158,3 +158,6 @@ Used https://www.django-rest-framework.org/api-guide/viewsets/#example_3 to unde
 ### Citation 10
 Used https://www.linkedin.com/pulse/creating-api-documentation-django-swagger-atomixweb-15twf/ to understand how to create API documentation in Django. This was used in chartreuse/api_handling/users.py and chartreuse/api_handling/likes.py to create API documentation on lines _ to _.
 
+### Citation 11
+Used https://www.youtube.com/watch?v=hA_VxnxCHbo&t=570s Youtube video by the user: The Dumbfolds (Accessed October 7, 2024) For helping how to write Django views tests and testing their logic. This idea was used in test_project_views.py for the whole document.
+

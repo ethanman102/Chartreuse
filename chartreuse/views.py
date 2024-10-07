@@ -68,7 +68,7 @@ def follow_reject(request,pk):
     '''
     if request.POST:
         data = request.POST #
-        follow_request = get_object_or_404(FollowRequest,requester=data.get('follower_id_accept'),requestee=data.get('followee_id_accept'))
+        follow_request = get_object_or_404(FollowRequest,requester=data.get('follower_id_reject'),requestee=data.get('followee_id_reject'))
         follow_request.delete()
     return redirect("chartreuse:profile",pk=pk)
 

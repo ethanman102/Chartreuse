@@ -4,6 +4,7 @@ from django.contrib.auth.models import User as AuthUser
 from django.urls import reverse
 from .models import User,Like,Comment,Post,Follow,FollowRequest
 from django.views.generic.detail import DetailView
+from django.http import HttpResponseNotAllowed
 
 
 class Host():
@@ -35,39 +36,44 @@ def login(request):
 
 
 
-def follow_accept(request,pk):
+def follow_accept(request,followee,follower):
 
     '''
     Purpose: View to interact with the follow requests database by deleting a request and processing the request into a new follower
 
     Arguments:
     request: Request body containing the followee id and the follower id to process into the database.
-    pk: the primary key of the User object getting followed.
+    followee: the primary key of the User object getting followed.
+    follower: the primary key of the User object doing the following
     '''
 
-    if request.POST:
-        data = request.POST # get the request body.
-        follow_request = get_object_or_404(FollowRequest,requester=data.get('follower_id_accept'),requestee=data.get('followee_id_accept'))
-        follow = Follow(follower=follow_request.requester,followed=follow_request.requestee) # create the new follow!
+    if request.POST: # get the request body.
+        followed_used = get_object_or_404(User,user=followee)
+        following_user = get_object_or_404(User,user=follower)
+        follow_request = get_object_or_404(FollowRequest,requester=following_user,requestee=followed_used)
+        follow = Follow(follower=following_user,followed=followed_used) # create the new follow!
         follow.save()
         follow_request.delete()
-        return redirect('chartreuse:profile',pk=pk)
+        return redirect('chartreuse:profile',pk=followee)
     
-    return redirect('chartreuse:profile',pk=pk)
+    return HttpResponseNotAllowed(["POST"])
 
-def follow_reject(request,pk):
+def follow_reject(request,followee,follower):
     '''
     Purpose: View to interact with the follow requests database by rejecting a follow request and not processing it into a follow!!
 
     Arguments:
     request: Request body containing the id's of who is to be followed and who is following
-    pk: the Primary key of the User being followed!
+    followee: the primary key of the User object getting followed.
+    follower: the primary key of the User object doing the following
     '''
     if request.POST:
-        data = request.POST #
-        follow_request = get_object_or_404(FollowRequest,requester=data.get('follower_id_reject'),requestee=data.get('followee_id_reject'))
+        followed_used = get_object_or_404(User,user=followee)
+        following_user = get_object_or_404(User,user=follower)
+        follow_request = get_object_or_404(FollowRequest,requester=following_user,requestee=followed_used)
         follow_request.delete()
-    return redirect("chartreuse:profile",pk=pk)
+        return redirect("chartreuse:profile",pk=followee)
+    return HttpResponseNotAllowed(["POST"])
 
 
 
@@ -107,7 +113,7 @@ class ProfileDetailView(DetailView):
     def get_object(self):
         # user's Id can't be obtained since the User model does not explicity state a primary key. Will retrieve the user by grabbing them by the URL pk param.
         
-        user = super().get_object()
-        return user
+        user_id = self.kwargs['pk']
+        return get_object_or_404(User,user=user_id)
         
 

@@ -69,7 +69,7 @@
                     <!-- Loop through all posts of the posting list visible to the user. -->
                     <h2>This is Where some Posts will be made</h2>
                     {% else %}
-                    <h1 class="text-center">there's nothing here... :(</h1>
+                    <h1 class="text-center">there's nothing here... :( {{profile.user.id}}</h1>
                     {% endif %}
                 </div>
 
@@ -80,24 +80,21 @@
                 <div class="tab-pane fade" id="nav-requests" role="tabpanel" aria-labelledby="nav-requests-tab" tabindex="0">
                     <!-- Loop through all follow requests using displaying a fixed number amount per page. -->
                     {% if requests %}
-                    {% url 'chartreuse:profile_follow_accept' profile.user.id as accept_url %}
-                    {% url 'chartreuse:profile_follow_reject' profile.user.id as reject_url %}
                     {% for follow_request in requests %}
+
+                    {% url 'chartreuse:profile_follow_accept' follow_request.requestee.id follow_request.requester.id as accept_url %}
+                    {% url 'chartreuse:profile_follow_reject' follow_request.requestee.id follow_request.requester.id as reject_url %}
                     <div class="follow-request" style="border: solid black 3px;">
                         <img src="{{follow_request.requester.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
                         <h5 style="display: inline;">{{follow_request.requester.displayName}} wants to follow you...</h5>
                         <!-- Accept follow request form -->
                         <form action="{{accept_url}}" method="POST" class="accept_form">
                             {% csrf_token %}
-                            <input type="hidden" name="follower_id_accept" value="{{follow_request.requester.id}}">
-                            <input type="hidden" name="followee_id_accept" value="{{follow_request.requestee.id}}">
                             <button type="submit" class="btn btn-primary">Accept</button>
                         </form>
                         <!-- Reject follow request form-->
                         <form action="{{reject_url}}" method="POST" class="reject_form">
                             {% csrf_token %}
-                            <input type="hidden" name="follower_id_reject" value="{{follow_request.requester.id}}">
-                            <input type="hidden" name="followee_id_reject" value="{{follow_request.requestee.id}}">
                             <button type="submit" class="btn btn-primary">Reject</button>
                         </form>
                     </div>

@@ -1,74 +1,129 @@
 import json
 
-from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema, OpenApiResponse, extend_schema_view
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import serializers
-from rest_framework_swagger import renderers
-from rest_framework.decorators import api_view, renderer_classes, action
-from ..models import User, Like
-from . import users
+from rest_framework import viewsets
+from rest_framework.decorators import action, api_view
+from rest_framework.permissions import IsAuthenticated
+
+from ..models import Like, User
+from .users import UserSerializer, UserViewSet
 
 class LikeSerializer(serializers.Serializer):
     type = serializers.CharField(default="like")
-    author = users.AuthorSerializer()
+    author = UserSerializer()
     published = serializers.DateTimeField()
-    id = serializers.CharField()
+    id = serializers.URLField()
     object = serializers.URLField()
 
-@login_required
-def like(request, user_id):
-    '''
-    Adds a like to a post or deletes a like from a post.
+    class Meta:
+        fields = ['type', 'author', 'published', 'id', 'object']
 
-    Parameters:
-        request: HttpRequest object containing the request and query parameters.
-        user_id: The id of the user who is liking the post.
+class LikesSerializer(serializers.Serializer):
+    type = serializers.CharField(default="likes")
+    page = serializers.URLField()
+    id = serializers.URLField()
+    page_number = serializers.IntegerField()
+    size = serializers.IntegerField()
+    count = serializers.IntegerField()
+    src = LikeSerializer(many=True)
 
-    Returns:
-        JsonResponse containing the like object.
-    '''
-    if request.method == 'POST':        
-        # Get the post URL from the request body
-        postUrl = request.POST.get('post')
-        
-        # Ensure the user liking the post is the current user
-        userLiking = get_object_or_404(User, id=user_id)
-        
-        # Check if the user has already liked this post
-        if Like.objects.filter(user=userLiking, post=postUrl).exists():
-            return JsonResponse({"error": "Like already exists."}, status=400)
-        
-        # Create and save the like
-        like = Like(user=userLiking, post=postUrl)
-        like.save()
+    class Meta:
+        fields = ['type', 'page', 'id', 'page_number', 'size', 'count', 'src']
 
-        request.method = 'GET'
-        response = users.user(request, user_id)
-        data = json.loads(response.content)
-        
-        # Construct the like object to return in the response
-        likeObject = {
-            "type": "like",
-            "author": {
-                "type": "author",
-                "id": data["id"],
-                "page": data["page"],
-                "host": data["host"],
-                "displayName": data["displayName"],
-                "github": data["github"],
-                "profileImage": data["profileImage"]
-            },
-            "published": like.dateCreated,
-            "id": userLiking.host + "authors/" + str(userLiking.id) + "/liked/" + str(like.id),
-            "object": postUrl
+class LikeViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = LikeSerializer
+
+    @extend_schema(
+        summary="Adds a like to a post",
+        description="Adds a like to a post based on the provided post URL.",
+        responses={
+            200: OpenApiResponse(description="Like added successfully.", response=LikeSerializer),
+            400: OpenApiResponse(description="Like already exists."),
+            401: OpenApiResponse(description="User is not authenticated."),
+            404: OpenApiResponse(description="User not found."),
+            405: OpenApiResponse(description="Method not allowed."),
         }
-        
-        return JsonResponse(likeObject, status=200)
+    )
+    @action(detail=False, methods=["POST"])
+    def add_like(self, request, user_id):
+        '''
+        Adds a like to a post.
+
+        Parameters:
+            request: rest_framework object containing the request and query parameters.
+            user_id: The id of the user who is liking the post.
+
+        Returns:
+            JsonResponse containing the like object.
+        '''
+        if request.user.is_authenticated:
+            # Get the post URL from the request body
+            postUrl = request.POST.get('post')
+            
+            # Ensure the user liking the post is the current user
+            userLiking = get_object_or_404(User, id=user_id)
+            
+            # Check if the user has already liked this post
+            if Like.objects.filter(user=userLiking, post=postUrl).exists():
+                return JsonResponse({"error": "Like already exists."}, status=400)
+            
+            # Create and save the like
+            like = Like(user=userLiking, post=postUrl)
+            like.save()
+
+            request.method = 'GET'
+            user_viewset = UserViewSet() 
+            response = user_viewset.retrieve(request, pk=user_id)
+            data = json.loads(response.content)
+            
+            # Construct the like object to return in the response
+            likeObject = {
+                "type": "like",
+                "author": {
+                    "type": "author",
+                    "id": data["id"],
+                    "page": data["page"],
+                    "host": data["host"],
+                    "displayName": data["displayName"],
+                    "github": data["github"],
+                    "profileImage": data["profileImage"]
+                },
+                "published": like.dateCreated,
+                "id": userLiking.host + "authors/" + str(userLiking.id) + "/liked/" + str(like.id),
+                "object": postUrl
+            }
+            
+            return JsonResponse(likeObject, status=200)
+        else:
+            return JsonResponse({"error": "User is not authenticated."}, status=401)
     
-    if request.method == 'DELETE':
+    @extend_schema(
+        summary="Removes a like from a post",
+        description="Removes a like from a post based on the provided post URL.",
+        responses={
+            200: OpenApiResponse(description="Like deleted successfully.", response=LikeSerializer),
+            400: OpenApiResponse(description="Like does not exist."),
+            404: OpenApiResponse(description="User not found."),
+            405: OpenApiResponse(description="Method not allowed."),
+        }
+    )
+    @action(detail=False, methods=["DELETE"])
+    def remove_like(self, request, user_id):
+        '''
+        Removes a like from a post.
+
+        Parameters:
+            request: rest_framework object containing the request and query parameters.
+            user_id: The id of the user who is liking the post.
+
+        Returns:
+            JsonResponse containing the like object.
+        '''
         # Get the post URL from the request body
         postUrl = request.POST.get('post')
         
@@ -84,7 +139,8 @@ def like(request, user_id):
         like.delete()
 
         request.method = 'GET'
-        response = users.user(request, user_id)
+        user_viewset = UserViewSet() 
+        response = user_viewset.retrieve(request, pk=user_id)
         data = json.loads(response.content)
         
         # Construct the like object to return in the response
@@ -105,26 +161,34 @@ def like(request, user_id):
         }
 
         return JsonResponse(likeObject, status=200)
-    else:
-        return JsonResponse({"error": "Method not allowed."}, status=405)
 
-def like_object(request, user_id, like_id):
-    '''
-    Gets a specific like object from a user.
+    @extend_schema(
+        summary="Gets a specific like from a user",
+        description="Retrieves a specific like object from a user based on the like ID and user ID.",
+        responses={
+            200: OpenApiResponse(description="Successfully retrieved like.", response=LikeSerializer),
+            404: OpenApiResponse(description="User or like not found."),
+            405: OpenApiResponse(description="Method not allowed."),
+        }
+    )
+    @api_view(["GET"])
+    def get_like(self, request, user_id, like_id):
+        '''
+        Gets a specific like object from a user.
 
-    Parameters:
-        request: HttpRequest object containing the request and query parameters.
-        user_id: The id of the user who is liking the posts.
-        like_id: The id of the like object.
+        Parameters:
+            request: rest_framework object containing the request and query parameters.
+            user_id: The id of the user who is liking the posts.
+            like_id: The id of the like object.
 
-    Returns:
-        JsonResponse containing the like object.
-    '''
-    if request.method == 'GET':
+        Returns:
+            JsonResponse containing the like object.
+        '''
         user = get_object_or_404(User, id=user_id)
 
         request.method = 'GET'
-        response = users.user(request, user_id)
+        user_viewset = UserViewSet() 
+        response = user_viewset.retrieve(request, pk=user_id)
 
         data = json.loads(response.content)
         like = Like.objects.filter(user=user, id=like_id)[0]
@@ -145,39 +209,61 @@ def like_object(request, user_id, like_id):
             "object": like.post
         }
         return JsonResponse(likeObject, safe=False)
-    else:
-        return JsonResponse({"error": "Method not allowed."}, status=405)
 
-def likes(request, user_id, post_id):
-    '''
-    This function handles getting all likes on a post.
-    '''
-    if request.method == 'GET':
+    @extend_schema(
+        summary="Gets all likes on a post",
+        description=("Gets all likes on a post based on the provided post ID and user ID."),
+        responses={
+            200: OpenApiResponse(description="Successfully retrieved all likes.", response=LikesSerializer),
+            405: OpenApiResponse(description="Method not allowed."),
+        }
+    )
+    @api_view(["GET"])
+    def get_post_likes(self, request, user_id, post_id):
+        '''
+        This function handles getting all likes on a post.
+        '''
         pass # Placeholder for now since posts have not been implemented yet
-    else:
-        return JsonResponse({"error": "Method not allowed."}, status=405)
 
-def comment_likes(request, user_id, post_id, comment_id):
-    '''
-    This function handles getting all likes on a comment.
-    '''
-    if request.method == 'GET':
+    @extend_schema(
+        summary="Gets all likes on a comment from a post",
+        description=("Gets all likes on a comment from a post based on the provided post ID, comment ID, and user ID."),
+        responses={
+            200: OpenApiResponse(description="Successfully retrieved all likes."),
+            405: OpenApiResponse(description="Method not allowed."),
+        }
+    )
+    @api_view(["GET"])
+    def get_comment_likes(self, request, user_id, post_id, comment_id):
+        '''
+        This function handles getting all likes on a comment.
+        '''
         pass # Placeholder for now since posts have not been implemented yet
-    else:
-        return JsonResponse({"error": "Method not allowed."}, status=405)
 
-def liked(request, user_id):
-    '''
-    Gets all the likes of a user.
+    @extend_schema(
+        summary="Gets all likes made by a user",
+        description="Retrieves all likes made by a user based on the user ID, with optional pagination.",
+        parameters=[
+            OpenApiParameter(name="page", description="Page number for pagination.", required=False, type=int),
+            OpenApiParameter(name="size", description="Number of likes per page.", required=False, type=int),
+        ],
+        responses={
+            200: OpenApiResponse(description="Successfully retrieved all likes."),
+            405: OpenApiResponse(description="Method not allowed."),
+        }
+    )
+    @api_view(["GET"])
+    def user_likes(request, user_id):
+        '''
+        Gets all the likes of a user.
 
-    Parameters:
-        request: HttpRequest object containing the request and query parameters.
-        user_id: The id of the user who is liking the posts.
+        Parameters:
+            request: rest_framework object containing the request and query parameters.
+            user_id: The id of the user who is liking the posts.
 
-    Returns:
-        JsonResponse containing the like objects.
-    '''
-    if request.method == 'GET':
+        Returns:
+            JsonResponse containing the like objects.
+        '''
         page = request.GET.get('page')
         size = request.GET.get('size')
 
@@ -191,8 +277,8 @@ def liked(request, user_id):
         likes = Like.objects.filter(user=user)
 
         request.method = 'GET'
-        response = users.user(request, user_id)
-
+        user_viewset = UserViewSet() 
+        response = user_viewset.retrieve(request, pk=user_id)
         data = json.loads(response.content)
         
         # Paginates likes based on the size
@@ -232,27 +318,34 @@ def liked(request, user_id):
         }
 
         return JsonResponse(userLikes, safe=False)
-    else:
-        return JsonResponse({"error": "Method not allowed."}, status=405)
 
-def like_object(request, user_id, like_id):
-    '''
-    Gets a specific like object from a user.
+    @extend_schema(
+        summary="Gets a specific like object from a user",
+        description="Retrieves a specific like object based on the user ID and like ID.",
+        responses={
+            200: OpenApiResponse(description="Successfully retrieved the like."),
+            404: OpenApiResponse(description="Like or user not found."),
+            405: OpenApiResponse(description="Method not allowed."),
+        }
+    )
+    @api_view(["GET"])
+    def like_object(request, user_id, like_id):
+        '''
+        Gets a specific like object from a user.
 
-    Parameters:
-        request: HttpRequest object containing the request and query parameters.
-        user_id: The id of the user who is liking the posts.
-        like_id: The id of the like object.
+        Parameters:
+            request: rest_framework object containing the request and query parameters.
+            user_id: The id of the user who is liking the posts.
+            like_id: The id of the like object.
 
-    Returns:
-        JsonResponse containing the like object.
-    '''
-    if request.method == 'GET':
+        Returns:
+            JsonResponse containing the like object.
+        '''
         user = get_object_or_404(User, id=user_id)
 
         request.method = 'GET'
-        response = users.user(request, user_id)
-
+        user_viewset = UserViewSet() 
+        response = user_viewset.retrieve(request, pk=user_id)
         data = json.loads(response.content)
         like = Like.objects.filter(user=user, id=like_id)[0]
 
@@ -272,5 +365,3 @@ def like_object(request, user_id, like_id):
             "object": like.post
         }
         return JsonResponse(likeObject, safe=False)
-    else:
-        return JsonResponse({"error": "Method not allowed."}, status=405)

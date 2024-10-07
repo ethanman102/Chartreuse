@@ -17,7 +17,7 @@ class ImageTestCases(TestCase):
             'lastName': 'Johnson',
         }
 
-        self.client.post(reverse('chartreuse:create_user'), self.test_user_1_data, format='json')
+        self.client.post(reverse('chartreuse:user-list'), self.test_user_1_data, format='json')
     
     def test_encode_image_from_url(self):
         '''

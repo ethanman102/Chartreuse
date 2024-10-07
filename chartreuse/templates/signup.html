@@ -1,3 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+
 <form method="POST" action="/chartreuse/signup/save">
     <label>Username</label>
     <input name="username" required type="text"/><br>
@@ -12,3 +16,5 @@
     <input type="submit" value="Signup"/>
     {% csrf_token %}
 </form>
+
+{% endblock %}

@@ -1,5 +1,5 @@
 from django.urls import path
-from .api_handling import users, likes, images, github, friends, posts
+from .api_handling import users, likes, images, github, friends, posts, comments
 from .api_handling import followers, follow_requests
 from . import views
 from .views import ProfileDetailView
@@ -15,8 +15,12 @@ urlpatterns = [
 
     path("authors/<int:pk>/", ProfileDetailView.as_view(),name="profile"),
 
-    path("authors/<str:user_id>/posts/", posts.post, name="post"),
-    #path("authors/<str:user_id>/posts/<str:post_id>", posts.post, name=""),
+    path("authors/<str:user_id>/posts/", posts.create_post, name="create_post"),
+    path("authors/<str:user_id>/posts/<str:post_id>", posts.update_post, name="update_post"),
+
+    path("authors/<str:user_id>/inbox", comments.create_comment, name="create_comment"),
+    path("authors/<str:user_id>/posts/<str:post_id>/comments", comments.get_comments, name="get_comments"),
+    path("authors/<str:user_id>/post/<str:post_id>/comment/<str:remote_comment_id>", comments.get_comment, name="get_comment"),
 
     path('authors/<int:author_id>/posts/<int:post_id>/image', images.get_image_post, name='get_image_post'),
     path("api/authors/<str:user_id>/inbox/", likes.like, name="like"),

@@ -50,7 +50,7 @@ def follow_accept(request,followee,follower):
     follower: the primary key of the User object doing the following
     '''
 
-    if request.POST: # get the request body.
+    if request.method == "POST": # get the request body.
         followed_used = get_object_or_404(User,user=followee)
         following_user = get_object_or_404(User,user=follower)
         follow_request = get_object_or_404(FollowRequest,requester=following_user,requestee=followed_used)
@@ -70,7 +70,7 @@ def follow_reject(request,followee,follower):
     followee: the primary key of the User object getting followed.
     follower: the primary key of the User object doing the following
     '''
-    if request.POST:
+    if request.method == "POST":
         followed_used = get_object_or_404(User,user=followee)
         following_user = get_object_or_404(User,user=follower)
         follow_request = get_object_or_404(FollowRequest,requester=following_user,requestee=followed_used)

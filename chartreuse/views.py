@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import generic
 from django.contrib.auth.models import User as AuthUser
 from django.urls import reverse
-from .models import User,Like,Comment,Post,Follow
+from .models import User,Like,Comment,Post,Follow,FollowRequest
 from django.views.generic.detail import DetailView
 
 
@@ -73,6 +73,11 @@ class ProfileDetailView(DetailView):
         context['like_count'] = Like.objects.filter(user=user).count()
         context['comment_count'] = Comment.objects.filter(user=user).count()
         context['post_count'] = Post.objects.filter(user=user).count()
+
+        follow_requests = FollowRequest.objects.filter(requestee=user)
+        requests = [fk for fk in follow_requests]
+
+        context['requests'] = requests
         return context
         
 

@@ -14,7 +14,7 @@ urlpatterns = [
 
     path("authors/<int:pk>/", ProfileDetailView.as_view(),name="profile"),
     path("authors/<int:pk>/accept/", views.follow_accept,name="profile_follow_accept"),
-   # path("authors/<int:followee>/reject<int:follower>/", views.follow_reject,name="profile_follow_reject"),
+    path("authors/<int:followee>/deny/", views.follow_reject,name="profile_follow_reject"),
 
     path("api/authors/<str:user_id>/inbox/", likes.LikeViewSet.as_view({'post': 'add_like', 'delete': 'remove_like'}), name="like"),
     path("api/authors/<str:user_id>/posts/<str:post_id>/likes", likes.LikeViewSet.get_post_likes, name="post_likes"),

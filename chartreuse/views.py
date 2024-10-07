@@ -36,18 +36,39 @@ def login(request):
 
 
 def follow_accept(request,pk):
-    if request.POST:
 
-        data = request.POST
-        print(data)
-        follow_request = get_object_or_404(FollowRequest,requester=data.get('follower_id'),requestee=data.get('followee_id'))
-     
-        follow = Follow(follower=follow_request.requester,followed=follow_request.requestee)
+    '''
+    Purpose: View to interact with the follow requests database by deleting a request and processing the request into a new follower
+
+    Arguments:
+    request: Request body containing the followee id and the follower id to process into the database.
+    pk: the primary key of the User object getting followed.
+    '''
+
+    if request.POST:
+        data = request.POST # get the request body.
+        follow_request = get_object_or_404(FollowRequest,requester=data.get('follower_id_accept'),requestee=data.get('followee_id_accept'))
+        follow = Follow(follower=follow_request.requester,followed=follow_request.requestee) # create the new follow!
         follow.save()
         follow_request.delete()
         return redirect('chartreuse:profile',pk=pk)
     
     return redirect('chartreuse:profile',pk=pk)
+
+def follow_reject(request,pk):
+    '''
+    Purpose: View to interact with the follow requests database by rejecting a follow request and not processing it into a follow!!
+
+    Arguments:
+    request: Request body containing the id's of who is to be followed and who is following
+    pk: the Primary key of the User being followed!
+    '''
+    if request.POST:
+        data = request.POST #
+        follow_request = get_object_or_404(FollowRequest,requester=data.get('follower_id_accept'),requestee=data.get('followee_id_accept'))
+        follow_request.delete()
+    return redirect("chartreuse:profile",pk=pk)
+
 
 
 class ProfileDetailView(DetailView):

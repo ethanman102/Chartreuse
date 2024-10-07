@@ -72,6 +72,10 @@ From the detail view. Used on lines _ to _.
 We furthermore used:
 * https://medium.com/@katheller/how-to-use-get-object-in-drf-generics-views-examples-a7b879ff2d50#:~:text=In%20Django%20REST%20Framework%2C%20if%20you%20override%20the,expected%20because%20any%20permission%20was%20taken%20into%20consideration. (Author Katarzyna Antonik-Heller May 19,2023) To learn how to override get_object
 
+### Citation 6
+From https://stackoverflow.com/questions/9932047/html-multiple-name-value-for-an-element Author: Madara's Ghost on March 29, 2012
+This citation helped us to understand how to data inside a form without having to have it inputted into a tetx box. The main issue with needing this approach was found in profile/html where we needed to send the requester and requestee user id's in the request body to be processed for usage. This technique was used in lines _ to _.
+
 
 
 ### Django Documentation Citations
@@ -112,6 +116,10 @@ We additionally used the following resources:
 * https://www.rootstrap.com/blog/automating-django-rest-apis-documentation-made-easy-with-drf-spectacular-part-2
 * https://drf-spectacular.readthedocs.io/en/latest/
 * https://rohitkrgupta.medium.com/swagger-with-django-made-easy-a-drf-spectacular-explainer-20b18bb4c33c
+
+### Citation 5
+https://docs.djangoproject.com/en/5.1/ref/templates/builtins/ Accessed: October 6 2024
+Learned how to input a URL tag to use in a form. We initially ran into the issue of form's not working due to the requests loop. This allows us to use the same URL in the loop over and over again. Used in lines _ to _ of profile.html.
 
 ### Other Citations
 

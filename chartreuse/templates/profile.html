@@ -79,15 +79,17 @@
 
                 <div class="tab-pane fade" id="nav-requests" role="tabpanel" aria-labelledby="nav-requests-tab" tabindex="0">
                     <!-- Loop through all follow requests using displaying a fixed number amount per page. -->
-                    {% if profile.requests %}
-                    {% for follow_request in profile.requests %}
+                    {% if requests %}
+                    {% url 'chartreuse:profile_follow_accept' profile.user.id as the_url %}
+                    {% for follow_request in requests %}
                     <div class="follow-request" style="border: solid black 3px;">
                         <img src="{{follow_request.requester.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
-                        <h5 style="display: inline;">{{follow_request.displayName}} wants to follow you...</h5>
+                        <h5 style="display: inline;">{{follow_request.requester.displayName}} wants to follow you...</h5>
                         <!-- Accept follow request form -->
-                        <form action="{% url 'profile_follow_accept' follow_request.requester.id follow_request.requestee.id}" method="POST">
+                        <form action="{{the_url}}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="follower_id" value="{{follow_request.requester.id}}">
                             <input type="hidden" name="followee_id" value="{{follow_request.requestee.id}}">
-                            <input type="hidden" name="followee_id" value="{{follow_request.requester.id}}">
                             <button type="submit" class="btn btn-primary">Accept</button>
                         </form>
                         <!-- Reject follow request form-->
@@ -96,7 +98,7 @@
 
 
                     {% else %}
-                    <h1 class="text-center">there's nothing here... :(</h1>
+                    <h1 class="text-center">there's nothing here...:(</h1>
                     {% endif %}
                 </div>
 

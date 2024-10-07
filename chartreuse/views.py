@@ -38,20 +38,19 @@ def error(request):
 
 
 
-def follow_accept(request):
+def follow_accept(request,pk):
     if request.POST:
 
         data = request.POST
-        follow_request = get_object_or_404(requester=data.follower_id,requestee=data.followee_id)
-        if Follow.objects.filter(follower=data.follower_id,followed=data.followee_id).exists():
-            follow_request.delete() # follow already exists...
-        else:
-            follow = Follow(follower=data.follower_id,followed=data.followee_id)
-            follow.save()
-            follow_request.delete()
-            return redirect('profile')
+        print(data)
+        follow_request = get_object_or_404(FollowRequest,requester=data.get('follower_id'),requestee=data.get('followee_id'))
+     
+        follow = Follow(follower=follow_request.requester,followed=follow_request.requestee)
+        follow.save()
+        follow_request.delete()
+        return redirect('chartreuse:profile',pk=pk)
     
-    return redirect('profile')
+    return redirect('chartreuse:profile',pk=pk)
 
 
 class ProfileDetailView(DetailView):
@@ -66,7 +65,7 @@ class ProfileDetailView(DetailView):
 
 
     model = User
-    template_name = "chartreuse/profile.html"
+    template_name = "profile.html"
     context_object_name= "profile"
 
     def get_context_data(self,**kwargs):
@@ -81,11 +80,15 @@ class ProfileDetailView(DetailView):
         requests = [fk for fk in follow_requests]
 
         context['requests'] = requests
+        print(requests)
+        print(context)
+    
         return context
         
 
     def get_object(self):
         # user's Id can't be obtained since the User model does not explicity state a primary key. Will retrieve the user by grabbing them by the URL pk param.
+        
         user = super().get_object()
         return user
         

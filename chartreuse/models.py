@@ -7,6 +7,7 @@ CONTENT_TYPE_CHOICES = {"text/markdown": "text/markdown", "text/plain": "text/pl
 
 class User(models.Model):
     user = models.OneToOneField(AuthUser, on_delete=models.CASCADE)
+    url_id = models.URLField(primary_key=True)
     displayName = models.CharField(max_length=100)
     host = models.URLField()
     github = models.URLField()
@@ -24,6 +25,7 @@ class Post(models.Model):
     visibility = models.CharField(max_length=20, choices=VISIBILITY_CHOICES, default='PUBLIC')
 
 class Like(models.Model):
+    url_id = models.URLField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.CharField(max_length=300, default='text/plain') # it will be this temporarily
     # post = models.ForeignKey(Post, on_delete=models.CASCADE)

@@ -9,6 +9,7 @@ class UserTestCases(TestCase):
 
         # Test user data
         self.test_user_1_data = {
+            'id': 'https://node-a/api/authors/1',
             'displayName': 'Greg Johnson',
             'github': 'http://github.com/gjohnson',
             'profileImage': 'https://i.imgur.com/k7XVwpB.jpeg',
@@ -20,6 +21,7 @@ class UserTestCases(TestCase):
         }
 
         self.test_user_2_data = {
+            'id': 'https://node-b/api/authors/1',
             'displayName': 'John Smith',
             'github': 'http://github.com/jiori',
             'profileImage': 'https://i.imgur.com/1234.jpeg',
@@ -31,6 +33,7 @@ class UserTestCases(TestCase):
         }
 
         self.test_user_3_data = {
+            'id': 'https://node-a/api/authors/2',
             'displayName': 'Benjamin Stanley',
             'github': 'http://github.com/bstanley',
             'profileImage': 'https://i.imgur.com/abcd.jpeg',
@@ -50,6 +53,7 @@ class UserTestCases(TestCase):
         This tests creating a user.
         '''
         response = self.client.post(reverse('chartreuse:user-list'), {
+            'id': 'https://node-a/api/authors/3',
             'displayName': 'Jane Doe',
             'github': 'http://github.com/jdoe',
             'profileImage': 'https://i.imgur.com/1234.jpeg',
@@ -67,7 +71,7 @@ class UserTestCases(TestCase):
         self.assertEqual(response.json()['profileImage'], 'https://i.imgur.com/1234.jpeg')
         self.assertEqual(response.json()['type'], 'author')
         self.assertEqual(response.json()['page'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/api/authors/jane")
-        self.assertEqual(response.json()['id'], 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/api/authors/4')
+        self.assertEqual(response.json()['id'], 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/api/authors/3')
         self.assertEqual(response.json()['host'], 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/api/')
     
     def test_get_all_users(self):
@@ -107,7 +111,7 @@ class UserTestCases(TestCase):
         '''
         This tests getting a specific user.
         '''
-        response = self.client.get(reverse('chartreuse:user-detail', args=[1]))
+        response = self.client.get(reverse('chartreuse:user-detail', args=["https://node-a/api/authors/1"]))
 
         # Successfully got user
         self.assertEqual(response.status_code, 200)
@@ -123,7 +127,7 @@ class UserTestCases(TestCase):
         '''
         This tests getting a user with an invalid id.
         '''
-        response = self.client.get(reverse('chartreuse:user-detail', args=[100]))
+        response = self.client.get(reverse('chartreuse:user-detail', args=["https://node-a/api/authors/100"]))
 
         # User does not exist
         self.assertEqual(response.status_code, 404)
@@ -138,7 +142,7 @@ class UserTestCases(TestCase):
             'password': 'ABC123!!!'
         })
 
-        response = self.client.delete(reverse('chartreuse:user-detail', args=[1]))
+        response = self.client.delete(reverse('chartreuse:user-detail', args=["https://node-a/api/authors/1"]))
 
         # Successfully deleted user
         self.assertEqual(response.status_code, 200)
@@ -148,7 +152,7 @@ class UserTestCases(TestCase):
         '''
         This tests deleting a user with an invalid id.
         '''
-        response = self.client.delete(reverse('chartreuse:user-detail', args=[100]))
+        response = self.client.delete(reverse('chartreuse:user-detail', args=["https://node-a/api/authors/100"]))
 
         # User does not exist
         self.assertEqual(response.status_code, 404)
@@ -157,7 +161,7 @@ class UserTestCases(TestCase):
         '''
         This tests updating a user.
         '''
-        url = reverse('chartreuse:user-detail', args=[1])
+        url = reverse('chartreuse:user-detail', args=["https://node-a/api/authors/1"])
 
         data = {
             "github": "http://github.com/newgithub",

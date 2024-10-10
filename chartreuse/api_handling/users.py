@@ -18,6 +18,7 @@ from ..models import User
 
 class UserSerializer(serializers.ModelSerializer):
     type = serializers.CharField(default="author")
+    id = serializers.URLField()
     displayName = serializers.CharField()
     host = serializers.URLField()
     github = serializers.URLField()
@@ -26,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['type', 'displayName', 'host', 'github', 'profileImage', 'page', 'dateCreated']
+        fields = ['type', 'id', 'displayName', 'host', 'github', 'profileImage', 'page', 'dateCreated']
 
     def validate_displayName(self, value):
         if not value:
@@ -94,7 +95,7 @@ class UserViewSet(viewsets.ViewSet):
         # Since we have some additional fields, we only want to return the required ones
         filtered_user_attributes = []
         for user in page_users:
-            id = user.host + "authors/" + str(user.user.id)
+            id = str(user.url_id)
             page = user.host + "authors/" + user.user.username
 
             filtered_user_attributes.append({
@@ -140,7 +141,7 @@ class UserViewSet(viewsets.ViewSet):
         '''
         user = get_object_or_404(User, pk=pk)
 
-        id = user.host + "authors/" + str(user.user.id)
+        id = str(user.url_id)
         page = user.host + "authors/" + user.user.username
 
         # We only want to return the required fields
@@ -173,7 +174,7 @@ class UserViewSet(viewsets.ViewSet):
         if request.user.is_authenticated:
             user = get_object_or_404(User, pk=pk)
 
-            id = user.host + "authors/" + str(user.user.id)
+            id = str(user.url_id)
             page = user.host + "authors/" + user.user.username
 
             data = json.loads(request.body.decode('utf-8'))
@@ -268,7 +269,10 @@ class UserViewSet(viewsets.ViewSet):
         authUser.set_password(password)
         authUser.save()
 
+        id = host + "authors/" + str(authUser.id)
+
         user = User.objects.create(
+            url_id = id,
             displayName = displayName,
             github = github,
             profileImage = profileImage,
@@ -279,7 +283,7 @@ class UserViewSet(viewsets.ViewSet):
         # Save the user
         user.save()
 
-        id = user.host + "authors/" + str(user.user.id)
+        id = str(user.url_id)
         page = user.host + "authors/" + user.user.username
 
         return JsonResponse({

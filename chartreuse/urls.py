@@ -49,4 +49,8 @@ urlpatterns = [
     path("api/authors/<str:author_id>/friends/", friends.get_friends, name="get_friends"),
     path('api/authors/<str:author_id>/friends/<str:foreign_author_id>/check_friendship/', friends.check_friendship, name='check_friendship'),
 
+    # for the error page
+    path("error", views.error, name="error"),
+
+    
 ] + router.urls

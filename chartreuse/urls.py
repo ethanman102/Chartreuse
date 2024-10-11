@@ -41,6 +41,7 @@ urlpatterns = [
     path("api/authors/<str:author_id>/followers/<str:foreign_author_id>/is_follower/", followers.is_follower, name="is_follower"),
 
     # Follow Request URLs
+    # Need to figure out how to change the endpoint for sending a follow request to the author's inbox
     path("api/authors/<str:author_id>/follow-requests/send", follow_requests.send_follow_request, name="send_follow_request"),
     path("api/follow-requests/<int:request_id>/accept/", follow_requests.accept_follow_request, name="accept_follow_request"),
     path("api/follow-requests/<int:request_id>/reject/", follow_requests.reject_follow_request, name="reject_follow_request"),

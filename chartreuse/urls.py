@@ -41,7 +41,7 @@ urlpatterns = [
     path("api/authors/<str:author_id>/followers/<str:foreign_author_id>/is_follower/", followers.is_follower, name="is_follower"),
 
     # Follow Request URLs
-    path("api/authors/<str:author_id>/inbox/", follow_requests.send_follow_request, name="send_follow_request"),
+    path("api/authors/<str:author_id>/follow-requests/send", follow_requests.send_follow_request, name="send_follow_request"),
     path("api/follow-requests/<int:request_id>/accept/", follow_requests.accept_follow_request, name="accept_follow_request"),
     path("api/follow-requests/<int:request_id>/reject/", follow_requests.reject_follow_request, name="reject_follow_request"),
     path("api/follow-requests/", follow_requests.get_follow_requests, name="get_follow_requests"),

@@ -9,8 +9,11 @@ html body {
     margin: 20%;
 
     border-style: solid;
-    border-color: black;
-    background-color: lightgrey;
+    border-color: #1b1b1b;
+
+    /* background-color: #bebfc5; */
+    /* I think the lightgray looks nice with this error page */
+    background-color: lightgray;
 
 
     font-family: "Sometype Mono", monospace;
@@ -21,17 +24,17 @@ html body {
 
 .container h4 {
     color: chartreuse;
-    background-color: darkblue;
+    background-color: #00356b;
     font-size: 4ch;
 
     border-bottom-style: solid;
-    border-bottom-color: black;
+    border-bottom-color: #1b1b1b;
     /* code from OpenAI, ChatGPT, "how to put header at the top of div container", 2024-10-10 */
     margin: 0;
 }
 
 .container p{
-    color: black;
+    color: #1b1b1b;
     font-size: 5ch;
     padding-bottom: 2ch;
     padding-left: 0.3ch;

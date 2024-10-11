@@ -51,8 +51,8 @@ def follow_accept(request,followee,follower):
     '''
 
     if request.method == "POST": # get the request body.
-        followed_used = get_object_or_404(User,pk=followee)
-        following_user = get_object_or_404(User,pk=follower)
+        followed_used = get_object_or_404(User,url_id=followee)
+        following_user = get_object_or_404(User,url_id=follower)
         follow_request = get_object_or_404(FollowRequest,requester=following_user,requestee=followed_used)
         follow = Follow(follower=following_user,followed=followed_used) # create the new follow!
         follow.save()
@@ -71,8 +71,8 @@ def follow_reject(request,followee,follower):
     follower: the primary key of the User object doing the following
     '''
     if request.method == "POST":
-        followed_used = get_object_or_404(User,pk=followee)
-        following_user = get_object_or_404(User,pk=follower)
+        followed_used = get_object_or_404(User,url_id=followee)
+        following_user = get_object_or_404(User,url_id=follower)
         follow_request = get_object_or_404(FollowRequest,requester=following_user,requestee=followed_used)
         follow_request.delete()
         return redirect("chartreuse:profile",pk=followee)
@@ -96,12 +96,59 @@ class ProfileDetailView(DetailView):
     context_object_name= "profile"
 
     def get_context_data(self,**kwargs):
+
+
+        '''
+        Context Dictionary Structure:
+        {
+        profile: (the User model object - NOT AUTHUSER - )
+        viewer: (the id if the user viewing the page.) 
+        logged_in: (Depicts if user is authenticated and has full page access)
+        owner: (If the logged in user is viewing their own page)
+        requests: (A list of follow request objects)
+        following: (If the user is foreign this key will be here, depicts if they are following the page owner or not.)
+        sent_request: (Bool if the user is NOT already following, but did they sent a follow request?)
+        }
+        
+        
+        
+        '''
+
         context = super().get_context_data(**kwargs)
         user = context['profile']
+
+        # checking if user is authenticated or anonymous
+        if self.request.user.is_authenticated:
+            context['logged_in'] = True
+            # if logged in, check if user owns the current page or that's being visited or not...
+            current_user = self.request.user
+            current_user_model = get_object_or_404(User,user=current_user)
+            page_user = kwargs['url_id']
+            if page_user.url_id == current_user_model.url_id:
+                # owns the page, should not display follow button etc...
+                context['owner'] = True
+                follow_requests = FollowRequest.objects.filter(requestee=user)
+                requests = [fk for fk in follow_requests]
+                context['requests'] = requests
+            else:
+
+                context['viewer'] = current_user_model.url_id
+                # check if the user if following or not...
+                follow = Follow.objects.filter(follower=current_user,followed=page_user)
+                if follow.count() == 0:
+                    # check if a follow request has been sent or not!
+                    follow_request  = FollowRequest.objects.filter(requestee=page_user,requester=current_user)
+                    if follow_request.count() != 0:
+                        context['sent_request'] = True
+                else:
+                    context['following'] = True
+
         # Overriden to get these addition counts.
         context['like_count'] = Like.objects.filter(user=user).count()
         context['comment_count'] = Comment.objects.filter(user=user).count()
         context['post_count'] = Post.objects.filter(user=user).count()
+        context['followers'] = Follow.objects.filter(followee=page_user).count()
+        context['following'] = Follow.objects.filter(follower=page_user).count()
 
         follow_requests = FollowRequest.objects.filter(requestee=user)
         requests = [fk for fk in follow_requests]
@@ -117,6 +164,6 @@ class ProfileDetailView(DetailView):
         # user's Id can't be obtained since the User model does not explicity state a primary key. Will retrieve the user by grabbing them by the URL pk param.
         
         user_id = self.kwargs['pk']
-        return get_object_or_404(User,pk=user_id)
+        return get_object_or_404(User,url_id=user_id)
         
 

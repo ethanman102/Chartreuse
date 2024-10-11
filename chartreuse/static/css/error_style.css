@@ -11,9 +11,9 @@ html body {
     border-style: solid;
     border-color: #1b1b1b;
 
-    /* background-color: #bebfc5; */
+    /* background-color: lightgray; */
     /* I think the lightgray looks nice with this error page */
-    background-color: lightgray;
+    background-color: #f5f5f5;
 
 
     font-family: "Sometype Mono", monospace;

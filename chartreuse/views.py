@@ -33,6 +33,9 @@ def save_signup(request):
 def login(request):
     return render(request, 'login.html')
 
+def error(request):
+    return render(request, 'error.html')
+
 
 class ProfileDetailView(DetailView):
 

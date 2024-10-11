@@ -1,12 +1,9 @@
-from django.urls import path
+from django.urls import path, re_path
 from .api_handling import users, likes, images, github, friends
 from .api_handling import followers, follow_requests
 from . import views
 from .views import ProfileDetailView
 from rest_framework.routers import DefaultRouter
-
-router = DefaultRouter()
-router.register(r'api/authors', users.UserViewSet, basename='user')
 
 app_name = "chartreuse"
 urlpatterns = [
@@ -14,14 +11,17 @@ urlpatterns = [
 
     path("authors/<int:pk>/", ProfileDetailView.as_view(),name="profile"),
 
-    path("api/authors/<str:user_id>/inbox/", likes.LikeViewSet.as_view({'post': 'add_like', 'delete': 'remove_like'}), name="like"),
-    path("api/authors/<str:user_id>/posts/<str:post_id>/likes", likes.LikeViewSet.get_post_likes, name="post_likes"),
-    path("api/authors/<str:user_id>/posts/<str:post_id>/comments/<str:comment_id>/likes", likes.LikeViewSet.get_comment_likes, name="comment_likes"),
+    re_path(r"api/authors/(?P<user_id>.+)/inbox/", likes.LikeViewSet.as_view({'post': 'add_like', 'delete': 'remove_like'}), name="like"),
+    re_path(r"api/authors/(?P<user_id>.+)/posts/<str:post_id>/likes", likes.LikeViewSet.get_post_likes, name="post_likes"),
+    re_path(r"api/authors/(?P<user_id>.+)/posts/<str:post_id>/comments/<str:comment_id>/likes", likes.LikeViewSet.get_comment_likes, name="comment_likes"),
 
-    path("api/authors/<str:user_id>/liked/", likes.LikeViewSet.user_likes, name="get_liked"),
-    path("api/authors/<str:user_id>/liked/<str:like_id>", likes.LikeViewSet.like_object, name="get_like_object"),
+    re_path(r"api/authors/(?P<user_id>.+)/liked/(?P<like_id>.+)", likes.LikeViewSet.get_like, name="get_like_object"),
+    re_path(r"api/authors/(?P<user_id>.+)/liked/", likes.LikeViewSet.user_likes, name="get_liked"),
 
     path('api/authors/<int:author_id>/posts/<int:post_id>/image', images.ImageViewSet.retrieve, name='get_image_post'),
+
+    re_path(r"api/authors/(?P<pk>.+)/$", users.UserViewSet.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'}), name="user-detail"),
+    path("api/authors/", users.UserViewSet.as_view({'post': 'create', 'get': 'list'}), name="user-list"),
 
     path("github/<str:user_id>/events/", github.get_events, name="get_events"),
     path("github/<str:user_id>/starred/", github.get_starred, name="get_starred"),
@@ -49,4 +49,4 @@ urlpatterns = [
     path("api/authors/<str:author_id>/friends/", friends.get_friends, name="get_friends"),
     path('api/authors/<str:author_id>/friends/<str:foreign_author_id>/check_friendship/', friends.check_friendship, name='check_friendship'),
 
-] + router.urls
+]

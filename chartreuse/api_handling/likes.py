@@ -66,7 +66,7 @@ class LikeViewSet(viewsets.ViewSet):
             postUrl = request.POST.get('post')
             
             # Ensure the user liking the post is the current user
-            userLiking = get_object_or_404(User, id=user_id)
+            userLiking = get_object_or_404(User, url_id=user_id)
             
             # Check if the user has already liked this post
             if Like.objects.filter(user=userLiking, post=postUrl).exists():
@@ -94,7 +94,7 @@ class LikeViewSet(viewsets.ViewSet):
                     "profileImage": data["profileImage"]
                 },
                 "published": like.dateCreated,
-                "id": userLiking.host + "authors/" + str(userLiking.id) + "/liked/" + str(like.id),
+                "id": str(userLiking.url_id) + "/liked/" + str(like.id),
                 "object": postUrl
             }
             
@@ -128,7 +128,7 @@ class LikeViewSet(viewsets.ViewSet):
         postUrl = request.POST.get('post')
         
         # Ensure the user liking the post is the current user
-        userLiking = get_object_or_404(User, id=user_id)
+        userLiking = get_object_or_404(User, url_id=user_id)
         
         # Check if the user has already liked this post
         if not Like.objects.filter(user=userLiking, post=postUrl).exists():
@@ -156,7 +156,7 @@ class LikeViewSet(viewsets.ViewSet):
                 "profileImage": data["profileImage"]
             },
             "published": like.dateCreated,
-            "id": userLiking.host + "authors/" + str(userLiking.id) + "/liked/" + str(like.id),
+            "id": str(userLiking.url_id) + "/liked/" + str(like.id),
             "object": postUrl
         }
 
@@ -172,7 +172,7 @@ class LikeViewSet(viewsets.ViewSet):
         }
     )
     @api_view(["GET"])
-    def get_like(self, request, user_id, like_id):
+    def get_like(request, user_id, like_id):
         '''
         Gets a specific like object from a user.
 
@@ -184,7 +184,7 @@ class LikeViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like object.
         '''
-        user = get_object_or_404(User, id=user_id)
+        user = get_object_or_404(User, url_id=user_id)
 
         request.method = 'GET'
         user_viewset = UserViewSet() 
@@ -205,7 +205,7 @@ class LikeViewSet(viewsets.ViewSet):
                 "profileImage": data["profileImage"]
             },
             "published": like.dateCreated,
-            "id": user.host + "authors/" + str(user.id) + "/liked/" + str(like.id),
+            "id": str(user.url_id) + "/liked/" + str(like.id),
             "object": like.post
         }
         return JsonResponse(likeObject, safe=False)
@@ -273,7 +273,7 @@ class LikeViewSet(viewsets.ViewSet):
         if (size is None):
             size = 50 # Default size is 50
         
-        user = get_object_or_404(User, id=user_id)
+        user = get_object_or_404(User, url_id=user_id)
         likes = Like.objects.filter(user=user)
 
         request.method = 'GET'
@@ -302,7 +302,7 @@ class LikeViewSet(viewsets.ViewSet):
                     "profileImage": data["profileImage"]
                 },
                 "published": like.dateCreated,
-                "id": user.host + "authors/" + str(user.id) + "/liked/" + str(like.id),
+                "id": str(user.url_id) + "/liked/" + str(like.id),
                 "object": like.post
             }
 
@@ -310,7 +310,7 @@ class LikeViewSet(viewsets.ViewSet):
 
         userLikes = {
             "type": "likes",
-            "page": user.host + "authors/" + str(user.id) + "/posts/",
+            "page": str(user.url_id) + "/posts/",
             "page_number": page,
             "size": size,
             "count": len(likes),
@@ -318,50 +318,3 @@ class LikeViewSet(viewsets.ViewSet):
         }
 
         return JsonResponse(userLikes, safe=False)
-
-    @extend_schema(
-        summary="Gets a specific like object from a user",
-        description="Retrieves a specific like object based on the user ID and like ID.",
-        responses={
-            200: OpenApiResponse(description="Successfully retrieved the like."),
-            404: OpenApiResponse(description="Like or user not found."),
-            405: OpenApiResponse(description="Method not allowed."),
-        }
-    )
-    @api_view(["GET"])
-    def like_object(request, user_id, like_id):
-        '''
-        Gets a specific like object from a user.
-
-        Parameters:
-            request: rest_framework object containing the request and query parameters.
-            user_id: The id of the user who is liking the posts.
-            like_id: The id of the like object.
-
-        Returns:
-            JsonResponse containing the like object.
-        '''
-        user = get_object_or_404(User, id=user_id)
-
-        request.method = 'GET'
-        user_viewset = UserViewSet() 
-        response = user_viewset.retrieve(request, pk=user_id)
-        data = json.loads(response.content)
-        like = Like.objects.filter(user=user, id=like_id)[0]
-
-        likeObject = {
-            "type": "like",
-            "author": {
-                "type": "author",
-                "id": data["id"],
-                "page": data["page"],
-                "host": data["host"],
-                "displayName": data["displayName"],
-                "github": data["github"],
-                "profileImage": data["profileImage"]
-            },
-            "published": like.dateCreated,
-            "id": user.host + "authors/" + str(user.id) + "/liked/" + str(like.id),
-            "object": like.post
-        }
-        return JsonResponse(likeObject, safe=False)

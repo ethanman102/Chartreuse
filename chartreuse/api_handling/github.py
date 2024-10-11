@@ -28,7 +28,7 @@ def get_events(request, user_id):
         JsonResponse: the response from the github api
     '''
     if request.method == 'GET':
-        user = get_object_or_404(User, id=user_id)
+        user = get_object_or_404(User, url_id=user_id)
 
         githubUrl = user.github
         githubUsername = githubUrl.split("/")[-1]
@@ -62,7 +62,7 @@ def get_starred(request, user_id):
         JsonResponse: the response from the github api
     '''
     if request.method == 'GET':
-        user = get_object_or_404(User, id=user_id)
+        user = get_object_or_404(User, url_id=user_id)
 
         githubUrl = user.github
         githubUsername = githubUrl.split("/")[-1]
@@ -96,7 +96,7 @@ def get_subscriptions(request, user_id):
         JsonResponse: the response from the github api
     '''
     if request.method == 'GET':
-        user = get_object_or_404(User, id=user_id)
+        user = get_object_or_404(User, url_id=user_id)
 
         githubUrl = user.github
         githubUsername = githubUrl.split("/")[-1]

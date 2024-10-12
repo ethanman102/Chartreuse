@@ -1,7 +1,6 @@
 # from django.test import TestCase, Client
 # from django.urls import reverse
-# from . import models
-from urllib.parse import quote
+# from urllib.parse import quote
 
 # class FollowersTestCases(TestCase):
 #     def setUp(self):

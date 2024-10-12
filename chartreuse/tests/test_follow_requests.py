@@ -1,9 +1,8 @@
 # from django.test import TestCase, Client
 # from django.urls import reverse
-# from . import models
-# from .models import User, FollowRequest, Follow
+# from ..models import User, FollowRequest, Follow
 # from django.shortcuts import get_object_or_404
-from urllib.parse import quote
+# from urllib.parse import quote
 
 # class FollowRequestsTestCases(TestCase):
 #     def setUp(self):

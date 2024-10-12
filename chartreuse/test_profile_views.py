@@ -22,20 +22,23 @@ class TestProfileViews(TestCase):
         # setting up user's model
         self.user_1 = User.objects.create(user=self.auth_user_1,
                            displayName="goatmanethan",
-                           github='https://github.com/'
+                           github='https://github.com/',
+                           url_id = "http://nodeaaaa/api/authors/111"
                            )
         self.user_2 = User.objects.create(user=self.auth_user_2,
                            displayName="juliaDtheGOAT",
-                           github='https://github.com/'
+                           github='https://github.com/',
+                           url_id = "http://nodeaaaa/api/authors/222"
                            )
         self.user_3 = User.objects.create(user=self.auth_user_3,
                            displayName="allenisagoat",
-                           github='https://github.com/'
+                           github='https://github.com/',
+                           url_id = "http://nodeaaaa/api/authors/333"
                            )
         # setting up each user's id
-        self.user_1_id = self.user_1.user.id
-        self.user_2_id = self.user_2.user.id
-        self.user_3_id = self.user_3.user.id
+        self.user_1_id = self.user_1.user.url_id
+        self.user_2_id = self.user_2.user.url_id
+        self.user_3_id = self.user_3.user.url_id
 
         # Setting up follow request
         self.follow_request_1 = FollowRequest.objects.create(requestee=self.user_1,requester=self.user_2)

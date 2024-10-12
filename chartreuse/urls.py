@@ -17,11 +17,11 @@ urlpatterns = [
     re_path(r"api/authors/(?P<user_id>.+)/posts/(?P<post_id>.+)/", posts.PostViewSet.as_view({"get": "get_post", "delete": "remove_post", "put": "update_post"}), name="post"),
 
     # Comment URLs 
-    path("authors/<str:user_id>/inbox", comments.create_comment, name="create_comment"),
-    path("authors/<str:user_id>/posts/<str:post_id>/comments", comments.get_comments, name="get_comments"),
-    path("authors/<str:user_id>/post/<str:post_id>/comment/<str:remote_comment_id>", comments.get_comment, name="get_comment"),
+    # path("authors/<str:user_id>/inbox", comments.create_comment, name="create_comment"),
+    # path("authors/<str:user_id>/posts/<str:post_id>/comments", comments.get_comments, name="get_comments"),
+    # path("authors/<str:user_id>/post/<str:post_id>/comment/<str:remote_comment_id>", comments.get_comment, name="get_comment"),
 
-    path('authors/<int:author_id>/posts/<int:post_id>/image', images.get_image_post, name='get_image_post'),
+    # path('authors/<int:author_id>/posts/<int:post_id>/image', images.get_image_post, name='get_image_post'),
 
     re_path(r"api/authors/(?P<user_id>.+)/inbox/", likes.LikeViewSet.as_view({'post': 'add_like', 'delete': 'remove_like'}), name="like"),
     re_path(r"api/authors/(?P<user_id>.+)/posts/(?P<post_id>.+)/likes", likes.LikeViewSet.get_post_likes, name="post_likes"),

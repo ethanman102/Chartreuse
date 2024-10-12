@@ -42,7 +42,7 @@ class PostViewSet(viewsets.ViewSet):
         description="Adds a post based on the on author URL",
         parameters=[
             OpenApiParameter(name="visibility", description="visibilility of the post.", required=False, type=str),
-            OpenApiParameter(name="title", description="title of the post.", requred=True, type=str),
+            OpenApiParameter(name="title", description="title of the post.", required=True, type=str),
             OpenApiParameter(name="description", description="the description of the post.", required=False, type=str),
             OpenApiParameter(name="contentType", description="the contentType of teh post.", required=False, type=str),
             OpenApiParameter(name="content", description="content of the post.", required=True, type=str),
@@ -388,7 +388,7 @@ class PostViewSet(viewsets.ViewSet):
         description="Updates the post using the author id and post id provided",
         parameters=[
             OpenApiParameter(name="visibility", description="visibilility of the post.", required=False, type=str),
-            OpenApiParameter(name="title", description="title of the post.", requred=False, type=str),
+            OpenApiParameter(name="title", description="title of the post.", required=False, type=str),
             OpenApiParameter(name="description", description="the description of the post.", required=False, type=str),
             OpenApiParameter(name="contentType", description="the contentType of teh post.", required=False, type=str),
             OpenApiParameter(name="content", description="content of the post.", required=False, type=str),
@@ -397,7 +397,7 @@ class PostViewSet(viewsets.ViewSet):
             200: OpenApiResponse(description="Post updated succesfully.", response=PostSerializer),
             400: OpenApiResponse(description="User was not found."),
             404: OpenApiResponse(description="Post was not found."),
-            405: OpenApiResponse(descriptoin="Method not allowed."),
+            405: OpenApiResponse(description="Method not allowed."),
         }
     ) 
     @action(detail=False, methods=["PUT"])

@@ -4,6 +4,7 @@ from ..models import User, FollowRequest, Follow
 from django.contrib.auth.decorators import login_required
 import json
 from urllib.parse import unquote
+from rest_framework.permissions import IsAuthenticated
 
 @login_required
 def add_follower(request, author_id, foreign_author_id):
@@ -13,15 +14,21 @@ def add_follower(request, author_id, foreign_author_id):
     Parameters:
         request: HttpRequest object containing the request.
         author_id: The id of the current author.
-        foreign_author_id: The id of the author to unfollow
+        foreign_author_id: The id of the author who is becoming a follower
 
     Returns:
-        JsonResponse with the follow request/follower details.
+        JsonResponse with the follower details.
     '''
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "User is not authenticated."}, status=401)
+
     if request.method == 'POST' or request.method == 'PUT':
 
-        author = get_object_or_404(User, id=author_id)
-        foreign_author = get_object_or_404(User, id=foreign_author_id)
+        decoded_author_id = unquote(author_id)
+        decoded_foreign_author_id = unquote(foreign_author_id)
+
+        author = get_object_or_404(User, url_id=decoded_author_id)
+        foreign_author = get_object_or_404(User, url_id=decoded_foreign_author_id)
 
         # Check if the user already follows the author
         if Follow.objects.filter(follower=foreign_author, followed=author).exists():
@@ -49,8 +56,11 @@ def remove_follower(request, author_id, foreign_author_id):
         JsonResponse with success message.
     '''
     if request.method == 'DELETE':
-        author = get_object_or_404(User, id=author_id)
-        foreign_author = get_object_or_404(User, id=foreign_author_id)
+        decoded_author_id = unquote(author_id)
+        decoded_foreign_author_id = unquote(foreign_author_id)
+
+        author = get_object_or_404(User, url_id=decoded_author_id)
+        foreign_author = get_object_or_404(User, url_id=decoded_foreign_author_id)
 
         # Check if the user is following the author
         follow = Follow.objects.filter(follower=foreign_author, followed=author)
@@ -78,8 +88,10 @@ def get_followers(request, author_id):
     Returns:
         JsonResponse with the list of followers.
     '''
+    decoded_author_id = unquote(author_id)
+
     # Fetch the author based on the provided author_id
-    author = get_object_or_404(User, id=author_id)
+    author = get_object_or_404(User, url_id=decoded_author_id)
     
     # Get all followers for the author
     followers = Follow.objects.filter(followed=author)
@@ -122,8 +134,11 @@ def is_follower(request, author_id, foreign_author_id):
     Returns:
         JsonResponse with success message.
     '''
-    author = get_object_or_404(User, id=author_id)
-    foreign_author = get_object_or_404(User, id=foreign_author_id)
+    decoded_author_id = unquote(author_id)
+    decoded_foreign_author_id = unquote(foreign_author_id)
+
+    author = get_object_or_404(User, url_id=decoded_author_id)
+    foreign_author = get_object_or_404(User, url_id=decoded_foreign_author_id)
 
     if Follow.objects.filter(follower=foreign_author, followed=author).exists():
         return JsonResponse({"message": "Is a follower"}, status=200)

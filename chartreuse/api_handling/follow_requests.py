@@ -17,8 +17,10 @@ def send_follow_request(request, author_id):
         JsonResponse with the follow request details.
     '''
     if request.method == 'POST':
+        decoded_author_id = unquote(author_id)
+
         current_user = User.objects.get(user=request.user)
-        author = get_object_or_404(User, id=author_id)
+        author = get_object_or_404(User, url_id=decoded_author_id)
 
         # Check if a follow request already exists
         if FollowRequest.objects.filter(requester=current_user, requestee=author).exists():
@@ -105,7 +107,7 @@ def get_follow_requests(request):
             "summary": f"{follow_request.requester.displayName} wants to follow {follow_request.requestee.displayName}",
             "actor": {
                 "type": "author",
-                "id": f"{follow_request.requester.host}/authors/{follow_request.requester.id}",
+                "id": f"{follow_request.requester.host}/authors/{follow_request.requester.url_id}",
                 "host": follow_request.requester.host,
                 "displayName": follow_request.requester.displayName,
                 "github": follow_request.requester.github,
@@ -113,7 +115,7 @@ def get_follow_requests(request):
             },
             "object": {
                 "type": "author",
-                "id": f"{follow_request.requestee.host}/authors/{follow_request.requestee.id}",
+                "id": f"{follow_request.requestee.host}/authors/{follow_request.requestee.url_id}",
                 "host": follow_request.requestee.host,
                 "displayName": follow_request.requestee.displayName,
                 "github": follow_request.requestee.github,

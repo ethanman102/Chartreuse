@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from .api_handling import images
+from ..api_handling import images
 
 class ImageTestCases(TestCase):
     def setUp(self):
@@ -12,7 +12,7 @@ class ImageTestCases(TestCase):
             'profileImage': 'https://kirby.nintendo.com/assets/img/about/char-kirby.png',
             'username': 'greg',
             'password': 'ABC123!!!',
-            'host': 'http://nodeaaaa/api/',
+            'host': 'http://nodeaaaa/',
             'firstName': 'Greg',
             'lastName': 'Johnson',
         }

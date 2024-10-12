@@ -7,7 +7,7 @@ from django.views.generic.detail import DetailView
 
 
 class Host():
-    host = "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/api/"
+    host = "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/"
 
 def signup(request):
     return render(request, 'signup.html')
@@ -32,6 +32,9 @@ def save_signup(request):
 
 def login(request):
     return render(request, 'login.html')
+
+def error(request):
+    return render(request, 'error.html')
 
 
 class ProfileDetailView(DetailView):

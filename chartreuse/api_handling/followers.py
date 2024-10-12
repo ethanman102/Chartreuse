@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from ..models import User, FollowRequest, Follow
 from django.contrib.auth.decorators import login_required
 import json
+from urllib.parse import unquote
 
 @login_required
 def add_follower(request, author_id, foreign_author_id):

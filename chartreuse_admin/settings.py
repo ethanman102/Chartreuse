@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+TEST_DISCOVERY_PATTERN = 'test_*.py'
 
 # Application definition
 

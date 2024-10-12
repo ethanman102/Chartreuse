@@ -17,8 +17,10 @@ def send_follow_request(request, author_id):
         JsonResponse with the follow request details.
     '''
     if request.method == 'POST':
+        decoded_author_id = unquote(author_id)
+
         current_user = User.objects.get(user=request.user)
-        author = get_object_or_404(User, id=author_id)
+        author = get_object_or_404(User, id=decoded_author_id)
 
         # Check if a follow request already exists
         if FollowRequest.objects.filter(requester=current_user, requestee=author).exists():

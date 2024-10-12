@@ -14,7 +14,8 @@ def get_friends(request, author_id):
     Returns:
         JsonResponse with the list of friends.
     '''
-    author = get_object_or_404(User, id=author_id)
+    decoded_author_id = unquote(author_id)
+    author = get_object_or_404(User, id=decoded_author_id)
 
     # Get the followers of the author
     followers = Follow.objects.filter(followed=author).values_list('follower', flat=True)
@@ -58,8 +59,11 @@ def check_friendship(request, author_id, foreign_author_id):
     Returns:
         JsonResponse with a message indicating friendship status.
     '''
-    author = get_object_or_404(User, id=author_id)
-    foreign_author = get_object_or_404(User, id=foreign_author_id)
+    decoded_author_id = unquote(author_id)
+    decoded_foreign_author_id = unquote(foreign_author_id)
+
+    author = get_object_or_404(User, id=decoded_author_id)
+    foreign_author = get_object_or_404(User, id=decoded_foreign_author_id)
 
     # Check if the current user follows the author and vice versa
     if (Follow.objects.filter(follower=author, followed=foreign_author).exists() and

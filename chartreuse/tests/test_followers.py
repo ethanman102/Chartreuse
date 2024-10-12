@@ -2,6 +2,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from rest_framework.test import APIClient
 from urllib.parse import quote
+from .. import models
 
 class FollowersTestCases(TestCase):
     def setUp(self):

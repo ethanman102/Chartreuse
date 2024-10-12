@@ -24,11 +24,11 @@ def add_follower(request, author_id, foreign_author_id):
 
     if request.method == 'POST' or request.method == 'PUT':
 
-        decoded_user_id = unquote(user_id)
+        decoded_author_id = unquote(author_id)
         decoded_foreign_author_id = unquote(foreign_author_id)
 
-        author = get_object_or_404(User, id=decoded_author_id)
-        foreign_author = get_object_or_404(User, id=decoded_foreign_author_id)
+        author = get_object_or_404(User, url_id=decoded_author_id)
+        foreign_author = get_object_or_404(User, url_id=decoded_foreign_author_id)
 
         # Check if the user already follows the author
         if Follow.objects.filter(follower=foreign_author, followed=author).exists():
@@ -59,8 +59,8 @@ def remove_follower(request, author_id, foreign_author_id):
         decoded_author_id = unquote(author_id)
         decoded_foreign_author_id = unquote(foreign_author_id)
 
-        author = get_object_or_404(User, id=decoded_author_id)
-        foreign_author = get_object_or_404(User, id=decoded_foreign_author_id)
+        author = get_object_or_404(User, url_id=decoded_author_id)
+        foreign_author = get_object_or_404(User, url_id=decoded_foreign_author_id)
 
         # Check if the user is following the author
         follow = Follow.objects.filter(follower=foreign_author, followed=author)
@@ -91,7 +91,7 @@ def get_followers(request, author_id):
     decoded_author_id = unquote(author_id)
 
     # Fetch the author based on the provided author_id
-    author = get_object_or_404(User, id=decoded_author_id)
+    author = get_object_or_404(User, url_id=decoded_author_id)
     
     # Get all followers for the author
     followers = Follow.objects.filter(followed=author)
@@ -137,8 +137,8 @@ def is_follower(request, author_id, foreign_author_id):
     decoded_author_id = unquote(author_id)
     decoded_foreign_author_id = unquote(foreign_author_id)
 
-    author = get_object_or_404(User, id=decoded_author_id)
-    foreign_author = get_object_or_404(User, id=decoded_foreign_author_id)
+    author = get_object_or_404(User, url_id=decoded_author_id)
+    foreign_author = get_object_or_404(User, url_id=decoded_foreign_author_id)
 
     if Follow.objects.filter(follower=foreign_author, followed=author).exists():
         return JsonResponse({"message": "Is a follower"}, status=200)

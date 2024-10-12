@@ -80,8 +80,8 @@ class FollowRequestsTestCases(TestCase):
             'password': 'ABC123!!!'
         })
 
-        greg = get_object_or_404(User, url_id=author_id)
-        john = get_object_or_404(User, url_id=follower_id)
+        greg = get_object_or_404(User, url_id="https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1")
+        john = get_object_or_404(User, url_id="https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/2")
 
         # Approve the follow request as user 2
         follow_request = FollowRequest.objects.get(requester=john, requestee=greg)
@@ -116,8 +116,8 @@ class FollowRequestsTestCases(TestCase):
             'password': '87@398dh817b!'
         })
 
-        current_user = get_object_or_404(User, url_id=follower_id)
-        author = get_object_or_404(User, url_id=author_id)
+        current_user = get_object_or_404(User, url_id="https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/2")
+        author = get_object_or_404(User, url_id="https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1")
 
         # Reject the follow request as user 2
         follow_request = FollowRequest.objects.get(requester=current_user, requestee=author)

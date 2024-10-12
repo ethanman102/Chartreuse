@@ -113,8 +113,6 @@ class ProfileDetailView(DetailView):
         sent_request: (Bool if the user is NOT already following, but did they sent a follow request?)
         }
         
-        
-        
         '''
 
         context = super().get_context_data(**kwargs)

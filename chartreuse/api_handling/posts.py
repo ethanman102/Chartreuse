@@ -10,10 +10,10 @@ from rest_framework import viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 
-from ..models import User, Like, Post, Follow, Comment
+from ..models import User, Post
 from .users import UserSerializer, UserViewSet
-from .likes import LikeSerializer, LikesSerializer, LikeViewSet
-from .comments import CommentSerializer, CommentsSerializer, CommentViewSet
+from .likes import LikesSerializer, LikeViewSet
+from .comments import CommentsSerializer, CommentViewSet
 from .friends import check_friendship
 from urllib.parse import unquote
 
@@ -66,10 +66,7 @@ class PostViewSet(viewsets.ViewSet):
             
         Returns:
             JsonResponce containing the new post    
-        """
-        if not request.user.is_authenticated:
-            return JsonResponse({"error": "User is not authenticated."}, status=401)
-        
+        """        
         decoded_user_id = unquote(user_id)
 
         # Ensure the user creating the post is the current user
@@ -132,7 +129,6 @@ class PostViewSet(viewsets.ViewSet):
             return JsonResponse({"error": "post visibliity invalid"}, status=400)
 
         
-
     @extend_schema(
         summary="Removes a post",
         description="Removes a post based on the provided post URL.",
@@ -159,12 +155,7 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like object.
         """
-        if not request.user.is_authenticated:
-            return JsonResponse({"error": "User is not authenticated."}, status=401) 
-
         decoded_user_id = unquote(user_id)
-
-        # Get the post URL from the post id
         decoded_post_url = unquote(post_id)
 
         # Ensure the user deleting the post is the current user
@@ -400,8 +391,7 @@ class PostViewSet(viewsets.ViewSet):
             405: OpenApiResponse(description="Method not allowed."),
         }
     ) 
-    @action(detail=False, methods=["PUT"])
-    def update_post(self, request, user_id, post_id):
+    def update(self, request, user_id, post_id):
         """
         Updates the post requested
         

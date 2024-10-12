@@ -28,12 +28,18 @@ class Post(models.Model):
     published = models.DateTimeField(auto_now_add=True)
     visibility = models.CharField(max_length=20, choices=VISIBILITY_CHOICES, default='PUBLIC')
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.url_id = f"{self.user.url_id}/posts/{self.pk}"
+
+    def __str__(self):
+        return f"Post(id={self.id}, url_id={self.url_id}, title={self.title}, description={self.description}, contentType={self.contentType}, content={self.content}, user={self.user}, published={self.published}, visibility={self.visibility})"
+
 class Like(models.Model):
     id = models.AutoField(primary_key=True)
     url_id = models.URLField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.CharField(max_length=300, default='text/plain') # it will be this temporarily
-    # post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
     dateCreated = models.DateTimeField(auto_now_add=True)
 
     class Meta:

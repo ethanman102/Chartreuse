@@ -27,24 +27,32 @@
                         </div>
                         <div class="col-3">
                             <button type="button" class="btn btn-primary w-100">
-                                Followers {{ profile.follwers }}
+                                Followers {{ follwers }}
                             </button>
                         </div>
                         <div class="col-3">
                             <button type="button" class="btn btn-primary w-100">
-                                Following {{ profile.following }}
+                                Following {{ following }}
                             </button>
                         </div>
                     </div>
                     <div class="row mt-4">
-                    {% if profile.displayName %}
+                    {% if profile.github %}
                         <div class="col-6">
                             <h3><a href="{{ profile.github }}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">{{ profile.displayName }}'s Github</a></h3>
                         </div>
                     {% endif %}
+                    {% if not owner and viewer %}
                         <div class="col-6">
+                            {% if not following and not_request %}
                             <button class="btn btn-outline-primary btn-lg w-100" type="button">Follow</button>
+                            {% elif sent_request %}
+                            <button class="btn btn-secondary btn-lg w-100" type="button" disabled>Requested</button>
+                            {% else %}
+                            <button class="btn btn-primary btn-lg w-100" type="button">Following</button>
+                            {% endif %}
                         </div>
+                    {% endif %}
                     </div>
                 </div>
             </div>
@@ -58,7 +66,13 @@
                 <div class="nav nav-tabs nav-justified" id="nav-tab" role="tablist">
                   <button class="nav-link active" id="nav-posts-tab" data-bs-toggle="tab" data-bs-target="#nav-posts" type="button" role="tab" aria-controls="nav-posts" aria-selected="true">Posts</button>
                   <button class="nav-link" id="nav-statistics-tab" data-bs-toggle="tab" data-bs-target="#nav-statistics" type="button" role="tab" aria-controls="nav-statistics" aria-selected="false">Statistics</button>
-                  <button class="nav-link" id="nav-requests-tab" data-bs-toggle="tab" data-bs-target="#nav-requests" type="button" role="tab" aria-controls="nav-requests" aria-selected="false">Requests</button>
+                  {% if owner %}
+                  <button class="nav-link" id="nav-requests-tab" data-bs-toggle="tab" data-bs-target="#nav-requests" type="button" role="tab" aria-controls="nav-requests" aria-selected="false">Requests
+                    {% if requests %}
+                    <span class="badge bg-danger"> </span>
+                    {% endif %}
+                  </button>
+                  {% end if %}
 
                 </div>
               </nav>
@@ -69,23 +83,43 @@
                     <!-- Loop through all posts of the posting list visible to the user. -->
                     <h2>This is Where some Posts will be made</h2>
                     {% else %}
-                    <h1 class="text-center">there's nothing here... :(</h1>
+                    <h1 class="text-center">there's nothing here... :( {{profile.user.id}}</h1>
                     {% endif %}
                 </div>
 
                 <div class="tab-pane fade" id="nav-statistics" role="tabpanel" aria-labelledby="nav-statistics-tab" tabindex="0">
                     <h2>This is Where some profile statistics for OUR NODE will be shown</h2>
                 </div>
-
+                {% if owner %}
                 <div class="tab-pane fade" id="nav-requests" role="tabpanel" aria-labelledby="nav-requests-tab" tabindex="0">
                     <!-- Loop through all follow requests using displaying a fixed number amount per page. -->
-                    {% if profile.requests %}
-                    <h2>This is where the paginated profile requests will go to the user...</h2>
+                    {% if requests %}
+                    {% for follow_request in requests %}
+
+                    {% url 'chartreuse:profile_follow_accept' follow_request.requestee.url_id follow_request.requester.url_id as accept_url %}
+                    {% url 'chartreuse:profile_follow_reject' follow_request.requestee.url_id follow_request.requester.url_id as reject_url %}
+                    <div class="follow-request" style="border: solid black 3px;">
+                        <img src="{{follow_request.requester.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
+                        <h5 style="display: inline;">{{follow_request.requester.displayName}} wants to follow you...</h5>
+                        <!-- Accept follow request form -->
+                        <form action="{{accept_url}}" method="POST" class="accept_form">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">Accept</button>
+                        </form>
+                        <!-- Reject follow request form-->
+                        <form action="{{reject_url}}" method="POST" class="reject_form">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">Reject</button>
+                        </form>
+                    </div>
+                    {% endfor %}
+
+
                     {% else %}
-                    <h1 class="text-center">there's nothing here... :(</h1>
+                    <h1 class="text-center">there's nothing here...:(</h1>
                     {% endif %}
                 </div>
-
+                {% endif %}
               </div>
         </div> 
     </div>

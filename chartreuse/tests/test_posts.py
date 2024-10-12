@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from . import models
+from .. import models
 from rest_framework.test import APIClient
 
 class PostTestCases(TestCase):

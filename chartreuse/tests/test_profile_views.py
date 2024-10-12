@@ -132,6 +132,40 @@ class TestProfileViews(TestCase):
         self.assertEqual('allenisagoat' in data,True)
         self.assertEqual('Following 0' in data, True)
         self.assertEqual('Followers 1' in data,True)
+    
+    '''
+    
+    Tests for unfollowing an author and sending in follow requests!
+
+    '''
+
+    def test_unfollow_invalid_method(self):
+        response = self.client.get(reverse('chartreuse:profile_unfollow'),args=[self.user_3_id,self.user_1_id])
+        self.assertEqual(response.status_code,405)
+
+    def test_send_follow_request_invalid_method(self):
+        response = self.client.get(reverse('chartreuse:profile_follow_request'),args=[self.user_3_id,self.user_1_id])
+        self.assertEqual(response.status_code,405)
+
+    def test_unfollow(self):
+        response = self.client.post(reverse('chartreuse:profile_unfollow'),args=[self.user_3_id,self.user_1_id])
+        self.assertEqual(response.status_code,302)
+        # check that follow has been removed
+        follow = Follow.objects.filter(follower=self.user_1,followed=self.user_3).count()
+        self.assertEqual(follow,0)
+        # check that UI updated to remove the follower!
+        response = self.client.get(reverse('chartreuse:profile',args=[self.user_3_id]))
+        self.assertTemplateUsed(response,'profile.html')
+        data = response.content
+        data = data.decode()
+        self.assertEqual('Followers 0' in data,True)
+
+    def test_profile_send_follow_request(self):
+        response = self.client.post(reverse('chartreuse:profile_follow_request'),args=[self.user_2_id,self.user_3_id])
+
+        self.assertEqual(response.status_code,302)
+        follow_request = FollowRequest.objects.filter(requester=self.user_2,requestee=self.user_3).count()
+        self.assertEqual(follow_request,1)
 
   
         

@@ -37,7 +37,7 @@
                         </div>
                     </div>
                     <div class="row mt-4">
-                    {% if profile.displayName %}
+                    {% if profile.github %}
                         <div class="col-6">
                             <h3><a href="{{ profile.github }}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">{{ profile.displayName }}'s Github</a></h3>
                         </div>
@@ -94,10 +94,6 @@
                 <div class="tab-pane fade" id="nav-requests" role="tabpanel" aria-labelledby="nav-requests-tab" tabindex="0">
                     <!-- Loop through all follow requests using displaying a fixed number amount per page. -->
                     {% if requests %}
-                    <!--https://getbootstrap.com/docs/5.0/components/badge/-->
-                    <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
-                        <span class="visually-hidden">New alerts</span>
-                    </span>
                     {% for follow_request in requests %}
 
                     {% url 'chartreuse:profile_follow_accept' follow_request.requestee.url_id follow_request.requester.url_id as accept_url %}

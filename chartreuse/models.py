@@ -19,12 +19,13 @@ class User(models.Model):
 
 class Post(models.Model):
     title = models.CharField(max_length=200)
-    id = models.URLField(primary_key=True)
+    id = models.AutoField(primary_key=True)
+    url_id = models.URLField()
     description = models.TextField()
     contentType = models.CharField(max_length=50, choices=CONTENT_TYPE_CHOICES, default='text/plain')
     content = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    published = models.DateTimeField()
+    published = models.DateTimeField(auto_now_add=True)
     visibility = models.CharField(max_length=20, choices=VISIBILITY_CHOICES, default='PUBLIC')
 
 class Like(models.Model):
@@ -56,7 +57,7 @@ class Comment(models.Model):
     dateCreated = models.DateTimeField(auto_now_add=True)
     username = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
-    date_created  = models.DateTimeField(auto_now_add=True)
+    #date_created  = models.DateTimeField(auto_now_add=True)
 
 class Follow(models.Model):
     follower = models.ForeignKey(User, related_name="following", on_delete=models.CASCADE) # Use user.following to get all the users that a user is following

@@ -47,20 +47,21 @@ urlpatterns = [
     path("login", views.login, name="login"),
 
     # Follower URLs
-    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)/", followers.add_follower, name="add_follower"),
-    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)/remove/", followers.remove_follower, name="remove_follower"),
-    re_path(r"api/authors/(?P<author_id>.+)/followers/", followers.get_followers, name="get_followers"),
-    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)/is_follower/", followers.is_follower, name="is_follower"),
+    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)/is_follower", followers.is_follower, name="is_follower"),
+    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)/remove", followers.remove_follower, name="remove_follower"),
+    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)", followers.add_follower, name="add_follower"),
+    re_path(r"api/authors/(?P<author_id>.+)/followers", followers.get_followers, name="get_followers"),
 
     # Follow Request URLs
-    re_path(r"api/authors/(?P<author_id>.+)/follow-requests/send/", follow_requests.send_follow_request, name="send_follow_request"),
-    path("api/follow-requests/<int:request_id>/accept/", follow_requests.accept_follow_request, name="accept_follow_request"),
-    path("api/follow-requests/<int:request_id>/reject/", follow_requests.reject_follow_request, name="reject_follow_request"),
-    path("api/follow-requests/", follow_requests.get_follow_requests, name="get_follow_requests"),
+    re_path(r"api/authors/(?P<author_id>.+)/follow-requests/send", follow_requests.send_follow_request, name="send_follow_request"),
+    path("api/follow-requests/<int:request_id>/accept", follow_requests.accept_follow_request, name="accept_follow_request"),
+    path("api/follow-requests/<int:request_id>/reject", follow_requests.reject_follow_request, name="reject_follow_request"),
+    path("api/follow-requests", follow_requests.get_follow_requests, name="get_follow_requests"),
 
-    re_path(r"api/authors/(?P<author_id>.+)/friends/", friends.get_friends, name="get_friends"),
-    re_path(r'api/authors/(?P<author_id>.+)/friends/(?P<foreign_author_id>.+)/check_friendship/', friends.check_friendship, name='check_friendship'),
-  
+    re_path(r'api/authors/(?P<author_id>.+)/friends/(?P<foreign_author_id>.+)/check_friendship', friends.check_friendship, name='check_friendship'),
+    re_path(r"api/authors/(?P<author_id>.+)/friends", friends.get_friends, name="get_friends"),
+
+    
     # for the error page
     path("error", views.error, name="error"),
 ] 

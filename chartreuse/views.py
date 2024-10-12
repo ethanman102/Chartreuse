@@ -38,10 +38,6 @@ def login(request):
 def error(request):
     return render(request, 'error.html')
 
-
-
-
-
 def follow_accept(request,followee,follower):
 
     '''

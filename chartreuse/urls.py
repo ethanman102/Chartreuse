@@ -47,5 +47,7 @@ urlpatterns = [
 
     re_path(r"api/authors/(?P<author_id>.+)/friends/", friends.get_friends, name="get_friends"),
     re_path(r'api/authors/(?P<author_id>.+)/friends/(?P<foreign_author_id>.+)/check_friendship/', friends.check_friendship, name='check_friendship'),
-
-]
+  
+    # for the error page
+    path("error", views.error, name="error"),
+] 

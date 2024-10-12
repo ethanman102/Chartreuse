@@ -523,7 +523,7 @@ class PostViewSet(viewsets.ViewSet):
             405: OpenApiResponse(description="Method not allowed."),
         }
     )
-    def get_posts(self, request, author_id):
+    def get_posts(request, user_id):
         """
         Gets all the posts of a user.
 
@@ -534,7 +534,7 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the post objects.
         """
-        decoded_author_id = unquote(author_id)
+        decoded_author_id = unquote(user_id)
         page = request.GET.get("page")
         size = request.GET.get("size")
     
@@ -554,7 +554,7 @@ class PostViewSet(viewsets.ViewSet):
         
         if request.user.is_authenticated:
             posts = Post.objects.filter(Q(user=user, visibility="PUBLIC") | Q(user=user, visibility="FRIENDS") | Q(user=user, visibility="UNLISTED")).latest('published')
-            if request_user == author_id or check_friendship(request, request_user, author_id):
+            if request_user == user_id or check_friendship(request, request_user, user_id):
                 # Authenticated locally as an author or Authenticated locally as a friend
                 # Paginate posts based on size
                 posts_paginator = Paginator(posts, size)

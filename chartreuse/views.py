@@ -136,6 +136,9 @@ class ProfileDetailView(DetailView):
                 context['owner'] = True
                 follow_requests = FollowRequest.objects.filter(requestee=page_user)
                 requests = [fk for fk in follow_requests]
+                for follow_request in requests:
+                    follow_request.follower.url_id = quote(follow_request.follower.url_id,safe='')
+                    follow_request.followed.url_id = quote(follow_request.followed.url_id,safe='')
                 context['requests'] = requests
             else:
 

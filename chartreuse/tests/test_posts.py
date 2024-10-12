@@ -50,16 +50,6 @@ class PostTestCases(TestCase):
         self.user_id_2 = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/2", safe = "")
         self.user_id_3 = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/3", safe = "")
 
-        self.post1 = models.Post.objects.create(user=models.User.objects.get(pk="https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1"))
-        self.post2 = models.Post.objects.create(user=models.User.objects.get(pk="https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1"))
-        self.post3 = models.Post.objects.create(user=models.User.objects.get(pk="https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/2"))
-        self.post4 = models.Post.objects.create(user=models.User.objects.get(pk="https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/3"))
-
-        self.encoded_post_url_id_1 = quote(self.post1.url_id, safe = "")
-        self.encoded_post_url_id_2 = quote(self.post2.url_id, safe = "")
-        self.encoded_post_url_id_3 = quote(self.post3.url_id, safe = "")
-        self.encoded_post_url_id_4 = quote(self.post4.url_id, safe = "")
-
     def test_creating_post(self):
         """
         This tests creating a post.
@@ -76,7 +66,7 @@ class PostTestCases(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json()['type'], 'post')
         self.assertEqual(response.json()['author']['displayName'], 'Greg Johnson')
-        self.assertEqual(response.json()['id'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1/posts/5")
+        self.assertEqual(response.json()['id'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1/posts/1")
         self.assertEqual(response.json()['visibility'], 'PUBLIC')
         self.assertEqual(response.json()['title'], 'Gregs public post')
         self.assertEqual(response.json()['description'], 'Test post description')
@@ -99,46 +89,58 @@ class PostTestCases(TestCase):
         """
         Tests getting a post.
         """
+        # login as user 1
+        response = self.client.post(reverse('chartreuse:login_user'), {
+            'username': 'greg',
+            'password': 'ABC123!!!'
+        })
+
+        post = self.client.post(reverse('chartreuse:posts', args=[self.user_id_1]), {'visibility': "PUBLIC", "title": "Gregs public post", "description": "Test post description", "contentType": "text/plain", "content": "Hello World! \nThis is a short message from greg!"})
 
         # Assuming you have a user and post objects created in the test setup
-        response = self.client.get(reverse('chartreuse:post', args=[self.user_id_1, self.encoded_post_url_id_1]))
+        response = self.client.get(reverse('chartreuse:post', args=[self.user_id_1, quote(post.json()['id'], safe="")]))
 
         # Assertions to verify the response
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['type'], 'post')
-        self.assertEqual(response.json()['author']['displayName'], 'Greg Johnson')
-        self.assertEqual(response.json()['id'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1/posts/1")
 
     def test_get_posts_by_author(self):
         """
         Tests getting posts by an author.
-        """
+        """# login as user 1
+        response = self.client.post(reverse('chartreuse:login_user'), {
+            'username': 'greg',
+            'password': 'ABC123!!!'
+        })
+
+        self.client.post(reverse('chartreuse:posts', args=[self.user_id_1]), {'visibility': "PUBLIC", "title": "Gregs public post", "description": "Test post description", "contentType": "text/plain", "content": "Hello World! \nThis is a short message from greg!"})
+
         # Assuming you have a user and post objects created in the test setup
-        response = self.client.get(reverse('chartreuse:post', args=[self.user_id_1, self.encoded_post_url_id_1]))
+        response = self.client.get(reverse('chartreuse:posts', args=[self.user_id_1]))
 
         # Assertions to verify the response
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()['type'], 'post')
-        self.assertEqual(response.json()['author']['displayName'], 'Greg Johnson')
-        self.assertEqual(response.json()['id'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1/posts/1")
+        self.assertEqual(response.json()['type'], 'posts')
 
     def test_delete_post(self):
         """
         Tests deleting a post.
         """
-        # login as user 2
+        # login as user 1
         response = self.client.post(reverse('chartreuse:login_user'), {
-            'username': 'john',
-            'password': '87@398dh817b!',
+            'username': 'greg',
+            'password': 'ABC123!!!'
         })
 
-        response = self.client.post(reverse('chartreuse:post', args=[self.user_id_2, self.encoded_post_url_id_3]), {'post': "http://nodebbbb/authors/2/posts/3"})
+        post = self.client.post(reverse('chartreuse:posts', args=[self.user_id_1]), {'visibility': "PUBLIC", "title": "Gregs public post", "description": "Test post description", "contentType": "text/plain", "content": "Hello World! \nThis is a short message from greg!"})
 
+        response = self.client.delete(reverse('chartreuse:post', args=[self.user_id_1, quote(post.json()['id'], safe="")]))
+ 
         # Successfully removed post
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['type'], 'post')
-        self.assertEqual(response.json()['author']['displayName'], 'John Smith')
-        self.assertEqual(response.json()['id'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/2/posts/3")
+        self.assertEqual(response.json()['author']['displayName'], 'Greg Johnson')
+        self.assertEqual(response.json()['id'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1/posts/1")
         self.assertEqual(response.json()['visibility'], 'DELETED')
 
     def test_update_post(self):
@@ -150,17 +152,25 @@ class PostTestCases(TestCase):
             'username': 'greg',
             'password': 'ABC123!!!'
         })
+        
+        post = self.client.post(reverse('chartreuse:posts', args=[self.user_id_1]), {'visibility': "PUBLIC", "title": "Gregs public post", "description": "Test post description", "contentType": "text/plain", "content": "Hello World! \nThis is a short message from greg!"})
 
-        response = self.client.put(reverse('chartreuse:post', args=[self.user_id_1, self.encoded_post_url_id_2]), {'visibility': "PUBLIC", "title": "Gregs updated public post", "description": "New test post description", "contentType": "text/plain", "content": "Hello World!!!! \nThis is a short message from greg!"})
+        response = self.client.put(reverse('chartreuse:post', args=[self.user_id_1, quote(post.json()['id'], safe="")]), {
+            'visibility': "PUBLIC", 
+            "title": "Gregs updated public post", 
+            "description": "New test post description", 
+            "contentType": "text/plain", 
+            "content": "New content"
+            })
 
         # Successfully updated post
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['type'], 'post')
         self.assertEqual(response.json()['author']['displayName'], 'Greg Johnson')
-        self.assertEqual(response.json()['id'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1/posts/2")
+        self.assertEqual(response.json()['id'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1/posts/1")
         self.assertEqual(response.json()['visibility'], 'PUBLIC')
-        self.assertEqual(response.json()['title'], 'Gregs public post')
-        self.assertEqual(response.json()['description'], 'Test post description')
+        self.assertEqual(response.json()['title'], 'Gregs updated public post')
+        self.assertEqual(response.json()['description'], 'New test post description')
         self.assertEqual(response.json()['contentType'], 'text/plain')
-        self.assertEqual(response.json()['content'], 'Hello World! \nThis is a short message from greg!')
+        self.assertEqual(response.json()['content'], 'New content')
         

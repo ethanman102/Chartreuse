@@ -31,6 +31,7 @@ class Post(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         self.url_id = f"{self.user.url_id}/posts/{self.pk}"
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Post(id={self.id}, url_id={self.url_id}, title={self.title}, description={self.description}, contentType={self.contentType}, content={self.content}, user={self.user}, published={self.published}, visibility={self.visibility})"

@@ -153,8 +153,6 @@ class ProfileDetailView(DetailView):
         context['following'] = Follow.objects.filter(follower=page_user).count()
 
         context['requests'] = requests
-        print(requests)
-        print(context)
     
         return context
         

@@ -13,8 +13,8 @@ urlpatterns = [
     path("authors/<str:followee>/reject/<str:follower>", views.follow_reject,name="profile_follow_reject"),
 
     # Post URLs
-    re_path(r"api/authors/(?P<user_id>.+)/posts/", posts.PostViewSet.as_view({"get": "get_posts", "post": "create_post"}), name="posts"),
-    re_path(r"api/authors/(?P<user_id>.+)/posts/(?P<post_id>.+)/", posts.PostViewSet.as_view({"get": "get_post", "delete": "remove_post", "put": "update"}), name="post"),
+    re_path(r"api/authors/(?P<user_id>.+)/posts/(?P<post_id>.+)", posts.PostViewSet.as_view({"get": "get_post", "delete": "remove_post", "put": "update"}), name="post"),
+    re_path(r"api/authors/(?P<user_id>.+)/posts", posts.PostViewSet.as_view({"get": "get_posts", "post": "create_post"}), name="posts"),
 
     # Comment URLs 
     # path("authors/<str:user_id>/inbox", comments.create_comment, name="create_comment"),

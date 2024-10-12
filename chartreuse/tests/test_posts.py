@@ -55,8 +55,6 @@ class PostTestCases(TestCase):
         self.post3 = models.Post.objects.create(user=models.User.objects.get(pk="https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/2"))
         self.post4 = models.Post.objects.create(user=models.User.objects.get(pk="https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/3"))
 
-        print(models.Post.objects.all())
-
     def test_creating_post(self):
         """
         This tests creating a post.

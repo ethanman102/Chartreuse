@@ -38,18 +38,17 @@ class TestProfileViews(TestCase):
                            )
         # setting up each user's id
         self.user_1_id = quote(self.user_1.url_id,safe = '')
-        
         self.user_2_id = quote(self.user_2.url_id,safe = '')
         self.user_3_id = quote(self.user_3.url_id,safe = '')
 
         # Setting up follow request
         self.follow_request_1 = FollowRequest.objects.create(requestee=self.user_1,requester=self.user_2)
+        self.follow_1 = Follow.objects.create(followed=self.user_3,follower=self.user_1)
 
     def test_follow_accept_method_not_allowed(self):
         response = self.client.get(reverse('chartreuse:profile_follow_accept', args=[self.user_1_id,self.user_2_id]))
         self.assertEqual(response.status_code,405) # equivalence class of tests is checking other methods other than post.
         
-    
     def test_follow_reject_method_not_allowed(self):
         response = self.client.get(reverse('chartreuse:profile_follow_reject', args=[self.user_1_id,self.user_2_id]))
         self.assertEqual(response.status_code,405) # equivalence class of tests is checking other methods other than post.
@@ -113,6 +112,26 @@ class TestProfileViews(TestCase):
         self.assertEqual(follow.exists(),True)
         self.assertEqual(follow.count(),1)
 
-        
+    '''
 
+    Tests for checking the template view (detail view)
+
+    '''
+    def test_profile_template_used(self):
+        response = self.client.get(reverse('chartreuse:profile',args=[self.user_1_id]))
+        self.assertTemplateUsed(response,'profile.html')
+    
+    def test_profile_template_context(self):
+
+        response = self.client.get(reverse('chartreuse:profile',args=[self.user_3_id]))
+        self.assertTemplateUsed(response,'profile.html')
+
+        data = response.content
+        data = data.decode()
+
+        self.assertEqual('allenisagoat' in data,True)
+        self.assertEqual('Following 0' in data, True)
+        self.assertEqual('Followers 1' in data,True)
+
+  
         

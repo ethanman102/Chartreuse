@@ -14,7 +14,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from urllib.parse import unquote
 import requests
-import re
+import regex as re
 
 from .. import views
 from ..models import User

@@ -1,5 +1,6 @@
 # from django.test import TestCase, Client
 # from django.urls import reverse
+# from urllib.parse import quote
 
 # class LikeTestCases(TestCase):
 #     def setUp(self):
@@ -23,7 +24,8 @@
 #         '''
 #         This tests getting a users git events.
 #         '''
-#         response = self.client.get(reverse('chartreuse:get_events', args=[1]))
+#         user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1", safe='')
+#         response = self.client.get(reverse('chartreuse:get_events', args=[user_id]))
 
 #         # Successfully got response
 #         self.assertEqual(response.status_code, 200)
@@ -32,7 +34,8 @@
 #         '''
 #         This tests getting a users starred repos.
 #         '''
-#         response = self.client.get(reverse('chartreuse:get_starred', args=[1]))
+#         user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1", safe='')
+#         response = self.client.get(reverse('chartreuse:get_starred', args=[user_id]))
 
 #         # Successfully got response
 #         self.assertEqual(response.status_code, 200)
@@ -41,7 +44,8 @@
 #         '''
 #         This tests getting a users watched repos.
 #         '''
-#         response = self.client.get(reverse('chartreuse:get_subscriptions', args=[1]))
+#         user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1", safe='')
+#         response = self.client.get(reverse('chartreuse:get_subscriptions', args=[user_id]))
 
 #         # Successfully got response
 #         self.assertEqual(response.status_code, 200)

@@ -1,6 +1,7 @@
 # from rest_framework.test import APIClient
 # from django.test import TestCase
 # from django.urls import reverse
+# from urllib.parse import quote
 # import json
 
 # class UserTestCases(TestCase):
@@ -107,7 +108,8 @@
 #         '''
 #         This tests getting a specific user.
 #         '''
-#         response = self.client.get(reverse('chartreuse:user-detail', args=["https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1"]))
+#         user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1", safe='')
+#         response = self.client.get(reverse('chartreuse:user-detail', args=[user_id]))
 
 #         # Successfully got user
 #         self.assertEqual(response.status_code, 200)
@@ -123,7 +125,8 @@
 #         '''
 #         This tests getting a user with an invalid id.
 #         '''
-#         response = self.client.get(reverse('chartreuse:user-detail', args=["https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/100"]))
+#         user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/100", safe='')
+#         response = self.client.get(reverse('chartreuse:user-detail', args=[user_id]))
 
 #         # User does not exist
 #         self.assertEqual(response.status_code, 404)
@@ -138,7 +141,8 @@
 #             'password': 'ABC123!!!'
 #         })
 
-#         response = self.client.delete(reverse('chartreuse:user-detail', args=["https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1"]))
+#         user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1", safe='')
+#         response = self.client.delete(reverse('chartreuse:user-detail', args=[user_id]))
 
 #         # Successfully deleted user
 #         self.assertEqual(response.status_code, 200)
@@ -148,7 +152,8 @@
 #         '''
 #         This tests deleting a user with an invalid id.
 #         '''
-#         response = self.client.delete(reverse('chartreuse:user-detail', args=["https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/100"]))
+#         user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/100", safe='')
+#         response = self.client.delete(reverse('chartreuse:user-detail', args=[user_id]))
 
 #         # User does not exist
 #         self.assertEqual(response.status_code, 404)
@@ -157,7 +162,8 @@
 #         '''
 #         This tests updating a user.
 #         '''
-#         url = reverse('chartreuse:user-detail', args=["https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1"])
+#         user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1", safe='')
+#         url = reverse('chartreuse:user-detail', args=[user_id])
 
 #         data = {
 #             "github": "http://github.com/newgithub",

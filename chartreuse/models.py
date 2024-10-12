@@ -14,6 +14,9 @@ class User(models.Model):
     profileImage = models.URLField()
     dateCreated  = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"User(pk={self.pk}, username={self.user.username}, displayName={self.displayName}, host={self.host}, github={self.github}, profileImage={self.profileImage})"
+
 class Post(models.Model):
     title = models.CharField(max_length=200)
     id = models.URLField(primary_key=True)
@@ -26,6 +29,7 @@ class Post(models.Model):
 
 class Like(models.Model):
     id = models.AutoField(primary_key=True)
+    url_id = models.URLField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.CharField(max_length=300, default='text/plain') # it will be this temporarily
     # post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -35,6 +39,13 @@ class Like(models.Model):
         constraints = [
             UniqueConstraint(fields=['user', 'post'], name='unique_user_post_like')
         ]
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.url_id = f"{self.user.url_id}/liked/{self.pk}"
+    
+    def __str__(self):
+        return f"Like(id={self.id}, url_id={self.url_id}, user={self.user}, post={self.post}, dateCreated={self.dateCreated})"
 
 class Comment(models.Model):
     id = models.AutoField(primary_key=True)

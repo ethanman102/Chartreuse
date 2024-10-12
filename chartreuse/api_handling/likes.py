@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from ..models import Like, User
 from .users import UserSerializer, UserViewSet
+from urllib.parse import unquote
 
 class LikeSerializer(serializers.Serializer):
     type = serializers.CharField(default="like")
@@ -59,48 +60,57 @@ class LikeViewSet(viewsets.ViewSet):
             user_id: The id of the user who is liking the post.
 
         Returns:
-            JsonResponse containing the like object.
+            JsonResponse containing the like object or error messages.
         '''
-        if request.user.is_authenticated:
-            # Get the post URL from the request body
-            postUrl = request.POST.get('post')
-            
-            # Ensure the user liking the post is the current user
-            userLiking = get_object_or_404(User, url_id=user_id)
-            
-            # Check if the user has already liked this post
-            if Like.objects.filter(user=userLiking, post=postUrl).exists():
-                return JsonResponse({"error": "Like already exists."}, status=400)
-            
-            # Create and save the like
-            like = Like(user=userLiking, post=postUrl)
-            like.save()
-
-            request.method = 'GET'
-            user_viewset = UserViewSet() 
-            response = user_viewset.retrieve(request, pk=user_id)
-            data = json.loads(response.content)
-            
-            # Construct the like object to return in the response
-            likeObject = {
-                "type": "like",
-                "author": {
-                    "type": "author",
-                    "id": data["id"],
-                    "page": data["page"],
-                    "host": data["host"],
-                    "displayName": data["displayName"],
-                    "github": data["github"],
-                    "profileImage": data["profileImage"]
-                },
-                "published": like.dateCreated,
-                "id": str(userLiking.url_id) + "/liked/" + str(like.id),
-                "object": postUrl
-            }
-            
-            return JsonResponse(likeObject, status=200)
-        else:
+        if not request.user.is_authenticated:
             return JsonResponse({"error": "User is not authenticated."}, status=401)
+    
+        decoded_user_id = unquote(user_id)
+
+        # Get the post URL from the request body
+        post_url = request.POST.get('post')
+        if not post_url:
+            return JsonResponse({"error": "Post URL is required."}, status=400)
+
+        # Ensure the user liking the post is the current user
+        user_liking = User.objects.get(pk=decoded_user_id)
+
+        decoded_post_url = unquote(post_url)    
+        
+        # Use get_or_create to simplify checking if the user already liked the post
+        like, created = Like.objects.get_or_create(user=user_liking, post=decoded_post_url)
+        
+        if not created:
+            return JsonResponse({"error": "Like already exists."}, status=400)
+        
+        like.save()
+
+        # Reuse the UserViewSet to get author details (using a request object copy if needed)
+        user_viewset = UserViewSet()
+        user_response = user_viewset.retrieve(request, pk=decoded_user_id)
+        
+        if user_response.status_code != 200:
+            return JsonResponse({"error": "Failed to retrieve user details."}, status=user_response.status_code)
+        
+        user_data = json.loads(user_response.content)
+
+        # Construct the like object to return in the response
+        like_object = {
+            "type": "like",
+            "author": {
+                "type": "author",
+                "id": user_data["id"],
+                "page": user_data["page"],
+                "host": user_data["host"],
+                "displayName": user_data["displayName"],
+                "github": user_data["github"],
+                "profileImage": user_data["profileImage"],
+            },
+            "published": like.dateCreated,
+            "id": like.url_id,
+            "object": decoded_post_url
+        }
+        return JsonResponse(like_object, status=200)
     
     @extend_schema(
         summary="Removes a like from a post",
@@ -124,23 +134,25 @@ class LikeViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like object.
         '''
+        decoded_user_id = unquote(user_id)
         # Get the post URL from the request body
         postUrl = request.POST.get('post')
+        decoded_post_url = unquote(postUrl)
         
         # Ensure the user liking the post is the current user
-        userLiking = get_object_or_404(User, url_id=user_id)
+        user_liking = User.objects.get(pk=decoded_user_id)
         
         # Check if the user has already liked this post
-        if not Like.objects.filter(user=userLiking, post=postUrl).exists():
+        if not Like.objects.filter(user=user_liking, post=decoded_post_url).exists():
             return JsonResponse({"error": "Like does not exist."}, status=400)
         
         # Create and save the like
-        like = Like.objects.filter(user=userLiking, post=postUrl)
+        like = Like.objects.filter(user=user_liking, post=decoded_post_url)
         like.delete()
 
         request.method = 'GET'
         user_viewset = UserViewSet() 
-        response = user_viewset.retrieve(request, pk=user_id)
+        response = user_viewset.retrieve(request, pk=decoded_user_id)
         data = json.loads(response.content)
         
         # Construct the like object to return in the response
@@ -156,8 +168,8 @@ class LikeViewSet(viewsets.ViewSet):
                 "profileImage": data["profileImage"]
             },
             "published": like.dateCreated,
-            "id": str(userLiking.url_id) + "/liked/" + str(like.id),
-            "object": postUrl
+            "id": like.url_id,
+            "object": decoded_post_url
         }
 
         return JsonResponse(likeObject, status=200)
@@ -184,14 +196,17 @@ class LikeViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like object.
         '''
-        user = get_object_or_404(User, url_id=user_id)
+        decoded_user_id = unquote(user_id)
+        decoded_like_id = unquote(like_id)
+    
+        user = User.objects.get(pk=decoded_user_id)
 
         request.method = 'GET'
         user_viewset = UserViewSet() 
-        response = user_viewset.retrieve(request, pk=user_id)
+        response = user_viewset.retrieve(request, pk=decoded_user_id)
 
         data = json.loads(response.content)
-        like = Like.objects.filter(user=user, id=like_id)[0]
+        like = Like.objects.filter(user=user, url_id=decoded_like_id)[0]
 
         likeObject = {
             "type": "like",
@@ -205,7 +220,7 @@ class LikeViewSet(viewsets.ViewSet):
                 "profileImage": data["profileImage"]
             },
             "published": like.dateCreated,
-            "id": str(user.url_id) + "/liked/" + str(like.id),
+            "id": like.url_id,
             "object": like.post
         }
         return JsonResponse(likeObject, safe=False)
@@ -264,6 +279,7 @@ class LikeViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like objects.
         '''
+        decoded_user_id = unquote(user_id)
         page = request.GET.get('page')
         size = request.GET.get('size')
 
@@ -273,12 +289,12 @@ class LikeViewSet(viewsets.ViewSet):
         if (size is None):
             size = 50 # Default size is 50
         
-        user = get_object_or_404(User, url_id=user_id)
+        user = get_object_or_404(User, url_id=decoded_user_id)
         likes = Like.objects.filter(user=user)
 
         request.method = 'GET'
         user_viewset = UserViewSet() 
-        response = user_viewset.retrieve(request, pk=user_id)
+        response = user_viewset.retrieve(request, pk=decoded_user_id)
         data = json.loads(response.content)
         
         # Paginates likes based on the size
@@ -302,7 +318,7 @@ class LikeViewSet(viewsets.ViewSet):
                     "profileImage": data["profileImage"]
                 },
                 "published": like.dateCreated,
-                "id": str(user.url_id) + "/liked/" + str(like.id),
+                "id": like.url_id,
                 "object": like.post
             }
 

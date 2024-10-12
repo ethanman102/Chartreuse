@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from ..models import User, FollowRequest, Follow
 from django.contrib.auth.decorators import login_required
+from urllib.parse import unquote
 
 @login_required
 def send_follow_request(request, author_id):

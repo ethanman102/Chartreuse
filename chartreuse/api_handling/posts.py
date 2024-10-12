@@ -7,14 +7,11 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import serializers
 from rest_framework import viewsets
-from rest_framework.decorators import action, api_view
-from rest_framework.permissions import IsAuthenticated
 
-from ..models import User, Like, Post, Follow, Comment
+from ..models import User, Post
 from .users import UserSerializer, UserViewSet
-from .likes import LikeSerializer, LikesSerializer, LikeViewSet
-from .comments import CommentSerializer, CommentsSerializer, CommentViewSet
-from .friends import check_friendship
+from .likes import LikesSerializer
+from .comments import CommentsSerializer
 from urllib.parse import unquote
 
 class PostSerializer(serializers.Serializer):
@@ -34,7 +31,6 @@ class PostSerializer(serializers.Serializer):
         fields = ['type', 'title', 'id', 'decription', 'contentType', 'content', 'author', 'comments', 'likes', 'published', 'visibility']
 
 class PostViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
     serializer_class = PostSerializer
 
     @extend_schema(
@@ -55,7 +51,6 @@ class PostViewSet(viewsets.ViewSet):
             405: OpenApiResponse(description="Method not allowed."),
         }
     )
-    @action(detail=False, methods=["POST"])
     def create_post(self, request, user_id):
         """
         Creates a new post.
@@ -66,8 +61,8 @@ class PostViewSet(viewsets.ViewSet):
             
         Returns:
             JsonResponce containing the new post    
-        """
-        if not request.user.is_authenticated:
+        """        
+        if (not request.user.is_authenticated):
             return JsonResponse({"error": "User is not authenticated."}, status=401)
         
         decoded_user_id = unquote(user_id)
@@ -132,7 +127,6 @@ class PostViewSet(viewsets.ViewSet):
             return JsonResponse({"error": "post visibliity invalid"}, status=400)
 
         
-
     @extend_schema(
         summary="Removes a post",
         description="Removes a post based on the provided post URL.",
@@ -147,7 +141,6 @@ class PostViewSet(viewsets.ViewSet):
             405: OpenApiResponse(description="Method not allowed."),
         }
     )
-    @action(detail=False, methods=["DELETE"])
     def remove_post(self, request, user_id, post_id):
         """
         Reassigns the status of a post to DELETED.
@@ -159,24 +152,16 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like object.
         """
-        if not request.user.is_authenticated:
-            return JsonResponse({"error": "User is not authenticated."}, status=401) 
-
         decoded_user_id = unquote(user_id)
-
-        # Get the post URL from the post id
         decoded_post_url = unquote(post_id)
 
         # Ensure the user deleting the post is the current user
         author = User.objects.get(pk=decoded_user_id)
 
-        # Check if the post was previously created
-        if not Post.objects.filter(user=author, pk=decoded_post_url).exists():
-            return JsonResponse({"error": "Post does not exists."}, status=404)
-
         # Delete the post
-        post = Post.objects.filter(user=author, uerl_id=decoded_post_url)
-        post.update(visibility="DELETED")
+        post = Post.objects.filter(user=author, url_id=decoded_post_url)[0]
+        post.visibility = "DELETED"
+        post.save()
 
         # get the post data
         request.method = "GET"
@@ -187,16 +172,16 @@ class PostViewSet(viewsets.ViewSet):
         if response.status_code != 200:
             return JsonResponse({"error": "Failed to retrieve user details."}, status=response.status_code)
 
-        comments_viewset = CommentViewSet()
-        response = comments_viewset.retrieve(request, pk=decoded_post_url)
-        comments_data = json.loads(response.content)
+        # comments_viewset = CommentViewSet()
+        # response = comments_viewset.retrieve(request, pk=decoded_post_url)
+        # comments_data = json.loads(response.content)
 
         if response.status_code != 200:
             return JsonResponse({"error": "Failed to retrieve comments details."}, status=response.status_code)
 
-        likes_viewset = LikeViewSet()
-        response = likes_viewset.retrieve(request, pk=decoded_post_url)
-        likes_data = json.loads(response.content)
+        # likes_viewset = LikeViewSet()
+        # response = likes_viewset.retrieve(request, pk=decoded_post_url)
+        # likes_data = json.loads(response.content)
 
         if response.status_code != 200:
             return JsonResponse({"error": "Failed to retrieve likes details."}, status=response.status_code)
@@ -218,26 +203,26 @@ class PostViewSet(viewsets.ViewSet):
                 "github": author_data["github"],
                 "profileImage": author_data["profileImage"]
             },
-            "comments":{
-                "type": "comments",
-                "page": comments_data["page"],
-                "id": comments_data["id"],
-                "page_number": comments_data["page_number"],
-                "size": comments_data["size"],
-                "count": comments_data["count"],
-                "src": comments_data["src"]
-            },
-            "likes": {
-                "types": "likes",
-                "page": likes_data["page"],
-                "id": likes_data["id"],
-                "page_number": likes_data["page_number"],
-                "size": likes_data["size"],
-                "count": likes_data["count"],
-                "src": likes_data["src"]
-            },
+            # "comments":{
+            #     "type": "comments",
+            #     "page": comments_data["page"],
+            #     "id": comments_data["id"],
+            #     "page_number": comments_data["page_number"],
+            #     "size": comments_data["size"],
+            #     "count": comments_data["count"],
+            #     "src": comments_data["src"]
+            # },
+            # "likes": {
+            #     "types": "likes",
+            #     "page": likes_data["page"],
+            #     "id": likes_data["id"],
+            #     "page_number": likes_data["page_number"],
+            #     "size": likes_data["size"],
+            #     "count": likes_data["count"],
+            #     "src": likes_data["src"]
+            # },
             "published": post.published,
-            "visibility": post.visiblity,
+            "visibility": post.visibility,
         }
 
         return JsonResponse(postObject, status=200)
@@ -257,7 +242,6 @@ class PostViewSet(viewsets.ViewSet):
                 405: OpenApiResponse(description="Method not allowed."),
             }
     )
-    @api_view(["GET"])
     def get_post(self, request, user_id, post_id):
         """
         Gets a specific post object from a user.
@@ -273,25 +257,63 @@ class PostViewSet(viewsets.ViewSet):
         decoded_user_id = unquote(user_id)
         decoded_post_id = unquote(post_id)
 
-        author = User.objects.get(pk=decoded_user_id)
+        author = User.objects.get(url_id=decoded_user_id)
 
-        request_user_id = unquote(request.GET.get("user_id"))
-        is_authenticated = request.user.is_authenticated
         post = Post.objects.filter(user=author, url_id=decoded_post_id)[0]
 
         user_viewset = UserViewSet()
         response = user_viewset.retrieve(request, pk=decoded_user_id)
         author_data = json.loads(response.content)
     
-        comments_viewset = CommentViewSet()
-        response = comments_viewset.retrieve(request, pk=decoded_post_id)
-        comments_data = json.loads(response.content)
+        # comments_viewset = CommentViewSet()
+        # response = comments_viewset.retrieve(request, pk=decoded_post_id)
+        # comments_data = json.loads(response.content)
 
-        likes_viewset = LikeViewSet()
-        response = likes_viewset.retrieve(request, pk=decoded_post_id)
-        likes_data = json.loads(response.content)
+        # likes_viewset = LikeViewSet()
+        # response = likes_viewset.retrieve(request, pk=decoded_post_id)
+        # likes_data = json.loads(response.content)
     
         if post.visibility in ["PUBLIC", "UNLISTED"]:
+            postObject = {
+                "type": "post",
+                "title": post.title,
+                "id": post.id,
+                "description": post.description,
+                "contentType": post.contentType,
+                "content": post.content,
+                "author": {
+                    "type": "author",
+                    "id": author_data["id"],
+                    "page": author_data["page"],
+                    "host": author_data["host"],
+                    "displayName": author_data["displayName"],
+                    "github": author_data["github"],
+                    "profileImage": author_data["profileImage"]
+                },
+                # "comments":{
+                #     "type": "comments",
+                #     "page": comments_data["page"],
+                #     "id": comments_data["id"],
+                #     "page_number": comments_data["page_number"],
+                #     "size": comments_data["size"],
+                #     "count": comments_data["count"],
+                #     "src": comments_data["src"]
+                # },
+                # "likes": {
+                #     "types": "likes",
+                #     "page": likes_data["page"],
+                #     "id": likes_data["id"],
+                #     "page_number": likes_data["page_number"],
+                #     "size": likes_data["size"],
+                #     "count": likes_data["count"],
+                #     "src": likes_data["src"]
+                # },
+                "published": post.published,
+                "visibility": post.visibility,
+            }
+
+        elif post.visibility == "FRIENDS":
+            # check if the current user is the authors friend
             postObject = {
                 "type": "post",
                 "title": post.title,
@@ -328,56 +350,7 @@ class PostViewSet(viewsets.ViewSet):
                 },
                 "published": post.published,
                 "visibility": post.visibility,
-            }
-
-        elif post.visibility == "FRIENDS":
-            # check if the current user is the authors friend
-            if is_authenticated:
-                response = check_friendship(request, user_id, request_user_id)
-
-                if response.status_code() == 200:
-                    postObject = {
-                        "type": "post",
-                        "title": post.title,
-                        "id": post.id,
-                        "description": post.description,
-                        "contentType": post.contentType,
-                        "content": post.content,
-                        "author": {
-                            "type": "author",
-                            "id": author_data["id"],
-                            "page": author_data["page"],
-                            "host": author_data["host"],
-                            "displayName": author_data["displayName"],
-                            "github": author_data["github"],
-                            "profileImage": author_data["profileImage"]
-                        },
-                        "comments":{
-                            "type": "comments",
-                            "page": comments_data["page"],
-                            "id": comments_data["id"],
-                            "page_number": comments_data["page_number"],
-                            "size": comments_data["size"],
-                            "count": comments_data["count"],
-                            "src": comments_data["src"]
-                        },
-                        "likes": {
-                            "types": "likes",
-                            "page": likes_data["page"],
-                            "id": likes_data["id"],
-                            "page_number": likes_data["page_number"],
-                            "size": likes_data["size"],
-                            "count": likes_data["count"],
-                            "src": likes_data["src"]
-                        },
-                        "published": post.published,
-                        "visibility": post.visibility,
-                    } 
-
-                else:
-                    JsonResponse({"error": "This user must be a friend of the author to view this post"}, status=400)       
-            else:
-                JsonResponse({"error": "The user is not authenticated."}, status=401)
+            } 
         else:
             return JsonResponse({"error": "Post does not exist."}, status=404)
         
@@ -400,8 +373,7 @@ class PostViewSet(viewsets.ViewSet):
             405: OpenApiResponse(description="Method not allowed."),
         }
     ) 
-    @action(detail=False, methods=["PUT"])
-    def update_post(self, request, user_id, post_id):
+    def update(self, request, user_id, post_id):
         """
         Updates the post requested
         
@@ -413,19 +385,12 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing updated post 
         """
-        if request.user.is_authenticated and user_id == request.PUT.get("user_id"):
+        if request.user.is_authenticated:
             decoded_user_id = unquote(user_id)
             decoded_post_id = unquote(post_id)
-
-            # Unsure the post and user exist
-            if not User.objects.filter(pk=decoded_user_id).exists():
-                return JsonResponse({"error": "User does not exist."}, status=400)
             
-            if not Post.objects.filter(pk=decoded_post_id).exists():
-                return JsonResponse({"error": "User does not exist."}, status=404)
-            
-            author = User.objects.get(pk=decoded_user_id)
-            post = Post.objects.filter(user=author, url_id=decoded_post_id)
+            author = User.objects.get(url_id=decoded_user_id)
+            post = Post.objects.filter(user=author, url_id=decoded_post_id)[0]
 
             # Get the request contents
             post_type = request.POST.get("visibility")
@@ -436,15 +401,15 @@ class PostViewSet(viewsets.ViewSet):
             if not post_title:
                 post_title = post.title
 
-            post_description = request.get("description")
+            post_description = request.POST.get("description")
             if not post_description:
                 post_description = post.decription
 
-            post_contentType = request.get("contentType")
+            post_contentType = request.POST.get("contentType")
             if not post_contentType:
                 post_contentType = post.contentType
 
-            post_content = request.get("content")
+            post_content = request.POST.get("content")
             if not post_content:
                 post_content = post.content
 
@@ -456,16 +421,16 @@ class PostViewSet(viewsets.ViewSet):
             if response.status_code != 200:
                 return JsonResponse({"error": "Failed to retrieve user details."}, status=response.status_code)
             
-            comments_viewset = CommentViewSet()
-            response = comments_viewset.retrieve(request, pk=post_id)
-            comments_data = json.loads(response.content)
+            # comments_viewset = CommentViewSet()
+            # response = comments_viewset.retrieve(request, pk=post_id)
+            # comments_data = json.loads(response.content)
 
             if response.status_code != 200:
                 return JsonResponse({"error": "Failed to retrieve comments details."}, status=response.status_code)
             
-            likes_viewset = LikeViewSet()
-            response = likes_viewset.retrieve(request, pk=post_id)
-            likes_data = json.loads(response.content)
+            # likes_viewset = LikeViewSet()
+            # response = likes_viewset.retrieve(request, pk=post_id)
+            # likes_data = json.loads(response.content)
 
             if response.status_code != 200:
                 return JsonResponse({"error": "Failed to retrieve likes details."}, status=response.status_code)
@@ -488,24 +453,24 @@ class PostViewSet(viewsets.ViewSet):
                         "github": author_data["github"],
                         "profileImage": author_data["profileImage"]
                     },
-                    "comments":{
-                        "type": "comments",
-                        "page": comments_data["page"],
-                        "id": comments_data["id"],
-                        "page_number": comments_data["page_number"],
-                        "size": comments_data["size"],
-                        "count": comments_data["count"],
-                        "src": comments_data["src"]
-                    },
-                    "likes": {
-                        "types": "likes",
-                        "page": likes_data["page"],
-                        "id": likes_data["id"],
-                        "page_number": likes_data["page_number"],
-                        "size": likes_data["size"],
-                        "count": likes_data["count"],
-                        "src": likes_data["src"]
-                    },
+                    # "comments":{
+                    #     "type": "comments",
+                    #     "page": comments_data["page"],
+                    #     "id": comments_data["id"],
+                    #     "page_number": comments_data["page_number"],
+                    #     "size": comments_data["size"],
+                    #     "count": comments_data["count"],
+                    #     "src": comments_data["src"]
+                    # },
+                    # "likes": {
+                    #     "types": "likes",
+                    #     "page": likes_data["page"],
+                    #     "id": likes_data["id"],
+                    #     "page_number": likes_data["page_number"],
+                    #     "size": likes_data["size"],
+                    #     "count": likes_data["count"],
+                    #     "src": likes_data["src"]
+                    # },
                     "published": post.published,
                     "visibility": post_type,
                 }
@@ -532,8 +497,7 @@ class PostViewSet(viewsets.ViewSet):
             405: OpenApiResponse(description="Method not allowed."),
         }
     )
-    @api_view(["GET"])
-    def get_posts(self, request, author_id):
+    def get_posts(self, request, user_id):
         """
         Gets all the posts of a user.
 
@@ -544,91 +508,37 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the post objects.
         """
-        decoded_author_id = unquote(author_id)
+        decoded_author_id = unquote(user_id)
         page = request.GET.get("page")
         size = request.GET.get("size")
-    
-        request_user = unquote(request.GET.get("user_id"))
 
         if page is None:
-            page = 1 # Default page is 1
+            page = 1  # Default page is 1
+        else:
+            page = int(page)
 
         if size is None:
-            size = 10 # Default size is 50
+            size = 10  # Default size is 10
+        else:
+            size = int(size)
 
-        user = get_object_or_404(User, id=decoded_author_id)
+        user = get_object_or_404(User, pk=decoded_author_id)
 
-        user_viewset = UserViewSet() 
+        user_viewset = UserViewSet()
         response = user_viewset.retrieve(request, pk=decoded_author_id)
         author_data = json.loads(response.content)
-        
+
         if request.user.is_authenticated:
-            posts = Post.objects.filter(Q(user=user, visibility="PUBLIC") | Q(user=user, visibility="FRIENDS") | Q(user=user, visibility="UNLISTED")).latest('published')
-            if request_user == author_id or check_friendship(request, request_user, author_id):
-                # Authenticated locally as an author or Authenticated locally as a friend
-                # Paginate posts based on size
-                posts_paginator = Paginator(posts, size)
+            posts = Post.objects.filter(
+                Q(user=user, visibility="PUBLIC") |
+                Q(user=user, visibility="FRIENDS") |
+                Q(user=user, visibility="UNLISTED")
+            ).order_by('-published')
+        else:
+            posts = Post.objects.filter(
+                Q(user=user, visibility="PUBLIC")
+            ).order_by('-published')
 
-                page_posts = posts_paginator.page(page)
-                
-                filtered_posts_attributes = []
-
-                for post in page_posts:
-                    post_id = unquote(post.id)
-                    comments_viewset = CommentViewSet()
-                    response = comments_viewset.retrieve(request, pk=post_id)
-                    comments_data = json.loads(response.content)
-
-                    likes_viewset = LikeViewSet()
-                    response = likes_viewset.retrieve(request, pk=post_id)
-                    likes_data = json.loads(response.content)
-
-                    postObject = {
-                        "type": "post",
-                        "title": post.title,
-                        "id": post.url_id,
-                        "description": post.description,
-                        "contentType": post.contentType,
-                        "content": post.content,
-                        "author": {
-                            "type": "author",
-                            "id": author_data["id"],
-                            "page": author_data["page"],
-                            "host": author_data["host"],
-                            "displayName": author_data["displayName"],
-                            "github": author_data["github"],
-                            "profileImage": author_data["profileImage"],
-                        },
-                        "comments": {
-                            "type": "comments",
-                            "page": comments_data["page"],
-                            "id": comments_data["id"],
-                            "page_number": comments_data["page_number"],
-                            "size": comments_data["size"],
-                            "count": comments_data["count"],
-                            "src": comments_data["src"]
-                        },
-                        "likes": {
-                            "types": "likes",
-                            "page": likes_data["page"],
-                            "id": likes_data["id"],
-                            "page_number": likes_data["page_number"],
-                            "size": likes_data["size"],
-                            "count": likes_data["count"],
-                            "src": likes_data["src"]
-                        },
-                        "published": post.published,
-                        "visibility": post.visibility,
-                    }
-
-                    filtered_posts_attributes.append(postObject)
-
-                return JsonResponse(filtered_posts_attributes, status=200)
-
-        # Not authenticated (only view public posts)
-        posts = Post.objects.filter(Q(user=user, visibility="PUBLIC")).latest('published')
-
-        # Paginate posts based on size
         posts_paginator = Paginator(posts, size)
 
         page_posts = posts_paginator.page(page)
@@ -636,14 +546,6 @@ class PostViewSet(viewsets.ViewSet):
         filtered_posts_attributes = []
 
         for post in page_posts:
-            post_id = unquote(post.id)
-            comments_viewset = CommentViewSet()
-            response = comments_viewset.retrieve(request, pk=post_id)
-            comments_data = json.loads(response.content)
-
-            likes_viewset = LikeViewSet()
-            response = likes_viewset.retrieve(request, pk=post_id)
-            likes_data = json.loads(response.content)
 
             postObject = {
                 "type": "post",
@@ -661,28 +563,36 @@ class PostViewSet(viewsets.ViewSet):
                     "github": author_data["github"],
                     "profileImage": author_data["profileImage"],
                 },
-                "comments": {
-                    "type": "comments",
-                    "page": comments_data["page"],
-                    "id": comments_data["id"],
-                    "page_number": comments_data["page_number"],
-                    "size": comments_data["size"],
-                    "count": comments_data["count"],
-                    "src": comments_data["src"]
-                },
-                "likes": {
-                    "types": "likes",
-                    "page": likes_data["page"],
-                    "id": likes_data["id"],
-                    "page_number": likes_data["page_number"],
-                    "size": likes_data["size"],
-                    "count": likes_data["count"],
-                    "src": likes_data["src"]
-                },
+                # "comments": {
+                #     "type": "comments",
+                #     "page": comments_data["page"],
+                #     "id": comments_data["id"],
+                #     "page_number": comments_data["page_number"],
+                #     "size": comments_data["size"],
+                #     "count": comments_data["count"],
+                #     "src": comments_data["src"]
+                # },
+                # "likes": {
+                #     "types": "likes",
+                #     "page": likes_data["page"],
+                #     "id": likes_data["id"],
+                #     "page_number": likes_data["page_number"],
+                #     "size": likes_data["size"],
+                #     "count": likes_data["count"],
+                #     "src": likes_data["src"]
+                # },
                 "published": post.published,
                 "visibility": post.visibility,
             }
 
             filtered_posts_attributes.append(postObject)
+        
+        posts = {
+            "type": "posts",
+            "page_number": page,
+            "size": size,
+            "count": posts_paginator.count,
+            "src": filtered_posts_attributes
+        }
 
-        return JsonResponse(filtered_posts_attributes, status=200)
+        return JsonResponse(posts, status=200, safe=False)

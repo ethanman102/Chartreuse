@@ -5,6 +5,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action, api_view
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 from .. import models
+from urllib.parse import unquote
 
 class ImageViewSet(viewsets.ViewSet):
 
@@ -30,7 +31,10 @@ class ImageViewSet(viewsets.ViewSet):
         Returns:
             HttpResponse containing the image data of the post.
         '''
-        post = models.Post.objects.filter(user__user__id=author_id, id=post_id).first()
+        decoded_author_id = unquote(author_id)
+        decoded_post_id = unquote(post_id)
+        author = models.User.objects.filter(url_id=decoded_author_id).first()
+        post = models.Post.objects.filter(user=author, url_id=decoded_post_id).first()
 
         # Check if there is image data
         if post and post.content and post.contentType in ['image/jpeg;base64', 'image/png;base64']:

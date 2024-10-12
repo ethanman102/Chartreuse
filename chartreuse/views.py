@@ -117,8 +117,6 @@ class ProfileDetailView(DetailView):
         sent_request: (Bool if the user is NOT already following, but did they sent a follow request?)
         }
         
-        
-        
         '''
 
         context = super().get_context_data(**kwargs)
@@ -157,8 +155,8 @@ class ProfileDetailView(DetailView):
         context['like_count'] = Like.objects.filter(user=user).count()
         context['comment_count'] = Comment.objects.filter(user=user).count()
         context['post_count'] = Post.objects.filter(user=user).count()
+
         context['followers'] = Follow.objects.filter(followed=user).count()
-       
         context['following'] = Follow.objects.filter(follower=user).count()
         
     

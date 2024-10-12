@@ -55,6 +55,11 @@ class PostTestCases(TestCase):
         self.post3 = models.Post.objects.create(user=models.User.objects.get(pk="https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/2"))
         self.post4 = models.Post.objects.create(user=models.User.objects.get(pk="https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/3"))
 
+        self.encoded_post_url_id_1 = quote(self.post1.url_id, safe = "")
+        self.encoded_post_url_id_2 = quote(self.post2.url_id, safe = "")
+        self.encoded_post_url_id_3 = quote(self.post3.url_id, safe = "")
+        self.encoded_post_url_id_4 = quote(self.post4.url_id, safe = "")
+
     def test_creating_post(self):
         """
         This tests creating a post.
@@ -84,7 +89,7 @@ class PostTestCases(TestCase):
         """
         # Purposely do not log in
         # send post request 
-        response = self.client.post(reverse('chartreuse:posts', args=[self.user_id_1]), {'post': "http://nodebbbb/authors/3/posts"})
+        response = self.client.post(reverse('chartreuse:posts', args=[self.user_id_1]), {'visibility': "PUBLIC", "title": "Gregs public post", "description": "Test post description", "contentType": "text/plain", "content": "Hello World! \nThis is a short message from greg!"})
 
         # We should be denied access
         self.assertEqual(response.status_code, 401)
@@ -96,7 +101,7 @@ class PostTestCases(TestCase):
         """
 
         # Assuming you have a user and post objects created in the test setup
-        response = self.client.get(reverse('chartreuse:post', args=[self.user_id_1, quote(self.post1.url_id, safe = "")]))
+        response = self.client.get(reverse('chartreuse:post', args=[self.user_id_1, self.encoded_post_url_id_1]))
 
         # Assertions to verify the response
         self.assertEqual(response.status_code, 200)
@@ -109,7 +114,7 @@ class PostTestCases(TestCase):
         Tests getting posts by an author.
         """
         # Assuming you have a user and post objects created in the test setup
-        response = self.client.get(reverse('chartreuse:post', args=[self.user_id_1, quote(self.post1.url_id, safe = "")]))
+        response = self.client.get(reverse('chartreuse:post', args=[self.user_id_1, self.encoded_post_url_id_1]))
 
         # Assertions to verify the response
         self.assertEqual(response.status_code, 200)
@@ -127,7 +132,7 @@ class PostTestCases(TestCase):
             'password': '87@398dh817b!',
         })
 
-        response = self.client.post(reverse('chartreuse:post', args=[self.user_id_2, quote(self.post3.url_id, safe = "")]), {'post': "http://nodebbbb/authors/2/posts/3"})
+        response = self.client.post(reverse('chartreuse:post', args=[self.user_id_2, self.encoded_post_url_id_3]), {'post': "http://nodebbbb/authors/2/posts/3"})
 
         # Successfully removed post
         self.assertEqual(response.status_code, 200)
@@ -146,7 +151,7 @@ class PostTestCases(TestCase):
             'password': 'ABC123!!!'
         })
 
-        response = self.client.put(reverse('chartreuse:post', args=[self.user_id_1, quote(self.post2.url_id, safe = "")]), {'visibility': "PUBLIC", "title": "Gregs public post", "description": "Test post description", "contentType": "text/plain", "content": "Hello World! \nThis is a short message from greg!"})
+        response = self.client.put(reverse('chartreuse:post', args=[self.user_id_1, self.encoded_post_url_id_2]), {'visibility': "PUBLIC", "title": "Gregs updated public post", "description": "New test post description", "contentType": "text/plain", "content": "Hello World!!!! \nThis is a short message from greg!"})
 
         # Successfully updated post
         self.assertEqual(response.status_code, 201)

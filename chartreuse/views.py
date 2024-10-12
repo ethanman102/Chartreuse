@@ -80,6 +80,48 @@ def follow_reject(request,followee,follower):
 
 
 
+
+def follow_accept(request,followee,follower):
+
+    '''
+    Purpose: View to interact with the follow requests database by deleting a request and processing the request into a new follower
+
+    Arguments:
+    request: Request body containing the followee id and the follower id to process into the database.
+    followee: the primary key of the User object getting followed.
+    follower: the primary key of the User object doing the following
+    '''
+
+    if request.method == "POST": # get the request body.
+        followed_used = get_object_or_404(User,url_id=followee)
+        following_user = get_object_or_404(User,url_id=follower)
+        follow_request = get_object_or_404(FollowRequest,requester=following_user,requestee=followed_used)
+        follow = Follow(follower=following_user,followed=followed_used) # create the new follow!
+        follow.save()
+        follow_request.delete()
+        return redirect('chartreuse:profile',pk=followee)
+    
+    return HttpResponseNotAllowed(["POST"])
+
+def follow_reject(request,followee,follower):
+    '''
+    Purpose: View to interact with the follow requests database by rejecting a follow request and not processing it into a follow!!
+
+    Arguments:
+    request: Request body containing the id's of who is to be followed and who is following
+    followee: the primary key of the User object getting followed.
+    follower: the primary key of the User object doing the following
+    '''
+    if request.method == "POST":
+        followed_used = get_object_or_404(User,url_id=followee)
+        following_user = get_object_or_404(User,url_id=follower)
+        follow_request = get_object_or_404(FollowRequest,requester=following_user,requestee=followed_used)
+        follow_request.delete()
+        return redirect("chartreuse:profile",pk=followee)
+    return HttpResponseNotAllowed(["POST"])
+
+
+
 class ProfileDetailView(DetailView):
 
     '''

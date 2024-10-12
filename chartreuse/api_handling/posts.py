@@ -34,7 +34,6 @@ class PostSerializer(serializers.Serializer):
         fields = ['type', 'title', 'id', 'decription', 'contentType', 'content', 'author', 'comments', 'likes', 'published', 'visibility']
 
 class PostViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
     serializer_class = PostSerializer
 
     @extend_schema(
@@ -67,6 +66,9 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing the new post    
         """        
+        if (not request.user.is_authenticated):
+            return JsonResponse({"error": "User is not authenticated."}, status=401)
+        
         decoded_user_id = unquote(user_id)
 
         # Ensure the user creating the post is the current user
@@ -248,7 +250,6 @@ class PostViewSet(viewsets.ViewSet):
                 405: OpenApiResponse(description="Method not allowed."),
             }
     )
-    @api_view(["GET"])
     def get_post(self, request, user_id, post_id):
         """
         Gets a specific post object from a user.
@@ -522,7 +523,6 @@ class PostViewSet(viewsets.ViewSet):
             405: OpenApiResponse(description="Method not allowed."),
         }
     )
-    @api_view(["GET"])
     def get_posts(self, request, author_id):
         """
         Gets all the posts of a user.

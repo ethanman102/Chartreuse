@@ -87,8 +87,8 @@ class PostTestCases(TestCase):
         response = self.client.post(reverse('chartreuse:posts', args=[self.user_id_1]), {'post': "http://nodebbbb/authors/3/posts"})
 
         # We should be denied access
-        self.assertEqual(response.status_code, 403)
-        self.assertEqual(response.json()["detail"], "Authentication credentials were not provided.")
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json()["error"], "User is not authenticated.")
         
     def test_get_post(self):
         """

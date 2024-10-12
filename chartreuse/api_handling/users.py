@@ -12,12 +12,16 @@ from rest_framework import serializers, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from urllib.parse import unquote
+import requests
+import regex as re
 
 from .. import views
 from ..models import User
 
 class UserSerializer(serializers.ModelSerializer):
     type = serializers.CharField(default="author")
+    id = serializers.URLField()
     displayName = serializers.CharField()
     host = serializers.URLField()
     github = serializers.URLField()
@@ -26,7 +30,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['type', 'displayName', 'host', 'github', 'profileImage', 'page', 'dateCreated']
+        fields = ['type', 'id', 'displayName', 'host', 'github', 'profileImage', 'page', 'dateCreated']
 
     def validate_displayName(self, value):
         if not value:
@@ -66,7 +70,8 @@ class UserViewSet(viewsets.ViewSet):
     )
     def list(self, request):
         '''
-        Gets a paginated list of users based on the provided query parameters.
+        Gets a paginated list of users based on the provided query parameters. 
+        This will only get users who are registered on the current host.
 
         Parameters:
             request: rest_framework object containing the request and query parameters.
@@ -94,12 +99,11 @@ class UserViewSet(viewsets.ViewSet):
         # Since we have some additional fields, we only want to return the required ones
         filtered_user_attributes = []
         for user in page_users:
-            id = user.host + "authors/" + str(user.user.id)
             page = user.host + "authors/" + user.user.username
 
             filtered_user_attributes.append({
                 "type": "author",
-                "id": id,
+                "id": user.url_id,
                 "host": user.host,
                 "displayName": user.displayName,
                 "github": user.github,
@@ -138,21 +142,31 @@ class UserViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the user.
         '''
-        user = get_object_or_404(User, pk=pk)
+        decoded_user_id = unquote(pk)
+        host = get_host_from_id(decoded_user_id)
 
-        id = user.host + "authors/" + str(user.user.id)
-        page = user.host + "authors/" + user.user.username
+        if(host != views.Host.host):
+            # if the user is not on the current host, we need to get the user from the remote host
+            api_url = host + "api/authors/" + pk
+            response = requests.get(api_url)
+            data = response.json()
 
-        # We only want to return the required fields
-        return JsonResponse({
-            "type": "author",
-            "id": id,
-            "host": user.host,
-            "displayName": user.displayName,
-            "github": user.github,
-            "profileImage": user.profileImage,
-            "page": page
-        }, safe=False)
+            return JsonResponse(data, safe=False)
+        else:
+            # case where the user is on the current host
+            user = get_object_or_404(User, pk=decoded_user_id)
+            page = user.host + "authors/" + user.user.username
+
+            # We only want to return the required fields
+            return JsonResponse({
+                "type": "author",
+                "id": user.url_id,
+                "host": user.host,
+                "displayName": user.displayName,
+                "github": user.github,
+                "profileImage": user.profileImage,
+                "page": page
+            }, safe=False)
 
     @extend_schema(
         summary="Update a user",
@@ -171,32 +185,44 @@ class UserViewSet(viewsets.ViewSet):
     )
     def update(self, request, pk=None):
         if request.user.is_authenticated:
-            user = get_object_or_404(User, pk=pk)
-
-            id = user.host + "authors/" + str(user.user.id)
-            page = user.host + "authors/" + user.user.username
+            decoded_user_id = unquote(pk)
+            host = get_host_from_id(decoded_user_id)
 
             data = json.loads(request.body.decode('utf-8'))
 
-            serializer = UserSerializer(instance=user, data=data, partial=True)
+            if(host != views.Host.host):
+                # if the user is not on the current host, we need to get the user from the remote host
+                api_url = host + "api/authors/" + pk
+                response = requests.put(api_url, data=json.dumps(data), headers={'Content-Type': 'application/json'})
 
-            # Save the updated user
-            if serializer.is_valid():
-                # If valid, save the updates
-                serializer.save()
-            
+                response.raise_for_status()
+                response_data = response.json()
+
+                return JsonResponse(response_data, safe=False)
             else:
-                return JsonResponse(serializer.errors, status=400)
+                # case where the user is on the current host
+                user = get_object_or_404(User, pk=decoded_user_id)
+                page = user.host + "authors/" + user.user.username
 
-            return JsonResponse({
-                "type": "author",
-                "id": id,
-                "host": user.host,
-                "displayName": user.displayName,
-                "github": user.github,
-                "profileImage": user.profileImage,
-                "page": page
-            }, safe=False)
+                serializer = UserSerializer(instance=user, data=data, partial=True)
+
+                # Save the updated user
+                if serializer.is_valid():
+                    # If valid, save the updates
+                    serializer.save()
+                
+                else:
+                    return JsonResponse(serializer.errors, status=400)
+
+                return JsonResponse({
+                    "type": "author",
+                    "id": user.url_id,
+                    "host": user.host,
+                    "displayName": user.displayName,
+                    "github": user.github,
+                    "profileImage": user.profileImage,
+                    "page": page
+                }, safe=False)
         else:
             return Response({"error": "Permission denied."}, status=401)
         
@@ -210,15 +236,28 @@ class UserViewSet(viewsets.ViewSet):
         }
     )
     def destroy(self, request, pk=None):
-        user = get_object_or_404(User, pk=pk)
+        decoded_user_id = unquote(pk)
 
-        logged_in_user = request.user
+        host = get_host_from_id(decoded_user_id)
+        
+        if(host != views.Host.host):
+            # if the user is not on the current host, we need to get the user from the remote host
+            api_url = host + "api/authors/" + pk
+            response = requests.delete(api_url)
 
-        if logged_in_user != user.user:
-            return Response({"error": "You do not have permission to delete this user."}, status=401)
+            # Raise an exception if the request failed
+            response.raise_for_status()
 
-        user.delete()
-        return Response({"success": "User deleted successfully."}, status=200)
+            return Response({"success": "User deleted successfully."}, status=200)
+        else:
+            logged_in_user = request.user
+            user = get_object_or_404(User, pk=decoded_user_id)
+
+            if logged_in_user != user.user:
+                return Response({"error": "You do not have permission to delete this user."}, status=401)
+            # case where the user is on the current host
+            user.delete()
+            return Response({"success": "User deleted successfully."}, status=200)
 
     @extend_schema(
         summary="Create a new user",
@@ -231,7 +270,7 @@ class UserViewSet(viewsets.ViewSet):
     )
     def create(self, request):
         '''
-        Creates a new user.
+        Creates a new user on the current host.
 
         Parameters:
             request: rest_framework object containing the request with the user details.
@@ -268,7 +307,10 @@ class UserViewSet(viewsets.ViewSet):
         authUser.set_password(password)
         authUser.save()
 
+        id = host + "authors/" + str(authUser.id)
+
         user = User.objects.create(
+            url_id = id,
             displayName = displayName,
             github = github,
             profileImage = profileImage,
@@ -279,7 +321,7 @@ class UserViewSet(viewsets.ViewSet):
         # Save the user
         user.save()
 
-        id = user.host + "authors/" + str(user.user.id)
+        id = str(user.url_id)
         page = user.host + "authors/" + user.user.username
 
         return JsonResponse({
@@ -325,3 +367,17 @@ class UserViewSet(viewsets.ViewSet):
             return JsonResponse({"success": "User logged in successfully."}, status=200)
         else:
             return JsonResponse({"error": "Invalid credentials."}, status=400)
+
+def get_host_from_id(user_id):
+    '''
+    Gets the host from the user id.
+
+    Parameters:
+        user_id: The user id to extract the host from.
+
+    Returns:
+        The host of the user.
+    '''
+    pattern = r'(https:\/\/[^\/]+\/)'
+    match = re.match(pattern, user_id)
+    return match.group(1)

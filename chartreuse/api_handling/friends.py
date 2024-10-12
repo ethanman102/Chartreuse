@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from ..models import Follow, User
+from urllib.parse import unquote
 
 def get_friends(request, author_id):
     '''

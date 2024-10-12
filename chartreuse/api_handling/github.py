@@ -4,6 +4,7 @@ from ..models import User
 from django.http import JsonResponse
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework.decorators import action, api_view
+from urllib.parse import unquote
 
 @extend_schema(
     summary="Gets the public events for a user from github",
@@ -28,7 +29,8 @@ def get_events(request, user_id):
         JsonResponse: the response from the github api
     '''
     if request.method == 'GET':
-        user = get_object_or_404(User, id=user_id)
+        decoded_user_id = unquote(user_id)
+        user = get_object_or_404(User, url_id=decoded_user_id)
 
         githubUrl = user.github
         githubUsername = githubUrl.split("/")[-1]
@@ -62,7 +64,8 @@ def get_starred(request, user_id):
         JsonResponse: the response from the github api
     '''
     if request.method == 'GET':
-        user = get_object_or_404(User, id=user_id)
+        decoded_user_id = unquote(user_id)
+        user = get_object_or_404(User, url_id=decoded_user_id)
 
         githubUrl = user.github
         githubUsername = githubUrl.split("/")[-1]
@@ -96,7 +99,8 @@ def get_subscriptions(request, user_id):
         JsonResponse: the response from the github api
     '''
     if request.method == 'GET':
-        user = get_object_or_404(User, id=user_id)
+        decoded_user_id = unquote(user_id)
+        user = get_object_or_404(User, url_id=decoded_user_id)
 
         githubUrl = user.github
         githubUsername = githubUrl.split("/")[-1]

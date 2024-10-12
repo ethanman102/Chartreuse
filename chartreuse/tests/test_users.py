@@ -1,6 +1,7 @@
 from rest_framework.test import APIClient
 from django.test import TestCase
 from django.urls import reverse
+from urllib.parse import quote
 import json
 
 class UserTestCases(TestCase):
@@ -14,7 +15,7 @@ class UserTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/k7XVwpB.jpeg',
             'username': 'greg',
             'password': 'ABC123!!!',
-            'host': 'http://nodeaaaa/api/',
+            'host': 'http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
             'firstName': 'Greg',
             'lastName': 'Johnson',
         }
@@ -25,7 +26,7 @@ class UserTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/1234.jpeg',
             'username': 'john',
             'password': '87@398dh817b!',
-            'host': 'http://nodeaaaa/api/',
+            'host': 'http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
             'firstName': 'John',
             'lastName': 'Smith',
         }
@@ -36,7 +37,7 @@ class UserTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/abcd.jpeg',
             'username': 'benjamin',
             'password': 'fwef!&123',
-            'host': 'http://nodeaaaa/api/',
+            'host': 'http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
             'firstName': 'Benjamin',
             'lastName': 'Stanley',
         }
@@ -55,7 +56,7 @@ class UserTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/1234.jpeg',
             'username': 'jane',
             'password': 'ABC123!!!',
-            'host': 'http://nodeaaaa/api/',
+            'host': 'http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
             'firstName': 'Jane',
             'lastName': 'Doe',
         }, format='json')
@@ -66,9 +67,9 @@ class UserTestCases(TestCase):
         self.assertEqual(response.json()['github'], 'http://github.com/jdoe')
         self.assertEqual(response.json()['profileImage'], 'https://i.imgur.com/1234.jpeg')
         self.assertEqual(response.json()['type'], 'author')
-        self.assertEqual(response.json()['page'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/api/authors/jane")
-        self.assertEqual(response.json()['id'], 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/api/authors/4')
-        self.assertEqual(response.json()['host'], 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/api/')
+        self.assertEqual(response.json()['page'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/jane")
+        self.assertEqual(response.json()['id'], 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/4')
+        self.assertEqual(response.json()['host'], 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/')
     
     def test_get_all_users(self):
         '''
@@ -95,7 +96,7 @@ class UserTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/1234.jpeg',
             'username': 'jane',
             'password': 'ABC',
-            'host': 'http://nodeaaaa/api/',
+            'host': 'http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
             'firstName': 'Jane',
             'lastName': 'Doe',
         }, format='json')
@@ -107,7 +108,8 @@ class UserTestCases(TestCase):
         '''
         This tests getting a specific user.
         '''
-        response = self.client.get(reverse('chartreuse:user-detail', args=[1]))
+        user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1", safe='')
+        response = self.client.get(reverse('chartreuse:user-detail', args=[user_id]))
 
         # Successfully got user
         self.assertEqual(response.status_code, 200)
@@ -115,15 +117,16 @@ class UserTestCases(TestCase):
         self.assertEqual(response.json()['github'], 'http://github.com/gjohnson')
         self.assertEqual(response.json()['profileImage'], 'https://i.imgur.com/k7XVwpB.jpeg')
         self.assertEqual(response.json()['type'], 'author')
-        self.assertEqual(response.json()['page'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/api/authors/greg")
-        self.assertEqual(response.json()['id'], 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/api/authors/1')
-        self.assertEqual(response.json()['host'], 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/api/')
+        self.assertEqual(response.json()['page'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/greg")
+        self.assertEqual(response.json()['id'], 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1')
+        self.assertEqual(response.json()['host'], 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/')
         
     def test_get_user_invalid_id(self):
         '''
         This tests getting a user with an invalid id.
         '''
-        response = self.client.get(reverse('chartreuse:user-detail', args=[100]))
+        user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/100", safe='')
+        response = self.client.get(reverse('chartreuse:user-detail', args=[user_id]))
 
         # User does not exist
         self.assertEqual(response.status_code, 404)
@@ -138,7 +141,8 @@ class UserTestCases(TestCase):
             'password': 'ABC123!!!'
         })
 
-        response = self.client.delete(reverse('chartreuse:user-detail', args=[1]))
+        user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1", safe='')
+        response = self.client.delete(reverse('chartreuse:user-detail', args=[user_id]))
 
         # Successfully deleted user
         self.assertEqual(response.status_code, 200)
@@ -148,7 +152,8 @@ class UserTestCases(TestCase):
         '''
         This tests deleting a user with an invalid id.
         '''
-        response = self.client.delete(reverse('chartreuse:user-detail', args=[100]))
+        user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/100", safe='')
+        response = self.client.delete(reverse('chartreuse:user-detail', args=[user_id]))
 
         # User does not exist
         self.assertEqual(response.status_code, 404)
@@ -157,7 +162,8 @@ class UserTestCases(TestCase):
         '''
         This tests updating a user.
         '''
-        url = reverse('chartreuse:user-detail', args=[1])
+        user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1", safe='')
+        url = reverse('chartreuse:user-detail', args=[user_id])
 
         data = {
             "github": "http://github.com/newgithub",

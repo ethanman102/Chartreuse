@@ -1,10 +1,12 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from urllib.parse import quote
+from rest_framework.test import APIClient
+from .. import models
 
-class FollowersTestCases(TestCase):
+class FriendsTestCases(TestCase):
     def setUp(self):
-        self.client = Client()
+        self.client = APIClient()
 
         # Test user data
         self.test_user_1_data = {

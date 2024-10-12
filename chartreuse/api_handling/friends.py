@@ -15,7 +15,7 @@ def get_friends(request, author_id):
         JsonResponse with the list of friends.
     '''
     decoded_author_id = unquote(author_id)
-    author = get_object_or_404(User, id=decoded_author_id)
+    author = get_object_or_404(User, url_id=decoded_author_id)
 
     # Get the followers of the author
     followers = Follow.objects.filter(followed=author).values_list('follower', flat=True)
@@ -23,17 +23,17 @@ def get_friends(request, author_id):
     # Get the authors that the current author follows
     following = Follow.objects.filter(follower=author).values_list('followed', flat=True)
 
-    friends = User.objects.filter(id__in=followers).filter(id__in=following)
+    friends = User.objects.filter(url_id__in=followers).filter(url_id__in=following)
 
     friends_list = []
 
     for friend in friends:
         friend_attributes = {
             "type": "author",
-            "id": f"{friend.host}/authors/{friend.user.id}",
+            "id": f"{friend.host}/authors/{friend.url_id}",
             "host": friend.host,
             "displayName": friend.displayName,
-            "page": f"{friend.host}/authors/{friend.user.id}",
+            "page": f"{friend.host}/authors/{friend.url_id}",
             "github": friend.github,
             "profileImage": friend.profileImage
         }
@@ -62,8 +62,8 @@ def check_friendship(request, author_id, foreign_author_id):
     decoded_author_id = unquote(author_id)
     decoded_foreign_author_id = unquote(foreign_author_id)
 
-    author = get_object_or_404(User, id=decoded_author_id)
-    foreign_author = get_object_or_404(User, id=decoded_foreign_author_id)
+    author = get_object_or_404(User, url_id=decoded_author_id)
+    foreign_author = get_object_or_404(User, url_id=decoded_foreign_author_id)
 
     # Check if the current user follows the author and vice versa
     if (Follow.objects.filter(follower=author, followed=foreign_author).exists() and

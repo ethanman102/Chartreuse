@@ -8,9 +8,10 @@ app_name = "chartreuse"
 urlpatterns = [
     path("api/author/login/", users.UserViewSet.login_user, name="login_user"),
 
-    path("authors/<str:pk>/", ProfileDetailView.as_view(),name="profile"),
-    path("authors/<str:followee>/accept/<str:follower>", views.follow_accept,name="profile_follow_accept"),
-    path("authors/<str:followee>/reject/<str:follower>", views.follow_reject,name="profile_follow_reject"),
+    re_path(r"authors/accept/(?P<followed>.+)/(?P<follower>.+)/", views.follow_accept,name="profile_follow_accept"),
+    re_path(r"authors/reject/(?P<followed>.+)/(?P<follower>.+)/", views.follow_reject,name="profile_follow_reject"),
+    re_path(r"authors/(?P<url_id>.+)/", ProfileDetailView.as_view(),name="profile"),
+    
 
     # Post URLs
     re_path(r"api/authors/(?P<user_id>.+)/posts/", posts.PostViewSet.as_view({"get": "get_posts", "post": "create_post"}), name="posts"),

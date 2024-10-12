@@ -14,9 +14,11 @@ urlpatterns = [
 
     path("authors/<int:pk>/", ProfileDetailView.as_view(),name="profile"),
 
-    path("authors/<str:user_id>/posts/", posts.create_post, name="create_post"),
-    path("authors/<str:user_id>/posts/<str:post_id>", posts.update_post, name="update_post"),
+    # Post URLs
+    path("authors/<str:user_id>/posts/", posts.PostViewSet.as_view({"get": "get_posts", "post": "create_post"}), name="posts"),
+    path("authors/<str:user_id>/posts/<str:post_id>", posts.PostViewSet.as_view({"get": "get_post", "delete": "remove_post", "put": "update_post"}), name="post"),
 
+    # Comment URLs 
     path("authors/<str:user_id>/inbox", comments.create_comment, name="create_comment"),
     path("authors/<str:user_id>/posts/<str:post_id>/comments", comments.get_comments, name="get_comments"),
     path("authors/<str:user_id>/post/<str:post_id>/comment/<str:remote_comment_id>", comments.get_comment, name="get_comment"),

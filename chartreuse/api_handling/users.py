@@ -23,10 +23,11 @@ class UserSerializer(serializers.ModelSerializer):
     github = serializers.URLField()
     profileImage = serializers.URLField()
     page = serializers.URLField()
+    id = serializers.URLField()
 
     class Meta:
         model = User
-        fields = ['type', 'displayName', 'host', 'github', 'profileImage', 'page', 'dateCreated']
+        fields = ['type', 'displayName', 'host', 'github', 'profileImage', 'page', 'id', 'dateCreated']
 
     def validate_displayName(self, value):
         if not value:

@@ -10,8 +10,8 @@ from rest_framework import viewsets
 
 from ..models import User, Post
 from .users import UserSerializer, UserViewSet
-from .likes import LikesSerializer, LikeViewSet
-from .comments import CommentsSerializer, CommentViewSet
+from .likes import LikesSerializer
+from .comments import CommentsSerializer
 from urllib.parse import unquote
 
 class PostSerializer(serializers.Serializer):

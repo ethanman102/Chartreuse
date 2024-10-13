@@ -11,9 +11,6 @@ from urllib.parse import unquote, quote
 class Host():
     host = "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/"
 
-def error(request):
-    return render(request, 'error.html')
-
 def follow_accept(request,followed,follower):
 
     '''

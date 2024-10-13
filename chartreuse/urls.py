@@ -10,6 +10,8 @@ urlpatterns = [
 
     re_path(r"authors/accept/(?P<followed>.+)/(?P<follower>.+)/", views.follow_accept,name="profile_follow_accept"),
     re_path(r"authors/reject/(?P<followed>.+)/(?P<follower>.+)/", views.follow_reject,name="profile_follow_reject"),
+    re_path(r"authors/unfollow/(?P<followed>.+)/(?P<follower>.+)/",views.profile_unfollow,name="profile_unfollow"),
+    re_path(r"authors/followrequest/(?P<requestee>.+)/(?P<requester>.+)/",views.profile_follow_request,name="profile_follow_request"),
     re_path(r"authors/(?P<url_id>.+)/", ProfileDetailView.as_view(),name="profile"),
     
 

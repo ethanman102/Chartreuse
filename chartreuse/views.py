@@ -56,10 +56,10 @@ def follow_accept(request,followed,follower):
     if request.method == "POST": # get the request body.
         followed = unquote(followed)
         follower = unquote(follower)
-        followed_used = get_object_or_404(User,url_id=followed)
+        followed_user = get_object_or_404(User,url_id=followed)
         following_user = get_object_or_404(User,url_id=follower)
-        follow_request = get_object_or_404(FollowRequest,requester=following_user,requestee=followed_used)
-        follow = Follow(follower=following_user,followed=followed_used) # create the new follow!
+        follow_request = get_object_or_404(FollowRequest,requester=following_user,requestee=followed_user)
+        follow = Follow(follower=following_user,followed=followed_user) # create the new follow!
         follow.save()
         follow_request.delete()
         return redirect('chartreuse:profile',url_id=quote(followed,safe=''))
@@ -78,11 +78,50 @@ def follow_reject(request,followed,follower):
     if request.method == "POST":
         followed = unquote(followed)
         follower = unquote(follower)
-        followed_used = get_object_or_404(User,url_id=followed)
+        followed_user = get_object_or_404(User,url_id=followed)
         following_user = get_object_or_404(User,url_id=follower)
-        follow_request = get_object_or_404(FollowRequest,requester=following_user,requestee=followed_used)
+        follow_request = get_object_or_404(FollowRequest,requester=following_user,requestee=followed_user)
         follow_request.delete()
         return redirect("chartreuse:profile",url_id=quote(followed,safe=''))
+    return HttpResponseNotAllowed(["POST"])
+
+def profile_unfollow(request,followed,follower):
+    '''
+    Purpose: View to interact with the user to unfollow the person on the current page through a form submission.
+
+    Arguments:
+    request: Request with body containing the id's of who is going to be unfollowed and who is currently trying to unfollow
+    followed: the id of the user who is currently followed but is about to be unfollowed
+    follower: the primary key of the user who is currently following but about to be removed from the follow.
+    '''
+
+    if request.method == "POST":
+        followed = unquote(followed)
+        follower = unquote(follower)
+        followed_user = get_object_or_404(User,url_id=followed)
+        following_user = get_object_or_404(User,url_id=follower)
+        follow = get_object_or_404(Follow,followed=followed_user,follower=following_user)
+        follow.delete()
+        return redirect("chartreuse:profile",url_id=quote(followed,safe=''))
+    return HttpResponseNotAllowed(["POST"])
+
+def profile_follow_request(request,requestee,requester):
+    '''
+    Purpose: View to interact with the user to send a follow request to the current user profile on the UI page
+
+    Arguments:
+    request: Request with body containing the ID's of whos in the follow request relationship
+    requestee: the id of the user who is being asked to get followed
+    requester: the id of the user who is sending the follow request
+    '''
+
+    if request.method == "POST":
+        requestee = unquote(requestee)
+        requester = unquote(requester)
+        requester_user = get_object_or_404(User,url_id=requester)
+        requestee_user = get_object_or_404(User,url_id=requestee)
+        FollowRequest.objects.create(requestee=requestee_user,requester=requester_user)
+        return redirect("chartreuse:profile",url_id=quote(requestee,safe=''))
     return HttpResponseNotAllowed(["POST"])
 
 
@@ -109,7 +148,8 @@ class ProfileDetailView(DetailView):
         Context Dictionary Structure:
         {
         profile: (the User model object - NOT AUTHUSER - )
-        viewer: (the id if the user viewing the page.) 
+        viewer_id: (the id if the user viewing the page. this is percent encoded...) 
+        owner_id: (the percent encoded id of the user who owns the page!)
         logged_in: (Depicts if user is authenticated and has full page access)
         owner: (If the logged in user is viewing their own page)
         requests: (A list of follow request objects)
@@ -140,7 +180,8 @@ class ProfileDetailView(DetailView):
                 context['requests'] = requests
             else:
 
-                context['viewer'] = quote(current_user_model.url_id,safe='')
+                context['viewer_id'] = quote(current_user_model.url_id,safe='')
+                context['owner_id'] = quote(page_user.url_id,safe='')
                 # check if the user if following or not...
                 follow = Follow.objects.filter(follower=current_user,followed=page_user)
                 if follow.count() == 0:
@@ -155,7 +196,6 @@ class ProfileDetailView(DetailView):
         context['like_count'] = Like.objects.filter(user=user).count()
         context['comment_count'] = Comment.objects.filter(user=user).count()
         context['post_count'] = Post.objects.filter(user=user).count()
-
         context['followers'] = Follow.objects.filter(followed=user).count()
         context['following'] = Follow.objects.filter(follower=user).count()
         

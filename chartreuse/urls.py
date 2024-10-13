@@ -2,7 +2,7 @@ from django.urls import path, re_path
 from .api_handling import users, likes, images, github, friends, posts, comments
 from .api_handling import followers, follow_requests
 from chartreuse.views import ProfileDetailView, error, follow_accept, follow_reject
-from .view import signup_view, login_view, homepage_view, landing_page_view
+from .view import signup_view, login_view, homepage_view, landing_page_view, add_post_view
 
 app_name = "chartreuse"
 urlpatterns = [
@@ -14,6 +14,8 @@ urlpatterns = [
     path('login/authenticate/', login_view.save_login, name='authenticate'),
 
     path("homepage/", homepage_view.FeedDetailView.as_view(), name="homepage"),
+    path('add-post/', add_post_view.add_post, name='add_post'),
+    path('add-post/save/', add_post_view.save_post, name='save_post'),
 
     # Like URLs
     re_path(r"api/authors/(?P<user_id>.+)/inbox/$", likes.LikeViewSet.as_view({'post': 'add_like', 'delete': 'remove_like'}), name="like"),

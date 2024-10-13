@@ -31,9 +31,7 @@ class FeedDetailView(DetailView):
         '''
         if self.request.user.is_authenticated:
             current_user = self.request.user
-            print(User.objects.all())
             current_user_model = get_object_or_404(User, user=current_user)
-            print("hi")
 
             # Get people that the user follows
             followers = get_followed(current_user_model.url_id)
@@ -45,8 +43,12 @@ class FeedDetailView(DetailView):
                 user_id = follower['id']
                 user_posts = get_public_posts(user_id)
                 posts.extend(user_posts)
+            
+            
+            # Get the user's own posts
+            user_posts = get_public_posts(current_user_model.url_id)
 
-            return posts
+            return user_posts
         else:
             # For anonymous users, show all public posts
             return get_public_posts()
@@ -65,6 +67,10 @@ class FeedDetailView(DetailView):
             context['logged_in'] = True
         else:
             context['logged_in'] = False
+        
+        get_queryset = self.get_queryset()
+        context['posts'] = get_queryset
+        print(context)
 
         return context
 

@@ -35,8 +35,14 @@ def save_signup(request):
 def login(request):
     return render(request, 'login.html')
 
+# view for rendering the error page
 def error(request):
     return render(request, 'error.html')
+
+# view for rendering the home page 
+# TO DO: swirch out home.html for the homepage Julia did
+def error(request):
+    return render(request, 'home.html')
 
 
 

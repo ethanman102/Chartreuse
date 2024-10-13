@@ -2,6 +2,10 @@ from django.shortcuts import get_object_or_404
 from chartreuse.models import User, Post, Follow, Like
 from django.views.generic.detail import DetailView
 from urllib.parse import unquote, quote
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import action
+from django.http import JsonResponse
+import json
 
 class FeedDetailView(DetailView):
     '''
@@ -19,13 +23,13 @@ class FeedDetailView(DetailView):
         Get the object from session data instead of the URL.
         Assumes the `url_id` is stored in the session.
         """
-        url_id = self.request.session.get('url_id')  # Retrieve from session
+        url_id = self.request.session.get('url_id')
         if url_id:
             return get_object_or_404(User, url_id=url_id)
         else:
-            return None  # Or raise an exception if you want
+            return None
 
-    def get_queryset(self):
+    def get_posts(self):
         '''
         Get the queryset based on the user's authentication status
         '''
@@ -44,10 +48,29 @@ class FeedDetailView(DetailView):
                 user_posts = get_public_posts(user_id)
                 posts.extend(user_posts)
 
+            user_posts = get_all_public_posts()
+            for post in user_posts:
+                post.likes_count = Like.objects.filter(post=post).count()
+                post.url_id = quote(post.url_id, safe='')
+                posts.append(post)
+
             return user_posts
         else:
-            # For anonymous users, show all public posts
             return posts()
+    
+    def get_user_details(self):
+        '''
+        Get the user details for the current user
+        '''
+        if self.request.user.is_authenticated:
+            current_user = self.request.user
+            current_user_model = get_object_or_404(User, user=current_user)
+
+            current_user_model.url_id = quote(current_user_model.url_id, safe='')
+
+            return current_user_model
+        else:
+            return None
 
     def get_context_data(self, **kwargs):
         '''
@@ -64,12 +87,64 @@ class FeedDetailView(DetailView):
         else:
             context['logged_in'] = False
         
-        queryset = self.get_queryset()
-        context['posts'] = queryset
+        posts = self.get_posts()
+        context['posts'] = posts
+
+        user_details = self.get_user_details()
+        context['user_details'] = user_details
 
         return context
 
-def get_public_posts():
+def get_post_likes(post_id):
+    """
+    Gets all likes for a post.
+
+    Parameters:
+        request: rest_framework object containing the request and query parameters.
+        post_id: The id of the post object.
+
+    Returns:
+        JsonResponse containing the likes for a post.
+    """
+    post = Post.objects.get(url_id=post_id)
+
+    likes = Like.objects.filter(post=post)
+
+    return likes
+
+def like_post(request):
+    """
+    Like a post.
+
+    Parameters:
+        request: rest_framework object containing the request and query parameters.
+        user_id: The id of the user who liked the post.
+        post_id: The id of the post object.
+
+    Returns:
+        JsonResponse containing the post object.
+    """
+    body = json.loads(request.body)
+    user_id = body["user_id"]
+    post_id = body["post_id"]
+
+    user = User.objects.get(url_id=unquote(user_id))
+    post = Post.objects.get(url_id=unquote(post_id))
+
+    # first check if the user has already liked the post
+    like = Like.objects.filter(user=user, post=post)
+
+    if like:
+        like.delete()
+    else:
+        Like.objects.create(user=user, post=post)
+
+    data = {
+        "likes_count": get_post_likes(unquote(post_id)).count()
+    }
+    return JsonResponse(data)
+
+def get_all_public_posts():
     '''
     Retrieves all public posts.
 
@@ -195,20 +270,3 @@ def get_unlisted_posts(user_id):
     posts = Post.objects.filter(user=author, visibility='UNLISTED')
 
     return posts
-
-def get_post_likes(post_id):
-    """
-    Gets all likes for a post.
-
-    Parameters:
-        request: rest_framework object containing the request and query parameters.
-        post_id: The id of the post object.
-
-    Returns:
-        JsonResponse containing the likes for a post.
-    """
-    post = Post.objects.get(id=post)
-
-    likes = Like.objects.filter(post=post)
-
-    return likes

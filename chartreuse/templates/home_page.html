@@ -14,6 +14,7 @@
 <body>
     <div class="container mt-5">
         <h4 class="mb-4">chartreuse.home</h4>
+        <p>Welcome, {{ user_details.displayName }}!</p>
         <div>
             <a href="/chartreuse/add-post" class="custom-button">Create a post</a>
         </div>
@@ -23,12 +24,12 @@
             {% for post in posts %}
             <div class="card mb-3 p-4">
                 <div class="d-flex justify-content-between align-items-center">
-                    <!-- Left side: Profile Image and Display Name -->
                     <div class="d-flex align-items-center">
-                        <img src="{{ post.user.profileImage }}" alt="{{ post.user.displayName }} Avatar" class="rounded-circle me-3" width="50" height="50">
+                        <img src="{{ user_details.profileImage }}" alt="{{ post.user.displayName }} Avatar" class="rounded-circle me-3" width="50" height="50">
                         <h5 class="card-title">{{ post.user.displayName }}</h5>
                     </div>
-                    <button class="btn like-button">{{ post.likes.count }} likes</button>
+                    <meta name="csrf-token" content="{{ csrf_token }}">
+                    <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}">{{ post.likes_count }} likes</button>
                 </div>
                 <p class="card-text mt-2">{{ post.content }}</p>
                 <p class="text-muted">Published on {{ post.published }}</p>
@@ -40,7 +41,7 @@
     </div>
     
     <br></br>
-
+    <script src="{% static 'javascript/like_post.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

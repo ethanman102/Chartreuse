@@ -1,20 +1,29 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="date" content="2024-10-12">
+    <meta name="tags" content="Signup">
+    <meta name="summary" content="Signup page.">
+    <title>Chartreuse</title>
 
-{% block content %}
-
-<form method="POST" action="/chartreuse/signup/save">
-    <label>Username</label>
-    <input name="username" required type="text"/><br>
-    <label>Password</label>
-    <input name="password1" required type="password"/><br>
-    <label>Type your password again</label>
-    <input name="password2" required type="password"/><br>
-    <label>Display Name</label>
-    <input name="displayname" required type="text"/><br>
-    <label>Github (Optional)</label>
-    <input name="github" type="url" value=""/><br>
-    <input type="submit" value="Signup"/>
-    {% csrf_token %}
-</form>
-
-{% endblock %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h4>Sign Up</h4>
+        <form method="POST" action="save/">
+            <p>First things first, let's create your profile!</p>
+            {% csrf_token %}
+            <input id="username" name="username" type="text" class="form-control" required placeholder="Enter your username"/>
+            <input id="password1" name="password1" type="password" class="form-control" required placeholder="Enter your password"/>
+            <input id="password2" name="password2" type="password" class="form-control" required placeholder="Confirm your password"/>
+            <input id="displayname" name="displayname" type="text" class="form-control" required placeholder="Enter your display name"/>
+            <input id="github" name="github" type="url" class="form-control" placeholder="Your GitHub URL"/>
+            <input id="profile-image" name="profile-image" type="url" class="form-control" placeholder="Profile Image URL"/>
+            <button type="submit" class="custom-button">Sign Up</button>
+        </form>
+    </div>
+</body>
+</html>

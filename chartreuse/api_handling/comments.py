@@ -56,7 +56,7 @@ class CommentViewSet(viewsets.ViewSet):
         
         Parameters:
             request: rest_framework object containing the request and query parameters.
-            user_id: The id of the post author whos post is being commented on.
+            post_author_id: The id of the post author whos post is being commented on.
             
         Returns:
             JsonResponce containing the comment object.  
@@ -64,13 +64,13 @@ class CommentViewSet(viewsets.ViewSet):
         pass
         
 
-    def get_comments(request, post_author_id):
+    def get_comments(self, request, post_author_id):
         """
         Gets the comments of a post
         
         Parameters:
             request: HttpRequest object containing the request and query parameters.
-            user_id: The id of the post author whos post is being commented on.
+            post_author_id: The id of the post author whos post is being commented on.
             
         Returns:
             JsonResponce containing the response   
@@ -98,7 +98,7 @@ class CommentViewSet(viewsets.ViewSet):
         
         Parameters:
             request: rest_framework object containing the request and query parameters.
-            user_id: The id of the user who is commenting on the posts.
+            post_author_id: The id of the user who is commenting on the posts.
             post_id: The id of the post object.
             remote_comment_id: the id of the remote comment id
 

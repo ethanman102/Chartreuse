@@ -1,30 +1,14 @@
-/* styles.css */
 @import url('https://fonts.googleapis.com/css2?family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap');
 
-html, body {
-    height: 100%;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+html body {
     background-image: url("background.png");
-    background-position: center;
-    font-family: "Sometype Mono", monospace;
 }
-
 .container {
-    width: 60%;
-    height: 40%;
-    padding-bottom: 10%;
     border-style: solid;
     border-color: #1b1b1b;
     background-color: #f5f5f5;
     font-family: "Sometype Mono", monospace;
     font-weight: 400;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
 
 .container h4 {
@@ -32,30 +16,21 @@ html, body {
     background-color: #00356b;
     font-size: 4ch;
     border-bottom-style: solid;
-    border-bottom-color: #1b1b1b;
-    margin: 0;
-    padding-left: 3%;
-    padding-bottom: 10px;
+    border-bottom-color: #00356b;
 }
 
-.container p {
+.container p{
     color: #1b1b1b;
-    font-size: 3ch;
+    font-size: 2ch;
     padding-bottom: 2ch;
     text-align: center;
-}
-
-.buttons {
-    display: flex;
-    justify-content: center;
-    gap: 2ch;
+    vertical-align: center;
 }
 
 .custom-button {
     color: chartreuse;
     background-color: #00356b;
     border-bottom-style: solid;
-    font-size: 3ch;
     width: 30%;
     text-align: center;
     border-bottom-color: #1b1b1b;
@@ -72,52 +47,21 @@ html, body {
     box-shadow: 6px 6px 0px #000000;
 }
 
-/* Card Styles */
-.card {
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    background-color: #ffffff;
-    margin-bottom: 20px;
-    padding: 20px;
-}
-
-.card-title {
-    font-size: 1.5rem;
-    color: #00356b;
-}
-
-.card-text {
-    font-size: 1rem;
-    color: #444;
-}
-
-.text-muted {
-    font-size: 0.9rem;
-    color: #777;
-}
-
-.card .d-flex {
-    padding: 15px;
-}
-
-.card .btn-outline-primary {
-    background-color: #f2f8fc;
-    border: 1px solid #00356b;
-    color: #00356b;
-}
-
-.card .btn-outline-primary:hover {
+.like-button {
+    color: chartreuse;
     background-color: #00356b;
-    color: white;
+    border-bottom-style: solid;
+    text-align: center;
+    border-bottom-color: #1b1b1b;
+    border-radius: 0;
+    box-shadow: none;
+    text-decoration: none;
+    padding: 10px 20px;
+    transition: box-shadow 0.3s ease;
 }
 
-.rounded-circle {
-    border: 2px solid #00356b;
-}
-
-/* Centering the Create Post Button */
-.btn-lg {
-    margin-top: 20px;
-    display: block;
-    width: 100%;
+.like-button:hover {
+    color: chartreuse;
+    background-color: #01254a;
+    box-shadow: 6px 6px 0px #000000;
 }

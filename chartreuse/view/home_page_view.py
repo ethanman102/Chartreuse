@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from chartreuse.models import User, Post, Follow
+from chartreuse.models import User, Post, Follow, Like
 from django.views.generic.detail import DetailView
 from urllib.parse import unquote, quote
 
@@ -68,9 +68,8 @@ class FeedDetailView(DetailView):
         else:
             context['logged_in'] = False
         
-        get_queryset = self.get_queryset()
-        context['posts'] = get_queryset
-        print(context)
+        queryset = self.get_queryset()
+        context['posts'] = queryset
 
         return context
 
@@ -200,3 +199,20 @@ def get_unlisted_posts(user_id):
     posts = Post.objects.filter(user=author, visibility='UNLISTED')
 
     return posts
+
+def get_post_likes(post_id):
+    """
+    Gets all likes for a post.
+
+    Parameters:
+        request: rest_framework object containing the request and query parameters.
+        post_id: The id of the post object.
+
+    Returns:
+        JsonResponse containing the likes for a post.
+    """
+    post = Post.objects.get(id=post)
+
+    likes = Like.objects.filter(post=post)
+
+    return likes

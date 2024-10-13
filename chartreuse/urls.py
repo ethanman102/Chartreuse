@@ -65,4 +65,5 @@ urlpatterns = [
     
     # for the error page
     path("error", views.error, name="error"),
+    path("home", views.home, name="home"),
 ] 

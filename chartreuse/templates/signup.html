@@ -1,28 +1,56 @@
-<form method="POST" action="save/">
-    {% csrf_token %}
-    <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <input id="username" name="username" type="text" class="form-control" required placeholder="Enter your username"/>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="date" content="2024-10-12">
+    <meta name="tags" content="Signup">
+    <meta name="summary" content="Signup page.">
+    <title>Chartreuse</title>
+
+    {% load static %}
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Your custom CSS file -->
+    <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+</head>
+<body class="bg-light">
+    <div class="container">
+        <h4 class="text-center">Sign Up</h4>
+        <form method="POST" action="save/">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input id="username" name="username" type="text" class="form-control" required placeholder="Enter your username"/>
+            </div>
+            <div class="mb-3">
+                <label for="password1" class="form-label">Password</label>
+                <input id="password1" name="password1" type="password" class="form-control" required placeholder="Enter your password"/>
+            </div>
+            <div class="mb-3">
+                <label for="password2" class="form-label">Confirm Password</label>
+                <input id="password2" name="password2" type="password" class="form-control" required placeholder="Confirm your password"/>
+            </div>
+            <div class="mb-3">
+                <label for="displayname" class="form-label">Display Name</label>
+                <input id="displayname" name="displayname" type="text" class="form-control" required placeholder="Enter your display name"/>
+            </div>
+            <div class="mb-3">
+                <label for="github" class="form-label">Github (Optional)</label>
+                <input id="github" name="github" type="url" class="form-control" placeholder="Your GitHub URL"/>
+            </div>
+            <div class="mb-3">
+                <label for="profile-image" class="form-label">Profile Image Link</label>
+                <input id="profile-image" name="profile-image" type="url" class="form-control" placeholder="Profile Image URL"/>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn custom-button">Sign Up</button>
+            </div>
+        </form>
     </div>
-    <div class="mb-3">
-        <label for="password1" class="form-label">Password</label>
-        <input id="password1" name="password1" type="password" class="form-control" required placeholder="Enter your password"/>
-    </div>
-    <div class="mb-3">
-        <label for="password2" class="form-label">Confirm Password</label>
-        <input id="password2" name="password2" type="password" class="form-control" required placeholder="Confirm your password"/>
-    </div>
-    <div class="mb-3">
-        <label for="displayname" class="form-label">Display Name</label>
-        <input id="displayname" name="displayname" type="text" class="form-control" required placeholder="Enter your display name"/>
-    </div>
-    <div class="mb-3">
-        <label for="github" class="form-label">Github (Optional)</label>
-        <input id="github" name="github" type="url" class="form-control" placeholder="Your GitHub URL"/>
-    </div>
-    <div class="mb-3">
-        <label for="profile-image" class="form-label">Profile Image Link</label>
-        <input id="profile-image" name="profile-image" type="url" class="form-control" placeholder="Profile Image URL"/>
-    </div>
-    <button type="submit" class="btn btn-primary">Sign Up</button>
-</form>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

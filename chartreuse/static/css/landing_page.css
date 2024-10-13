@@ -7,7 +7,6 @@ html, body {
     justify-content: center;
     align-items: center;
     background-image: url("background.png");
-    background-size: cover;
     background-position: center;
     font-family: "Sometype Mono", monospace;
 }
@@ -43,6 +42,8 @@ html, body {
 }
 
 .custom-button {
+    display: flex;
+    justify-content: center;
     color: chartreuse;
     background-color: #00356b;
     font-size: 2ch;
@@ -51,6 +52,7 @@ html, body {
     border-radius: 0;
     box-shadow: none;
     text-decoration: none;
+    display: inline-block;
     padding: 10px 20px;
     width: 30%;
     transition: box-shadow 0.3s ease;

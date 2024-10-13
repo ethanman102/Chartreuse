@@ -38,25 +38,43 @@ class FeedDetailView(DetailView):
             current_user_model = get_object_or_404(User, user=current_user)
 
             # Get people that the user follows
-            followers = get_followed(current_user_model.url_id)
+            following = get_followed(current_user_model.url_id) 
+
+            if len(following) == 0:
+                print("No following")
+                posts = get_all_public_posts()
+                for post in posts:
+                    post.likes_count = Like.objects.filter(post=post).count()
+                    post.url_id = quote(post.url_id, safe='')
+                    post.following_status = "Follow"
+                
+                return posts
 
             posts = []
 
             # Get the posts of the people that the user follows
-            for follower in followers:
+            for follower in following:
                 user_id = follower['id']
                 user_posts = get_public_posts(user_id)
                 posts.extend(user_posts)
 
-            user_posts = get_all_public_posts()
-            for post in user_posts:
+            for post in posts:
+                print("following")
                 post.likes_count = Like.objects.filter(post=post).count()
                 post.url_id = quote(post.url_id, safe='')
-                posts.append(post)
+                post.following_status = "Following"
 
-            return user_posts
+            return posts
         else:
-            return posts()
+            posts = get_all_public_posts()
+
+            for post in posts:
+                post.likes_count = Like.objects.filter(post=post).count()
+                post.url_id = quote(post.url_id, safe='')
+                post.following_status = False
+                posts.append(post)
+            
+            return posts
     
     def get_user_details(self):
         '''
@@ -111,6 +129,41 @@ def get_post_likes(post_id):
     likes = Like.objects.filter(post=post)
 
     return likes
+
+def follow_user(request):
+    """
+    Follow a user.
+
+    Parameters:
+        request: rest_framework object containing the request and query parameters.
+        follower_id: The id of the user who is following.
+        following_id: The id of the user who is being followed.
+
+    Returns:
+        JsonResponse containing the follower object.
+    """
+    body = json.loads(request.body)
+    user_id = body["user_id"]
+    post_id = body["post_id"]
+
+    user = User.objects.get(url_id=unquote(user_id))
+    post = Post.objects.get(url_id=unquote(post_id))
+
+    post_author = post.user
+
+    # first check if the user has already followed the author
+    follow = Follow.objects.filter(follower=user, followed=post_author)
+
+    follow_status = None
+
+    if follow:
+        follow.delete()
+        follow_status = "False"
+    else:
+        Follow.objects.create(follower=user, followed=post_author)
+        follow_status = "True"
+
+    return JsonResponse({"following_status": follow_status})
 
 def like_post(request):
     """
@@ -179,18 +232,16 @@ def get_followed(author_id):
 
     # Create a list of follower details to be included in the response
     for follower in followed:
-        user = follower.following
-        follower_attributes = [
-            {
-                "type": "author",
-                "id": f"{user.host}/authors/{user.user.id}",
-                "host": user.host,
-                "displayName": user.displayName,
-                "page": f"{user.host}/authors/{user.user.id}",
-                "github": user.github,
-                "profileImage": user.profileImage
-            }
-        ]
+        user = follower.followed
+        follower_attributes = {
+            "type": "author",
+            "id": user.url_id,
+            "host": user.host,
+            "displayName": user.displayName,
+            "page": user.url_id,
+            "github": user.github,
+            "profileImage": user.profileImage
+        }
         followed_list.append(follower_attributes)
 
     return followed_list
@@ -207,8 +258,7 @@ def get_public_posts(user_id):
     Returns:
         JsonResponse containing the post object.
     """
-    decoded_user_id = unquote(user_id)
-    author = User.objects.get(url_id=decoded_user_id)
+    author = User.objects.get(url_id=user_id)
 
     posts = Post.objects.filter(user=author, visibility='PUBLIC')
 

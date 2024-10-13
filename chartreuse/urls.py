@@ -1,7 +1,7 @@
 from django.urls import path, re_path
-from .api_handling import users, likes, images, github, friends, posts, comments
+from .api_handling import users, likes, images, github, friends, posts
 from .api_handling import followers, follow_requests
-from chartreuse.views import ProfileDetailView, error, follow_accept, follow_reject
+from chartreuse.views import ProfileDetailView, follow_accept, follow_reject
 from .view import home_page_view, signup_view, login_view, landing_page_view, add_post_view
 
 app_name = "chartreuse"
@@ -21,6 +21,7 @@ urlpatterns = [
     path("api/author/login/", users.UserViewSet.login_user, name="login_user"),
 
     re_path(r'homepage/like-post/', home_page_view.like_post, name='like-post'),
+    re_path(r'homepage/follow-user/', home_page_view.follow_user, name='follow-user'),
 
     # Like URLs
     re_path(r"api/authors/(?P<user_id>.+)/inbox/$", likes.LikeViewSet.as_view({'post': 'add_like', 'delete': 'remove_like'}), name="like"),
@@ -75,7 +76,4 @@ urlpatterns = [
     re_path(r"github/(?P<user_id>.+)/events/", github.get_events, name="get_events"),
     re_path(r"github/(?P<user_id>.+)/starred/", github.get_starred, name="get_starred"),
     re_path(r"github/(?P<user_id>.+)/subscriptions/", github.get_subscriptions, name="get_subscriptions"),
-    
-    path("error", views.error, name="error"),
-    path("home", views.home, name="home"),
-] 
+]

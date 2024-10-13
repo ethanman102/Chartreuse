@@ -11,7 +11,7 @@ class FeedDetailView(DetailView):
     '''
 
     model = User  # Define the model for the user
-    template_name = "homepage.html"
+    template_name = "home_page.html"
     context_object_name = "posts"
 
     def get_object(self):

@@ -12,20 +12,19 @@ html, body {
     font-family: "Sometype Mono", monospace;
 }
 
-input {
-    width: 80%;
+input, select {
+    width: 90%;
     color: #00356b;
     background-color: rgb(203, 247, 159);
     padding: 12px 20px;
     margin: 8px 0;
     border: 1px solid #ccc;
     border-radius: 4px;
-    box-sizing: border-box;
   }
 
 .container {
     width: 60%;
-    height: 80%;
+    padding-bottom: 4%;
     border-style: solid;
     border-color: #1b1b1b;
     background-color: #f5f5f5;
@@ -59,6 +58,10 @@ input {
     margin-top: 1.5rem;
     display: flex;
     justify-content: center;
+}
+
+form {
+    padding-left: 3%;
 }
 
 .custom-button:hover {

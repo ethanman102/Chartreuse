@@ -14,6 +14,7 @@
     <div class="container">
         <h4>Sign Up</h4>
         <form method="POST" action="save/">
+            <p>First things first, let's create your profile!</p>
             {% csrf_token %}
             <input id="username" name="username" type="text" class="form-control" required placeholder="Enter your username"/>
             <input id="password1" name="password1" type="password" class="form-control" required placeholder="Enter your password"/>

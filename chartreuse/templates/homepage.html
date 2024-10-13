@@ -9,38 +9,34 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../static/css/homepage.css">
+    <link rel="stylesheet"  href="../static/css/homepage.css">
 </head>
 <body>
     <div class="container mt-5">
         <h4 class="mb-4">chartreuse.home</h4>
 
-        <div class="card">
-            <div class="d-flex align-items-center">
-                <img src="https://via.placeholder.com/50" alt="User Avatar" class="rounded-circle me-3">
-                <h5 class="card-title">username1</h5>
-                <button class="btn btn-outline-primary float-end">## likes</button>
+        <!-- Check if user is logged in -->
+        {% if logged_in %}
+            <!-- Loop through posts -->
+            {% for post in posts %}
+            <div class="card mb-3">
+                <div class="d-flex align-items-center">
+                    <!-- User's profile image -->
+                    <img src="{{ post.user.profileImage }}" alt="{{ post.user.displayName }} Avatar" class="rounded-circle me-3" width="50" height="50">
+                    <!-- Username -->
+                    <h5 class="card-title">{{ post.user.displayName }}</h5>
+                    <!-- Likes button (Note: needs logic to fetch the like count) -->
+                    <button class="btn btn-outline-primary float-end">{{ post.likes.count }} likes</button>
+                </div>
+                <!-- Post content -->
+                <p class="card-text mt-2">{{ post.content }}</p>
+                <!-- Post published date -->
+                <p class="text-muted">Published on {{ post.published }}</p>
             </div>
-            <p class="card-text mt-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue orci ac neque malesuada feugiat.</p>
-        </div>
-
-        <div class="card">
-            <div class="d-flex align-items-center">
-                <img src="https://via.placeholder.com/50" alt="User Avatar" class="rounded-circle me-3">
-                <h5 class="card-title">username2</h5>
-                <button class="btn btn-outline-primary float-end">## likes</button>
-            </div>
-            <p class="card-text mt-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eu ipsum rutrum, ultricies tellus a, condimentum turpis. Sed consectetur placerat est, a ultricies felis rhoncus.</p>
-        </div>
-
-        <div class="card">
-            <div class="d-flex align-items-center">
-                <img src="https://via.placeholder.com/50" alt="User Avatar" class="rounded-circle me-3">
-                <h5 class="card-title">username3</h5>
-                <button class="btn btn-outline-primary float-end">## likes</button>
-            </div>
-            <p class="card-text mt-2">Lorem ipsum dolor sit amet.</p>
-        </div>
+            {% endfor %}
+        {% else %}
+            <p>Please log in to view posts.</p>
+        {% endif %}
     </div>
 
     <!-- Bootstrap JS -->

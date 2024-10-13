@@ -23,8 +23,9 @@ html, body {
     color: chartreuse;
     background-color: #00356b;
     font-size: 4ch;
-    margin: 0; /* Remove default margin on h4 */
-    padding: 10px; /* Add a little padding for breathing room */
+    margin: 0;
+    padding: 10px;
     border-bottom-style: solid;
     border-bottom-color: #00356b;
+    width: 100%;
 }

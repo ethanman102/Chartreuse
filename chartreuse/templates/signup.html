@@ -1,20 +1,28 @@
-{% extends "base.html" %}
-
-{% block content %}
-
-<form method="POST" action="/chartreuse/signup/save">
-    <label>Username</label>
-    <input name="username" required type="text"/><br>
-    <label>Password</label>
-    <input name="password1" required type="password"/><br>
-    <label>Type your password again</label>
-    <input name="password2" required type="password"/><br>
-    <label>Display Name</label>
-    <input name="displayname" required type="text"/><br>
-    <label>Github (Optional)</label>
-    <input name="github" type="url" value=""/><br>
-    <input type="submit" value="Signup"/>
+<form method="POST" action="save/">
     {% csrf_token %}
+    <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input id="username" name="username" type="text" class="form-control" required placeholder="Enter your username"/>
+    </div>
+    <div class="mb-3">
+        <label for="password1" class="form-label">Password</label>
+        <input id="password1" name="password1" type="password" class="form-control" required placeholder="Enter your password"/>
+    </div>
+    <div class="mb-3">
+        <label for="password2" class="form-label">Confirm Password</label>
+        <input id="password2" name="password2" type="password" class="form-control" required placeholder="Confirm your password"/>
+    </div>
+    <div class="mb-3">
+        <label for="displayname" class="form-label">Display Name</label>
+        <input id="displayname" name="displayname" type="text" class="form-control" required placeholder="Enter your display name"/>
+    </div>
+    <div class="mb-3">
+        <label for="github" class="form-label">Github (Optional)</label>
+        <input id="github" name="github" type="url" class="form-control" placeholder="Your GitHub URL"/>
+    </div>
+    <div class="mb-3">
+        <label for="profile-image" class="form-label">Profile Image Link</label>
+        <input id="profile-image" name="profile-image" type="url" class="form-control" placeholder="Profile Image URL"/>
+    </div>
+    <button type="submit" class="btn btn-primary">Sign Up</button>
 </form>
-
-{% endblock %}

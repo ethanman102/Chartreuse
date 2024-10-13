@@ -1,12 +1,19 @@
 from django.urls import path, re_path
 from .api_handling import users, likes, images, github, friends, posts, comments
 from .api_handling import followers, follow_requests
-from . import views
-from .views import ProfileDetailView
+from chartreuse.views import ProfileDetailView, error, follow_accept, follow_reject
+from .view import signup_view, login_view, homepage_view, landing_page_view
 
 app_name = "chartreuse"
 urlpatterns = [
-    path("api/author/login/", users.UserViewSet.login_user, name="login_user"),
+    path('', landing_page_view.landing_page, name='home'),
+    path('signup/', signup_view.signup, name='signup'),
+    path('signup/save/', signup_view.save_signup, name='save_signup'),
+
+    path('login/', login_view.login, name='login'),
+    path('login/authenticate/', login_view.save_login, name='authenticate'),
+
+    path("homepage/", homepage_view.FeedDetailView.as_view(), name="homepage"),
 
     # Like URLs
     re_path(r"api/authors/(?P<user_id>.+)/inbox/$", likes.LikeViewSet.as_view({'post': 'add_like', 'delete': 'remove_like'}), name="like"),
@@ -42,9 +49,9 @@ urlpatterns = [
     path("api/authors/", users.UserViewSet.as_view({'post': 'create', 'get': 'list'}), name="user-list"),
 
     # Follow Request URLs
-    re_path(r"authors/accept/(?P<followed>.+)/(?P<follower>.+)/", views.follow_accept,name="profile_follow_accept"),
-    re_path(r"authors/reject/(?P<followed>.+)/(?P<follower>.+)/", views.follow_reject,name="profile_follow_reject"),
-    re_path(r"authors/(?P<url_id>.+)/", ProfileDetailView.as_view(),name="profile"),
+    re_path(r"authors/accept/(?P<followed>.+)/(?P<follower>.+)/", follow_accept, name="profile_follow_accept"),
+    re_path(r"authors/reject/(?P<followed>.+)/(?P<follower>.+)/", follow_reject, name="profile_follow_reject"),
+    re_path(r"authors/(?P<url_id>.+)/", ProfileDetailView.as_view(), name="profile"),
 
     # Comment URLs 
     # path("authors/<str:user_id>/inbox", comments.create_comment, name="create_comment"),
@@ -61,14 +68,7 @@ urlpatterns = [
     re_path(r"github/(?P<user_id>.+)/events/", github.get_events, name="get_events"),
     re_path(r"github/(?P<user_id>.+)/starred/", github.get_starred, name="get_starred"),
     re_path(r"github/(?P<user_id>.+)/subscriptions/", github.get_subscriptions, name="get_subscriptions"),
-
-    # path('accounts/', include('django.contrib.auth.urls')),
-    # For registering a new account
-    path("signup", views.signup, name="signup"),
-    path("signup/save", views.save_signup, name="save_signup"),
-    # For logging in
-    path("login", views.login, name="login"),
     
     # for the error page
-    path("error", views.error, name="error"),
+    path("error", error, name="error"),
 ] 

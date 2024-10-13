@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from ..models import User, Like, Post, Follow, Comment
 from .users import UserSerializer, UserViewSet
 from .likes import LikeSerializer, LikesSerializer, LikeViewSet
+from urllib.parse import unquote
 
 class CommentSerializer(serializers.Serializer):
     type = serializers.CharField(default="comment")
@@ -61,9 +62,39 @@ class CommentViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing the comment object.  
         """
-        pass
-        
+        decoded_author_id = unquote(post_author_id)
 
+        try:
+            post = Post.objects.get(id=request.data.get('post_id'), user__url_id=decoded_author_id)
+        except Post.DoesNotExist:
+            return JsonResponse({"error": "Post not found"}, status=404) 
+
+        user = request.user
+        comment_text = request.data.get('comment', '')
+        content_type = request.data.get('contentType', 'text/markdown')
+
+        comment = Comment.objects.create(
+            user=user,
+            post=post,
+            comment=comment_text,
+            commentType=content_type,
+            username=user.displayName,
+            password=request.data.get('password')
+        )
+
+        comment_serializer = CommentSerializer(comment)
+
+        return JsonResponse(comment_serializer.data, status=201)
+        
+    @extend_schema(
+        summary="Get all comments on a post",
+        description="Fetch all comments on a post",
+        responses={
+            200: OpenApiResponse(description="List of comments retrieved successfully.", response=CommentsSerializer),
+            404: OpenApiResponse(description="Post not found."),
+        }
+    )
+    @action(detail=False, methods=["GET"])
     def get_comments(self, request, post_author_id):
         """
         Gets the comments of a post
@@ -75,8 +106,30 @@ class CommentViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing the response   
         """
-        if request.method == "POST":
-            pass
+        if request.method == "GET":
+            decoded_author_id = unquote(post_author_id)
+
+            try:
+                post = Post.objects.get(id=post_id, user__url_id=decoded_author_id)
+            except Post.DoesNotExist:
+                return JsonResponse({"error": "Post not found."}, status=404)
+
+            # Get all comments related to the post
+            comments = Comment.objects.filter(post=post)
+            paginator = Paginator(comments, 10)  # Pagination
+            page_number = request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
+
+            comments_serializer = CommentsSerializer({
+                'type': 'comments',
+                'page': page_obj.number,
+                'id': post.url_id,
+                'page_number': page_obj.number,
+                'size': paginator.per_page,
+                'src': page_obj.object_list,
+            })
+
+            return JsonResponse(comments_serializer.data, safe=False, status=200)
 
         else:
             return JsonResponse({"error": "Method not allowed."}, status=405)
@@ -105,8 +158,22 @@ class CommentViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing the response   
         """
-        if request.method == "POST":
-            pass
+        if request.method == "GET":
+            decoded_author_id = unquote(post_author_id)
+            decoded_post_id = unquote(post_id)
+
+            try:
+                post = Post.objects.get(id=decoded_post_id, user__url_id=decoded_author_id)
+            except Post.DoesNotExist:
+                return JsonResponse({"error": "Post not found."}, status=404)
+
+            try:
+                comment = Comment.objects.get(id=remote_comment_id, post=post)
+            except Comment.DoesNotExist:
+                return JsonResponse({"error": "Comment not found."}, status=404)
+
+            comment_serializer = CommentSerializer(comment)
+            return JsonResponse(comment_serializer.data, status=200)
 
         else:
             return JsonResponse({"error": "Method not allowed."}, status=405)

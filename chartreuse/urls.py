@@ -47,9 +47,9 @@ urlpatterns = [
     re_path(r"authors/(?P<url_id>.+)/", ProfileDetailView.as_view(),name="profile"),
 
     # Comment URLs 
-    # path("authors/<str:user_id>/inbox", comments.create_comment, name="create_comment"),
-    # path("authors/<str:user_id>/posts/<str:post_id>/comments", comments.get_comments, name="get_comments"),
-    # path("authors/<str:user_id>/post/<str:post_id>/comment/<str:remote_comment_id>", comments.get_comment, name="get_comment"),
+    re_path(r"api/authors/(?P<user_id>.+)/posts/(?P<post_id>.+)/comments/add/$", comments.CommentViewSet.as_view({'post': 'create_comment'}), name="create_comment"),
+    re_path(r"api/authors/(?P<user_id>.+)/posts/(?P<post_id>.+)/comments/$", comments.CommentViewSet.as_view({'get': 'get_comments'}), name="get_comments"),
+    re_path(r"api/authors/(?P<user_id>.+)/posts/(?P<post_id>.+)/comments/(?P<comment_id>.+)/$", comments.CommentViewSet.as_view({'get': 'get_comment'}), name="get_comment"),
 
     # Post Image URLs
     # path('authors/<int:author_id>/posts/<int:post_id>/image', images.get_image_post, name='get_image_post'),

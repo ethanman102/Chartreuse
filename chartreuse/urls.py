@@ -6,6 +6,7 @@ from .view import home_page_view, signup_view, login_view, landing_page_view, ad
 
 app_name = "chartreuse"
 urlpatterns = [
+    # UI Related URLs
     path('', landing_page_view.landing_page, name='home'),
     path('signup/', signup_view.signup, name='signup'),
     path('signup/save/', signup_view.save_signup, name='save_signup'),

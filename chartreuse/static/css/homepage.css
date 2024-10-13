@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap');
+
+/* Reset margin and padding for the body */
+html, body {
+    margin: 0;
+    padding: 0;
+    background-image: url("background.png");
+}
+
+/* Remove extra spacing around the container */
+.container {
+    margin-top: 0;
+    padding-top: 0;
+    border-style: solid;
+    border-color: #1b1b1b;
+    background-color: #f5f5f5;
+    font-family: "Sometype Mono", monospace;
+    font-weight: 400;
+}
+
+/* Styling for the h4 inside the container */
+.container h4 {
+    color: chartreuse;
+    background-color: #00356b;
+    font-size: 4ch;
+    margin: 0; /* Remove default margin on h4 */
+    padding: 10px; /* Add a little padding for breathing room */
+    border-bottom-style: solid;
+    border-bottom-color: #00356b;
+}

@@ -54,7 +54,14 @@ def follow_reject(request,followed,follower):
         return redirect("chartreuse:profile",url_id=quote(followed,safe=''))
     return HttpResponseNotAllowed(["POST"])
 
+def error(request):
+    '''
+    Purpose: View to render a generic error page
 
+    Arguments:
+    request: Request object
+    '''
+    return render(request, 'error.html')
 
 class ProfileDetailView(DetailView):
 

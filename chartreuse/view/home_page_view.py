@@ -43,15 +43,11 @@ class FeedDetailView(DetailView):
                 user_id = follower['id']
                 user_posts = get_public_posts(user_id)
                 posts.extend(user_posts)
-            
-            
-            # Get the user's own posts
-            user_posts = get_public_posts(current_user_model.url_id)
 
             return user_posts
         else:
             # For anonymous users, show all public posts
-            return get_public_posts()
+            return posts()
 
     def get_context_data(self, **kwargs):
         '''

@@ -29,7 +29,10 @@
                         <h5 class="card-title">{{ post.user.displayName }}</h5>
                     </div>
                     <meta name="csrf-token" content="{{ csrf_token }}">
-                    <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}">{{ post.likes_count }} likes</button>
+                    <div class="d-flex align-items-center mb-3" style="gap: 2ch;">
+                        <button class="btn follow-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}">Follow</button>
+                        <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}">{{ post.likes_count }} likes</button>
+                    </div>
                 </div>
                 <p class="card-text mt-2">{{ post.content }}</p>
                 <p class="text-muted">Published on {{ post.published }}</p>

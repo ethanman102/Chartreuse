@@ -62,6 +62,9 @@ class CommentViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing the comment object.  
         """
+        if (not request.user.is_authenticated):
+            return JsonResponse({"error": "User is not authenticated."}, status=401)
+            
         decoded_author_id = unquote(post_author_id)
 
         try:

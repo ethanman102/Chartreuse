@@ -45,13 +45,14 @@ class FeedDetailView(DetailView):
             # Get people that the user follows
             following = get_followed(current_user_model.url_id)
 
-            if len(following) >= 0:
+            if len(following) == 0:
                 posts = get_all_public_posts()
                 for post in posts:
                     post.likes_count = Like.objects.filter(post=post).count()
                     post.url_id = quote(post.url_id, safe='')
                     post.following_status = "Follow"
-                    post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+                    if post.contentType != "text/plain":
+                        post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
                 
                 return posts
 
@@ -66,6 +67,9 @@ class FeedDetailView(DetailView):
             for post in posts:
                 post.likes_count = Like.objects.filter(post=post).count()
                 post.url_id = quote(post.url_id, safe='')
+                post.following_status = "Follow"
+                if post.contentType != "text/plain":
+                    post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
                 post.following_status = "Following"
 
             return posts
@@ -223,6 +227,8 @@ def follow_user(request):
     else:
         Follow.objects.create(follower=user, followed=post_author)
         follow_status = "True"
+    
+    print(follow_status)
 
     return JsonResponse({"following_status": follow_status})
 

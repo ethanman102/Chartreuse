@@ -14,7 +14,9 @@
 <body>
     <div class="container mt-5">
         <h4 class="mb-4">chartreuse.home</h4>
-        <p>Welcome, {{ user_details.displayName }}!</p>
+        <div class="d-flex justify-content-left">
+            <p>Welcome, {{ user_details.displayName }}!</p>
+        </div>
         <div>
             <a href="/chartreuse/add-post" class="add-post-button">Create a post</a>
         </div>
@@ -25,7 +27,7 @@
             <div class="card mb-3 p-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
-                        <img src="{{ user_details.profileImage }}" alt="{{ post.user.displayName }} Avatar" class="rounded-circle me-3" width="50" height="50">
+                        <img src="{{ post.user.profileImage }}" alt="{{ post.user.displayName }} Avatar" class="rounded-circle me-3" width="50" height="50">
                         <h5 class="card-title">{{ post.user.displayName }}</h5>
                     </div>
                     <meta name="csrf-token" content="{{ csrf_token }}">
@@ -35,13 +37,15 @@
                     </div>
                 </div>
 
-                <!-- Check the content type of the post -->
                 {% if post.contentType == "text/plain" %}
-                    <!-- Show text content -->
+                    <p class="card-title mt-2">{{ post.title }}</p>
                     <p class="card-text mt-2">{{ post.content }}</p>
+                    <p class="card-text mt-2">{{ post.description }}</p>
                 {% elif post.contentType == "image/png" or post.contentType == "image/jpeg" %}
-                    <!-- Show the image content -->
-                    <img src="{{ post.content }}" alt="Post image" class="img-fluid mt-2" />
+                    <p class="card-title mt-2">{{ post.title }}</p>
+                    <div class="d-flex justify-content-center">
+                        <img src="{{ post.content }}" alt="Post image" style="width: 40%" />
+                    </div>
                     <p class="card-text mt-2">{{ post.description }}</p>
                 {% endif %}
 

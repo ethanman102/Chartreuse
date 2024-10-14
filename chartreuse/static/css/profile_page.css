@@ -1,7 +1,94 @@
 @import url('https://fonts.googleapis.com/css2?family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap');
 
+body,html{
+    font-family: "Sometype Mono", monospace;
+}
+
 .follow{
     border-radius: 0;
     background-color: #00356B;
     color: white;
+    transition: box-shadow 0.3s ease;
+    font-size: 100%;
+}
+
+.follow:hover{
+    background-color: #00356B;
+    box-shadow: 6px 6px 0px #000000;
+}
+
+@media only screen and (max-width: 995px){
+    .follow{
+        font-size: 75%;
+    }
+}
+
+@media only screen and (max-width: 750px){
+    .follow{
+        font-size: 50%;
+    }
+}
+
+#profile-header{
+    background-color: #00356B;
+}
+
+#profile-header > h4{
+    font-weight: bold;
+    color: #80FF00;
+}
+
+#profile-github{
+    transition: font-size 0.3s ease;
+}
+
+#profile-github:hover{
+    font-size: 125%;
+}
+
+.container{
+    border: solid black 5px;
+}
+
+.tab-bar{
+        margin-top: 4ch;
+}
+
+/*nav bar styling (posts, stats, follow-requests)*/
+
+#nav-tab{
+    background-color: #00356B;
+    border: none;
+}
+
+#nav-tab > .active{
+    background-color: #00356B;
+    border: none;
+    color: white;
+    text-decoration: underline;
+}
+
+.nav-link{
+    color: white;
+    border: none;
+}
+
+#nav-cols{
+    background-color: #00356B; 
+    border-bottom: #000000 solid 5px;
+}
+
+#nav-tab > button:hover{
+    background-color: #002549; 
+    color: white;
+    border: none;
+}
+
+.full-container{
+    width: 100%;
+    background-color: #D9D9D9;
+}
+
+img{
+    border: black solid 2px;
 }

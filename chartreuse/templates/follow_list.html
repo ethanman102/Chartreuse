@@ -13,17 +13,25 @@
     <body>
 
         <div class="container full-container" id="follow-list-header">
-            <h4>{{profile.displayName}}.{{relationship}}</h4>
+            <h4>{{user.displayName}}.{{relationship}}</h4>
         </div>
         <div class="container full-container" id="container-item-box">
-            <div class="follower-box">
-                <img src="{{follow_request.requester.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
-                <h5 style="display:inline">{{follower.displayName}}</h5>
-                <form class="view-profile-form" method="GET" action="">
-                    {% csrf_token %}
-                    <button type="submit" class="view-profile-button btn btn-primary">View Profile</button>
-                </form>
-            </div>
+            {% if follows %}
+                {% for follow in follows %}
+                {% url 'chartreuse:profile' follow.url_id as user_profile %}
+                <div class="follower-box">
+                    <img src="{{follow.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
+                    <h5 style="display:inline">{{follow.displayName}}</h5>
+                    <form class="view-profile-form" method="GET" action="{{user_profile}}">
+                        {% csrf_token %}
+                        <button type="submit" class="view-profile-button btn btn-primary">View Profile</button>
+                    </form>
+                </div>
+                {% endfor %}
+            {% else %}
+            <h1 class="text-center">there's nothing here... :(</h1>
+
+            {% endif %} 
         </div>
         <!-- Boostrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

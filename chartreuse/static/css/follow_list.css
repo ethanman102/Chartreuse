@@ -18,6 +18,9 @@ body,html{
     padding-top: 2ch;
     padding-bottom: 2ch;
     background-color: #D9D9D9;
+    overflow-y: scroll;
+    max-height: 400px;
+    min-height: 400px;
 }
 
 h4{

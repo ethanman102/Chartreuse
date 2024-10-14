@@ -44,6 +44,9 @@ class FollowListDetailView(DetailView):
         else:
             follows = self.get_following(user)
 
+        if len(follows) == 0:
+            return context
+        
         
 
         # need to be able to send the correct percent encoded url upon view-profile action, so percent encode all id's

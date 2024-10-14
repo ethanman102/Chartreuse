@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap');
+
+body,html{
+    font-family: "Sometype Mono", monospace;
+    background-image: url("background.png");
+}
+
+#follow-list-header{
+    background-color: #002549;
+    margin-top: 30px;
+}
+
+.full-container{
+    border: 5px solid black;
+}
+
+#container-item-box{
+    padding-top: 2ch;
+    padding-bottom: 2ch;
+    background-color: #D9D9D9;
+}
+
+h4{
+    font-weight: bold;
+    color: #80FF00;
+}
+
+/*follow profile box*/
+.follower-box{
+    background-color: #F5F5F5;
+    border: solid black 2px;
+    margin-bottom: 1ch;
+    padding: 1ch;
+    transition: background-color 0.3s ease;
+}
+.follower-box:hover{
+    background-color:  #b3b3b3;
+}
+
+img{
+    border: black solid 2px;
+}
+
+.view-profile-form{
+    display: inline;
+}
+
+.view-profile-button{
+    color: white;
+    border: none;
+    background-color: #002549;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 2ch;
+    padding-right: 2ch;
+    margin: 6px;
+    transition: box-shadow 0.3s ease;
+}
+
+.view-profile-button:hover{
+    box-shadow: 6px 6px 0px #000000;
+}
+

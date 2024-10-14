@@ -2,6 +2,8 @@ from django.urls import path, re_path
 from .api_handling import users, likes, images, github, friends, posts
 from .api_handling import followers, follow_requests
 from chartreuse.views import ProfileDetailView, follow_accept, follow_reject
+from django.conf import settings
+from django.conf.urls.static import static
 from .view import home_page_view, signup_view, login_view, landing_page_view, add_post_view
 
 app_name = "chartreuse"
@@ -16,7 +18,7 @@ urlpatterns = [
 
     path("homepage/", home_page_view.FeedDetailView.as_view(), name="homepage"),
     path('add-post/', add_post_view.add_post, name='add_post'),
-    path('add-post/save/', add_post_view.save_post, name='save_post'),
+    path('add-post/save/', home_page_view.save_post, name='save_post'),
 
     path("api/author/login/", users.UserViewSet.login_user, name="login_user"),
 
@@ -77,3 +79,6 @@ urlpatterns = [
     re_path(r"github/(?P<user_id>.+)/starred/", github.get_starred, name="get_starred"),
     re_path(r"github/(?P<user_id>.+)/subscriptions/", github.get_subscriptions, name="get_subscriptions"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

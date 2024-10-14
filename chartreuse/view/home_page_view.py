@@ -2,10 +2,15 @@ from django.shortcuts import get_object_or_404
 from chartreuse.models import User, Post, Follow, Like
 from django.views.generic.detail import DetailView
 from urllib.parse import unquote, quote
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import action
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 import json
+
+import base64
+from urllib.request import urlopen
+from django.http import JsonResponse
+from urllib.parse import unquote
+from django.views.decorators.csrf import csrf_exempt
 
 class FeedDetailView(DetailView):
     '''
@@ -14,7 +19,7 @@ class FeedDetailView(DetailView):
     Inherits From: DetailView 
     '''
 
-    model = User  # Define the model for the user
+    model = User
     template_name = "home_page.html"
     context_object_name = "posts"
 
@@ -38,15 +43,15 @@ class FeedDetailView(DetailView):
             current_user_model = get_object_or_404(User, user=current_user)
 
             # Get people that the user follows
-            following = get_followed(current_user_model.url_id) 
+            following = get_followed(current_user_model.url_id)
 
-            if len(following) == 0:
-                print("No following")
+            if len(following) >= 0:
                 posts = get_all_public_posts()
                 for post in posts:
                     post.likes_count = Like.objects.filter(post=post).count()
                     post.url_id = quote(post.url_id, safe='')
                     post.following_status = "Follow"
+                    post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
                 
                 return posts
 
@@ -59,7 +64,6 @@ class FeedDetailView(DetailView):
                 posts.extend(user_posts)
 
             for post in posts:
-                print("following")
                 post.likes_count = Like.objects.filter(post=post).count()
                 post.url_id = quote(post.url_id, safe='')
                 post.following_status = "Following"
@@ -129,6 +133,63 @@ def get_post_likes(post_id):
     likes = Like.objects.filter(post=post)
 
     return likes
+
+@csrf_exempt
+def save_post(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        content_type = request.POST.get('content_type')
+        content = request.POST.get('content')
+        image = request.FILES.get('image')
+        image_url = request.POST.get('image_url')
+        visibility = request.POST.get('visibility')
+
+        current_user = request.user
+        current_user_model = get_object_or_404(User, user=current_user)
+        
+        # Ensure that either content, image, or image URL is provided
+        if not content_type and not image and not image_url:
+            return JsonResponse({'error': 'Post content is required.'}, status=400)
+
+        # Determine content type and set appropriate content
+        if content:
+            content_type = 'text/plain'
+            post_content = content
+        elif image:
+            image_data = image.read()
+            encoded_image = base64.b64encode(image_data).decode('utf-8')
+            image_content = image.content_type.split('/')[1]
+            content_type = 'image/' + image_content
+            post_content = encoded_image
+        elif image_url:
+            print(image_url)
+            image_content = image_url.split('.')[-1]
+            content_type = 'image/' + image_content
+            try:
+                with urlopen(image_url) as url:
+                    f = url.read()
+                    encoded_string = base64.b64encode(f).decode("utf-8")
+            except Exception as e:
+                raise ValueError(f"Failed to retrieve image from URL: {e}")
+            post_content = encoded_string
+        else:
+            return JsonResponse({'error': 'Invalid post data.'}, status=400)
+        
+        post = Post(
+            user=current_user_model,
+            title=title,
+            description=description,
+            content=post_content,
+            contentType=content_type,
+            visibility=visibility,
+        )
+
+        post.save()
+
+        return redirect('/chartreuse/homepage/')
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 
 def follow_user(request):
     """

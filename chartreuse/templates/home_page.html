@@ -34,7 +34,17 @@
                         <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}">{{ post.likes_count }} likes</button>
                     </div>
                 </div>
-                <p class="card-text mt-2">{{ post.content }}</p>
+
+                <!-- Check the content type of the post -->
+                {% if post.contentType == "text/plain" %}
+                    <!-- Show text content -->
+                    <p class="card-text mt-2">{{ post.content }}</p>
+                {% elif post.contentType == "image/png" or post.contentType == "image/jpeg" %}
+                    <!-- Show the image content -->
+                    <img src="{{ post.content }}" alt="Post image" class="img-fluid mt-2" />
+                    <p class="card-text mt-2">{{ post.description }}</p>
+                {% endif %}
+
                 <p class="text-muted">Published on {{ post.published }}</p>
             </div>
             {% endfor %}

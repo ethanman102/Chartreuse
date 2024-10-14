@@ -223,27 +223,3 @@ class LikeTestCases(TestCase):
         self.assertEqual(response.json()['author']['displayName'], 'Greg Johnson')
         self.assertEqual(response.json()['id'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1/liked/1")
         self.assertEqual(response.json()['object'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/2/posts/1")
-    
-    def test_add_post_like(self):
-        """
-        This tests adding a like to a post.
-        """
-        self.client.post(reverse('chartreuse:login_user'), {
-            'username': 'john',
-            'password': '87@398dh817b!'
-        })
-
-        self.client.post(reverse('chartreuse:posts', args=[self.user_id_2]), {'visibility': "PUBLIC", "title": "Gregs public post", "description": "Test post description", "contentType": "text/plain", "content": "Hello World! \nThis is a short message from greg!"})
-
-        post_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/2/posts/1" , safe="")
-
-        self.client.post(reverse('chartreuse:login_user'), {
-            'username': 'greg',
-            'password': 'ABC123!!!'
-        })
-
-        user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1", safe = "")
-
-        like = self.client.post(reverse('chartreuse:like-post'), {'user_id': user_id, 'post_id': post_id})
-
-        print(like.json())

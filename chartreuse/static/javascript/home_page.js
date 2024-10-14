@@ -1,4 +1,3 @@
-
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -42,6 +41,37 @@ document.querySelectorAll('.like-button').forEach(button => {
                 console.error('Failed to like post:', data.error);
             }
             window.location.reload();  // Reload the page to update the like count
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
+
+document.querySelectorAll('.follow-button').forEach(button => {
+    button.addEventListener('click', function(event) {
+        const postId = this.getAttribute('data-post-id');
+        const userId = this.getAttribute('data-user-id');
+        const url = `follow-user/`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,  // Use the CSRF token from the cookie
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                post_id: postId,
+                user_id: userId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            if (data.following) {
+                this.innerText = 'Unfollow';  // Update the button text
+            } else {
+                this.innerText = 'Follow';  // Update the button text
+            }
+            window.location.reload();
         })
         .catch(error => console.error('Error:', error));
     });

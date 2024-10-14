@@ -6,10 +6,19 @@ from .view import home_page_view, signup_view, login_view, landing_page_view, ad
 
 app_name = "chartreuse"
 urlpatterns = [
+
+    path("api/author/login/", users.UserViewSet.login_user, name="login_user"),
+
+    # Comment URLs 
+    # path("authors/<str:user_id>/inbox", comments.create_comment, name="create_comment"),
+    # path("authors/<str:user_id>/posts/<str:post_id>/comments", comments.get_comments, name="get_comments"),
+    # path("authors/<str:user_id>/post/<str:post_id>/comment/<str:remote_comment_id>", comments.get_comment, name="get_comment"),
+
     # UI Related URLs
     path('', landing_page_view.landing_page, name='home'),
     path('signup/', signup_view.signup, name='signup'),
     path('signup/save/', signup_view.save_signup, name='save_signup'),
+
 
     path('login/', login_view.login, name='login'),
     path('login/authenticate/', login_view.save_login, name='authenticate'),
@@ -56,9 +65,11 @@ urlpatterns = [
     path("api/authors/", users.UserViewSet.as_view({'post': 'create', 'get': 'list'}), name="user-list"),
 
     # Follow Request URLs
-    re_path(r"authors/accept/(?P<followed>.+)/(?P<follower>.+)/", follow_accept, name="profile_follow_accept"),
-    re_path(r"authors/reject/(?P<followed>.+)/(?P<follower>.+)/", follow_reject, name="profile_follow_reject"),
-    re_path(r"authors/(?P<url_id>.+)/", ProfileDetailView.as_view(), name="profile"),
+    re_path(r"authors/accept/(?P<followed>.+)/(?P<follower>.+)/", views.follow_accept,name="profile_follow_accept"),
+    re_path(r"authors/reject/(?P<followed>.+)/(?P<follower>.+)/", views.follow_reject,name="profile_follow_reject"),
+    re_path(r"authors/unfollow/(?P<followed>.+)/(?P<follower>.+)/",views.profile_unfollow,name="profile_unfollow"),
+    re_path(r"authors/followrequest/(?P<requestee>.+)/(?P<requester>.+)/",views.profile_follow_request,name="profile_follow_request"),
+    re_path(r"authors/(?P<url_id>.+)/", ProfileDetailView.as_view(),name="profile"),
 
     # Comment URLs 
     # path("authors/<str:user_id>/inbox", comments.create_comment, name="create_comment"),

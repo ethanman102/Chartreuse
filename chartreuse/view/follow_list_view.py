@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.models import User as AuthUser
 from chartreuse.models import User,Follow
 from django.views.generic.detail import DetailView
@@ -84,3 +84,6 @@ class FollowListDetailView(DetailView):
         '''
         follows = Follow.objects.filter(followed = user)
         return [follow.follower for follow in follows]
+
+def view_profile_redirect(request,url_id):
+    return redirect("chartreuse:profile",url_id=url_id)

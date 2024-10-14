@@ -74,6 +74,7 @@ urlpatterns = [
     re_path(r"authors/followrequest/(?P<requestee>.+)/(?P<requester>.+)/",profile_view.profile_follow_request,name="profile_follow_request"),
     re_path(r"authors/following/(?P<user_id>.+)/",follow_list_view.FollowListDetailView.as_view(),name="user_following_list"),
     re_path(r"authors/followers/(?P<user_id>.+)/",follow_list_view.FollowListDetailView.as_view(),name="user_followers_list"),
+    re_path(r"authors/profile_redirect/(?P<url_id>.+)/",follow_list_view.view_profile_redirect,name="view_profile_redirect"),
     re_path(r"authors/(?P<url_id>.+)/", profile_view.ProfileDetailView.as_view(),name="profile"),
 
 

@@ -119,7 +119,7 @@ class ProfileDetailView(DetailView):
         logged_in: (Depicts if user is authenticated and has full page access)
         owner: (If the logged in user is viewing their own page)
         requests: (A list of follow request objects)
-        following: (If the user is foreign this key will be here, depicts if they are following the page owner or not.)
+        is_following: (If the user is foreign this key will be here, depicts if they are following the page owner or not.)
         sent_request: (Bool if the user is NOT already following, but did they sent a follow request?)
         }
         
@@ -129,7 +129,6 @@ class ProfileDetailView(DetailView):
         user = context['profile']
 
         page_user = get_object_or_404(User,url_id=unquote(self.kwargs['url_id']))
-        print(page_user.url_id)
         context['owner_id'] = quote(page_user.url_id,safe='')
 
         # checking if user is authenticated or anonymous
@@ -138,6 +137,7 @@ class ProfileDetailView(DetailView):
             # if logged in, check if user owns the current page or that's being visited or not...
             current_user = self.request.user
             current_user_model = get_object_or_404(User,user=current_user)
+            
             if page_user.url_id == current_user_model.url_id:
                 # owns the page, should not display follow button etc...
                 context['owner'] = True
@@ -153,19 +153,21 @@ class ProfileDetailView(DetailView):
                 # check if the user if following or not...
                
                 follow = Follow.objects.filter(follower=current_user_model,followed=page_user)
-                print(follow)
+                print(follow.count(),"HI")
                 if follow.count() == 0:
-                    context['following'] = False
+                    context['is_following'] = False
+                    print("WE IN THIS BISH")
                     # check if a follow request has been sent or not!
                     follow_request  = FollowRequest.objects.filter(requestee=page_user,requester=current_user_model)
                     if follow_request.count() > 0:
                         context['sent_request'] = True
+                        print("HI!!!!!!!")
                     else:
                         context['sent_request'] = False
+                        print("hooo")
                 else:
-                    context['following'] = True
-            print(context)
-
+                    context['is_following'] = True
+        
         # Overriden to get these addition counts.
         context['like_count'] = Like.objects.filter(user=user).count()
         context['comment_count'] = Comment.objects.filter(user=user).count()

@@ -32,10 +32,11 @@ h4{
     margin-bottom: 1ch;
     padding: 1ch;
     transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
 }
-.follower-box:hover{
-    background-color:  #b3b3b3;
-}
+
 
 img{
     border: black solid 2px;
@@ -43,6 +44,7 @@ img{
 
 .view-profile-form{
     display: inline;
+    flex-grow: 1;
 }
 
 .view-profile-button{
@@ -55,6 +57,8 @@ img{
     padding-right: 2ch;
     margin: 6px;
     transition: box-shadow 0.3s ease;
+    border-radius: 0;
+    float: right;
 }
 
 .view-profile-button:hover{

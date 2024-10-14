@@ -75,8 +75,8 @@ urlpatterns = [
     re_path(r"authors/(?P<url_id>.+)/", profile_view.ProfileDetailView.as_view(),name="profile"),
 
 
-    re_path(r"authors/(?P<relationship>following)/(?P<url_id>.+)/",follow_list_view.FollowListDetailView.as_view(),name="user_following_list")
-    re_path(r"authors/(?P<relationship>followers)/(?P<url_id>.+)/",follow_list_view.FollowListDetailView.as_view(),name="user_follower_list")
+    re_path(r"authors/(?P<relationship>following)/(?P<url_id>.+)/",follow_list_view.FollowListDetailView.as_view(),name="user_following_list"),
+    re_path(r"authors/(?P<relationship>followers)/(?P<url_id>.+)/",follow_list_view.FollowListDetailView.as_view(),name="user_follower_list"),
 
     # Comment URLs 
     # path("authors/<str:user_id>/inbox", comments.create_comment, name="create_comment"),

@@ -11,37 +11,6 @@ from urllib.parse import unquote, quote
 class Host():
     host = "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/"
 
-def signup(request):
-    return render(request, 'signup.html')
-
-def save_signup(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password_1 = request.POST.get('password1')
-        password_2 = request.POST.get('password2')
-        displayname = request.POST.get('displayname')
-        github = request.POST.get('github')
-
-        # create the auth user first, bacause User has a one to one relationship with it
-        auth_user = AuthUser(username=username, password=password_1)
-        auth_user.save()
-
-        # now create the User
-        user = User(user=auth_user, displayName=displayname, github=github)
-        user.save()
-
-        return redirect('chartreuse/login')
-
-def login(request):
-    return render(request, 'login.html')
-
-def error(request):
-    return render(request, 'error.html')
-
-
-
-
-
 def follow_accept(request,followed,follower):
 
     '''
@@ -85,6 +54,7 @@ def follow_reject(request,followed,follower):
         return redirect("chartreuse:profile",url_id=quote(followed,safe=''))
     return HttpResponseNotAllowed(["POST"])
 
+
 def profile_unfollow(request,followed,follower):
     '''
     Purpose: View to interact with the user to unfollow the person on the current page through a form submission.
@@ -125,6 +95,15 @@ def profile_follow_request(request,requestee,requester):
     return HttpResponseNotAllowed(["POST"])
 
 
+def error(request):
+    '''
+    Purpose: View to render a generic error page
+
+
+    Arguments:
+    request: Request object
+    '''
+    return render(request, 'error.html')
 
 class ProfileDetailView(DetailView):
 

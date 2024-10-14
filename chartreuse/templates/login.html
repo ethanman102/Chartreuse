@@ -1,1 +1,25 @@
-<h1>Test login page<h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="date" content="2024-10-12">
+    <meta name="tags" content="Login">
+    <meta name="summary" content="Login page.">
+    <title>Chartreuse</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h4>Login</h4>
+        <form method="POST" action="authenticate/">
+            <p>Now, let's log in!</p>
+            {% csrf_token %}
+            <input id="username" name="username" type="text" class="form-control" required placeholder="Enter your username"/>
+            <input id="password" name="password" type="password" class="form-control" required placeholder="Enter your password"/>
+            <button type="submit" class="custom-button">Log In</button>
+        </form>
+    </div>
+</body>
+</html>

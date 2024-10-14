@@ -2,8 +2,11 @@
 
 body,html{
     font-family: "Sometype Mono", monospace;
+    background-image: url("background.png");
 }
 
+
+/*Following related buttons */
 .follow{
     border-radius: 0;
     background-color: #00356B;
@@ -17,8 +20,19 @@ body,html{
     box-shadow: 6px 6px 0px #000000;
 }
 
+#requested{
+    border-radius: 0;
+    font-size: 100%;
+}
+
+
+
 @media only screen and (max-width: 995px){
     .follow{
+        font-size: 75%;
+    }
+
+    #requested{
         font-size: 75%;
     }
 }
@@ -27,8 +41,14 @@ body,html{
     .follow{
         font-size: 50%;
     }
+    #requested{
+        font-size: 50%;
+    }
 }
 
+
+
+/* profile title and header bar */
 #profile-header{
     background-color: #00356B;
 }
@@ -38,6 +58,7 @@ body,html{
     color: #80FF00;
 }
 
+/* github css */
 #profile-github{
     transition: font-size 0.3s ease;
 }
@@ -50,8 +71,10 @@ body,html{
     border: solid black 5px;
 }
 
+/* bottom content box */
 .tab-bar{
         margin-top: 4ch;
+        margin-bottom: 4ch;
 }
 
 /*nav bar styling (posts, stats, follow-requests)*/
@@ -91,4 +114,65 @@ body,html{
 
 img{
     border: black solid 2px;
+}
+
+/*follow request content*/
+
+/*https://stackoverflow.com/questions/18961918/css-to-fill-the-remaining-container-width*/
+/*Resource: Stack Overflow Post:CSS to fill remaining container width*/
+/*Answered by Abhishek Tewari on December 21, 2019*/
+.follow-request{
+    background-color: #F5F5F5;
+    border: black solid 2px;
+    margin-top: 1ch;
+    margin-bottom: 1ch;
+    padding: 1ch;
+    display: flex;
+    align-items: center;
+}
+
+.follow-request > img {
+    margin-top: 6px;
+    margin-left: 6px;
+}
+
+h5{
+    padding-left: 2ch;
+}
+
+
+
+#delete{
+    background-color: red;
+    border: none;
+    border-radius: 0;
+    margin: 6px;
+    
+}
+
+#accept{
+    background-color: #80FF00;
+    border: none;
+    border-radius: 0;
+    margin: 6px;
+    
+}
+
+#decision-forms{
+    display: inline-flex;
+    justify-content: flex-end;
+    flex-grow: 1;
+}
+
+#decision-forms > form {
+    display: inline;
+}
+
+
+#decision-forms > form > button{
+    transition: box-shadow 0.3s ease;
+}
+
+#decision-forms > form > button:hover{
+    box-shadow: 6px 6px 0px #000000;
 }

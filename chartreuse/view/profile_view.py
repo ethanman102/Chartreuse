@@ -141,18 +141,18 @@ class ProfileDetailView(DetailView):
                 follow_requests = FollowRequest.objects.filter(requestee=page_user)
                 requests = [fk for fk in follow_requests]
                 for follow_request in requests:
-                    follow_request.follower.url_id = quote(follow_request.follower.url_id,safe='')
-                    follow_request.followed.url_id = quote(follow_request.followed.url_id,safe='')
+                    follow_request.requester.url_id = quote(follow_request.requester.url_id,safe='')
+                    follow_request.requestee.url_id = quote(follow_request.requestee.url_id,safe='')
                 context['requests'] = requests
             else:
 
                 context['viewer_id'] = quote(current_user_model.url_id,safe='')
                 context['owner_id'] = quote(page_user.url_id,safe='')
                 # check if the user if following or not...
-                follow = Follow.objects.filter(follower=current_user,followed=page_user)
+                follow = Follow.objects.filter(follower=current_user_model,followed=page_user)
                 if follow.count() == 0:
                     # check if a follow request has been sent or not!
-                    follow_request  = FollowRequest.objects.filter(requestee=page_user,requester=current_user)
+                    follow_request  = FollowRequest.objects.filter(requestee=page_user,requester=current_user_model)
                     if follow_request.count() != 0:
                         context['sent_request'] = True
                 else:

@@ -1,7 +1,6 @@
 from django.urls import path, re_path
 from .api_handling import users, likes, images, github, friends, posts
 from .api_handling import followers, follow_requests
-from chartreuse.views import ProfileDetailView, follow_accept, follow_reject
 from django.conf import settings
 from django.conf.urls.static import static
 from chartreuse.views import  error

@@ -1,10 +1,7 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import generic
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User as AuthUser
-from django.urls import reverse
-from chartreuse.models import User,Like,Comment,Post,Follow,FollowRequest
+from chartreuse.models import User,Follow
 from django.views.generic.detail import DetailView
-from django.http import HttpResponseNotAllowed
 from urllib.parse import unquote, quote
 from django.http import Http404 
 
@@ -14,7 +11,7 @@ class FollowListDetailView(DetailView):
     Purpose: Serve associated files specified by the URL user url_id paramater to view either the users they are followed by or following
     """
 
-    template = 'follow-list.html'
+    template_name = 'follow_list.html'
     context_object_name = 'user'
     model = User
 
@@ -63,7 +60,7 @@ class FollowListDetailView(DetailView):
         return context
             
     def get_object(self):
-        user_id = unquote(self.kwargs['url_id'])
+        user_id = unquote(self.kwargs['user_id'])
         return get_object_or_404(User,url_id=user_id)
     
     def get_following(self,user):

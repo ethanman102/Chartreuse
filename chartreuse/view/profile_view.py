@@ -127,8 +127,9 @@ class ProfileDetailView(DetailView):
 
         context = super().get_context_data(**kwargs)
         user = context['profile']
-        
+
         page_user = get_object_or_404(User,url_id=unquote(self.kwargs['url_id']))
+        print(page_user.url_id)
         context['owner_id'] = quote(page_user.url_id,safe='')
 
         # checking if user is authenticated or anonymous
@@ -150,14 +151,20 @@ class ProfileDetailView(DetailView):
 
                 context['viewer_id'] = quote(current_user_model.url_id,safe='')
                 # check if the user if following or not...
+               
                 follow = Follow.objects.filter(follower=current_user_model,followed=page_user)
+                print(follow)
                 if follow.count() == 0:
+                    context['following'] = False
                     # check if a follow request has been sent or not!
                     follow_request  = FollowRequest.objects.filter(requestee=page_user,requester=current_user_model)
-                    if follow_request.count() != 0:
+                    if follow_request.count() > 0:
                         context['sent_request'] = True
+                    else:
+                        context['sent_request'] = False
                 else:
                     context['following'] = True
+            print(context)
 
         # Overriden to get these addition counts.
         context['like_count'] = Like.objects.filter(user=user).count()
@@ -174,6 +181,8 @@ class ProfileDetailView(DetailView):
         # user's Id can't be obtained since the User model does not explicity state a primary key. Will retrieve the user by grabbing them by the URL pk param.
        
         user_id = unquote(self.kwargs['url_id'])
-        return get_object_or_404(User,url_id=user_id)
+        user = get_object_or_404(User,url_id=user_id)
+
+        return user
         
 

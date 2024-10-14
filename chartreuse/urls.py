@@ -1,8 +1,8 @@
 from django.urls import path, re_path
 from .api_handling import users, likes, images, github, friends, posts, comments
 from .api_handling import followers, follow_requests
-from chartreuse.views import ProfileDetailView, error, follow_accept, follow_reject
-from .view import home_page_view, signup_view, login_view, landing_page_view, add_post_view
+from chartreuse.views import  error
+from .view import home_page_view, signup_view, login_view, landing_page_view, add_post_view, profile_view
 
 app_name = "chartreuse"
 urlpatterns = [
@@ -65,11 +65,11 @@ urlpatterns = [
     path("api/authors/", users.UserViewSet.as_view({'post': 'create', 'get': 'list'}), name="user-list"),
 
     # Follow Request URLs
-    re_path(r"authors/accept/(?P<followed>.+)/(?P<follower>.+)/", views.follow_accept,name="profile_follow_accept"),
-    re_path(r"authors/reject/(?P<followed>.+)/(?P<follower>.+)/", views.follow_reject,name="profile_follow_reject"),
-    re_path(r"authors/unfollow/(?P<followed>.+)/(?P<follower>.+)/",views.profile_unfollow,name="profile_unfollow"),
-    re_path(r"authors/followrequest/(?P<requestee>.+)/(?P<requester>.+)/",views.profile_follow_request,name="profile_follow_request"),
-    re_path(r"authors/(?P<url_id>.+)/", ProfileDetailView.as_view(),name="profile"),
+    re_path(r"authors/accept/(?P<followed>.+)/(?P<follower>.+)/", profile_view.follow_accept,name="profile_follow_accept"),
+    re_path(r"authors/reject/(?P<followed>.+)/(?P<follower>.+)/", profile_view.follow_reject,name="profile_follow_reject"),
+    re_path(r"authors/unfollow/(?P<followed>.+)/(?P<follower>.+)/",profile_view.profile_unfollow,name="profile_unfollow"),
+    re_path(r"authors/followrequest/(?P<requestee>.+)/(?P<requester>.+)/",profile_view.profile_follow_request,name="profile_follow_request"),
+    re_path(r"authors/(?P<url_id>.+)/", profile_view.ProfileDetailView.as_view(),name="profile"),
 
     # Comment URLs 
     # path("authors/<str:user_id>/inbox", comments.create_comment, name="create_comment"),

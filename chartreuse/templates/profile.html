@@ -26,12 +26,12 @@
                             <h2>{{ profile.displayName }}</h2>
                         </div>
                         <div class="col-3">
-                            <button type="button" class="btn btn-primary w-100">
+                            <button type="button" class="btn btn-primary w-100 follow">
                                 Followers {{ followers }}
                             </button>
                         </div>
                         <div class="col-3">
-                            <button type="button" class="btn btn-primary w-100">
+                            <button type="button" class="btn btn-primary w-100 follow">
                                 Following {{ following }}
                             </button>
                         </div>
@@ -47,14 +47,14 @@
                             {% if not following and not_request %}
                             {% url 'chartreuse:profile_follow_request' owner_id viewer_id as follow_request_url %}
                             <form action="{{follow_request_url}}" method="POST" class="follow_request_form">
-                                <button class="btn btn-outline-primary btn-lg w-100" type="submit">Follow</button>
+                                <button class="btn btn-outline-primary btn-lg w-100 follow" type="submit">Follow</button>
                             </form>
                             {% elif sent_request %}
                             <button class="btn btn-secondary btn-lg w-100" type="button" disabled>Requested</button>
                             {% else %}
                             {% url 'chartreuse:profile_unfollow' owner_id viewer_id as unfollow_url %}
                             <form action="{{unfollow_url}}" method="POST" class="unfollow_form">
-                                <button class="btn btn-primary btn-lg w-100" type="submit">Following</button>
+                                <button class="btn btn-primary btn-lg w-100 follow" type="submit">Following</button>
                             </form>
                             {% endif %}
                         </div>

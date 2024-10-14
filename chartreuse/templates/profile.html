@@ -11,8 +11,8 @@
 </head>
 <body>
 
-    {% url 'chartreuse:user_following_list' 'following' owner_id as following_url %}
-    {% url 'chartreuse:user_followers_list' 'followers' owner_id as followers_url %}
+    {% url 'chartreuse:user_following_list' owner_id as following_url %}
+    {% url 'chartreuse:user_followers_list' owner_id as followers_url %}
     <!-- Creating a mass container to store main details referring to the specific follower -->
     <div class="profile-box" style="margin-top: 30px;">
         <div class="container" id="profile-header">

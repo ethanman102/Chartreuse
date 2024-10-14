@@ -31,9 +31,15 @@ class FollowListDetailView(DetailView):
         '''
 
         context =  super().get_context_data(**kwargs)
-
+        # https://stackoverflow.com/questions/10533302/how-to-get-the-url-path-of-a-view-function-in-django
+        # How to get the url path of a view function in django
+        # Answered by Ashley H. November 18, 2020
         user = context['user']
-        relationship = self.kwargs['relationship']
+        path = self.request.path
+        if "following" in path:
+            relationship = "following"
+        else:
+            relationship = "followers"
         context['relationship'] = relationship
 
         # On October 14, 2024 Asked ChatGPT: How to throw django 404 error

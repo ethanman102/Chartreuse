@@ -1,4 +1,32 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block extra_head %}
+    <meta name="date" content="2024-10-12">
+    <meta name="tags" content="Signup">
+    <meta name="summary" content="Signup page.">
+    <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h4>Sign Up</h4>
+    <form method="POST" action="save/">
+        <p>First things first, let's create your profile!</p>
+        {% csrf_token %}
+        <input id="username" name="username" type="text" class="form-control" required placeholder="Enter your username"/>
+        <input id="password1" name="password1" type="password" class="form-control" required placeholder="Enter your password"/>
+        <input id="password2" name="password2" type="password" class="form-control" required placeholder="Confirm your password"/>
+        <input id="displayname" name="displayname" type="text" class="form-control" required placeholder="Enter your display name"/>
+        <input id="github" name="github" type="url" class="form-control" placeholder="Your GitHub URL"/>
+        <input id="profile-image" name="profile-image" type="url" class="form-control" placeholder="Profile Image URL"/>
+        <button type="submit" class="custom-button">Sign Up</button>
+    </form>
+</div>
+{% endblock %}
+
+{% comment %} <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -48,4 +76,4 @@
         </form>
     </div>
 </body>
-</html>
+</html> {% endcomment %}

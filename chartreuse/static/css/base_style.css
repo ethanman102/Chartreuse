@@ -1,3 +1,7 @@
+:root {
+    --bs-body-font-family: "Sometype Mono", sans-serif;
+}
+
 html body {
     background-image: url('../static/background.png');
     background-position: center;

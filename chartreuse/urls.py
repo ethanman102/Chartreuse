@@ -72,11 +72,12 @@ urlpatterns = [
     re_path(r"authors/reject/(?P<followed>.+)/(?P<follower>.+)/", profile_view.follow_reject,name="profile_follow_reject"),
     re_path(r"authors/unfollow/(?P<followed>.+)/(?P<follower>.+)/",profile_view.profile_unfollow,name="profile_unfollow"),
     re_path(r"authors/followrequest/(?P<requestee>.+)/(?P<requester>.+)/",profile_view.profile_follow_request,name="profile_follow_request"),
-    re_path(r"authors/(?P<url_id>.+)/", profile_view.ProfileDetailView.as_view(),name="profile"),
-
 
     re_path(r"authors/(?P<relationship>following)/(?P<url_id>.+)/",follow_list_view.FollowListDetailView.as_view(),name="user_following_list"),
     re_path(r"authors/(?P<relationship>followers)/(?P<url_id>.+)/",follow_list_view.FollowListDetailView.as_view(),name="user_follower_list"),
+    re_path(r"authors/(?P<url_id>.+)/", profile_view.ProfileDetailView.as_view(),name="profile"),
+
+
 
     # Comment URLs 
     # path("authors/<str:user_id>/inbox", comments.create_comment, name="create_comment"),

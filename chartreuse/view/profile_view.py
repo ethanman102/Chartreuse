@@ -127,6 +127,7 @@ class ProfileDetailView(DetailView):
 
         context = super().get_context_data(**kwargs)
         user = context['profile']
+        
         page_user = get_object_or_404(User,url_id=unquote(self.kwargs['url_id']))
         context['owner_id'] = quote(page_user.url_id,safe='')
 

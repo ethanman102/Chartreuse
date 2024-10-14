@@ -127,6 +127,7 @@ class ProfileDetailView(DetailView):
 
         context = super().get_context_data(**kwargs)
         user = context['profile']
+        page_user = get_object_or_404(User,url_id=unquote(self.kwargs['url_id']))
         context['owner_id'] = quote(page_user.url_id,safe='')
 
         # checking if user is authenticated or anonymous
@@ -135,7 +136,6 @@ class ProfileDetailView(DetailView):
             # if logged in, check if user owns the current page or that's being visited or not...
             current_user = self.request.user
             current_user_model = get_object_or_404(User,user=current_user)
-            page_user = get_object_or_404(User,url_id=unquote(self.kwargs['url_id']))
             if page_user.url_id == current_user_model.url_id:
                 # owns the page, should not display follow button etc...
                 context['owner'] = True

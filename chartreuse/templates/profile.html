@@ -11,7 +11,8 @@
 </head>
 <body>
 
-
+    {% url 'chartreuse:user_following_list' 'following' owner_id as following_url %}
+    {% url 'chartreuse:user_followers_list' 'followers' owner_id as followers_url %}
     <!-- Creating a mass container to store main details referring to the specific follower -->
     <div class="profile-box" style="margin-top: 30px;">
         <div class="container" id="profile-header">
@@ -28,14 +29,18 @@
                             <h2>{{ profile.displayName }}</h2>
                         </div>
                         <div class="col-3">
-                            <button type="button" class="btn btn-primary w-100 follow">
-                                Followers {{ followers }}
-                            </button>
+                            <form class="follow-forms" method="GET" action="{{followers_url}}">
+                                <button type="submit" class="btn btn-primary w-100 follow">
+                                    Followers {{ followers }}
+                                </button>
+                            </form>
                         </div>
                         <div class="col-3">
-                            <button type="button" class="btn btn-primary w-100 follow">
-                                Following {{ following }}
-                            </button>
+                            <form class="follow-forms" method="GET" action="{{following_url}}">
+                                <button type="button" class="btn btn-primary w-100 follow">
+                                    Following {{ following }}
+                                </button>
+                            </form>
                         </div>
                     </div>
                     <div class="row mt-4">

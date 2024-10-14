@@ -127,6 +127,7 @@ class ProfileDetailView(DetailView):
 
         context = super().get_context_data(**kwargs)
         user = context['profile']
+        context['owner_id'] = quote(page_user.url_id,safe='')
 
         # checking if user is authenticated or anonymous
         if self.request.user.is_authenticated:
@@ -147,7 +148,6 @@ class ProfileDetailView(DetailView):
             else:
 
                 context['viewer_id'] = quote(current_user_model.url_id,safe='')
-                context['owner_id'] = quote(page_user.url_id,safe='')
                 # check if the user if following or not...
                 follow = Follow.objects.filter(follower=current_user_model,followed=page_user)
                 if follow.count() == 0:

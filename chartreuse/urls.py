@@ -4,7 +4,7 @@ from .api_handling import followers, follow_requests
 from django.conf import settings
 from django.conf.urls.static import static
 from chartreuse.views import  error
-from .view import home_page_view, signup_view, login_view, landing_page_view, add_post_view, profile_view
+from .view import home_page_view, signup_view, login_view, landing_page_view, profile_view
 
 app_name = "chartreuse"
 urlpatterns = [
@@ -21,12 +21,11 @@ urlpatterns = [
     path('signup/', signup_view.signup, name='signup'),
     path('signup/save/', signup_view.save_signup, name='save_signup'),
 
-
     path('login/', login_view.login, name='login'),
     path('login/authenticate/', login_view.save_login, name='authenticate'),
 
     path("homepage/", home_page_view.FeedDetailView.as_view(), name="homepage"),
-    path('add-post/', add_post_view.add_post, name='add_post'),
+    path('add-post/', home_page_view.add_post, name='add_post'),
     path('add-post/save/', home_page_view.save_post, name='save_post'),
 
     path("api/author/login/", users.UserViewSet.login_user, name="login_user"),

@@ -66,11 +66,6 @@ document.querySelectorAll('.follow-button').forEach(button => {
         .then(response => response.json())
         .then(data => {
             console.log('Success:', data);
-            if (data.following) {
-                this.innerText = 'Unfollow';  // Update the button text
-            } else {
-                this.innerText = 'Follow';  // Update the button text
-            }
             window.location.reload();
         })
         .catch(error => console.error('Error:', error));

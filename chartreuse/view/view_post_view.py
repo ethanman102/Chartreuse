@@ -2,9 +2,8 @@ from django.shortcuts import get_object_or_404
 from chartreuse.models import User, Follow, Like
 from django.views.generic.detail import DetailView
 from urllib.parse import quote
-from support_functions import get_followed, get_all_public_posts, get_posts
 
-class FeedDetailView(DetailView):
+class PostDetailView(DetailView):
     '''
     Purpose: Serves posts that the user has access to
 
@@ -26,7 +25,7 @@ class FeedDetailView(DetailView):
         else:
             return None
 
-    def get_posts(self):
+    def get_post(self):
         '''
         Get the queryset based on the user's authentication status
         '''
@@ -87,7 +86,7 @@ class FeedDetailView(DetailView):
                     post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
             
             return posts
-
+    
     def get_user_details(self):
         '''
         Get the user details for the current user

@@ -45,9 +45,6 @@ class PostDetailView(DetailView):
                 post.following_status = "Pending"
             else:
                 post.following_status = "Follow"
-            
-            if post.visibility == "UNLISTED" and not is_following:
-                return redirect('/chartreuse/homepage')
 
             is_followed = Follow.objects.filter(follower=post.user, followed=current_user_model).exists()
             if ((not is_followed) and (not is_following) and (post.visibility == "FRIENDS")):

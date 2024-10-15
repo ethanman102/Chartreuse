@@ -1,0 +1,182 @@
+@import url('https://fonts.googleapis.com/css2?family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap');
+
+body,html{
+    font-family: "Sometype Mono", monospace;
+    background-image: url("background.png");
+}
+
+
+/*Following related buttons */
+.follow{
+    border-radius: 0;
+    background-color: #00356B;
+    color: white;
+    transition: box-shadow 0.3s ease;
+    font-size: 100%;
+}
+
+.follow:hover{
+    background-color: #00356B;
+    box-shadow: 6px 6px 0px #000000;
+}
+
+#requested{
+    border-radius: 0;
+    font-size: 100%;
+}
+
+.follow-forms{
+    display: inline;
+}
+
+
+
+@media only screen and (max-width: 995px){
+    .follow{
+        font-size: 75%;
+    }
+
+    #requested{
+        font-size: 75%;
+    }
+}
+
+@media only screen and (max-width: 750px){
+    .follow{
+        font-size: 50%;
+    }
+    #requested{
+        font-size: 50%;
+    }
+}
+
+
+
+/* profile title and header bar */
+#profile-header{
+    background-color: #00356B;
+}
+
+#profile-header > h4{
+    font-weight: bold;
+    color: #80FF00;
+}
+
+/* github css */
+#profile-github{
+    transition: font-size 0.3s ease;
+}
+
+#profile-github:hover{
+    font-size: 125%;
+}
+
+.container{
+    border: solid black 5px;
+}
+
+/* bottom content box */
+.tab-bar{
+        margin-top: 4ch;
+        margin-bottom: 4ch;
+}
+
+/*nav bar styling (posts, stats, follow-requests)*/
+
+#nav-tab{
+    background-color: #00356B;
+    border: none;
+}
+
+#nav-tab > .active{
+    background-color: #00356B;
+    border: none;
+    color: white;
+    text-decoration: underline;
+}
+
+.nav-link{
+    color: white;
+    border: none;
+}
+
+#nav-cols{
+    background-color: #00356B; 
+    border-bottom: #000000 solid 5px;
+}
+
+#nav-tab > button:hover{
+    background-color: #002549; 
+    color: white;
+    border: none;
+}
+
+.full-container{
+    width: 100%;
+    background-color: #D9D9D9;
+}
+
+img{
+    border: black solid 2px;
+}
+
+/*follow request content*/
+
+/*https://stackoverflow.com/questions/18961918/css-to-fill-the-remaining-container-width*/
+/*Resource: Stack Overflow Post:CSS to fill remaining container width*/
+/*Answered by Abhishek Tewari on December 21, 2019*/
+.follow-request{
+    background-color: #F5F5F5;
+    border: black solid 2px;
+    margin-top: 1ch;
+    margin-bottom: 1ch;
+    padding: 1ch;
+    display: flex;
+    align-items: center;
+}
+
+.follow-request > img {
+    margin-top: 6px;
+    margin-left: 6px;
+}
+
+h5{
+    padding-left: 2ch;
+}
+
+
+
+#delete{
+    background-color: red;
+    border: none;
+    border-radius: 0;
+    margin: 6px;
+    
+}
+
+#accept{
+    background-color: #80FF00;
+    border: none;
+    border-radius: 0;
+    margin: 6px;
+    
+}
+
+#decision-forms{
+    display: inline-flex;
+    justify-content: flex-end;
+    flex-grow: 1;
+}
+
+#decision-forms > form {
+    display: inline;
+}
+
+
+#decision-forms > form > button{
+    transition: box-shadow 0.3s ease;
+}
+
+#decision-forms > form > button:hover{
+    box-shadow: 6px 6px 0px #000000;
+}

@@ -119,7 +119,7 @@ class ProfileDetailView(DetailView):
         logged_in: (Depicts if user is authenticated and has full page access)
         owner: (If the logged in user is viewing their own page)
         requests: (A list of follow request objects)
-        following: (If the user is foreign this key will be here, depicts if they are following the page owner or not.)
+        is_following: (If the user is foreign this key will be here, depicts if they are following the page owner or not.)
         sent_request: (Bool if the user is NOT already following, but did they sent a follow request?)
         }
         
@@ -128,36 +128,46 @@ class ProfileDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         user = context['profile']
 
+        page_user = get_object_or_404(User,url_id=unquote(self.kwargs['url_id']))
+        context['owner_id'] = quote(page_user.url_id,safe='')
+
         # checking if user is authenticated or anonymous
         if self.request.user.is_authenticated:
             context['logged_in'] = True
             # if logged in, check if user owns the current page or that's being visited or not...
             current_user = self.request.user
             current_user_model = get_object_or_404(User,user=current_user)
-            page_user = get_object_or_404(User,url_id=unquote(self.kwargs['url_id']))
+            
             if page_user.url_id == current_user_model.url_id:
                 # owns the page, should not display follow button etc...
                 context['owner'] = True
                 follow_requests = FollowRequest.objects.filter(requestee=page_user)
                 requests = [fk for fk in follow_requests]
                 for follow_request in requests:
-                    follow_request.follower.url_id = quote(follow_request.follower.url_id,safe='')
-                    follow_request.followed.url_id = quote(follow_request.followed.url_id,safe='')
+                    follow_request.requester.url_id = quote(follow_request.requester.url_id,safe='')
+                    follow_request.requestee.url_id = quote(follow_request.requestee.url_id,safe='')
                 context['requests'] = requests
             else:
 
                 context['viewer_id'] = quote(current_user_model.url_id,safe='')
-                context['owner_id'] = quote(page_user.url_id,safe='')
                 # check if the user if following or not...
-                follow = Follow.objects.filter(follower=current_user,followed=page_user)
+               
+                follow = Follow.objects.filter(follower=current_user_model,followed=page_user)
+                print(follow.count(),"HI")
                 if follow.count() == 0:
+                    context['is_following'] = False
+                    print("WE IN THIS BISH")
                     # check if a follow request has been sent or not!
-                    follow_request  = FollowRequest.objects.filter(requestee=page_user,requester=current_user)
-                    if follow_request.count() != 0:
+                    follow_request  = FollowRequest.objects.filter(requestee=page_user,requester=current_user_model)
+                    if follow_request.count() > 0:
                         context['sent_request'] = True
+                        print("HI!!!!!!!")
+                    else:
+                        context['sent_request'] = False
+                        print("hooo")
                 else:
-                    context['following'] = True
-
+                    context['is_following'] = True
+        
         # Overriden to get these addition counts.
         context['like_count'] = Like.objects.filter(user=user).count()
         context['comment_count'] = Comment.objects.filter(user=user).count()
@@ -173,6 +183,8 @@ class ProfileDetailView(DetailView):
         # user's Id can't be obtained since the User model does not explicity state a primary key. Will retrieve the user by grabbing them by the URL pk param.
        
         user_id = unquote(self.kwargs['url_id'])
-        return get_object_or_404(User,url_id=user_id)
+        user = get_object_or_404(User,url_id=user_id)
+
+        return user
         
 

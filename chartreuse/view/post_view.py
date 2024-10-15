@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from django.views.generic.detail import DetailView
 from chartreuse.models import Post, Like, Follow, User, FollowRequest
 from urllib.parse import quote
+from django.shortcuts import redirect
 
 class PostDetailView(DetailView):
     '''
@@ -44,6 +45,13 @@ class PostDetailView(DetailView):
                 post.following_status = "Pending"
             else:
                 post.following_status = "Follow"
+            
+            if post.visibility == "UNLISTED" and not is_following:
+                return redirect('/chartreuse/homepage')
+
+            is_followed = Follow.objects.filter(follower=post.user, followed=current_user_model).exists()
+            if ((not is_followed) and (not is_following) and (post.visibility == "FRIENDS")):
+                return redirect('/chartreuse/homepage')
             
         else:
             post.following_status = "Follow"

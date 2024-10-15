@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
-from chartreuse.models import User, Follow, Like
+from chartreuse.models import User, Follow, Like, FollowRequest
 from django.views.generic.detail import DetailView
 from urllib.parse import quote
-from support_functions import get_followed, get_all_public_posts, get_posts
+from chartreuse.view.support_functions import get_followed, get_all_public_posts, get_posts
 
 class FeedDetailView(DetailView):
     '''
@@ -41,11 +41,13 @@ class FeedDetailView(DetailView):
 
             public_posts = get_all_public_posts().exclude(user=current_user_model)
 
+            following_url_ids = [user.url_id for user in following]
+
+            follow_requests = FollowRequest.objects.filter(requester=current_user_model)
+            follow_request_url_ids = [follow_request.requestee.url_id for follow_request in follow_requests]
+
             # get all posts from the users that the current user follows
             for follower in following:
-                public_posts = get_posts(follower.url_id, 'PUBLIC')
-                posts.extend(public_posts)
-
                 private_posts = get_posts(follower.url_id, 'UNLISTED')
                 posts.extend(private_posts)
 
@@ -55,14 +57,17 @@ class FeedDetailView(DetailView):
                 if (is_following and is_followed):
                     friends_posts = get_posts(follower.url_id, 'FRIENDS')
                     posts.extend(friends_posts)
-                
-                public_posts = public_posts.exclude(user=follower)
 
             for post in posts:
                 post.following_status = 'Following'
             
             for post in public_posts:
-                post.following_status = 'Follow'
+                if (post.user.url_id in following_url_ids):
+                    post.following_status = 'Following'
+                elif (post.user.url_id in follow_request_url_ids):
+                    post.following_status = 'Pending'
+                else:
+                    post.following_status = 'Follow'
 
             # Combine all posts and sort by date published
             posts.extend(public_posts)

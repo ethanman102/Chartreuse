@@ -11,7 +11,6 @@
 </head>
 <body>
 
-
     <!-- Creating a mass container to store main details referring to the specific follower -->
     <div class="profile-box" style="margin-top: 30px;">
         <div class="container" id="profile-header">
@@ -28,14 +27,18 @@
                             <h2>{{ profile.displayName }}</h2>
                         </div>
                         <div class="col-3">
-                            <button type="button" class="btn btn-primary w-100 follow">
-                                Followers {{ followers }}
-                            </button>
+                            <form class="follow-forms" method="GET" action="{% url 'chartreuse:user_followers_list' owner_id %}">
+                                <button type="submit" class="btn btn-primary w-100 follow">
+                                    Followers {{ followers }}
+                                </button>
+                            </form>
                         </div>
                         <div class="col-3">
-                            <button type="button" class="btn btn-primary w-100 follow">
-                                Following {{ following }}
-                            </button>
+                            <form class="follow-forms" method="GET" action="{% url 'chartreuse:user_following_list' owner_id %}">
+                                <button type="submit" class="btn btn-primary w-100 follow">
+                                    Following {{ following }}
+                                </button>
+                            </form>
                         </div>
                     </div>
                     <div class="row mt-4">
@@ -46,13 +49,13 @@
                     {% endif %}
                     {% if not owner and viewer_id %}
                         <div class="col-6">
-                            {% if not following and not sent_request %}
+                            {% if is_following == False and sent_request == False %}
                             {% url 'chartreuse:profile_follow_request' owner_id viewer_id as follow_request_url %}
                             <form action="{{follow_request_url}}" method="POST" class="follow_request_form">
                                 {% csrf_token %}
                                 <button class="btn btn-outline-primary btn-lg w-100 follow" type="submit">Follow</button>
                             </form>
-                            {% elif sent_request %}
+                            {% elif sent_request == True %}
                             <button class="btn btn-secondary btn-lg w-100" id="requested" type="button" disabled>Requested</button>
                             {% else %}
                             {% url 'chartreuse:profile_unfollow' owner_id viewer_id as unfollow_url %}

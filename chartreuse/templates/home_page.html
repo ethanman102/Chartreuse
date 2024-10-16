@@ -1,3 +1,5 @@
+{% extends base.html %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,6 +14,13 @@
     <link rel="stylesheet" href="{% static 'css/home_page.css' %}">
 </head>
 <body>
+
+    
+
+    {% block sidenav %}
+        {% include 'navbar.html' %}
+    {% endblock %}
+
     <div class="container mt-5">
         <h4 class="mb-4">chartreuse.home</h4>
         <div class="d-flex justify-content-left">

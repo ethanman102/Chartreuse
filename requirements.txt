@@ -24,10 +24,8 @@ referencing==0.35.1
 regex==2024.9.11
 requests==2.32.3
 rpds-py==0.20.0
-setuptools==74.1.2
 simplejson==3.19.3
 sqlparse==0.5.1
 tzdata==2024.2
 uritemplate==4.1.1
 urllib3==2.2.3
-wheel==0.44.0

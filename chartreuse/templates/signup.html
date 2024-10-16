@@ -9,10 +9,30 @@
 
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+
+    <script>
+        window.addEventListener('load', main); 
+
+        function main() {
+            let backButton = document.getElementById("back");
+
+            backButton.addEventListener('click', () => {
+                window.location.href = "/chartreuse/"; 
+            });
+        };
+
+        
+    </script>
+
 </head>
 <body>
     <div class="container">
-        <h4>Sign Up</h4>
+        <article id="header_bar"> 
+            <h4>Sign Up</h4>
+            <button id="back" type="button" class="custom-button">X</button>
+
+        </article>
+       
         <form method="POST" action="save/">
             <p>First things first, let's create your profile!</p>
             {% csrf_token %}
@@ -23,6 +43,8 @@
             <input id="github" name="github" type="url" class="form-control" placeholder="Your GitHub URL"/>
             <input id="profile-image" name="profile-image" type="url" class="form-control" placeholder="Profile Image URL"/>
             <button type="submit" class="custom-button">Sign Up</button>
+
+            
         </form>
     </div>
 </body>

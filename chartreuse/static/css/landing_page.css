@@ -43,6 +43,7 @@ html, body {
     display: flex;
     justify-content: center;
     gap: 2ch;
+    width: 5ch;
 }
 
 .custom-button {
@@ -50,7 +51,7 @@ html, body {
     background-color: #00356b;
     border-bottom-style: solid;
     font-size: 3ch;
-    width: 30%;
+    /* width: 30%; */
     text-align: center;
     border-bottom-color: #1b1b1b;
     border-radius: 0;
@@ -58,10 +59,15 @@ html, body {
     text-decoration: none;
     padding: 10px 20px;
     transition: box-shadow 0.3s ease;
+    margin: 20%;
 }
 
 .custom-button:hover {
     color: chartreuse;
     background-color: #01254a;
     box-shadow: 6px 6px 0px #000000;
+}
+
+#back.custom-button {
+    margin: 3%
 }

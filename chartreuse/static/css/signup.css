@@ -69,3 +69,10 @@ form {
     background-color: #01254a;
     box-shadow: 6px 6px 0px #000000;
 }
+
+button#back {
+    margin: 10%;
+    font-weight: 600;
+
+    width: 3ch;
+}

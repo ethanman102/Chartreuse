@@ -27,7 +27,12 @@
 </head>
 <body>
     <div class="container">
-        <h4>Sign Up</h4>
+        <article id="header_bar"> 
+            <h4>Sign Up</h4>
+            <button id="back" type="button" class="custom-button">X</button>
+
+        </article>
+       
         <form method="POST" action="save/">
             <p>First things first, let's create your profile!</p>
             {% csrf_token %}
@@ -41,9 +46,6 @@
 
             
         </form>
-        <button id="back" type="button" class="custom-button">
-            Back
-        </button>
     </div>
 </body>
 </html>

@@ -1,21 +1,14 @@
 {% extends base.html %}
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <!--referred to W3Schools to properly set charset for html file, https://www.w3schools.com/html/html_charset.asp, 2024-10-10-->
-        <meta charset="UTF-8">
-        <meta name="date"   content="2024-10-10">
-        <meta name="tags"   content="error">
-        <meta name="summary"    content="This is the error page because something went wrong">
-        <title>Error</title>
+
+{% block title %}Error{% endblock %}
         
-       
-        <!--<link rel="stylesheet" href="../static\font.css">-->
-        <link rel="stylesheet"  href="../static/css/error_style.css">
+    
+<link rel="stylesheet"  href="../static/css/error_style.css">
 
-    </head>
+  
 
-    <body>
+
+{% block content %}
         <div class="container">
             <h4>chartreuse.error</h4>
 
@@ -24,5 +17,4 @@
             </p>
         </div>
 
-    </body>
-</html>
+{% endblock %}

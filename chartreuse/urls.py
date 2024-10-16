@@ -99,7 +99,11 @@ urlpatterns = [
     re_path(r"github/(?P<user_id>.+)/starred/", github.get_starred, name="get_starred"),
     re_path(r"github/(?P<user_id>.+)/subscriptions/", github.get_subscriptions, name="get_subscriptions"),
     
+    # error page url
     path("error", error, name="error"),
+
+ 
+
 ] 
 
 if settings.DEBUG:

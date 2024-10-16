@@ -22,39 +22,37 @@
         </div>
         <br></br>
     
-        {% if logged_in %}
-            {% for post in posts %}
-            <div class="card mb-3 p-4">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center">
-                        <img src="{{ post.user.profileImage }}" alt="{{ post.user.displayName }} Avatar" class="rounded-circle me-3" width="50" height="50">
-                        <h5 class="card-title">{{ post.user.displayName }}</h5>
-                    </div>
-                    <meta name="csrf-token" content="{{ csrf_token }}">
-                    <div class="d-flex align-items-center mb-3" style="gap: 2ch;">
-                        <button class="btn follow-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}"> {{ post.following_status }}</button>
-                        <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}">{{ post.likes_count }} likes</button>
-                    </div>
+        {% for post in posts %}
+        <div class="card mb-3 p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <img src="{{ post.user.profileImage }}" alt="{{ post.user.displayName }} Avatar" class="rounded-circle me-3" width="50" height="50">
+                    <h5 class="card-title">{{ post.user.displayName }}</h5>
                 </div>
-
-                {% if post.contentType == "text/plain" %}
-                    <p class="card-title mt-2">{{ post.title }}</p>
-                    <p class="card-text mt-2">{{ post.content }}</p>
-                    <p class="card-text mt-2">{{ post.description }}</p>
-                {% elif post.contentType == "image/png" or post.contentType == "image/jpeg" %}
-                    <p class="card-title mt-2">{{ post.title }}</p>
-                    <div class="d-flex justify-content-center">
-                        <img src="{{ post.content }}" alt="Post image" style="width: 40%" />
-                    </div>
-                    <p class="card-text mt-2">{{ post.description }}</p>
-                {% endif %}
-
-                <p class="text-muted">Published on {{ post.published }}</p>
+                <meta name="csrf-token" content="{{ csrf_token }}">
+                <div class="d-flex align-items-center mb-3" style="gap: 2ch;">
+                    <button class="btn follow-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}"> {{ post.following_status }}</button>
+                    <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}">{{ post.likes_count }} likes</button>
+                </div>
             </div>
-            {% endfor %}
-        {% else %}
-            <p>Please log in to view posts.</p>
-        {% endif %}
+
+            <a href="/chartreuse/homepage/post/{{ post.url_id }}/" class="card-link" style="text-decoration: none;">
+                <div class="post"> 
+                    <p class="card-title mt-2">{{ post.title }}</p>
+                    {% if post.contentType == "text/plain" %}
+                        <p class="card-text mt-2">{{ post.content }}</p>
+                    {% elif post.contentType == "image/png" or post.contentType == "image/jpeg" %}
+                        <div class="d-flex justify-content-center">
+                            <img src="{{ post.content }}" alt="Post image" style="width: 40%" />
+                        </div>
+                    {% endif %}
+                    <p class="card-text mt-2">{{ post.description }}</p>
+
+                    <p class="text-muted">Published on {{ post.published }}</p>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
     </div>
     
     <br></br>

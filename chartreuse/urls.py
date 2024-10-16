@@ -4,7 +4,7 @@ from .api_handling import followers, follow_requests
 from django.conf import settings
 from django.conf.urls.static import static
 from chartreuse.views import  error
-from .view import home_page_view, signup_view, login_view, landing_page_view, add_post_view, profile_view, follow_list_view
+from .view import home_page_view, signup_view, login_view, landing_page_view, profile_view, follow_list_view, support_functions, post_view
 
 app_name = "chartreuse"
 urlpatterns = [
@@ -21,18 +21,22 @@ urlpatterns = [
     path('signup/', signup_view.signup, name='signup'),
     path('signup/save/', signup_view.save_signup, name='save_signup'),
 
-
     path('login/', login_view.login, name='login'),
     path('login/authenticate/', login_view.save_login, name='authenticate'),
 
     path("homepage/", home_page_view.FeedDetailView.as_view(), name="homepage"),
-    path('add-post/', add_post_view.add_post, name='add_post'),
-    path('add-post/save/', home_page_view.save_post, name='save_post'),
+    path('add-post/', support_functions.add_post, name='add_post'),
+    path('add-post/save/', support_functions.save_post, name='save_post'),
 
     path("api/author/login/", users.UserViewSet.login_user, name="login_user"),
 
-    re_path(r'homepage/like-post/', home_page_view.like_post, name='like-post'),
-    re_path(r'homepage/follow-user/', home_page_view.follow_user, name='follow-user'),
+    re_path(r'.+/like-post/', support_functions.like_post, name='like-post'),
+    re_path(r'.+/send-follow-request/', support_functions.send_follow_request, name='send-follow-request'),
+
+    re_path(r'homepage/post/(?P<post_id>.+)/edit/', support_functions.edit_post, name='edit-post'),
+    re_path(r'homepage/post/(?P<post_id>.+)/delete/', support_functions.delete_post, name='delete-post'),
+    re_path(r'homepage/post/(?P<post_id>.+)/update/', support_functions.update_post, name='update-post'),
+    re_path(r'homepage/post/(?P<post_id>.+)/', post_view.PostDetailView.as_view(), name='view-post'),
 
     # Like URLs
     re_path(r"api/authors/(?P<user_id>.+)/inbox/$", likes.LikeViewSet.as_view({'post': 'add_like', 'delete': 'remove_like'}), name="like"),

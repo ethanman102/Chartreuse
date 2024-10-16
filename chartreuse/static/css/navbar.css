@@ -1,25 +1,25 @@
 nav div.container {
-    display: flex;
-    position: relative; 
-    height: 100%;
-    left: 0ch;
-    justify-items: left;
+    display: flex;	
+    position: relative; 	
+    height: 100%;	
+    left: 0ch;	
+    justify-items: left;	
 
-    /*height: 100%;*/
+    /*height: 100%;*/	
 
-    flex-direction: column;
-}
+    flex-direction: column;	
+}	
 
-ul {
-    position: fixed;
-    left: 0ch;
+ul {	
+    position: fixed;	
+    left: 0ch;	
 
-    width: 15%;
-    max-height: 80%;
-    margin-bottom: 20%;
-}
+    width: 15%;	
+    max-height: 80%;	
+    margin-bottom: 20%;	
+}	
 
-ul li img{
-    padding: 1ch;
-    height: 50%;
-}
+ul li img{	
+    padding: 1ch;	
+    height: 50%;	
+}	

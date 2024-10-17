@@ -128,8 +128,7 @@ class ProfileDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         user = context['profile']
 
-        page_user = get_object_or_404(User,url_id=unquote(self.kwargs['url_id']))
-        context['owner_id'] = quote(page_user.url_id,safe='')
+        context['owner_id'] = quote(user.url_id,safe='')
 
         # checking if user is authenticated or anonymous
         if self.request.user.is_authenticated:
@@ -138,35 +137,33 @@ class ProfileDetailView(DetailView):
             current_user = self.request.user
             current_user_model = get_object_or_404(User,user=current_user)
             
-            if page_user.url_id == current_user_model.url_id:
+            if user.url_id == current_user_model.url_id:
                 # owns the page, should not display follow button etc...
                 context['owner'] = True
-                follow_requests = FollowRequest.objects.filter(requestee=page_user)
+                follow_requests = FollowRequest.objects.filter(requestee=user)
                 requests = [fk for fk in follow_requests]
                 for follow_request in requests:
                     follow_request.requester.url_id = quote(follow_request.requester.url_id,safe='')
                     follow_request.requestee.url_id = quote(follow_request.requestee.url_id,safe='')
                 context['requests'] = requests
             else:
-
                 context['viewer_id'] = quote(current_user_model.url_id,safe='')
                 # check if the user if following or not...
                
-                follow = Follow.objects.filter(follower=current_user_model,followed=page_user)
-                print(follow.count(),"HI")
+                follow = Follow.objects.filter(follower=current_user_model,followed=user)
                 if follow.count() == 0:
                     context['is_following'] = False
-                    print("WE IN THIS BISH")
                     # check if a follow request has been sent or not!
-                    follow_request  = FollowRequest.objects.filter(requestee=page_user,requester=current_user_model)
+                    follow_request  = FollowRequest.objects.filter(requestee=user,requester=current_user_model)
                     if follow_request.count() > 0:
                         context['sent_request'] = True
-                        print("HI!!!!!!!")
                     else:
                         context['sent_request'] = False
-                        print("hooo")
                 else:
                     context['is_following'] = True
+                    # check if the user is following them back or not!
+        else:
+            context['logged_in'] = False
         
         # Overriden to get these addition counts.
         context['like_count'] = Like.objects.filter(user=user).count()

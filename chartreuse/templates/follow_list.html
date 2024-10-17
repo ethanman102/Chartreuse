@@ -15,7 +15,7 @@
         <div class="container">
             <div class="container full-container" id="follow-list-header">
                 <h4>{{user.displayName}}.{{relationship}}</h4>
-                <button id="back" type="button" class="custom-button">X</button>
+                <button id="back" type="button" url-id="{% url 'chartreuse:profile' user.url_id %}" class="custom-button">X</button>
             </div>
             <div class="container full-container" id="container-item-box">
                 {% if follows %}
@@ -46,7 +46,14 @@
                         window.location.href = location;
                     });
                 });
-            };
+
+                let backButton = document.getElementById("back");
+    
+                backButton.addEventListener('click', function(event){
+                    window.location.href = this.getAttribute("url-id"); 
+                 });
+
+            }
     
             
         </script>

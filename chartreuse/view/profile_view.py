@@ -198,6 +198,6 @@ class ProfileDetailView(DetailView):
         for follow_request in requests:
             follow_request.requester.url_id = quote(follow_request.requester.url_id,safe='')
             follow_request.requestee.url_id = quote(follow_request.requestee.url_id,safe='')
-        return follow_request
+        return follow_requests
         
 

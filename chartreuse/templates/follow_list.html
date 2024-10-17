@@ -12,23 +12,26 @@
     </head>
     <body>
 
-        <div class="container full-container" id="follow-list-header">
-            <h4>{{user.displayName}}.{{relationship}}</h4>
-        </div>
-        <div class="container full-container" id="container-item-box">
-            {% if follows %}
-                {% for follow in follows %}
-                
-                <div class="follower-box">
-                    <img src="{{follow.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
-                    <h5 style="display:inline">{{follow.displayName}}</h5>
-                    <button class="view-profile-button btn btn-primary view-profile-button" url-id="{% url 'chartreuse:profile' follow.url_id %}">View Profile</button>   
-                </div>
-                {% endfor %}
-            {% else %}
-            <h1 class="text-center">there's nothing here... :(</h1>
+        <div class="container">
+            <div class="container full-container" id="follow-list-header">
+                <h4>{{user.displayName}}.{{relationship}}</h4>
+                <button id="back" type="button" class="custom-button">X</button>
+            </div>
+            <div class="container full-container" id="container-item-box">
+                {% if follows %}
+                    {% for follow in follows %}
+                    
+                    <div class="follower-box">
+                        <img src="{{follow.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
+                        <h5 style="display:inline">{{follow.displayName}}</h5>
+                        <button class="view-profile-button btn btn-primary view-profile-button" url-id="{% url 'chartreuse:profile' follow.url_id %}">View Profile</button>   
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <h1 class="text-center">there's nothing here... :(</h1>
 
-            {% endif %} 
+                {% endif %} 
+            </div>
         </div>
         
         <!-- Boostrap JS -->

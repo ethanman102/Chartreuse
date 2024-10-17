@@ -25,7 +25,8 @@ body,html{
 
 h4{
     font-weight: bold;
-    color: #80FF00;
+    color:chartreuse;
+    display: inline;
 }
 
 /*follow profile box*/
@@ -34,10 +35,6 @@ h4{
     border: solid black 2px;
     margin-bottom: 1ch;
     padding: 1ch;
-    transition: background-color 0.3s ease;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
 }
 
 
@@ -45,10 +42,6 @@ img{
     border: black solid 2px;
 }
 
-.view-profile-form{
-    display: inline;
-    flex-grow: 1;
-}
 
 .view-profile-button{
     color: white;
@@ -68,3 +61,15 @@ img{
     box-shadow: 6px 6px 0px #000000;
 }
 
+.custom-button {
+    color: chartreuse;
+    float: right;
+    background: none;
+    border: none;
+    transition: box-shadow 0.3s ease;
+    font-size: 2ch;
+}
+
+.custom-button:hover {
+    color: white;
+}

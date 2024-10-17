@@ -66,6 +66,17 @@
                             {% endif %}
                         </div>
                     {% endif %}
+
+
+                    {% if owner %}
+                        <div class="col-6">
+                            <form class="follow-forms" method="GET" action="{% url 'chartreuse:user_friends_list' owner_id %}">
+                                <button type="submit" class="btn btn-primary w-100 follow">
+                                    View Friends!
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
                     </div>
                 </div>
             </div>

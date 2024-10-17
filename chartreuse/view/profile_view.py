@@ -121,6 +121,7 @@ class ProfileDetailView(DetailView):
         requests: (A list of follow request objects)
         is_following: (If the user is foreign this key will be here, depicts if they are following the page owner or not.)
         sent_request: (Bool if the user is NOT already following, but did they sent a follow request?)
+        follow_relationship: "Friends/Following" depicts whether the following is mutual or unmutual!
         }
         
         '''
@@ -140,12 +141,7 @@ class ProfileDetailView(DetailView):
             if user.url_id == current_user_model.url_id:
                 # owns the page, should not display follow button etc...
                 context['owner'] = True
-                follow_requests = FollowRequest.objects.filter(requestee=user)
-                requests = [fk for fk in follow_requests]
-                for follow_request in requests:
-                    follow_request.requester.url_id = quote(follow_request.requester.url_id,safe='')
-                    follow_request.requestee.url_id = quote(follow_request.requestee.url_id,safe='')
-                context['requests'] = requests
+                context['requests'] = self.prepare_follow_requests(user)
             else:
                 context['viewer_id'] = quote(current_user_model.url_id,safe='')
                 # check if the user if following or not...
@@ -161,14 +157,20 @@ class ProfileDetailView(DetailView):
                         context['sent_request'] = False
                 else:
                     context['is_following'] = True
-                    # check if the user is following them back or not!
+                    # check if the user is following them back or not! (friends)
+                    if Follow.objects.filter(followed=current_user_model,follower=user).exists():
+                        context['follow_relationship'] = "Friends"
+                    else:
+                        context['follow_relationship'] = "Following"
         else:
             context['logged_in'] = False
         
-        # Overriden to get these addition counts.
+        # Statistics
         context['like_count'] = Like.objects.filter(user=user).count()
         context['comment_count'] = Comment.objects.filter(user=user).count()
         context['post_count'] = Post.objects.filter(user=user).count()
+
+        # Relationship Counts
         context['followers'] = Follow.objects.filter(followed=user).count()
         context['following'] = Follow.objects.filter(follower=user).count()
         
@@ -183,5 +185,19 @@ class ProfileDetailView(DetailView):
         user = get_object_or_404(User,url_id=user_id)
 
         return user
+    
+    def prepare_follow_requests(self,user):
+        '''
+        Purpose: Runs if the User is logged in and grabs all follow requests for a specific user. Url_id's are percent encoded to be sent to profile page.
+
+        # Arguments:
+        user: The user object for the current profile page!
+        '''
+        follow_requests = FollowRequest.objects.filter(requestee=user)
+        requests = [fk for fk in follow_requests]
+        for follow_request in requests:
+            follow_request.requester.url_id = quote(follow_request.requester.url_id,safe='')
+            follow_request.requestee.url_id = quote(follow_request.requestee.url_id,safe='')
+        return follow_request
         
 

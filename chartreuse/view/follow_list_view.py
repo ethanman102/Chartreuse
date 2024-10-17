@@ -3,7 +3,7 @@ from django.contrib.auth.models import User as AuthUser
 from chartreuse.models import User,Follow
 from django.views.generic.detail import DetailView
 from urllib.parse import unquote, quote
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.core.exceptions import PermissionDenied
 
 class FollowListDetailView(DetailView):
@@ -15,6 +15,23 @@ class FollowListDetailView(DetailView):
     template_name = 'follow_list.html'
     context_object_name = 'user'
     model = User
+
+    def get(self, request, *args, **kwargs):
+        '''
+        Purpose: Overriden DetailView method to be able to handle serving 401 unauthorized requests!
+        '''
+
+        # Because get_context_data can not return anything other than a dict, must override get method to return a 401 since it does not have an exception form!
+        # Used this Stack Overflow reference on how to properly override the get method of detail view: https://stackoverflow.com/questions/57645928/django-overriding-detail-view-get-method
+        # Answer Author: Harold Holsappel on June 15, 2023.
+        # Also used this reference for returning HTTP errors because get_context_data can only return a DICT: https://stackoverflow.com/questions/67263268/django-class-based-view-to-return-httpresponse-such-as-httpresponsebadrequest
+        # Answered by: Abdul Aziz Barkat on April 26 2021
+        path = self.request.path.lower().split("/")
+        if "friends" in path and not self.request.user.is_authenticated:
+            return HttpResponse("Unauthorized",status=401)
+        
+
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
 
@@ -28,6 +45,10 @@ class FollowListDetailView(DetailView):
         
         '''
 
+        
+
+        
+
         context =  super().get_context_data(**kwargs)
         # https://stackoverflow.com/questions/10533302/how-to-get-the-url-path-of-a-view-function-in-django
         # How to get the url path of a view function in django
@@ -40,8 +61,6 @@ class FollowListDetailView(DetailView):
             relationship = "followers"
         elif "friends" in path:
             # required to be the owner of the friends list and authenticated in order to view the friends list!!!
-            if not self.request.user.is_authenticated:
-                raise PermissionDenied
             current_user = User.objects.get(user=self.request.user)
             if current_user.url_id != page_user.url_id:
                 raise PermissionDenied

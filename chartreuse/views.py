@@ -22,4 +22,14 @@ def error(request):
     '''
     return render(request, 'error.html')
 
+def test(request):
+    '''
+    Purpose: View to render a test page
+
+
+    Arguments:
+    request: Request object
+    '''
+    return render(request, 'test.html')
+
 

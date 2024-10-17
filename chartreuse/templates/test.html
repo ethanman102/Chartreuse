@@ -1,13 +1,24 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load static %}
 
-{% block title %}chartreuse.homepage{% endblock %}
+{% block title %}chartreuse.test{% endblock %}
 
 {% block content %}
+
+<body> 
 
     {% block sidenav %}
         {% include 'navbar.html' %}
     {% endblock %}
    
-    <h2>chartreuse.homepage</h2>
+    <h2>chartreuse.test</h2>
+
+    <p id="cm_text">
+        <!-- rendered commonmark text shows here -->
+    </p>
+
+    <script src="{% static 'javascript/cm_edit.js' %}"></script>
+
+</body>
 
 {% endblock %}

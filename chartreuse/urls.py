@@ -3,7 +3,7 @@ from .api_handling import users, likes, images, github, friends, posts
 from .api_handling import followers, follow_requests
 from django.conf import settings
 from django.conf.urls.static import static
-from chartreuse.views import  error
+from chartreuse.views import  error, test
 from .view import home_page_view, signup_view, login_view, landing_page_view, profile_view, follow_list_view, support_functions, post_view
 
 app_name = "chartreuse"
@@ -101,6 +101,7 @@ urlpatterns = [
     
     # error page url
     path("error", error, name="error"),
+    path("test", test, name="test"),
 
  
 

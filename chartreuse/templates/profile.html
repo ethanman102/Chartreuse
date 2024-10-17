@@ -61,7 +61,7 @@
                             {% url 'chartreuse:profile_unfollow' owner_id viewer_id as unfollow_url %}
                             <form action="{{unfollow_url}}" method="POST" class="unfollow_form">
                                 {% csrf_token %}
-                                <button class="btn btn-primary btn-lg w-100 follow" type="submit">Following</button>
+                                <button class="btn btn-primary btn-lg w-100 follow" type="submit">{{follow_relationship}}</button>
                             </form>
                             {% endif %}
                         </div>

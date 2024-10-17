@@ -1,7 +1,5 @@
-
-
 'use strict'
-import commonmark from 'commonmark';
+import { Parser, HtmlRenderer, Node} from 'commonmark';
 
 
 window.addEventListener('load', main);
@@ -19,8 +17,6 @@ function main() {
 
     // sets the text to be shown in html file as the rendered Commonmark text 
     htmlString.textContent = result;
-
-    
 };
 
 // npx esbuild ./chartreuse/static/javascript/cm_edit.js --bundle --minify --sourcemap --outfile=./chartreuse/static/javascript/cm_edit.min.js

@@ -11,6 +11,11 @@
     <link rel="stylesheet" href="{% static 'css/add_post.css' %}">
 </head>
 <body class="bg-light">
+    
+    {% block sidenav %}
+        {% include 'navbar.html' %}
+    {% endblock %}
+
     <div class="container vh-100 d-flex justify-content-center align-items-center">
         <div class="text-center">
             <h1 class="mb-4">Create a post</h1>

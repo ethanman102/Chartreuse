@@ -102,13 +102,18 @@ class FollowListDetailView(DetailView):
         Arguments:
         user: The User Model object to find the followers for
         '''
-        user_follows = Follow.objects.filter(follower=user).values_list("followed",flat=True)
-        user_followed_by = Follow.objects.filter(followed=user).values_list("follower",flat=True)
+        user_follows = Follow.objects.filter(follower=user)
+        user_followed_by = Follow.objects.filter(followed=user)
+        print(user_follows)
 
         friends = list()
         for author in user_follows:
-            if author in user_followed_by:
-                friends.append(author)
+            author = author.followed
+            for author2 in user_followed_by:
+                author2 = author2.follower
+                if author.url_id== author2.url_id:
+                    friends.append(author)
+                    break
         
         return friends
         

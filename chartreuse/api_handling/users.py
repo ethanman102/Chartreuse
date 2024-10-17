@@ -60,13 +60,25 @@ class UserViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Get a list of users",
-        description=("Gets a paginated list of users based on the provided query parameters (page and size)."),
+        description=(
+            "Gets a paginated list of users based on the provided query parameters (page and size)."
+            "\n\n**When to use:** Use this endpoint when you need to display a list of all users."
+            "\n\n**How to use:** Send a GET request to this endpoint. You can use pagination by specifying the 'page' and 'size' parameters."
+            "\n\n**Why to use:** This endpoint allows you to view all users, useful for user management features."
+            "\n\n**Why not to use:** Avoid using this endpoint for individual user details; use the specific user endpoint instead."),
         parameters=[
             OpenApiParameter(name='page', type=int, description="Page number for pagination (Default is 1)."),
             OpenApiParameter(name='size', type=int, description="Number of users per page (Default is 50)."),
         ],
         responses={
-            200: OpenApiResponse( response=UsersSerializer(), description="A paginated list of users."),
+            200: OpenApiResponse( 
+                response=UsersSerializer(), description="A paginated list of users.",
+                   
+            ),
+            404: OpenApiResponse(
+                response=None,
+                description="No users found."
+            ),
         }
     )
     def list(self, request):
@@ -121,7 +133,13 @@ class UserViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Get a specific user",
-        description=("Retrieves a user by their ID. Use this endpoint to get detailed information about a specific user."),
+        description=(
+            "Retrieves a user by their ID."
+            "\n\n**When to use:** Use this endpoint to fetch information about a specific user."
+            "\n\n**How to use:** Send a GET request with the user ID as a path parameter."
+            "\n\n**Why to use:** This endpoint is useful when you need details about a specific user, such as their display name, GitHub URL, or profile image."
+            "\n\n**Why not to use:** Avoid using this endpoint to list multiple users. Use the user list endpoint instead."
+        ),
         responses={
             200: OpenApiResponse(
                 response=UserSerializer,
@@ -171,8 +189,13 @@ class UserViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Update a user",
-        description=("Updates an existing user based on provided user details. "
-                     "Use this endpoint to modify user attributes."),
+        description=(
+            "Updates an existing user based on provided user details."
+            "\n\n**When to use:** Use this endpoint to modify an existing user's details, such as their display name, GitHub link, or profile image."
+            "\n\n**How to use:** Send a PUT request with the new user data in the request body, and the user ID as a path parameter."
+            "\n\n**Why to use:** This endpoint is crucial for user profile management, allowing users to update their own information."
+            "\n\n**Why not to use:** Do not use this endpoint to create new users; use the user creation endpoint for that."
+        ),
         request=UserSerializer,
         responses={
             200: OpenApiResponse(
@@ -229,9 +252,15 @@ class UserViewSet(viewsets.ViewSet):
         
     @extend_schema(
         summary="Delete a user",
-        description=("Deletes an existing user based on the provided user ID. "),
+        description=(
+            "Deletes an existing user based on the provided user ID. "
+            "\n\n**When to use:** Use this endpoint to remove a user permanently."
+            "\n\n**How to use:** Send a DELETE request with the user ID as a path parameter."
+            "\n\n**Why to use:** This endpoint is useful for user account removal, typically used in admin dashboards or user account deletion flows."
+            "\n\n**Why not to use:** Be cautious when using this endpoint as it will permanently delete the user data."
+        ),
         responses={
-            200: OpenApiResponse(description="User deleted successfully."),
+            204: OpenApiResponse(description="User deleted successfully."),
             404: OpenApiResponse(description="User not found."),
             401: OpenApiResponse(description="You do not have permission to delete this user."),
         }
@@ -262,7 +291,13 @@ class UserViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Create a new user",
-        description=("Creates a new user with the provided details."),
+        description=(
+            "Creates a new user with the provided details."
+            "\n\n**When to use:** Use this endpoint when a new user wants to sign up for the platform."
+            "\n\n**How to use:** Send a POST request with the user details in the request body."
+            "\n\n**Why to use:** This endpoint facilitates user registration, enabling users to access platform features."
+            "\n\n**Why not to use:** Do not use this endpoint for updating existing users; use the update endpoint instead."
+            ),
         request=UserSerializer,
         responses={
             200: OpenApiResponse(response=UserSerializer, description="Newly created user details."),

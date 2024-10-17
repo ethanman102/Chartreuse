@@ -6,8 +6,8 @@ window.addEventListener('load', main);
 
 function main() {
     // will need to bundle with esbuild command for the browser import mini package
-    var reader = new commonmark.Parser({smart: true});
-    var writer = new commonmark.HtmlRenderer({sourcepos: true, safe: true, softbreak: "<br />"});
+    var reader = new Parser({smart: true});
+    var writer = new HtmlRenderer({sourcepos: true, safe: true, softbreak: "<br />"});
     var parsed = reader.parse("Hello *world*"); // parsed is a 'Node' tree
     // transform parsed if you like...
     var result = writer.render(parsed); // result is a String

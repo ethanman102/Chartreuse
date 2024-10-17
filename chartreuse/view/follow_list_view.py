@@ -41,15 +41,16 @@ class FollowListDetailView(DetailView):
         elif "friends" in path:
             # required to be the owner of the friends list and authenticated in order to view the friends list!!!
             if not self.request.user.is_authenticated:
-                return PermissionDenied
+                raise PermissionDenied
             current_user = User.objects.get(user=self.request.user)
             if current_user.url_id != page_user.url_id:
-                return PermissionDenied
+                raise PermissionDenied
             relationship = "friends"
         
         context['relationship'] = relationship
 
         # On October 14, 2024 Asked ChatGPT: How to throw django 404 error
+        # Grab appropiate group of following relationships
         if relationship != "following" and relationship != "followers" and relationship != "friends":
             raise Http404("Page not found")
         elif relationship == "followers":
@@ -67,6 +68,8 @@ class FollowListDetailView(DetailView):
             follow_user.url_id = quote(follow_user.url_id,safe='')
         
         context['follows'] = follows
+        # Must quote url_id of the owner of the list to ensure back button works correctly to redirect to the profile.
+        page_user.url_id = quote(page_user.url_id,safe='')
         return context
             
     def get_object(self):

@@ -35,12 +35,18 @@ class PostViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Adds a post",
-        description="Adds a post based on the on author URL",
+        description=(
+            "Adds a post based on the on author URL"
+            "\n\n**When to use:** Use this endpoint to allow an authenticated user to create a post."
+            "\n\n**How to use:** Send a POST request with the necessary parameters, including the post's title, content, and optional visibility settings."
+            "\n\n**Why to use:** This API is useful when users need to share content, such as articles, status updates, or other posts."
+            "\n\n**Why not to use:** If the user is not authenticated, the post cannot be created, and this endpoint should not be used."
+        ),
         parameters=[
             OpenApiParameter(name="visibility", description="visibilility of the post.", required=False, type=str),
             OpenApiParameter(name="title", description="title of the post.", required=True, type=str),
             OpenApiParameter(name="description", description="the description of the post.", required=False, type=str),
-            OpenApiParameter(name="contentType", description="the contentType of teh post.", required=False, type=str),
+            OpenApiParameter(name="contentType", description="the contentType of the post.", required=False, type=str),
             OpenApiParameter(name="content", description="content of the post.", required=True, type=str),
         ],
         responses = {
@@ -129,7 +135,13 @@ class PostViewSet(viewsets.ViewSet):
         
     @extend_schema(
         summary="Removes a post",
-        description="Removes a post based on the provided post URL.",
+        description=(
+            "Removes a post based on the provided post URL."
+            "\n\n**When to use:** Use this endpoint to delete a post that the user has authored."
+            "\n\n**How to use:** Send a DELETE request with the `post` parameter set to the URL of the post you wish to delete."
+            "\n\n**Why to use:** This API is useful for users who want to remove their own posts from the platform."
+            "\n\n**Why not to use:** If the post does not exist or if the user is not authenticated, the post cannot be deleted."
+        ),
         parameters=[
             OpenApiParameter(name="post", description="the post url.", required=True, type=str),
         ],
@@ -230,10 +242,17 @@ class PostViewSet(viewsets.ViewSet):
 
     @extend_schema(
             summary="Gets a specific post from a user",
-            description="Retrieves a specific post object from a user based on the user id and post id",
+            description=(
+                "Retrieves a specific post object from a user based on the user id and post id"
+                "\n\n**When to use:** Use this endpoint to fetch details of a particular post authored by a specific user."
+                "\n\n**How to use:** Send a GET request with the `user_id` and `post_id` as parameters in the URL."
+                "\n\n**Why to use:** This API helps in retrieving the content and metadata of a post, useful for viewing posts in detail."
+                "\n\n**Why not to use:** If the post is restricted to FRIENDS only and the user is not friends with the author, access will be denied."
+            ),
             parameters=[
             OpenApiParameter(name="user_id", description="The id of the user requesting the post.", required=False, type=str),
-        ],
+            OpenApiParameter(name="post_id", description="The ID of the post to retrieve (required).", required=False, type=str),
+            ],
             responses={
                 200: OpenApiResponse(description="Successfully retrieved post.", response=PostSerializer),
                 400: OpenApiResponse(description="This is a FRIENDS only post and user and author are not friends"),
@@ -358,7 +377,13 @@ class PostViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Updates the post",
-        description="Updates the post using the author id and post id provided",
+        description=(
+            "Updates the post using the author id and post id provided"
+            "\n\n**When to use:** Use this endpoint to modify an existing post's details, such as visibility, title, description, content type, and content."
+            "\n\n**How to use:** Send a PATCH request with the `user_id`, `post_id`, and any fields you wish to update as parameters."
+            "\n\n**Why to use:** This API allows authors to manage their posts effectively by updating essential information."
+            "\n\n**Why not to use:** If the post does not exist or if the user is not authorized to modify the post, the update will fail."
+        ),
         parameters=[
             OpenApiParameter(name="visibility", description="visibilility of the post.", required=False, type=str),
             OpenApiParameter(name="title", description="title of the post.", required=False, type=str),
@@ -486,14 +511,20 @@ class PostViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Get the recent posts made by an author",
-        description="Retrieves the most recent posts made by an author based on the user ID, with optional pagination.",
+        description=(
+            "Retrieves the most recent posts made by an author based on the user ID, with optional pagination."
+            "\n\n**When to use:** Use this endpoint to fetch the latest posts from a specific author."
+            "\n\n**How to use:** Send a GET request with the `user_id`, along with optional pagination parameters `page` and `size`."
+            "\n\n**Why to use:** This API helps in fetching recent content from an author, which is useful for displaying updates or new posts."
+            "\n\n**Why not to use:** If the author does not exist or if the request is not properly formatted, the retrieval may fail."
+        ),
         parameters=[
             OpenApiParameter(name="page", description="Page number for pagination.", required=False, type=int),
             OpenApiParameter(name="size", description="Number of posts per page.", required=False, type=int),
             OpenApiParameter(name="user_id", description="The id of the request user.", required=False, type=str),
         ],
         responses={
-            200: OpenApiResponse(description="Successfully retrieved all posts."),
+            200: OpenApiResponse(description="Successfully retrieved all posts.", response=PostSerializer),
             405: OpenApiResponse(description="Method not allowed."),
         }
     )

@@ -41,7 +41,13 @@ class LikeViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Adds a like to a post",
-        description="Adds a like to a post based on the provided post URL.",
+        description=(
+            "Adds a like to a post based on the provided post URL."
+            "\n\n**When to use:** Use this endpoint when a user wants to express appreciation for a post by liking it."
+            "\n\n**How to use:** Send a POST request with the user ID in the URL and the post URL in the request body."
+            "\n\n**Why to use:** This endpoint provides a way to track and reflect user engagement with posts."
+            "\n\n**Why not to use:** Do not use this if the user has already liked the post, or if the user is not authenticated."
+        ),
         responses={
             200: OpenApiResponse(description="Like added successfully.", response=LikeSerializer),
             400: OpenApiResponse(description="Like already exists."),
@@ -117,7 +123,13 @@ class LikeViewSet(viewsets.ViewSet):
     
     @extend_schema(
         summary="Removes a like from a post",
-        description="Removes a like from a post based on the provided post URL.",
+        description=(
+            "Removes a like from a post based on the provided post URL."
+            "\n\n**When to use:** Use this endpoint when a user wants to remove their like from a post."
+            "\n\n**How to use:** Send a DELETE request with the user ID in the URL and the post URL in the request body."
+            "\n\n**Why to use:** This endpoint allows users to retract their engagement on posts by removing the like."
+            "\n\n**Why not to use:** Do not use this if the user hasn't liked the post or if the user is not authenticated."
+        ),
         responses={
             200: OpenApiResponse(description="Like deleted successfully.", response=LikeSerializer),
             400: OpenApiResponse(description="Like does not exist."),
@@ -181,7 +193,13 @@ class LikeViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Gets a specific like from a user",
-        description="Retrieves a specific like object from a user based on the like ID and user ID.",
+        description=(
+            "Retrieves a specific like object from a user based on the like ID and user ID."
+            "\n\n**When to use:** Use this endpoint when you need to fetch details of a specific like that a user has made on a post."
+            "\n\n**How to use:** Send a GET request with the user ID in the URL and the like ID of the desired like object."
+            "\n\n**Why to use:** This endpoint provides a way to retrieve details about a specific like, such as when it was made and on which post."
+            "\n\n**Why not to use:** Do not use this if the like does not exist or if the user is not authenticated."
+        ),
         responses={
             200: OpenApiResponse(description="Successfully retrieved like.", response=LikeSerializer),
             404: OpenApiResponse(description="User or like not found."),
@@ -232,7 +250,13 @@ class LikeViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Gets all likes on a post",
-        description=("Gets all likes on a post based on the provided post ID and user ID."),
+        description=(
+            "Gets all likes on a post based on the provided post ID and user ID."
+            "\n\n**When to use:** Use this endpoint to fetch a list of likes on a post."
+            "\n\n**How to use:** Send a GET request with the `user_id` and `post_id` in the URL."
+            "\n\n**Why to use:** This API helps in getting all likes related to a post, useful for tracking engagement."
+            "\n\n**Why not to use:** If the post doesn't exist, or if you do not require all likes on a post."
+        ),
         responses={
             200: OpenApiResponse(description="Successfully retrieved all likes.", response=LikesSerializer),
             405: OpenApiResponse(description="Method not allowed."),
@@ -311,7 +335,13 @@ class LikeViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Gets all likes on a comment from a post",
-        description=("Gets all likes on a comment from a post based on the provided post ID, comment ID, and user ID."),
+        description=(
+            "Gets all likes on a comment from a post based on the provided post ID, comment ID, and user ID."
+            "\n\n**When to use:** Use this endpoint when you need to fetch all the likes for a particular comment."
+            "\n\n**How to use:** Send a GET request with the `user_id`, `post_id`, and `comment_id` in the URL."
+            "\n\n**Why to use:** This endpoint is helpful to track how many likes a specific comment has received."
+            "\n\n**Why not to use:** If you're not interested in the comment likes or if the comment doesn't exist."
+        ),
         responses={
             200: OpenApiResponse(description="Successfully retrieved all likes."),
             405: OpenApiResponse(description="Method not allowed."),
@@ -326,13 +356,19 @@ class LikeViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Gets all likes made by a user",
-        description="Retrieves all likes made by a user based on the user ID, with optional pagination.",
+        description=(
+            "Retrieves all likes made by a user based on the user ID, with optional pagination."
+            "\n\n**When to use:** Use this endpoint to list all the posts or comments a user has liked."
+            "\n\n**How to use:** Send a GET request with the `user_id` in the URL. Optionally, include `page` and `size` query parameters for pagination."
+            "\n\n**Why to use:** To track all the posts and comments that a particular user has liked."
+            "\n\n**Why not to use:** If you are not interested in a user's likes or if the user ID is not valid."
+        ),
         parameters=[
             OpenApiParameter(name="page", description="Page number for pagination.", required=False, type=int),
             OpenApiParameter(name="size", description="Number of likes per page.", required=False, type=int),
         ],
         responses={
-            200: OpenApiResponse(description="Successfully retrieved all likes."),
+            200: OpenApiResponse(description="Successfully retrieved all likes.", response=LikeSerializer),
             405: OpenApiResponse(description="Method not allowed."),
         }
     )

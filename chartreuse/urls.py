@@ -53,10 +53,10 @@ urlpatterns = [
     re_path(r"api/authors/(?P<author_id>.+)/followers", followers.FollowViewSet.as_view({'get': 'get_followers'}), name="get_followers"),
 
     # Follow Request API URLs
-    re_path(r"api/authors/(?P<author_id>.+)/follow-requests/send", follow_requests.send_follow_request, name="send_follow_request"),
-    path("api/follow-requests/<int:request_id>/accept", follow_requests.accept_follow_request, name="accept_follow_request"),
-    path("api/follow-requests/<int:request_id>/reject", follow_requests.reject_follow_request, name="reject_follow_request"),
-    path("api/follow-requests", follow_requests.get_follow_requests, name="get_follow_requests"),
+    re_path(r"api/authors/(?P<author_id>.+)/follow-requests/send", follow_requests.FollowRequestViewSet.as_view({'post': 'send_follow_request'}), name="send_follow_request"),
+    path("api/follow-requests/<int:request_id>/accept", follow_requests.FollowRequestViewSet.as_view({'post': 'accept_follow_request'}), name="accept_follow_request"),
+    path("api/follow-requests/<int:request_id>/reject", follow_requests.FollowRequestViewSet.as_view({'delete': 'reject_follow_request'}), name="reject_follow_request"),
+    path("api/follow-requests", follow_requests.FollowRequestViewSet.as_view({'get': 'get_follow_requests'}), name="get_follow_requests"),
 
     # Post URLs
     re_path(r"api/authors/(?P<user_id>.+)/posts/(?P<post_id>.+)/$", posts.PostViewSet.as_view({"get": "get_post", "delete": "remove_post", "put": "update"}), name="post"),

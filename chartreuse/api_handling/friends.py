@@ -40,9 +40,6 @@ class FriendsViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API helps in managing mutual relationships, fetching friends of an author."
             "\n\n**Why not to use:** If the author has no friends or invalid author ID is provided."
         ),
-        parameters=[
-            OpenApiParameter(name="author_id", description="The ID of the author whose friends are being retrieved.", required=True, type=str),
-        ],
         responses={
             200: OpenApiResponse(description="Successfully retrieved the list of friends.", response=FriendsSerializer),
             404: OpenApiResponse(description="Author not found."),
@@ -77,10 +74,10 @@ class FriendsViewSet(viewsets.ViewSet):
         for friend in friends:
             friend_attributes = {
                 "type": "author",
-                "id": f"{friend.host}/authors/{friend.url_id}",
+                "id": f"{friend.host}authors/{friend.user.id}",
                 "host": friend.host,
                 "displayName": friend.displayName,
-                "page": f"{friend.host}/authors/{friend.url_id}",
+                "page": f"{friend.host}authors/{friend.url_id}",
                 "github": friend.github,
                 "profileImage": friend.profileImage
             }
@@ -104,22 +101,8 @@ class FriendsViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API helps determine if two authors have a mutual following relationship."
             "\n\n**Why not to use:** Don't use this to check a one-way relationship."
         ),
-        parameters=[
-            OpenApiParameter(
-                name="author_id", 
-                description="The ID of the current author whose friendship with the foreign author is being checked.", 
-                required=True, 
-                type=str
-            ),
-            OpenApiParameter(
-                name="foreign_author_id", 
-                description="The ID of the foreign author whose friendship with the current author is being checked.", 
-                required=True, 
-                type=str
-            ),
-        ],
         responses={
-            200: OpenApiResponse(description="Authors are friends", response=OpenApiResponse),
+            200: OpenApiResponse(description="Authors are friends"),
             404: OpenApiResponse(description="Authors are not friends"),
             405: OpenApiResponse(description="Method not allowed."),
         }

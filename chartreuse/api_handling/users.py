@@ -372,7 +372,13 @@ class UserViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Login a user",
-        description=("Logs in a user based on the provided user details."),
+        description=(
+            "Logs in a user based on the provided user details."
+            "\n\n**When to use:** Use this endpoint when an author wants to access their account."
+            "\n\n**How to use:** Send a POST request with the required `username` and `password` fields in the request body."
+            "\n\n**Why to use:** This API enables users to authenticate and access their accounts securely."
+            "\n\n**Why not to use:** If the credentials are invalid or missing, the login attempt will fail."
+        ),
         responses={
             200: OpenApiResponse(description="User logged in successfully."),
             400: OpenApiResponse(description="Invalid credentials."),

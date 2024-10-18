@@ -44,10 +44,6 @@ class FollowViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API facilitates the creation of follow relationships between authors, useful in social applications."
             "\n\n**Why not to use:** If either author does not exist, or if the follow request is not properly structured, the request may fail."
         ),
-        parameters=[
-            OpenApiParameter(name="author_id", description="The ID of the author who is being followed", required=True, type=str),
-            OpenApiParameter(name="foreign_author_id", description="The ID of the author who is becoming a follower.", required=True, type=str),
-        ],
         responses={
             200: OpenApiResponse(description="Follower added"),
             404: OpenApiResponse(description="Author not found."),
@@ -98,10 +94,6 @@ class FollowViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API is useful in managing social relationships by allowing authors to remove followers."
             "\n\n**Why not to use:** If the authors do not exist or are not following each other, the request may fail."
         ),
-        parameters=[
-            OpenApiParameter(name="author_id", description="The ID of the author who wants to remove a follower.", required=True, type=str),
-            OpenApiParameter(name="foreign_author_id", description="The ID of the author being unfollowed.", required=True, type=str),
-        ],
         responses={
             200: OpenApiResponse(description="Follower removed."),
             400: OpenApiResponse(description="Not a follower."),
@@ -152,9 +144,6 @@ class FollowViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API helps in managing social relationships by fetching all followers of an author."
             "\n\n**Why not to use:** If the author ID is invalid or the author has no followers."
         ),
-        parameters=[
-            OpenApiParameter(name="author_id", description="The ID of the author whose followers are being retrieved.", required=True, type=str),
-        ],
         responses={
             200: OpenApiResponse(description="Successfully retrieved the list of followers.", response=FollowersSerializer),
             400: OpenApiResponse(description="Invalid request or missing parameters."),
@@ -190,10 +179,10 @@ class FollowViewSet(viewsets.ViewSet):
             follower_attributes = [
                 {
                     "type": "author",
-                    "id": f"{user.host}/authors/{user.user.id}",
+                    "id": f"{user.host}authors/{user.user.id}",
                     "host": user.host,
                     "displayName": user.displayName,
-                    "page": f"{user.host}/authors/{user.user.id}",
+                    "page": f"{user.host}authors/{user.url_id}",
                     "github": user.github,
                     "profileImage": user.profileImage
                 }
@@ -217,10 +206,6 @@ class FollowViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API helps in checking social relationships, determining if one specific author follows another."
             "\n\n**Why not to use:** If the provided IDs are invalid or if no follower relationship exists."
         ),
-        parameters=[
-            OpenApiParameter(name="author_id", description="The ID of the current author.", required=True, type=str),
-            OpenApiParameter(name="foreign_author_id", description="The ID of the foreign author to check if they are a follower.", required=True, type=str),
-        ],
         responses={
             200: OpenApiResponse(description="Is a follower"),
             404: OpenApiResponse(description="Not a follower"),

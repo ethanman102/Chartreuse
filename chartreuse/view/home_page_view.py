@@ -48,8 +48,8 @@ class FeedDetailView(DetailView):
 
             # get all posts from the users that the current user follows
             for follower in following:
-                private_posts = get_posts(follower.url_id, 'UNLISTED')
-                posts.extend(private_posts)
+                unlisted_posts = get_posts(follower.url_id, 'UNLISTED')
+                posts.extend(unlisted_posts)
 
                 is_following = Follow.objects.filter(follower=current_user_model, followed=follower.url_id).exists()
                 is_followed = Follow.objects.filter(follower=follower.url_id, followed=current_user_model).exists()

@@ -55,7 +55,8 @@ def delete_post(request, post_id):
         
         # Check if the current user is the author of the post
         if current_user_model == post.user:
-            post.delete()
+            post.visibility = 'DELETED'
+            post.save()
     
     return redirect('/chartreuse/homepage/')
 

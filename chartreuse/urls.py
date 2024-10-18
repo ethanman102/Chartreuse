@@ -64,8 +64,8 @@ urlpatterns = [
 
 
     # Friend API URLs
-    re_path(r'api/authors/(?P<author_id>.+)/friends/(?P<foreign_author_id>.+)/check_friendship', friends.check_friendship, name='check_friendship'),
-    re_path(r"api/authors/(?P<author_id>.+)/friends", friends.get_friends, name="get_friends"),
+    re_path(r'api/authors/(?P<author_id>.+)/friends/(?P<foreign_author_id>.+)/check_friendship', friends.FriendsViewSet.as_view({'get': 'check_friendship'}), name='check_friendship'),
+    re_path(r"api/authors/(?P<author_id>.+)/friends", friends.FriendsViewSet.as_view({'get': 'get_friends'}), name="get_friends"),
 
     # Author URLs
     re_path(r"api/authors/(?P<pk>.+)/$", users.UserViewSet.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'}), name="user-detail"),

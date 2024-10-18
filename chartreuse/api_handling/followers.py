@@ -36,7 +36,7 @@ class FollowViewSet(viewsets.ViewSet):
     serializer_class = FollowerSerializer
 
     @extend_schema(
-        summary="Add a follower or handle a follow request",
+        summary="Add a follower",
         description=(
             "Adds a new follower to the author's list based on the provided author IDs."
             "\n\n**When to use:** Use this endpoint when an author wants to follow another author"
@@ -90,7 +90,7 @@ class FollowViewSet(viewsets.ViewSet):
             return JsonResponse({"error": "Method not allowed."}, status=405)
 
     @extend_schema(
-        summary="Remove a follower or handle unfollow request",
+        summary="Remove a follower",
         description=(
             "Removes an author from the follower list of another author based on the provided author IDs."
             "\n\n**When to use:** Use this endpoint when an author wants to unfollow another author."

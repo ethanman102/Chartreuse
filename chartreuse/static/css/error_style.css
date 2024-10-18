@@ -2,6 +2,8 @@
 
 html body {
     background-image: url("background.png");
+
+    margin-left: 10%;
 }
 .container {
     width: 60%;

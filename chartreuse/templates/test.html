@@ -14,28 +14,29 @@
     <script type="module">
         import "https://unpkg.com/commonmark@0.29.3/dist/commonmark.js";
 
-        // window.addEventListener('load', main);
+        window.addEventListener('load', main);
 
-        // function main() {
-        //     // const commonmark = window.commonmark;
-            
-        //     // will need to bundle with esbuild command for the browser import mini package
-        //     var reader = new Parser({smart: true});
-        //     var writer = new HtmlRenderer({sourcepos: true, safe: true, softbreak: "<br />"});
-        //     var parsed = reader.parse("Hello **world**"); // parsed is a 'Node' tree
-        //     // transform parsed if you like...
-        //     var result = writer.render(parsed); // result is a String
+        function main() {
+            const commonmark = window.commonmark;
 
-        //     // variable to track the html element for displaying the commonmark text
-        //     let p = document.getElementById("cm_text");
-        //     p.textContent = result;
+            // let testString = getElementById("test");
+            // will need to bundle with esbuild command for the browser import mini package
+            var reader = new commonmark.Parser({smart: true});
+            var writer = new commonmark.HtmlRenderer({sourcepos: true, safe: true, softbreak: "<br />"});
+            var parsed = reader.parse("Hello **world**"); // parsed is a 'Node' tree
+            // transform parsed if you like...
+            var result = writer.render(parsed); // result is a String
 
-        //     // // sets the text to be shown in html file as the rendered Commonmark text 
-        //     // htmlString.textContent = result;
-        // };
+            // variable to track the html element for displaying the commonmark text
+            document.getElementById("cm_text").innerHTML = result;
+
+            // // sets the text to be shown in html file as the rendered Commonmark text 
+            // htmlString.textContent = result;
+        };
+
         
     </script>
-    <script src="{% static 'javascript/cm_edit.min.js' %}"></script>
+    <!-- <script src="{% static 'javascript/cm_edit.min.js' %}"></script> -->
 </head>
 
 <body> 
@@ -52,8 +53,6 @@
     <p id="cm_text">
         <!-- rendered commonmark text shows here -->
     </p>
-
-    
 
 </body>
 

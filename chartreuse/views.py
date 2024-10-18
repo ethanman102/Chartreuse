@@ -26,6 +26,8 @@ def test(request):
     '''
     Purpose: View to render a test page
 
+    Test page is used for testing UI changes
+
 
     Arguments:
     request: Request object

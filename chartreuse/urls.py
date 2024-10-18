@@ -47,10 +47,10 @@ urlpatterns = [
     re_path(r"api/authors/(?P<user_id>.+)/liked/$", likes.LikeViewSet.user_likes, name="get_liked"),
 
     # Follower API URLs
-    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)/is_follower", followers.FollowViewSet.is_follower, name="is_follower"),
-    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)/remove", followers.FollowViewSet.remove_follower, name="remove_follower"),
-    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)", followers.FollowViewSet.add_follower, name="add_follower"),
-    re_path(r"api/authors/(?P<author_id>.+)/followers", followers.FollowViewSet.get_followers, name="get_followers"),
+    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)/is_follower", followers.FollowViewSet.as_view({'get': 'is_follower'}), name="is_follower"),
+    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)/remove", followers.FollowViewSet.as_view({'delete': 'remove_follower'}), name="remove_follower"),
+    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)", followers.FollowViewSet.as_view({'post': 'add_follower', 'put': 'add_follower'}), name="add_follower"),
+    re_path(r"api/authors/(?P<author_id>.+)/followers", followers.FollowViewSet.as_view({'get': 'get_followers'}), name="get_followers"),
 
     # Follow Request API URLs
     re_path(r"api/authors/(?P<author_id>.+)/follow-requests/send", follow_requests.send_follow_request, name="send_follow_request"),

@@ -4,6 +4,39 @@
 {% block title %}chartreuse.test{% endblock %}
 
 {% block content %}
+<head>
+    <style>
+        html body {
+            margin-left: 10%;
+        }
+    </style>
+
+    <script type="module">
+        import "https://unpkg.com/commonmark@0.29.3/dist/commonmark.js";
+
+        // window.addEventListener('load', main);
+
+        // function main() {
+        //     // const commonmark = window.commonmark;
+            
+        //     // will need to bundle with esbuild command for the browser import mini package
+        //     var reader = new Parser({smart: true});
+        //     var writer = new HtmlRenderer({sourcepos: true, safe: true, softbreak: "<br />"});
+        //     var parsed = reader.parse("Hello **world**"); // parsed is a 'Node' tree
+        //     // transform parsed if you like...
+        //     var result = writer.render(parsed); // result is a String
+
+        //     // variable to track the html element for displaying the commonmark text
+        //     let p = document.getElementById("cm_text");
+        //     p.textContent = result;
+
+        //     // // sets the text to be shown in html file as the rendered Commonmark text 
+        //     // htmlString.textContent = result;
+        // };
+        
+    </script>
+    <script src="{% static 'javascript/cm_edit.min.js' %}"></script>
+</head>
 
 <body> 
 
@@ -13,11 +46,14 @@
    
     <h2>chartreuse.test</h2>
 
+    
+    <p id="test"># This is testing</p>
+
     <p id="cm_text">
         <!-- rendered commonmark text shows here -->
     </p>
 
-    <script type="module"   src="{% static 'javascript/cm_edit.js' %}"></script>
+    
 
 </body>
 

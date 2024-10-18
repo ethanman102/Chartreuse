@@ -46,13 +46,13 @@ urlpatterns = [
     re_path(r"api/authors/(?P<user_id>.+)/liked/(?P<like_id>.+)/$", likes.LikeViewSet.get_like, name="get_like_object"),
     re_path(r"api/authors/(?P<user_id>.+)/liked/$", likes.LikeViewSet.user_likes, name="get_liked"),
 
-    # Follower URLs
-    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)/is_follower", followers.is_follower, name="is_follower"),
-    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)/remove", followers.remove_follower, name="remove_follower"),
-    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)", followers.add_follower, name="add_follower"),
-    re_path(r"api/authors/(?P<author_id>.+)/followers", followers.get_followers, name="get_followers"),
+    # Follower API URLs
+    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)/is_follower", followers.FollowViewSet.is_follower, name="is_follower"),
+    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)/remove", followers.FollowViewSet.remove_follower, name="remove_follower"),
+    re_path(r"api/authors/(?P<author_id>.+)/followers/(?P<foreign_author_id>.+)", followers.FollowViewSet.add_follower, name="add_follower"),
+    re_path(r"api/authors/(?P<author_id>.+)/followers", followers.FollowViewSet.get_followers, name="get_followers"),
 
-    # Follow Request URLs
+    # Follow Request API URLs
     re_path(r"api/authors/(?P<author_id>.+)/follow-requests/send", follow_requests.send_follow_request, name="send_follow_request"),
     path("api/follow-requests/<int:request_id>/accept", follow_requests.accept_follow_request, name="accept_follow_request"),
     path("api/follow-requests/<int:request_id>/reject", follow_requests.reject_follow_request, name="reject_follow_request"),
@@ -63,7 +63,7 @@ urlpatterns = [
     re_path(r"api/authors/(?P<user_id>.+)/posts/$", posts.PostViewSet.as_view({"get": "get_posts", "post": "create_post"}), name="posts"),
 
 
-    # Friend URLs
+    # Friend API URLs
     re_path(r'api/authors/(?P<author_id>.+)/friends/(?P<foreign_author_id>.+)/check_friendship', friends.check_friendship, name='check_friendship'),
     re_path(r"api/authors/(?P<author_id>.+)/friends", friends.get_friends, name="get_friends"),
 

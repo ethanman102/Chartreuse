@@ -100,10 +100,10 @@ urlpatterns = [
     re_path(r"github/(?P<user_id>.+)/subscriptions/", github.get_subscriptions, name="get_subscriptions"),
     
     # error page url
-    path("error", error, name="error"),
-    path("test", test, name="test"),
+    path("error/", error, name="error"),
 
- 
+    # UI testing page -- for debugging
+    path("test/", test, name="test"),
 
 ] 
 

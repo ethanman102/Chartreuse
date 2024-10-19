@@ -5,10 +5,16 @@ nav div.container {
     left: 0ch;	
     justify-items: left;	
 
-    /*height: 100%;*/	
-
     flex-direction: column;	
 }	
+
+nav {
+    display: flex;	
+    position: relative; 	
+    height: 100%;	
+
+    flex-direction: column;	
+}
 
 ul {	
     position: fixed;	

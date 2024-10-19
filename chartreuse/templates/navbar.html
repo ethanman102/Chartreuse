@@ -1,45 +1,46 @@
+{% load static %}
+
 {% block sidenav %}
 <head> 
     <meta charset="UTF-8">
-    <meta name="date"   content="2024-10-11">
-    <link rel="stylesheet"  href="../static/css/nav_style.css">
+    <link rel="stylesheet"  href="{% static 'css/navbar.css' %}">
 </head>
 
 <body>
     <nav class="navbar bg-body-tertiary">
-        <div class="container">
+        <!-- <div class="container"> -->
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-button"   href="home">
-                        <img src="../static/css/icons/home.svg"    alt="home">
+                    <a class="nav-button"   href="../homepage">
+                        <img src="{% static 'css/icons/home.svg' %}"    alt="homepage">
+                    </a>
+                </li> 
+
+                <li class="nav-item">
+                    <a class="nav-button"   href="../add-post">
+                        <img src="{% static 'css/icons/make_post.svg' %}"    alt="add_post">
                     </a>
                 </li>
 
                 <li class="nav-item">
                     <a class="nav-button"   href="#">
-                        <img src="../static/css/icons/make_post.svg"    alt="make post">
+                        <img src="{% static 'css/icons/profile.svg' %}"    alt="profile">
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-button"   href="#">
-                        <img src="../static/css/icons/profile.svg"    alt="profile">
+                    <a class="nav-button"   href="./error">
+                        <img src="{% static 'css/icons/settings.svg' %}"    alt="settings">
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-button"   href="error">
-                        <img src="../static/css/icons/settings.svg"    alt="settings">
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-button"   href="#">
-                        <img src="../static/css/icons/logout.svg"    alt="log out">
+                    <a class="nav-button"   href="./test">
+                        <img src="{% static 'css/icons/logout.svg' %}"    alt="log out">
                     </a>
                 </li>
             </ul>
-        </div>
+        <!-- </div> -->
     </nav>
 
 </body>

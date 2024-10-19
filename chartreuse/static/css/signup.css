@@ -12,7 +12,7 @@
     font-family: "Sometype Mono", monospace;
 } */
 
-input, select {
+/* input, select {
     width: 90%;
     color: #00356b;
     background-color: rgb(203, 247, 159);
@@ -76,4 +76,4 @@ button#back {
     font-weight: 600;
 
     width: 3ch;
-}
+} */

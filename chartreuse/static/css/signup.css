@@ -77,3 +77,33 @@ button#back {
 
     width: 3ch;
 } */
+
+#username,
+#password1,
+#password2,
+#displayname,
+#github {
+    background-color: #CBF79F; 
+    border-radius: 0px; 
+    border-style: solid; 
+    border-color: #1b1b1b;
+}
+
+button {
+    color: chartreuse;
+    background-color: #00356b;
+    font-size: 2ch;
+    border-bottom-style: solid;
+    border-bottom-color: #1b1b1b;
+    border-radius: 0;
+    box-shadow: none;
+    text-decoration: none;
+    transition: box-shadow 0.3s ease;
+    padding: 0.5rem;
+}
+
+button:hover {
+    color: chartreuse;
+    background-color: #01254a;
+    box-shadow: 6px 6px 0px #000000;
+}

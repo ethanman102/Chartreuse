@@ -19,7 +19,8 @@ def save_signup(request):
         password_2 = request.POST.get('password2')
         displayName = request.POST.get('displayname')
         github = request.POST.get('github', '')  # Default to empty string if not provided
-        profileImage = request.POST.get('profile-image', '')  # Default to empty string if not provided
+        # profileImage = request.POST.get('profile-image', '')  # Default to empty string if not provided
+        profileImage = ''
 
         # Check if the username already exists
         if AuthUser.objects.filter(username=username).exists():

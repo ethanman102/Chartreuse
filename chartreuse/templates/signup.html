@@ -7,44 +7,38 @@
     <meta name="tags" content="Signup">
     <meta name="summary" content="Signup page.">
     <link rel="stylesheet" href="{% static 'css/signup.css' %}">
-    <script>
-        window.addEventListener('load', main); 
-
-        function main() {
-            let backButton = document.getElementById("back");
-
-            backButton.addEventListener('click', () => {
-                window.location.href = "/chartreuse/"; 
-            });
-        };
-
-        
-    </script>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid min-vh-100 w-100 d-flex flex-column justify-content-center align-items-center">
-    {% comment %} <article id="header_bar"> 
+    <div class="container w-50" style="color: chartreuse; background-color: #00356b; font-size: 4ch; border-style: solid; border-color: #1b1b1b;">
         <h4>Sign Up</h4>
-        <button id="back" type="button" class="custom-button">X</button>
-
-    </article> {% endcomment %}
-    <div class="container p-5 bg-black">
-        <span class="d-flex justify-content-between">
-            <h4>Sign Up</h4>
-            <button id="back">x</button>
-        </span>
+    </div>
+    <div class="container px-5 py-3 w-50" style="background-color:#f5f5f5; border-style: solid; border-color: #1b1b1b;">
+        <p class="text-center">First things first, let's create your profile!</p>
         <form method="POST" action="save/">
-            <p>First things first, let's create your profile!</p>
             {% csrf_token %}
-            <input id="username" name="username" type="text" class="form-control" required placeholder="Enter your username"/>
-            <input id="password1" name="password1" type="password" class="form-control" required placeholder="Enter your password"/>
-            <input id="password2" name="password2" type="password" class="form-control" required placeholder="Confirm your password"/>
-            <input id="displayname" name="displayname" type="text" class="form-control" required placeholder="Enter your display name"/>
-            <input id="github" name="github" type="url" class="form-control" placeholder="Your GitHub URL"/>
-            <input id="profile-image" name="profile-image" type="url" class="form-control" placeholder="Profile Image URL"/>
-            <button type="submit" class="d-block mx-auto mt-5">Sign Up</button>
+            <div class="my-1">
+                <input id="username" name="username" type="text" class="form-control" required placeholder="Enter your username"/>
+            </div>
+            <div class="my-1">
+                <input id="password1" name="password1" type="password" class="form-control" required placeholder="Enter your password"/>
+            </div>
+            <div class="my-1">
+                <input id="password2" name="password2" type="password" class="form-control" required placeholder="Confirm your password"/>
+            </div>
+            <div class="my-1">
+                <input id="displayname" name="displayname" type="text" class="form-control" required placeholder="Enter your display name"/>
+            </div>
+            <div class="my-1">
+                <input id="github" name="github" type="url" class="form-control" placeholder="Your GitHub URL"/>
+            </div>
+            <button type="submit" class="d-block mx-auto my-3">Sign Up</button>
         </form>
+        <div class="text-center">
+            <a href="/chartreuse/login">Already have an account? Log In</a><br>
+            <a href="/chartreuse/">Skip signing up and view as a guest user</a>
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -125,7 +125,7 @@
                             </div>
                         </div>
             
-                        <a href="" class="card-link" style="text-decoration: none;">
+                        <a href="{% url 'chartreuse:profile_view_post' owner_id post.url_id %}" class="card-link" style="text-decoration: none;">
                             <div class="post"> 
                                 <p class="card-title mt-2">{{ post.title }}</p>
                                 {% if post.contentType == "text/plain" %}

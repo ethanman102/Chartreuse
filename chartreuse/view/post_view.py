@@ -19,6 +19,8 @@ class PostDetailView(DetailView):
         Retrieve the post object based on the URL parameter 'url_id'.
         """
         url_id = self.kwargs.get('post_id')
+        print(self.kwargs.get('post_id'))
+        print(self.kwargs.get("url_id"))
         post = get_object_or_404(Post, url_id=url_id)
         return post
 

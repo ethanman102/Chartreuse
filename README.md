@@ -47,6 +47,3 @@ To view the API documentation, go to the following link after running the server
 ## Citations
 We created a couple of pages on our wiki to hold all the resources we referred to while working on this project. To see our citations, [please click here](https://github.com/uofa-cmput404/f24-project-chartreuse/wiki/Citations-Main-Page) to visit our Citation Main Page
 
-### Citation 11
-Used https://www.youtube.com/watch?v=hA_VxnxCHbo&t=570s Youtube video by the user: The Dumbfolds (Accessed October 7, 2024) For helping how to write Django views tests and testing their logic. This idea was used in test_project_views.py for the whole document.
-

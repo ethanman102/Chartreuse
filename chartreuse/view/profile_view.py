@@ -236,9 +236,15 @@ class ProfileDetailView(DetailView):
         if post_access == "public":
             posts = Post.objects.filter(visibility="PUBLIC",user=user)
         elif post_access == "unlisted":
-            posts = Post.objects.filter(visiblity="PUBLIC",user=user) | Post.objects.filter(visibility="UNLISTED",user=user)
+            posts = Post.objects.filter(visibility="PUBLIC",user=user) | Post.objects.filter(visibility="UNLISTED",user=user)
         else:
             posts = Post.objects.filter(user=user)
-        return [post for post in posts]
+
+        # Resource: https://www.w3schools.com/django/django_queryset_orderby.php 
+        # This Resource by W3 Schools titled: 'Django QuerySet - Order By' helped us to understand how to order a queryset from descending order!
+        posts.order_by("-published")
+        posts = [post for post in posts]
+        posts = sorted(posts, key=lambda post: post.published, reverse=True)
+        return posts
         
 

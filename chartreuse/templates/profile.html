@@ -112,11 +112,12 @@
 
                     {% if posts %}
                     <!-- Loop through all posts of the posting list visible to the user. -->
+                    <!-- Code from home_page.html which was provided to Ethan Keys but Julia Dantas. Allows for consistent post -->
                     {% for post in posts %}
                     <div class="card mb-3 p-4">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
-                                <img src="{{ post.user.profileImage }}"  class="rounded-circle me-3" width="50" height="50">
+                                <img src="{{ post.user.profileImage }}"  class="rounded-circle me-3 post-image" width="50" height="50">
                                 <h5 class="card-title">{{ post.user.displayName }}</h5>
                             </div>
                             <meta name="csrf-token" content="{{ csrf_token }}">

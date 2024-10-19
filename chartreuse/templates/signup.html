@@ -1,4 +1,55 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block extra_head %}
+    <meta name="date" content="2024-10-12">
+    <meta name="tags" content="Signup">
+    <meta name="summary" content="Signup page.">
+    <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+    <script>
+        window.addEventListener('load', main); 
+
+        function main() {
+            let backButton = document.getElementById("back");
+
+            backButton.addEventListener('click', () => {
+                window.location.href = "/chartreuse/"; 
+            });
+        };
+
+        
+    </script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid min-vh-100 w-100 d-flex flex-column justify-content-center align-items-center">
+    {% comment %} <article id="header_bar"> 
+        <h4>Sign Up</h4>
+        <button id="back" type="button" class="custom-button">X</button>
+
+    </article> {% endcomment %}
+    <div class="container p-5 bg-black">
+        <span class="d-flex justify-content-between">
+            <h4>Sign Up</h4>
+            <button id="back">x</button>
+        </span>
+        <form method="POST" action="save/">
+            <p>First things first, let's create your profile!</p>
+            {% csrf_token %}
+            <input id="username" name="username" type="text" class="form-control" required placeholder="Enter your username"/>
+            <input id="password1" name="password1" type="password" class="form-control" required placeholder="Enter your password"/>
+            <input id="password2" name="password2" type="password" class="form-control" required placeholder="Confirm your password"/>
+            <input id="displayname" name="displayname" type="text" class="form-control" required placeholder="Enter your display name"/>
+            <input id="github" name="github" type="url" class="form-control" placeholder="Your GitHub URL"/>
+            <input id="profile-image" name="profile-image" type="url" class="form-control" placeholder="Profile Image URL"/>
+            <button type="submit" class="d-block mx-auto mt-5">Sign Up</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% comment %} <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -48,4 +99,4 @@
         </form>
     </div>
 </body>
-</html>
+</html> {% endcomment %}

@@ -233,6 +233,9 @@ class ProfileDetailView(DetailView):
         post_access: the type of posts the user should be able to see!
         '''
 
+
+        # This stackoverflow post allowed us to check how to do an OR query in Django: https://stackoverflow.com/questions/6567831/how-to-perform-or-condition-in-django-queryset
+        # Relevant Response Post Date was: Author: hobs Date: October 11 2012
         if post_access == "public":
             posts = Post.objects.filter(visibility="PUBLIC",user=user)
         elif post_access == "unlisted":

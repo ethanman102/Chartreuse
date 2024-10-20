@@ -126,7 +126,6 @@ class ProfileDetailView(DetailView):
         }
         
         '''
-
         context = super().get_context_data(**kwargs)
         user = context['profile']
         context['owner_id'] = quote(user.url_id,safe='')

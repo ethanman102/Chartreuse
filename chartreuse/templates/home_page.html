@@ -40,26 +40,38 @@
 </head>
 <body>
     {% block sidenav %}
-        {% include 'navbar.html' %}
+    {% if logged_in %}
+            {% include 'navbar.html' %}
+    {% else %}
+            {% include 'navbar_unauthenticated.html' %}
+    {% endif %}
     {% endblock %}
 
     <div class="container mt-5">
         <h4 class="mb-4">chartreuse.home</h4>
         <div class="d-flex justify-content-left">
-            <p>Welcome, {{ user_details.displayName }}!</p>
+            {% if logged_in %}
+                <p>Welcome, {{ user_details.displayName }}!</p>
+            {% else %}
+                <p>Welcome, guest user!</p>
+            {% endif %}
         </div>
-        <div>
-            <a href="/chartreuse/add-post" class="add-post-button">Create a post</a>
-        </div>
-        <br></br>
+        {% if logged_in %}
+            <div>
+                    <a href="/chartreuse/add-post" class="add-post-button">Create a post</a>
+            </div>
+            <br></br>
+        {% endif %}
     
         {% for post in posts %}
         <div class="card mb-3 p-4">
             <div class="d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <img src="{{ post.user.profileImage }}" alt="{{ post.user.displayName }} Avatar" class="rounded-circle me-3" width="50" height="50">
-                    <h5 class="card-title">{{ post.user.displayName }}</h5>
-                </div>
+                <a href="/chartreuse/authors/{{ post.user.url_id }}/" style="text-decoration: none; color:black">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ post.user.profileImage }}" alt="{{ post.user.displayName }} Avatar" class="rounded-circle me-3" width="50" height="50">
+                        <h5 class="card-title">{{ post.user.displayName }}</h5>
+                    </div>
+                </a>
                 <meta name="csrf-token" content="{{ csrf_token }}">
                 <div class="d-flex align-items-center mb-3" style="gap: 2ch;">
                     <button class="btn follow-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}"> {{ post.following_status }}</button>

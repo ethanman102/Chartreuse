@@ -33,14 +33,35 @@
             <div class="my-1">
                 <input id="github" name="github" type="url" class="form-control" placeholder="Your GitHub URL"/>
             </div>
+            <p class="text-center">Choose one of these profile pics to get started! Don't worry... you can choose a different profile pic later!</p>
+            <div class="pfp-container">
+                <img src="{% static 'images/default_pfp_1.png' %}" class="pfp" alt="Profile Pic 1">
+                <img src="{% static 'images/default_pfp_2.jpg' %}" class="pfp" alt="Profile Pic 2">
+                <img src="{% static 'images/default_pfp_3.jpg' %}" class="pfp" alt="Profile Pic 3">
+            </div>
+            <input type="hidden" id="selected-pfp" name="profile_image" value="">
             <button type="submit" class="d-block mx-auto my-3">Sign Up</button>
         </form>
         <div class="text-center">
             <a href="/chartreuse/login">Already have an account? Log In</a><br>
-            <a href="/chartreuse/">Skip signing up and view as a guest user</a>
+            <a href="/chartreuse/homepage/">Skip signing up and view as a guest user</a>
         </div>
     </div>
 </div>
+<script>
+    window.addEventListener('load', () => {
+        let pfps = document.querySelectorAll('.pfp');
+        pfps.forEach(pfp => {
+            pfp.addEventListener('click', () => {
+                document.getElementById('selected-pfp').value = pfp.src;
+                pfps.forEach(pfp => {
+                    pfp.style.border = 'none';
+                });
+                pfp.style.border = '2px solid chartreuse';
+            });
+        });
+    });
+</script>
 {% endblock %}
 
 {% comment %} <!DOCTYPE html>
@@ -65,7 +86,6 @@
                 window.location.href = "/chartreuse/"; 
             });
         };
-
         
     </script>
 

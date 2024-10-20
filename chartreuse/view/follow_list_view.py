@@ -120,8 +120,6 @@ class FollowListDetailView(DetailView):
         '''
         user_follows = Follow.objects.filter(follower=user)
         user_followed_by = Follow.objects.filter(followed=user)
-        print(user_follows)
-
         friends = list()
         for author in user_follows:
             author = author.followed

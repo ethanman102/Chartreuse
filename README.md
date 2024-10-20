@@ -27,6 +27,7 @@ The authors claiming copyright, if they wish to be known, can list their names h
 * Theresa Gabrielle Tian
 
 ## Heroku Details
+* App link: https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/
 * Dashboard link: https://dashboard.heroku.com/apps/f24-project-chartreuse
 * Service address: https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/
 * Hostname: f24-project-chartreuse-b4b2bcc83d87.herokuapp.com

@@ -49,28 +49,6 @@
                         <button class="btn follow-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}"> {{ post.following_status }}</button>
                         <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">{{ post.likes_count }} likes</button>
                     </div>
-                    
-                    <div class="comments mt-5">
-                        <h4>Comments</h4>
-
-                        {% if logged_in and not is_author %}
-                            <form action="/chartreuse/post/{{ post.url_id }}/add-comment" method="POST" class="mt-4">
-                                <div class="mb-3">
-                                    <label for="commentContent" class="form-label">Add a Comment</label>
-                                    <textarea class="form-control" id="commentContent" name="commentContent" rows="3" required></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-success">Submit Comment</button>
-                            </form>
-                        {% endif %}
-                        <ul class="list-group">
-                            {% for comment in post.comments %}
-                                <li class="list-group-item">
-                                    <strong>{{ comment.user.displayName }}:</strong> {{ comment.content }}
-                                    <span class="text-muted float-end">{{ comment.published }}</span>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
                 </div>
             </div>
         </div>

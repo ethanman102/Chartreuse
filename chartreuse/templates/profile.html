@@ -1,5 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}chartreuse.profile{% endblock %}
+
+{% block content %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +15,9 @@
 
 </head>
 <body>
-
+    {% block sidenav %}
+    {% include 'navbar.html' %}
+    {% endblock %}
     <!-- Creating a mass container to store main details referring to the specific follower -->
     <div class="profile-box" style="margin-top: 30px;">
         <div class="container" id="profile-header">
@@ -20,7 +26,7 @@
         <div class="container full-container">
             <div class="row" style="margin-top: 20px; margin-bottom: 20px;">
                 <div class="col-4">
-                    <img src="{{profile.profileImage}}" class="rounded img-fluid" style="width: 200px; height: 200px; object-fit: cover;">
+                    <img src="{{profile.profileImage}}" class="rounded img-fluid pfp-image" style="width: 200px; height: 200px; object-fit: cover;">
                 </div>
                 <div class="col-8">
                     <div class="row">
@@ -128,17 +134,17 @@
             
                         <a href="{% url 'chartreuse:profile_view_post' owner_id post.url_id %}" class="card-link" style="text-decoration: none;">
                             <div class="post"> 
-                                <p class="card-title mt-2">{{ post.title }}</p>
+                                <p class="card-title mt-2" style="text-align: left;">{{ post.title }}</p>
                                 {% if post.contentType == "text/plain" %}
-                                    <p class="card-text mt-2">{{ post.content }}</p>
+                                    <p class="card-text mt-2" style="text-align: left;">{{ post.content }}</p>
                                 {% elif post.contentType == "image/png" or post.contentType == "image/jpeg" %}
-                                    <div class="d-flex justify-content-center">
-                                        <img src="{{ post.content }}" alt="Post image" style="width: 40%" />
+                                    <div class="d-flex justify-content-start">
+                                        <img src="{{ post.content }}" alt="Post Image" class="img-fluid mt-3" style="border: none; max-width: 20%;">
                                     </div>
                                 {% endif %}
-                                <p class="card-text mt-2">{{ post.description }}</p>
+                                <p class="card-text mt-2" style="text-align: left;">{{ post.description }}</p>
             
-                                <p class="text-muted">Published on {{ post.published }}</p>
+                                <p class="text-muted" style="text-align: left;">Published on {{ post.published }}</p>
                             </div>
                         </a>
                     </div>
@@ -146,7 +152,7 @@
 
 
                     {% else %}
-                    <h1 class="text-center">there's nothing here... :( {{profile.user.id}}</h1>
+                    <h1 class="text-center">there's nothing here... :(</h1>
                     {% endif %}
                 </div>
 
@@ -193,4 +199,4 @@
     <script src="{% static 'javascript/home_page.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
-</html>
+{% endblock %}

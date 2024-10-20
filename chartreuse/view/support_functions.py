@@ -1,14 +1,11 @@
-from django.shortcuts import get_object_or_404
-from chartreuse.models import User, Post, Follow, Like, FollowRequest
-from urllib.parse import unquote
-from django.shortcuts import redirect, render
-from django.http import JsonResponse
-import json
-
 import base64
+import json
+from urllib.parse import quote, unquote
 from urllib.request import urlopen
+
+from chartreuse.models import Follow, FollowRequest, Like, Post, User
 from django.http import JsonResponse
-from urllib.parse import unquote
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
 
 def get_post_likes(post_id):
@@ -29,9 +26,42 @@ def get_post_likes(post_id):
     return likes
 
 def add_post(request):
-    return render(request, 'add_post.html')
+    '''
+    Purpose: View to render the add post page
+
+    Arguments:
+        request: Request object
+    '''
+    if request.user.is_authenticated:
+        return render(request, 'add_post.html')
+    else:
+        return redirect('/chartreuse/signup/')
+
+def view_profile(request):
+    '''
+    Purpose: View to render the profile page
+
+    Arguments:
+        request: Request object
+    '''
+    if request.user.is_authenticated:
+
+        current_user = request.user
+        current_user_model = User.objects.get(user=current_user)
+        url_id = quote(current_user_model.url_id, safe='')
+
+        return redirect(f'/chartreuse/authors/{url_id}/')
+    else:
+        return redirect('/chartreuse/signup/')
 
 def edit_post(request, post_id):
+    '''
+    Purpose: View to render the edit post page
+    
+    Arguments:
+        request: Request object
+        post_id: The id of the post object
+    '''
     post = get_object_or_404(Post, url_id=post_id)
     
     # Check if the user is authenticated
@@ -46,6 +76,13 @@ def edit_post(request, post_id):
     return redirect('/chartreuse/homepage/')
 
 def delete_post(request, post_id):
+    '''
+    Purpose: View to delete a post
+
+    Arguments:
+        request: Request object
+        post_id: The id of the post object
+    '''
     post = get_object_or_404(Post, url_id=post_id)
 
     # Check if user is authenticated
@@ -62,6 +99,13 @@ def delete_post(request, post_id):
 
 @csrf_exempt
 def update_post(request, post_id):
+    '''
+    Purpose: View to update a post
+    
+    Arguments:
+        request: Request object
+        post_id: The id of the post object
+    '''
     if request.method == 'POST':
         title = request.POST.get('title')
         description = request.POST.get('description')
@@ -89,7 +133,6 @@ def update_post(request, post_id):
             content_type = 'image/' + image_content
             post_content = encoded_image
         elif image_url:
-            print(image_url)
             image_content = image_url.split('.')[-1]
             content_type = 'image/' + image_content
             try:
@@ -119,6 +162,12 @@ def update_post(request, post_id):
 
 @csrf_exempt
 def save_post(request):
+    '''
+    Purpose: View to save a post
+
+    Arguments:
+        request: Request object
+    '''
     if request.method == 'POST':
         title = request.POST.get('title')
         description = request.POST.get('description')
@@ -146,7 +195,6 @@ def save_post(request):
             content_type = 'image/' + image_content
             post_content = encoded_image
         elif image_url:
-            print(image_url)
             image_content = image_url.split('.')[-1]
             content_type = 'image/' + image_content
             try:
@@ -185,26 +233,28 @@ def like_post(request):
     Returns:
         JsonResponse containing the post object.
     """
-    body = json.loads(request.body)
-    user_id = body["user_id"]
-    post_id = body["post_id"]
-    print(body)
+    if request.user.is_authenticated:
+        body = json.loads(request.body)
+        user_id = body["user_id"]
+        post_id = body["post_id"]
 
-    user = User.objects.get(url_id=unquote(user_id))
-    post = Post.objects.get(url_id=unquote(post_id))
+        user = User.objects.get(url_id=unquote(user_id))
+        post = Post.objects.get(url_id=unquote(post_id))
 
-    # first check if the user has already liked the post
-    like = Like.objects.filter(user=user, post=post)
+        # first check if the user has already liked the post
+        like = Like.objects.filter(user=user, post=post)
 
-    if like:
-        like.delete()
+        if like:
+            like.delete()
+        else:
+            Like.objects.create(user=user, post=post)
+
+        data = {
+            "likes_count": get_post_likes(unquote(post_id)).count()
+        }
+        return JsonResponse(data)
     else:
-        Like.objects.create(user=user, post=post)
-
-    data = {
-        "likes_count": get_post_likes(unquote(post_id)).count()
-    }
-    return JsonResponse(data)
+        pass
 
 def get_all_public_posts():
     '''
@@ -274,29 +324,32 @@ def send_follow_request(request):
     Returns:
         JsonResponse containing the follow request status.
     """
-    body = json.loads(request.body)
-    user_id = body["user_id"]
-    post_id = body["post_id"]
+    if request.user.is_authenticated:
+        body = json.loads(request.body)
+        user_id = body["user_id"]
+        post_id = body["post_id"]
 
-    user = User.objects.get(url_id=unquote(user_id))
-    post = Post.objects.get(url_id=unquote(post_id))
+        user = User.objects.get(url_id=unquote(user_id))
+        post = Post.objects.get(url_id=unquote(post_id))
 
-    post_author = post.user
+        post_author = post.user
 
-    # first check if the user has already followed the author
-    follow = Follow.objects.filter(follower=user, followed=post_author)
+        # first check if the user has already followed the author
+        follow = Follow.objects.filter(follower=user, followed=post_author)
 
-    follow_request= FollowRequest.objects.filter(requester=user, requestee=post_author)
-    follow_request_status = None
+        follow_request= FollowRequest.objects.filter(requester=user, requestee=post_author)
+        follow_request_status = None
 
-    if follow:
-        follow.delete()
-        follow_request_status = "Unfollowed"
-    if follow_request:
-        follow_request.delete()
-        follow_request_status = "Removed Follow Request"
+        if follow:
+            follow.delete()
+            follow_request_status = "Unfollowed"
+        if follow_request:
+            follow_request.delete()
+            follow_request_status = "Removed Follow Request"
+        else:
+            FollowRequest.objects.create(requester=user, requestee=post_author)
+            follow_request_status = "Sent Follow Request"
+
+        return JsonResponse({"follow_request_status": follow_request_status})
     else:
-        FollowRequest.objects.create(requester=user, requestee=post_author)
-        follow_request_status = "Sent Follow Request"
-
-    return JsonResponse({"follow_request_status": follow_request_status})
+        pass

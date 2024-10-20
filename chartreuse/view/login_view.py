@@ -3,9 +3,15 @@ from django.http import JsonResponse
 from django.contrib.auth import authenticate, login as auth_login
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import logout as auth_logout
 
 def login(request):
     return render(request, 'login.html')
+
+def logout(request):
+    if request.user.is_authenticated:
+        auth_logout(request)
+    return redirect('/chartreuse/')
 
 @csrf_exempt
 def save_login(request):

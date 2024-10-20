@@ -75,7 +75,6 @@ document.querySelectorAll('.post-card').forEach(button => {
     button.addEventListener('click', function(event) {
         const postCards = document.querySelectorAll('.post-card');
 
-        print(event)
         if (!event.target.closest('button')) {
             const postUrl = card.getAttribute('data-post-url');
         }
@@ -88,8 +87,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     postCards.forEach(function(card) {
         card.addEventListener('click', function(event) {
-            // Prevent click action on buttons or other elements inside the card
-            print(event)
             if (!event.target.closest('button')) {
                 const postUrl = card.getAttribute('data-post-url');
                 window.location.href = postUrl;

@@ -87,7 +87,7 @@ class FeedDetailView(DetailView):
             for post in posts:
                 post.likes_count = Like.objects.filter(post=post).count()
                 post.url_id = quote(post.url_id, safe='')
-                post.following_status = False
+                post.following_status = "Sign up to follow!"
                 if post.contentType != "text/plain":
                     post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
             

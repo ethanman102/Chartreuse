@@ -35,7 +35,7 @@ class ImageTestCases(TestCase):
         '''
         Test encoding an image from a file path.
         '''
-        imagePath = 'chartreuse/test_images/buba.jpg'
+        imagePath = 'chartreuse/static/images/buba.jpg'
         
         encoded_string = images.encode_image(imagePath)
         
@@ -47,7 +47,7 @@ class ImageTestCases(TestCase):
         '''
         Test decoding an image from a base64 string.
         '''
-        imagePath = 'chartreuse/test_images/buba.jpg'
+        imagePath = 'chartreuse/static/images/buba.jpg'
         
         encoded_string = images.encode_image(imagePath)
         

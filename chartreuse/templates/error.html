@@ -3,14 +3,13 @@
 
 {% block title %}chartreuse.error{% endblock %}
 
-{% block content %}
-
+{% block extra_head %}
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <link rel="stylesheet"  href="{% static 'css/error_style.css' %}">
 </head>
+{% endblock %}
+
+{% block content %}
 <body>
 
     {% block sidenav %}

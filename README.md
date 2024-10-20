@@ -41,8 +41,7 @@ python manage.py test chartreuse
 ```
 
 ## API Documentation
-To view the API documentation, go to the following link after running the server locally: http://127.0.0.1:8000/chartreuse/schema/swagger-ui/
+To view the API documentation, go to the following link: https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/schema/swagger-ui/
 
 ## Citations
 We created a couple of pages on our wiki to hold all the resources we referred to while working on this project. To see our citations, [please click here](https://github.com/uofa-cmput404/f24-project-chartreuse/wiki/Citations-Main-Page) to visit our Citation Main Page
-

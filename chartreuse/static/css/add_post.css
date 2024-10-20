@@ -25,3 +25,22 @@ h1 {
     border-bottom-style: solid;
     border-bottom-color: #1b1b1b;
 }
+
+.create-button {
+    color: chartreuse;
+    background-color: #00356b;
+    border-bottom-style: solid;
+    text-align: center;
+    border-bottom-color: #1b1b1b;
+    border-radius: 0;
+    box-shadow: none;
+    text-decoration: none;
+    padding: 10px 20px;
+    transition: box-shadow 0.3s ease;
+}
+
+.create-button:hover {
+    color: chartreuse;
+    background-color: #01254a;
+    box-shadow: 6px 6px 0px #000000;
+}

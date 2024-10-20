@@ -32,7 +32,10 @@ def add_post(request):
     Arguments:
         request: Request object
     '''
-    return render(request, 'add_post.html')
+    if request.user.is_authenticated:
+        return render(request, 'add_post.html')
+    else:
+        return redirect('/chartreuse/signup/')
 
 def view_profile(request):
     '''
@@ -49,7 +52,7 @@ def view_profile(request):
 
         return redirect(f'/chartreuse/authors/{url_id}/')
     else:
-        return redirect('/chartreuse/homepage/')
+        return redirect('/chartreuse/signup/')
 
 def edit_post(request, post_id):
     '''

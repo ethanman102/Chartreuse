@@ -13,87 +13,86 @@
 <body class="bg-light">
     
     {% block sidenav %}
-        {% include 'navbar.html' %}
+    {% include 'navbar.html' %}
     {% endblock %}
 
     <div class="container vh-100 d-flex justify-content-center align-items-center">
         <div class="text-center">
             <h1 class="mb-4">Create a post</h1>
-            <form method="POST" action="save/" enctype="multipart/form-data">
-                {% csrf_token %}
-                
-                <label for="title" class="form-label">Post Title</label>
-                <input type="text" class="form-control" id="title" name="title" required placeholder="Enter post title">
-
-                <label for="description" class="form-label">Post Description</label>
-                <input type="text" class="form-control" id="description" name="description" required placeholder="Enter post description">
-
-                <label class="form-label mt-3">Choose Content Type</label>
-                <div class="d-flex justify-content-center mb-3">
-                    <div class="form-check me-3">
-                        <input class="form-check-input" type="radio" name="content_type" id="textOption" value="text" checked>
-                        <label class="form-check-label" for="textOption">
-                            Text
-                        </label>
+            <div class="mx-4 my-3 p-3">
+                <form method="POST" action="save/" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <label for="title" class="form-label">Post Title</label>
+                    <input type="text" class="form-control" id="title" name="title" required placeholder="Enter post title">
+    
+                    <label for="description" class="form-label">Post Description</label>
+                    <input type="text" class="form-control" id="description" name="description" required placeholder="Enter post description">
+    
+                    <label class="form-label mt-3">Choose Content Type</label>
+                    <div class="d-flex justify-content-center mb-3"></div>
+                        <div class="form-check me-3">
+                            <input class="form-check-input" type="radio" name="content_type" id="textOption" value="text" checked>
+                            <label class="form-check-label" for="textOption">
+                                Text
+                            </label>
+                        </div>
+    
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="content_type" id="imageOption" value="image">
+                            <label class="form-check-label" for="imageOption">
+                                Image
+                            </label>
+                        </div>
                     </div>
-
-                    <div class="form-check me-3">
-                        <input class="form-check-input" type="radio" name="content_type" id="textOption" value="text">
-                        <label class="form-check-label" for="textOption">
-                            CommonMark
-                        </label>
+    
+                    <div id="textContent" class="my-3 px-3">
+                        <label for="content" class="form-label">Content</label>
+                        <textarea class="form-control" id="content" name="content" rows="5" required placeholder="Enter post content"></textarea>
                     </div>
-
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="content_type" id="imageOption" value="image">
-                        <label class="form-check-label" for="imageOption">
-                            Image
-                        </label>
+    
+                    <div id="imageContent" class="hidden">
+                        <div class="d-flex justify-content-center mb-3">
+                            <div class="form-check mb-3 me-3">
+                                <input class="form-check-input" type="radio" name="image_type" id="uploadImageOption" value="upload" checked>
+                                <label class="form-check-label" for="uploadImageOption">
+                                    Upload Image
+                                </label>
+                            </div>
+                            <div class="form-check mb-3 me-3">
+                                <input class="form-check-input" type="radio" name="image_type" id="urlImageOption" value="url">
+                                <label class="form-check-label" for="urlImageOption">
+                                    Provide Image URL
+                                </label>
+                            </div>
+                        </div>
+    
+                        <div id="uploadImageContent">
+                            <label for="image" class="form-label">Upload Image</label>
+                            <input type="file" class="form-control" id="image" name="image">
+                        </div>
+    
+                        <div id="urlImageContent" class="hidden">
+                            <label for="image_url" class="form-label">Image URL</label>
+                            <input type="url" class="form-control" id="image_url" name="image_url" placeholder="Enter image URL">
+                        </div>
                     </div>
-                </div>
-
-                <div id="textContent">
-                    <label for="content" class="form-label">Content</label>
-                    <textarea class="form-control" id="content" name="content" rows="5" required placeholder="Enter post content"></textarea>
-                </div>
-
-                <div id="imageContent" class="hidden">
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="radio" name="image_type" id="uploadImageOption" value="upload" checked>
-                        <label class="form-check-label" for="uploadImageOption">
-                            Upload Image
-                        </label>
+    
+                    <div class="my-3 px-3">
+                        <label for="visibility" class="form-label mt-3">Visibility</label>
+                        <select class="form-select" id="visibility" name="visibility">
+                            <option value="PUBLIC">Public</option>
+                            <option value="UNLISTED">Unlisted</option>
+                            <option value="FRIENDS">Friends Only</option>
+                        </select>
                     </div>
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="radio" name="image_type" id="urlImageOption" value="url">
-                        <label class="form-check-label" for="urlImageOption">
-                            Provide Image URL
-                        </label>
+    
+                    <div class="gap-2 d-flex justify-content-center mb-3">
+                        <button type="submit" class="btn btn-primary" style="color: chartreuse; background-color: #00356b;">Create Post</button>
+                        <a href="javascript:history.back()" class="btn btn-secondary">Cancel</a>
                     </div>
-
-                    <div id="uploadImageContent">
-                        <label for="image" class="form-label">Upload Image</label>
-                        <input type="file" class="form-control" id="image" name="image">
-                    </div>
-
-                    <div id="urlImageContent" class="hidden">
-                        <label for="image_url" class="form-label">Image URL</label>
-                        <input type="url" class="form-control" id="image_url" name="image_url" placeholder="Enter image URL">
-                    </div>
-                </div>
-
-                <label for="visibility" class="form-label mt-3">Visibility</label>
-                <select class="form-select" id="visibility" name="visibility">
-                    <option value="PUBLIC">Public</option>
-                    <option value="UNLISTED">Unlisted</option>
-                    <option value="FRIENDS">Friends Only</option>
-                </select>
-
-                <div class="d-flex gap-2 mt-3">
-                    <button type="submit" class="btn btn-primary">Create Post</button>
-                    <a href="javascript:history.back()" class="btn btn-secondary">Cancel</a>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -158,7 +157,5 @@
             }
         });
     </script>    
-
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script> -->
 </body>
 {% endblock %}

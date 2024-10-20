@@ -203,8 +203,9 @@ class ProfileDetailView(DetailView):
         follow_requests = FollowRequest.objects.filter(requestee=user)
         requests = [fk for fk in follow_requests]
         for follow_request in requests:
-            follow_request.requester.url_id = quote(follow_request.requester.url_id,safe='')
-            follow_request.requestee.url_id = quote(follow_request.requestee.url_id,safe='')
+            if (follow_request.requester.url_id != user.url_id):
+                follow_request.requester.url_id = quote(follow_request.requester.url_id,safe='')
+                follow_request.requestee.url_id = quote(follow_request.requestee.url_id,safe='')
         return follow_requests
     
     def prepare_posts(self,posts):

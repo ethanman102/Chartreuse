@@ -122,33 +122,35 @@ class ProfileDetailView(DetailView):
         is_following: (If the user is foreign this key will be here, depicts if they are following the page owner or not.)
         sent_request: (Bool if the user is NOT already following, but did they sent a follow request?)
         follow_relationship: "Friends/Following" depicts whether the following is mutual or unmutual!
+        posts: Contains all the posts by the author who owns the profile page that the current user visiting can see.
         }
         
         '''
 
         context = super().get_context_data(**kwargs)
         user = context['profile']
-
         context['owner_id'] = quote(user.url_id,safe='')
+
+        post_access = "public" # default following status, will be updated after!
 
         # checking if user is authenticated or anonymous
         if self.request.user.is_authenticated:
             context['logged_in'] = True
             # if logged in, check if user owns the current page or that's being visited or not...
             current_user = self.request.user
-            current_user_model = get_object_or_404(User,user=current_user)
-            
+            current_user_model = get_object_or_404(User,user=current_user)  
             if user.url_id == current_user_model.url_id:
                 # owns the page, should not display follow button etc...
                 context['owner'] = True
                 context['requests'] = self.prepare_follow_requests(user)
+                post_access = "all"
             else:
                 context['viewer_id'] = quote(current_user_model.url_id,safe='')
                 # check if the user if following or not...
-               
                 follow = Follow.objects.filter(follower=current_user_model,followed=user)
                 if follow.count() == 0:
                     context['is_following'] = False
+                    post_access = "public"
                     # check if a follow request has been sent or not!
                     follow_request  = FollowRequest.objects.filter(requestee=user,requester=current_user_model)
                     if follow_request.count() > 0:
@@ -157,9 +159,11 @@ class ProfileDetailView(DetailView):
                         context['sent_request'] = False
                 else:
                     context['is_following'] = True
+                    post_access = "unlisted"
                     # check if the user is following them back or not! (friends)
                     if Follow.objects.filter(followed=current_user_model,follower=user).exists():
                         context['follow_relationship'] = "Friends"
+                        post_access = "all"
                     else:
                         context['follow_relationship'] = "Following"
         else:
@@ -173,8 +177,12 @@ class ProfileDetailView(DetailView):
         # Relationship Counts
         context['followers'] = Follow.objects.filter(followed=user).count()
         context['following'] = Follow.objects.filter(follower=user).count()
-        
-    
+
+        # posts that can be viewed by the current user visiting.
+        posts = self.get_posts(post_access,user)
+        self.prepare_posts(posts)
+        context['posts'] = posts
+
         return context
         
 
@@ -199,5 +207,47 @@ class ProfileDetailView(DetailView):
             follow_request.requester.url_id = quote(follow_request.requester.url_id,safe='')
             follow_request.requestee.url_id = quote(follow_request.requestee.url_id,safe='')
         return follow_requests
+    
+    def prepare_posts(self,posts):
+        '''
+        Purpose: to add the current like count to the post and percent encode their ids to allow for navigation to the post.
+
+        Arguments:
+        posts: list of post objects
+        '''
+
+        for post in posts:
+            post.likes_count = Like.objects.filter(post=post).count()
+            if post.contentType != "text/plain":
+                post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+    
+        # no return because mutability of lists.
+
+    def get_posts(self,post_access,user):
+
+        '''
+        Purpose: Get all visible posts that should appear on a user's profile page.
+
+        Arguments: 
+        user: The current user who owns the current page being viewed!
+        post_access: the type of posts the user should be able to see!
+        '''
+
+
+        # This stackoverflow post allowed us to check how to do an OR query in Django: https://stackoverflow.com/questions/6567831/how-to-perform-or-condition-in-django-queryset
+        # Relevant Response Post Date was: Author: hobs Date: October 11 2012
+        if post_access == "public":
+            posts = Post.objects.filter(visibility="PUBLIC",user=user)
+        elif post_access == "unlisted":
+            posts = Post.objects.filter(visibility="PUBLIC",user=user) | Post.objects.filter(visibility="UNLISTED",user=user)
+        else:
+            posts = Post.objects.filter(user=user)
+
+        # Resource: https://www.w3schools.com/django/django_queryset_orderby.php 
+        # This Resource by W3 Schools titled: 'Django QuerySet - Order By' helped us to understand how to order a queryset from descending order!
+        posts.order_by("-published")
+        posts = [post for post in posts]
+        posts = sorted(posts, key=lambda post: post.published, reverse=True)
+        return posts
         
 

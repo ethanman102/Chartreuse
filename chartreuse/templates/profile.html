@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="main.css">
     <title>{{ profile.displayName }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/profile_page.css'%}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/profile_page.css' %}">
+
 </head>
 <body>
 
@@ -108,9 +109,42 @@
               <div class="tab-content" id="nav-tabContent">
                 <!-- Check if any posts have been made by the user. Otherwise prompt a nothing message. NTS: Only display posts related to the posts visibility -->
                 <div class="tab-pane fade show active" id="nav-posts" role="tabpanel" aria-labelledby="nav-posts-tab" tabindex="0">
-                    {% if profile.posts %}
+
+                    {% if posts %}
                     <!-- Loop through all posts of the posting list visible to the user. -->
-                    <h2>This is Where some Posts will be made</h2>
+                    <!-- Code from home_page.html which was provided to Ethan Keys but Julia Dantas. Allows for consistent post -->
+                    {% for post in posts %}
+                    <div class="card mb-3 p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ post.user.profileImage }}"  class="rounded-circle me-3 post-image" width="50" height="50">
+                                <h5 class="card-title">{{ post.user.displayName }}</h5>
+                            </div>
+                            <meta name="csrf-token" content="{{ csrf_token }}">
+                            <div class="d-flex align-items-center mb-3" style="gap: 2ch;">
+                                <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ viewer_id }}">{{ post.likes_count }} likes</button>
+                            </div>
+                        </div>
+            
+                        <a href="{% url 'chartreuse:profile_view_post' owner_id post.url_id %}" class="card-link" style="text-decoration: none;">
+                            <div class="post"> 
+                                <p class="card-title mt-2">{{ post.title }}</p>
+                                {% if post.contentType == "text/plain" %}
+                                    <p class="card-text mt-2">{{ post.content }}</p>
+                                {% elif post.contentType == "image/png" or post.contentType == "image/jpeg" %}
+                                    <div class="d-flex justify-content-center">
+                                        <img src="{{ post.content }}" alt="Post image" style="width: 40%" />
+                                    </div>
+                                {% endif %}
+                                <p class="card-text mt-2">{{ post.description }}</p>
+            
+                                <p class="text-muted">Published on {{ post.published }}</p>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+
+
                     {% else %}
                     <h1 class="text-center">there's nothing here... :( {{profile.user.id}}</h1>
                     {% endif %}
@@ -156,6 +190,7 @@
     </div>
 
 
+    <script src="{% static 'javascript/home_page.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -188,6 +188,7 @@ def like_post(request):
     body = json.loads(request.body)
     user_id = body["user_id"]
     post_id = body["post_id"]
+    print(body)
 
     user = User.objects.get(url_id=unquote(user_id))
     post = Post.objects.get(url_id=unquote(post_id))

@@ -72,6 +72,7 @@ urlpatterns = [
     path("api/authors/", users.UserViewSet.as_view({'post': 'create', 'get': 'list'}), name="user-list"),
 
     # Follow Request URLs
+    re_path(r"authors/(?P<url_id>.+)/post/(?P<post_id>.+)/",post_view.PostDetailView.as_view(),name="profile_view_post"),
     re_path(r"authors/accept/(?P<followed>.+)/(?P<follower>.+)/", profile_view.follow_accept,name="profile_follow_accept"),
     re_path(r"authors/reject/(?P<followed>.+)/(?P<follower>.+)/", profile_view.follow_reject,name="profile_follow_reject"),
     re_path(r"authors/unfollow/(?P<followed>.+)/(?P<follower>.+)/",profile_view.profile_unfollow,name="profile_unfollow"),
@@ -80,9 +81,7 @@ urlpatterns = [
     re_path(r"authors/followers/(?P<user_id>.+)/",follow_list_view.FollowListDetailView.as_view(),name="user_followers_list"),
     re_path(r"authors/friends/(?P<user_id>.+)/",follow_list_view.FollowListDetailView.as_view(),name="user_friends_list"),
     re_path(r"authors/(?P<url_id>.+)/", profile_view.ProfileDetailView.as_view(),name="profile"),
-
-
-
+    
     # Comment URLs 
     # path("authors/<str:user_id>/inbox", comments.create_comment, name="create_comment"),
     # path("authors/<str:user_id>/posts/<str:post_id>/comments", comments.get_comments, name="get_comments"),

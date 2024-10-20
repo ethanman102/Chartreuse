@@ -3,6 +3,7 @@
 html body {
     background-image: url("background.png");
     margin-left: 10%;
+    font-family: "Sometype Mono", monospace;
 }
 
 .hidden {

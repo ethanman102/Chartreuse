@@ -220,6 +220,7 @@ class ProfileDetailView(DetailView):
             post.likes_count = Like.objects.filter(post=post).count()
             if post.contentType != "text/plain":
                 post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+            post.url_id = quote(post.url_id,safe='')
     
         # no return because mutability of lists.
 

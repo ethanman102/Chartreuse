@@ -158,7 +158,7 @@ def update_post(request, post_id):
         post.save()
 
         return redirect('/chartreuse/homepage/post/' + post_id + '/')
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
+    return redirect('/chartreuse/error/')
 
 @csrf_exempt
 def save_post(request):

@@ -32,7 +32,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["f24-project-chartreuse-b4b2bcc83d87.herokuapp.com", "*"]
 
 TEST_DISCOVERY_PATTERN = 'test_*.py'
 

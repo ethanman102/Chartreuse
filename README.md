@@ -29,11 +29,10 @@ The authors claiming copyright, if they wish to be known, can list their names h
 ## Heroku Details
 * Dashboard link: https://dashboard.heroku.com/apps/f24-project-chartreuse
 * Service address: https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/
-* Port:
-* Hostname:
-* Prefix:
-* Username for HTTP Basic Auth:
-* Password for HTTP Basic Auth:
+* Hostname: f24-project-chartreuse-b4b2bcc83d87.herokuapp.com
+* Username for HTTP Basic Auth: chartreuse-admin
+* Password for HTTP Basic Auth: abc123
+* Addresses:  3.216.88.24, 3.219.96.23, 23.22.52.7, 23.22.144.165
 
 ## Tests
 To run the tests, run the following command in the root directory of the project:

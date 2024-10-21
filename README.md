@@ -46,3 +46,4 @@ To view the API documentation, go to the following link: https://f24-project-cha
 
 ## Citations
 We created a couple of pages on our wiki to hold all the resources we referred to while working on this project. To see our citations, [please click here](https://github.com/uofa-cmput404/f24-project-chartreuse/wiki/Citations-Main-Page) to visit our Citation Main Page
+

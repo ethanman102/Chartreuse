@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}chartreuse.error{% endblock %}
+
+{% block extra_head %}
+<head>
+    <link rel="stylesheet"  href="{% static 'css/error_style.css' %}">
+</head>
+{% endblock %}
+
+{% block content %}
+<body>
+
+    {% block sidenav %}
+        {% include 'navbar.html' %}
+    {% endblock %}
+
+    <div class="container">
+        <h4>chartreuse.error</h4>
+
+        <p>
+            Oops, something went wrong :(
+        </p>
+    </div>
+</body>
+        
+
+{% endblock %}

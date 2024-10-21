@@ -1,0 +1,26 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="date" content="2024-10-12">
+    <meta name="tags" content="welcome">
+    <meta name="summary" content="Welcome page with signup and login buttons.">
+    <title>Chartreuse</title>
+
+    <link rel="stylesheet" href="../static/css/landing_page.css">
+    <link rel="shortcut icon"   type="image/png"    href="{% static 'favico.png' %}">
+</head>
+<body>
+    <div class="container">
+        <h4 class="mb-4">Welcome to Chartreuse!</h4>
+        <p class="lead mb-4">Join us today and connect with your friends, share posts, and much more!</p>
+
+        <div class="buttons">
+            <a href="signup" class="btn custom-button me-3">Sign Up</a>
+            <a href="login" class="btn custom-button">Login</a>
+        </div>
+    </div>
+</body>
+</html>

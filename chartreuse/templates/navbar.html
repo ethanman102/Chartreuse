@@ -1,0 +1,47 @@
+{% load static %}
+
+{% block sidenav %}
+<head> 
+    <meta charset="UTF-8">
+    <link rel="stylesheet"  href="{% static 'css/navbar.css' %}">
+</head>
+
+<body>
+    <nav class="navbar bg-body-tertiary">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-button"   href="{% url 'chartreuse:homepage' %}"> 
+                        <img src="{% static 'css/icons/home.svg' %}"    alt="homepage">
+                    </a>
+                </li> 
+
+                <li class="nav-item">
+                    <a class="nav-button"   href="{% url 'chartreuse:add_post' %}">
+                        <img src="{% static 'css/icons/make_post.svg' %}"    alt="add_post">
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-button"   href="{% url 'chartreuse:redirect_profile' %}">
+                        <img src="{% static 'css/icons/profile.svg' %}"    alt="profile">
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-button"   href="{% url 'chartreuse:error' %}">
+                        <img src="{% static 'css/icons/settings.svg' %}"    alt="settings">
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-button"   href="{% url 'chartreuse:logout' %}">
+                        <img src="{% static 'css/icons/logout.svg' %}"    alt="log out">
+                    </a>
+                </li>
+
+            </ul>
+    </nav>
+
+</body>
+
+{% endblock %}

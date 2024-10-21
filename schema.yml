@@ -1,0 +1,1254 @@
+openapi: 3.0.3
+info:
+  title: ''
+  version: 0.0.0
+paths:
+  /chartreuse/api/author/login/:
+    post:
+      operationId: api_author_login_create
+      description: Logs in a user based on the provided user details.
+      summary: Login a user
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: User logged in successfully.
+        '400':
+          description: Username and password are required.
+  /chartreuse/api/authors/:
+    get:
+      operationId: api_authors_list
+      description: |-
+        Gets a paginated list of users based on the provided query parameters (page and size).
+
+        **When to use:** Use this endpoint when you need to display a list of all users.
+
+        **How to use:** Send a GET request to this endpoint. You can use pagination by specifying the 'page' and 'size' parameters.
+
+        **Why to use:** This endpoint allows you to view all users, useful for user management features.
+
+        **Why not to use:** Avoid using this endpoint for individual user details; use the specific user endpoint instead.
+      summary: Get a list of users
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+        description: Page number for pagination (Default is 1).
+      - in: query
+        name: size
+        schema:
+          type: integer
+        description: Number of users per page (Default is 50).
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Users'
+          description: A paginated list of users.
+        '404':
+          description: No users found.
+    post:
+      operationId: api_authors_create
+      description: |-
+        Creates a new user with the provided details.
+
+        **When to use:** Use this endpoint when a new user wants to sign up for the platform.
+
+        **How to use:** Send a POST request with the user details in the request body.
+
+        **Why to use:** This endpoint facilitates user registration, enabling users to access platform features.
+
+        **Why not to use:** Do not use this endpoint for updating existing users; use the update endpoint instead.
+      summary: Create a new user
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: Newly created user details.
+        '400':
+          description: Username already exists.
+  /chartreuse/api/authors/{id}/:
+    get:
+      operationId: api_authors_retrieve
+      description: |-
+        Retrieves a user by their ID.
+
+        **When to use:** Use this endpoint to fetch information about a specific user.
+
+        **How to use:** Send a GET request with the user ID as a path parameter.
+
+        **Why to use:** This endpoint is useful when you need details about a specific user, such as their display name, GitHub URL, or profile image.
+
+        **Why not to use:** Avoid using this endpoint to list multiple users. Use the user list endpoint instead.
+      summary: Get a specific user
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: User details.
+        '404':
+          description: User not found.
+    put:
+      operationId: api_authors_update
+      description: |-
+        Updates an existing user based on provided user details.
+
+        **When to use:** Use this endpoint to modify an existing user's details, such as their display name, GitHub link, or profile image.
+
+        **How to use:** Send a PUT request with the new user data in the request body, and the user ID as a path parameter.
+
+        **Why to use:** This endpoint is crucial for user profile management, allowing users to update their own information.
+
+        **Why not to use:** Do not use this endpoint to create new users; use the user creation endpoint for that.
+      summary: Update a user
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: Updated user details.
+        '404':
+          description: User not found.
+        '401':
+          description: Permission denied.
+        '400':
+          description: Invalid data.
+    delete:
+      operationId: api_authors_destroy
+      description: "Deletes an existing user based on the provided user ID. \n\n**When\
+        \ to use:** Use this endpoint to remove a user permanently.\n\n**How to use:**\
+        \ Send a DELETE request with the user ID as a path parameter.\n\n**Why to\
+        \ use:** This endpoint is useful for user account removal, typically used\
+        \ in admin dashboards or user account deletion flows.\n\n**Why not to use:**\
+        \ Be cautious when using this endpoint as it will permanently delete the user\
+        \ data."
+      summary: Delete a user
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: User deleted successfully.
+        '404':
+          description: User not found.
+        '401':
+          description: You do not have permission to delete this user.
+  /chartreuse/api/authors/{user_id}/inbox/:
+    post:
+      operationId: api_authors_inbox_create
+      description: |-
+        Adds a like to a post based on the provided post URL.
+
+        **When to use:** Use this endpoint when a user wants to express appreciation for a post by liking it.
+
+        **How to use:** Send a POST request with the user ID in the URL and the post URL in the request body.
+
+        **Why to use:** This endpoint provides a way to track and reflect user engagement with posts.
+
+        **Why not to use:** Do not use this if the user has already liked the post, or if the user is not authenticated.
+      summary: Adds a like to a post
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Like'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Like'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Like'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Like'
+          description: Like added successfully.
+        '400':
+          description: Like already exists.
+        '401':
+          description: User is not authenticated.
+        '404':
+          description: User not found.
+        '405':
+          description: Method not allowed.
+    delete:
+      operationId: api_authors_inbox_destroy
+      description: |-
+        Removes a like from a post based on the provided post URL.
+
+        **When to use:** Use this endpoint when a user wants to remove their like from a post.
+
+        **How to use:** Send a DELETE request with the user ID in the URL and the post URL in the request body.
+
+        **Why to use:** This endpoint allows users to retract their engagement on posts by removing the like.
+
+        **Why not to use:** Do not use this if the user hasn't liked the post or if the user is not authenticated.
+      summary: Removes a like from a post
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Like'
+          description: Like deleted successfully.
+        '400':
+          description: Like does not exist.
+        '404':
+          description: User not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/authors/{user_id}/liked/:
+    get:
+      operationId: api_authors_liked_retrieve
+      description: |-
+        Retrieves all likes made by a user based on the user ID, with optional pagination.
+
+        **When to use:** Use this endpoint to list all the posts or comments a user has liked.
+
+        **How to use:** Send a GET request with the `user_id` in the URL. Optionally, include `page` and `size` query parameters for pagination.
+
+        **Why to use:** To track all the posts and comments that a particular user has liked.
+
+        **Why not to use:** If you are not interested in a user's likes or if the user ID is not valid.
+      summary: Gets all likes made by a user
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+        description: Page number for pagination.
+      - in: query
+        name: size
+        schema:
+          type: integer
+        description: Number of likes per page.
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Like'
+          description: Successfully retrieved all likes.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/authors/{user_id}/liked/{like_id}/:
+    get:
+      operationId: api_authors_liked_retrieve_2
+      description: |-
+        Retrieves a specific like object from a user based on the like ID and user ID.
+
+        **When to use:** Use this endpoint when you need to fetch details of a specific like that a user has made on a post.
+
+        **How to use:** Send a GET request with the user ID in the URL and the like ID of the desired like object.
+
+        **Why to use:** This endpoint provides a way to retrieve details about a specific like, such as when it was made and on which post.
+
+        **Why not to use:** Do not use this if the like does not exist or if the user is not authenticated.
+      summary: Gets a specific like from a user
+      parameters:
+      - in: path
+        name: like_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Like'
+          description: Successfully retrieved like.
+        '404':
+          description: User or like not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/authors/{user_id}/posts/:
+    get:
+      operationId: api_authors_posts_retrieve
+      description: |-
+        Retrieves the most recent posts made by an author based on the user ID, with optional pagination.
+
+        **When to use:** Use this endpoint to fetch the latest posts from a specific author.
+
+        **How to use:** Send a GET request with the `user_id`, along with optional pagination parameters `page` and `size`.
+
+        **Why to use:** This API helps in fetching recent content from an author, which is useful for displaying updates or new posts.
+
+        **Why not to use:** If the author does not exist or if the request is not properly formatted, the retrieval may fail.
+      summary: Get the recent posts made by an author
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+        description: Page number for pagination.
+      - in: query
+        name: size
+        schema:
+          type: integer
+        description: Number of posts per page.
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      - in: query
+        name: user_id
+        schema:
+          type: string
+        description: The id of the request user.
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: Successfully retrieved all posts.
+        '405':
+          description: Method not allowed.
+    post:
+      operationId: api_authors_posts_create
+      description: |-
+        Adds a post based on the on author URL
+
+        **When to use:** Use this endpoint to allow an authenticated user to create a post.
+
+        **How to use:** Send a POST request with the necessary parameters, including the post's title, content, and optional visibility settings.
+
+        **Why to use:** This API is useful when users need to share content, such as articles, status updates, or other posts.
+
+        **Why not to use:** If the user is not authenticated, the post cannot be created, and this endpoint should not be used.
+      summary: Adds a post
+      parameters:
+      - in: query
+        name: content
+        schema:
+          type: string
+        description: content of the post.
+        required: true
+      - in: query
+        name: contentType
+        schema:
+          type: string
+        description: the contentType of the post.
+      - in: query
+        name: description
+        schema:
+          type: string
+        description: the description of the post.
+      - in: query
+        name: title
+        schema:
+          type: string
+        description: title of the post.
+        required: true
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      - in: query
+        name: visibility
+        schema:
+          type: string
+        description: visibilility of the post.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Post'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Post'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: Post created successfully.
+        '400':
+          description: Request syntax invalid.
+        '401':
+          description: User is not authenticated.
+        '404':
+          description: User is not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/authors/{user_id}/posts/{post_id}/:
+    get:
+      operationId: api_authors_posts_retrieve_2
+      description: |-
+        Retrieves a specific post object from a user based on the user id and post id
+
+        **When to use:** Use this endpoint to fetch details of a particular post authored by a specific user.
+
+        **How to use:** Send a GET request with the `user_id` and `post_id` as parameters in the URL.
+
+        **Why to use:** This API helps in retrieving the content and metadata of a post, useful for viewing posts in detail.
+
+        **Why not to use:** If the post is restricted to FRIENDS only and the user is not friends with the author, access will be denied.
+      summary: Gets a specific post from a user
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      - in: query
+        name: post_id
+        schema:
+          type: string
+        description: The ID of the post to retrieve (required).
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      - in: query
+        name: user_id
+        schema:
+          type: string
+        description: The id of the user requesting the post.
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: Successfully retrieved post.
+        '400':
+          description: This is a FRIENDS only post and user and author are not friends
+        '401':
+          description: The user is not authenticated.
+        '404':
+          description: User or post not found.
+        '405':
+          description: Method not allowed.
+    put:
+      operationId: api_authors_posts_update
+      description: |-
+        Updates the post using the author id and post id provided
+
+        **When to use:** Use this endpoint to modify an existing post's details, such as visibility, title, description, content type, and content.
+
+        **How to use:** Send a PATCH request with the `user_id`, `post_id`, and any fields you wish to update as parameters.
+
+        **Why to use:** This API allows authors to manage their posts effectively by updating essential information.
+
+        **Why not to use:** If the post does not exist or if the user is not authorized to modify the post, the update will fail.
+      summary: Updates the post
+      parameters:
+      - in: query
+        name: content
+        schema:
+          type: string
+        description: content of the post.
+      - in: query
+        name: contentType
+        schema:
+          type: string
+        description: the contentType of teh post.
+      - in: query
+        name: description
+        schema:
+          type: string
+        description: the description of the post.
+      - in: path
+        name: post_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      - in: query
+        name: title
+        schema:
+          type: string
+        description: title of the post.
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      - in: query
+        name: visibility
+        schema:
+          type: string
+        description: visibilility of the post.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Post'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Post'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: Post updated succesfully.
+        '400':
+          description: User was not found.
+        '404':
+          description: Post was not found.
+        '405':
+          description: Method not allowed.
+    delete:
+      operationId: api_authors_posts_destroy
+      description: |-
+        Removes a post based on the provided post URL.
+
+        **When to use:** Use this endpoint to delete a post that the user has authored.
+
+        **How to use:** Send a DELETE request with the `post` parameter set to the URL of the post you wish to delete.
+
+        **Why to use:** This API is useful for users who want to remove their own posts from the platform.
+
+        **Why not to use:** If the post does not exist or if the user is not authenticated, the post cannot be deleted.
+      summary: Removes a post
+      parameters:
+      - in: query
+        name: post
+        schema:
+          type: string
+        description: the post url.
+        required: true
+      - in: path
+        name: post_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: Post deleted successfully.
+        '400':
+          description: Post does not exist.
+        '401':
+          description: User not authenticated.
+        '404':
+          description: User not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/authors/{user_id}/posts/{post_id}/comments/{comment_id}/likes:
+    get:
+      operationId: api_authors_posts_comments_likes_retrieve
+      description: |-
+        Gets all likes on a comment from a post based on the provided post ID, comment ID, and user ID.
+
+        **When to use:** Use this endpoint when you need to fetch all the likes for a particular comment.
+
+        **How to use:** Send a GET request with the `user_id`, `post_id`, and `comment_id` in the URL.
+
+        **Why to use:** This endpoint is helpful to track how many likes a specific comment has received.
+
+        **Why not to use:** If you're not interested in the comment likes or if the comment doesn't exist.
+      summary: Gets all likes on a comment from a post
+      parameters:
+      - in: path
+        name: comment_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      - in: path
+        name: post_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: Successfully retrieved all likes.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/authors/{user_id}/posts/{post_id}/likes:
+    get:
+      operationId: api_authors_posts_likes_retrieve
+      description: |-
+        Gets all likes on a post based on the provided post ID and user ID.
+
+        **When to use:** Use this endpoint to fetch a list of likes on a post.
+
+        **How to use:** Send a GET request with the `user_id` and `post_id` in the URL.
+
+        **Why to use:** This API helps in getting all likes related to a post, useful for tracking engagement.
+
+        **Why not to use:** If the post doesn't exist, or if you do not require all likes on a post.
+      summary: Gets all likes on a post
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Likes'
+          description: Successfully retrieved all likes.
+        '405':
+          description: Method not allowed.
+  /chartreuse/github/{user_id}/events/:
+    get:
+      operationId: github_events_retrieve
+      description: |-
+        Gets the public events for a user from github.The events are fetched from GitHub's public API and returned as a JSON object.
+
+        **When to use:** Use this endpoint to see recent public activities (such as commits, pull requests, issues) made by a GitHub user.
+
+        **How to use:** Send a GET request with the user ID in the URL. The GitHub username is extracted from the stored user data.
+
+        **Why to use:** Useful for tracking the public contributions and activities of a user across GitHub repositories.
+
+        **Why not to use:** Avoid using this if you are looking for private or non-public activity information, which is not accessible through this API.
+      summary: Gets the public events for a user from github
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - github
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: Successfully retrieved the public events.
+        '405':
+          description: Method not allowed.
+  /chartreuse/github/{user_id}/starred/:
+    get:
+      operationId: github_starred_retrieve
+      description: |-
+        Gets the repositories starred by a user on github.The information is fetched from GitHub's API and returned as a JSON object.
+
+        **When to use:** Use this to get a list of repositories that a user has starred, which may indicate their interests or contributions.
+
+        **How to use:** Send a GET request with the user ID in the URL. The GitHub username is extracted from the stored user data.
+
+        **Why to use:** Helpful for understanding the repositories a user values or wants to revisit.
+
+        **Why not to use:** Do not use this endpoint for repositories a user owns or forks. Use the appropriate GitHub API for those.
+      summary: Gets the repositories starred by a user on github
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - github
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: Successfully retrieved the public events.
+        '405':
+          description: Method not allowed.
+  /chartreuse/github/{user_id}/subscriptions/:
+    get:
+      operationId: github_subscriptions_retrieve
+      description: |-
+        Gets the repositories watched by a user on github.The information is fetched from GitHub's API and returned as a JSON object.
+
+        **When to use:** Use this endpoint to get a list of repositories that a user is watching, typically because they are interested in staying up-to-date with its changes.
+
+        **How to use:** Send a GET request with the user ID in the URL. The GitHub username is extracted from the stored user data.
+
+        **Why to use:** Useful for understanding which repositories a user actively follows.
+
+        **Why not to use:** Avoid using this endpoint to retrieve information about repositories a user has starred or owns. Use the appropriate GitHub APIs for those cases.
+      summary: Gets the repositories watched by a user on github
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - github
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: Successfully retrieved the public events.
+        '405':
+          description: Method not allowed.
+  /chartreuse/schema/:
+    get:
+      operationId: schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - ug
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - schema
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+components:
+  schemas:
+    Comment:
+      type: object
+      properties:
+        type:
+          type: string
+          default: comment
+        comment:
+          type: string
+        contentType:
+          type: string
+        published:
+          type: string
+          format: date-time
+        id:
+          type: string
+          format: uri
+        post:
+          type: string
+          format: uri
+        likes:
+          $ref: '#/components/schemas/Likes'
+      required:
+      - comment
+      - contentType
+      - id
+      - likes
+      - post
+      - published
+    Comments:
+      type: object
+      properties:
+        type:
+          type: string
+          default: comments
+        page:
+          type: string
+          format: uri
+        id:
+          type: string
+          format: uri
+        page_number:
+          type: integer
+        size:
+          type: integer
+        src:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+      required:
+      - id
+      - page
+      - page_number
+      - size
+      - src
+    Like:
+      type: object
+      properties:
+        type:
+          type: string
+          default: like
+        author:
+          $ref: '#/components/schemas/User'
+        published:
+          type: string
+          format: date-time
+        id:
+          type: string
+          format: uri
+        object:
+          type: string
+          format: uri
+      required:
+      - author
+      - id
+      - object
+      - published
+    Likes:
+      type: object
+      properties:
+        type:
+          type: string
+          default: likes
+        page:
+          type: string
+          format: uri
+        id:
+          type: string
+          format: uri
+        page_number:
+          type: integer
+        size:
+          type: integer
+        count:
+          type: integer
+        src:
+          type: array
+          items:
+            $ref: '#/components/schemas/Like'
+      required:
+      - count
+      - id
+      - page
+      - page_number
+      - size
+      - src
+    Post:
+      type: object
+      properties:
+        type:
+          type: string
+          default: post
+        title:
+          type: string
+        id:
+          type: string
+          format: uri
+        decription:
+          type: string
+        contentType:
+          type: string
+        content:
+          type: string
+        author:
+          $ref: '#/components/schemas/User'
+        comments:
+          $ref: '#/components/schemas/Comments'
+        likes:
+          $ref: '#/components/schemas/Likes'
+        published:
+          type: string
+          format: date-time
+        visibility:
+          type: string
+          default: PUBLIC
+      required:
+      - author
+      - comments
+      - content
+      - contentType
+      - decription
+      - id
+      - likes
+      - published
+      - title
+    User:
+      type: object
+      properties:
+        type:
+          type: string
+          default: author
+        id:
+          type: string
+          format: uri
+        displayName:
+          type: string
+        host:
+          type: string
+          format: uri
+        github:
+          type: string
+          format: uri
+        profileImage:
+          type: string
+          format: uri
+        page:
+          type: string
+          format: uri
+        dateCreated:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - dateCreated
+      - displayName
+      - github
+      - host
+      - id
+      - page
+      - profileImage
+    Users:
+      type: object
+      properties:
+        type:
+          type: string
+          default: authors
+        authors:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+      required:
+      - authors
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

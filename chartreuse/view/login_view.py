@@ -1,0 +1,30 @@
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.contrib.auth import authenticate, login as auth_login
+from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import logout as auth_logout
+
+def login(request):
+    return render(request, 'login.html')
+
+def logout(request):
+    if request.user.is_authenticated:
+        auth_logout(request)
+    return redirect('/chartreuse/')
+
+@csrf_exempt
+def save_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        if not username or not password:
+            return JsonResponse({"error": "Username and password are required."}, status=400)
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            auth_login(request, user)
+        
+        return redirect('/chartreuse/homepage')

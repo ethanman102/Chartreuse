@@ -1,0 +1,11 @@
+:root {
+    --bs-body-font-family: "Sometype Mono", sans-serif;
+}
+
+html body {
+    background-image: url(background.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+

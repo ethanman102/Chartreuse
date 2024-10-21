@@ -1,0 +1,31 @@
+nav div.container {
+    display: flex;	
+    position: relative; 	
+    height: 100%;	
+    left: 0ch;	
+    justify-items: left;	
+
+    flex-direction: column;	
+}	
+
+nav {
+    display: flex;	
+    position: relative; 	
+    height: 100%;	
+
+    flex-direction: column;	
+}
+
+ul {	
+    position: fixed;	
+    left: 0ch;	
+
+    width: 15%;	
+    max-height: 80%;	
+    margin-bottom: 20%;	
+}	
+
+ul li img{	
+    padding: 1ch;	
+    height: 50%;	
+}	

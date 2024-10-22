@@ -3,11 +3,7 @@
 
 {% block title %}chartreuse.test{% endblock %}
 
-{% block content %}
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+{% block extra_head %}
     <style>
         html body {
             margin-left: 10%;
@@ -15,6 +11,7 @@
     </style>
 
     <script type="module">
+        'use strict'
         import "https://unpkg.com/commonmark@0.29.3/dist/commonmark.js";
 
         window.addEventListener('load', main);
@@ -26,23 +23,25 @@
             // will need to bundle with esbuild command for the browser import mini package
             var reader = new commonmark.Parser({smart: true});
             var writer = new commonmark.HtmlRenderer({sourcepos: true, safe: true, softbreak: "<br />"});
-            var parsed = reader.parse("Hello **world**"); // parsed is a 'Node' tree
+            var parsed = reader.parse("<h4>Hello</h4> and *goodbye*"); // parsed is a 'Node' tree
             // transform parsed if you like...
             var result = writer.render(parsed); // result is a String
 
             // variable to track the html element for displaying the commonmark text
-            document.getElementById("cm_text").innerHTML = result;
+            // error that this string is used before assignment. maybe bc the cm_text isnt valid yet???
+            cm_String = document.getElementById("cm_text");
 
             // // sets the text to be shown in html file as the rendered Commonmark text 
-            // htmlString.textContent = result;
+            cm_String.innerHTML = result;
         };
 
         
     </script>
     <!-- <script src="{% static 'javascript/cm_edit.min.js' %}"></script> -->
-</head>
 
-<body> 
+{% endblock %}
+
+{% block content %}
 
     {% block sidenav %}
         {% include 'navbar.html' %}
@@ -57,6 +56,5 @@
         <!-- rendered commonmark text shows here -->
     </p>
 
-</body>
 
 {% endblock %}

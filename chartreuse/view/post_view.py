@@ -56,7 +56,7 @@ class PostDetailView(DetailView):
 
         post.url_id = quote(post.url_id, safe='')
 
-        if post.contentType != "text/plain":
+        if post.contentType != ("text/plain" and "text/commonmark"):
             post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
 
         context['post'] = post

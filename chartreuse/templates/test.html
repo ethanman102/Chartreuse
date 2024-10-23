@@ -11,33 +11,36 @@
     </style>
 
     <script type="module">
-        'use strict'
         import "https://unpkg.com/commonmark@0.29.3/dist/commonmark.js";
+
+        'use strict'
+        
 
         window.addEventListener('load', main);
 
         function main() {
             const commonmark = window.commonmark;
 
+            // variable to track the html element for displaying the commonmark text
+            // error that this string is used before assignment. maybe bc the cm_text isnt valid yet???
+            // cm_String = document.getElementById("cm_text");
+            var markString = document.getElementById('cm_content').innerText;
+
             // let testString = getElementById("test");
             // will need to bundle with esbuild command for the browser import mini package
             var reader = new commonmark.Parser({smart: true});
             var writer = new commonmark.HtmlRenderer({sourcepos: true, safe: true, softbreak: "<br />"});
-            var parsed = reader.parse("<h4>Hello</h4> and *goodbye*"); // parsed is a 'Node' tree
+            var parsed = reader.parse(markString); // parsed is a 'Node' tree
             // transform parsed if you like...
             var result = writer.render(parsed); // result is a String
 
-            // variable to track the html element for displaying the commonmark text
-            // error that this string is used before assignment. maybe bc the cm_text isnt valid yet???
-            cm_String = document.getElementById("cm_text");
-
+            
             // // sets the text to be shown in html file as the rendered Commonmark text 
-            cm_String.innerHTML = result;
+            document.getElementById("cm_text").innerHTML = result;
         };
 
         
     </script>
-    <!-- <script src="{% static 'javascript/cm_edit.min.js' %}"></script> -->
 
 {% endblock %}
 
@@ -52,9 +55,9 @@
     
     <p id="test"># This is testing</p>
 
-    <p id="cm_text">
-        <!-- rendered commonmark text shows here -->
-    </p>
-
+    <p class="card-text" id="cm_content" style="display: none;">{{ markdown_txt }}</p>
+    
+    <!-- rendered commonmark text shows here -->
+    <p id="cm_text"></p>
 
 {% endblock %}

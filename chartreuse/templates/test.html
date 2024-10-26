@@ -11,6 +11,10 @@
     </style>
 
     <script type="module">
+        // Consider switching to https://github.com/markdown-it/markdown-it?tab=readme-ov-file#markdown-it-
+        // Their docs: https://markdown-it.github.io/markdown-it/
+        // import markdownIt from 'https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/+esm'
+        
         import "https://unpkg.com/commonmark@0.29.3/dist/commonmark.js";
 
         'use strict'
@@ -29,7 +33,8 @@
             // let testString = getElementById("test");
             // will need to bundle with esbuild command for the browser import mini package
             var reader = new commonmark.Parser({smart: true});
-            var writer = new commonmark.HtmlRenderer({sourcepos: true, safe: true, softbreak: "<br />"});
+            var writer = new commonmark.HtmlRenderer({sourcepos: true, softbreak: "<br />"});
+            // var writer = new commonmark.HtmlRenderer({sourcepos: true, safe: true, softbreak: "<br />"});
             var parsed = reader.parse(markString); // parsed is a 'Node' tree
             // transform parsed if you like...
             var result = writer.render(parsed); // result is a String

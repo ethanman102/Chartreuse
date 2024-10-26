@@ -34,6 +34,7 @@ ul li img{
     height: 6ch;	
 }	
 
+/* resizing the navbar for smaller screens */
 @media screen and (max-width: 600px) {
     ul li img{	
         margin: 1ch;	

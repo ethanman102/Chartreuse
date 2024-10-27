@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from ..models import User, Like, Post, Follow, Comment
 from .users import UserSerializer, UserViewSet
 from .likes import LikeSerializer, LikesSerializer, LikeViewSet
+from .friends import FriendsViewSet
 from urllib.parse import unquote
 
 class CommentSerializer(serializers.Serializer):
@@ -42,58 +43,65 @@ class CommentViewSet(viewsets.ViewSet):
     @extend_schema(
             summary="Adds a comment on a post",
             description="Adds a comment on a post based on the provided post url",
+            parameters=[
+                OpenApiParameter(name="content", description="The comment content.", required=False, type=str),
+                OpenApiParameter(name="contentType", description="The comments content type.", required=False, type=str),
+                # OpenApiParameter(name="post", description="The post url id", required=True, type=str),
+            ],
             responses={
                 200: OpenApiResponse(description="Comment added successfully.", response=CommentSerializer),
                 400: OpenApiResponse(description="Comment already exists or incorrect request body"),
                 401: OpenApiResponse(description="User is not authenticated."),
                 404: OpenApiResponse(description="User not found."),
                 405: OpenApiResponse(description="Method not allowed."),
-            }
+            },
     )
     @action(detail=False, methods=["POST"])
-    def create_comment(self, request, post_author_id):
+    def create_comment(self, request, user_id, post_id):
         """
         Adds a comment on a post.
         
         Parameters:
             request: rest_framework object containing the request and query parameters.
-            post_author_id: The id of the post author whos post is being commented on.
+            user_id: The id of the post author whos post is being commented on.
+            post_id: The id of the post being commented on
             
         Returns:
             JsonResponce containing the comment object.  
         """
-        if (not request.user.is_authenticated):
+        if not request.user.is_authenticated:
             return JsonResponse({"error": "User is not authenticated."}, status=401)
             
-        decoded_author_id = unquote(post_author_id)
+        decoded_author_id = unquote(user_id)
 
         # Get the post URL from the request body
-        post_url = request.POST.get('post')
-        if not post_url:
-            return JsonResponse({"error": "Post URL is required"}, status=400)
+        # post_url = request.POST.get('post')
+        # if not post_url:
+        #     return JsonResponse({"error": "Post URL is required"}, status=400)
         
-        decoded_post_url = unquote(post_url)
+        decoded_post_url = unquote(post_id)
         
         # Get the user commenting on the post
         decoded_commenter = unquote(request.user.user.url_id)
         user_commenting = get_object_or_404(User, url_id=decoded_commenter)
 
         post = get_object_or_404(Post, url_id=decoded_post_url, user=decoded_author_id)
+        post_visibility = post.visibility
 
-        comment_text = request.data.get('comment', '')
-        content_type = request.data.get('contentType', 'text/markdown')
+        # check post visibillity permission
+        if post_visibility != "PUBLIC" and post_visibility != "UNLISTED" or (post_visibility == "FREINDS" and FriendsViewSet().check_friendship(request, user_id, request.user.user.id).status_code != 200):
+            return JsonResponse({"error": "User does not have permission to comment on this post"}, status=401)
 
+        comment_text = request.POST.get('content', '')
+        content_type = request.POST.get('contentType', 'text/markdown')
 
         # User get_or_creat to simplify checking if the user already commented on the post
-        comment, created = Comment.objects.get_or_create(
+        comment = Comment(
             user=user_commenting,
             post=post,
             comment=comment_text,
-            commentType=content_type,
+            contentType=content_type,
         )
-
-        if not created:
-            return JsonResponse({"error": "Comment already exists."}, status=400)
         
         comment.save()
 
@@ -136,44 +144,46 @@ class CommentViewSet(viewsets.ViewSet):
         }
     )
     @action(detail=False, methods=["GET"])
-    def get_comments(self, request, post_author_id):
+    def get_comments(self, request, user_id, post_id):
         """
         Gets the comments of a post
         
         Parameters:
             request: HttpRequest object containing the request and query parameters.
-            post_author_id: The id of the post author whos post is being commented on.
+            user_id: The id of the post author whos post is being commented on.
+            post_id: The id of the post.
             
         Returns:
             JsonResponce containing the response   
         """
-        if request.method == "GET":
-            decoded_author_id = unquote(post_author_id)
+        decoded_author_id = unquote(user_id)
 
-            try:
-                post = Post.objects.get(id=post_id, user__url_id=decoded_author_id)
-            except Post.DoesNotExist:
-                return JsonResponse({"error": "Post not found."}, status=404)
+        # Get the author
+        author = get_object_or_404(User, url_id=decoded_author_id)
 
-            # Get all comments related to the post
-            comments = Comment.objects.filter(post=post)
-            paginator = Paginator(comments, 10)  # Pagination
-            page_number = request.GET.get('page')
-            page_obj = paginator.get_page(page_number)
+        # Decoded the post id
+        decoded_post_url = unquote(post_id)
 
-            comments_serializer = CommentsSerializer({
-                'type': 'comments',
-                'page': page_obj.number,
-                'id': post.url_id,
-                'page_number': page_obj.number,
-                'size': paginator.per_page,
-                'src': page_obj.object_list,
-            })
+        # Get the post
+        post = get_object_or_404(Post, url_id=decoded_post_url, user=author)
 
-            return JsonResponse(comments_serializer.data, safe=False, status=200)
+        # Get all comments related to the post
+        comments = Comment.objects.filter(post=post)
+        paginator = Paginator(comments, 10)  # Pagination
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
 
-        else:
-            return JsonResponse({"error": "Method not allowed."}, status=405)
+        comments_serializer = CommentsSerializer({
+            'type': 'comments',
+            'page': page_obj.number,
+            'id': post.url_id,
+            'page_number': page_obj.number,
+            'size': paginator.per_page,
+            'src': page_obj.object_list,
+        })
+
+        return JsonResponse(comments_serializer.data, safe=False, status=200)
+
     
 
     @extend_schema(

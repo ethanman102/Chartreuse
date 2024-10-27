@@ -63,7 +63,7 @@ class CommentTestCases(TestCase):
 
         # Create a comment
         comment_response = self.client.post(reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]), {
-            'comment': 'Nice post!',
+            'content': 'Nice post!',
             'contentType': 'text/plain'
         })
 
@@ -73,21 +73,22 @@ class CommentTestCases(TestCase):
         self.assertEqual(comment_response.json()['author']['displayName'], 'John Smith')
         self.assertEqual(comment_response.json()['comment'], 'Nice post!')
 
-    '''
-    def test_create_comment_unauthenticated(self):
-        """
-        Tests creating a comment without being authenticated.
-        """
-        # Try to create a comment without logging in
-        comment_response = self.client.post(reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]), {
-            'comment': 'Nice post!',
-            'contentType': 'text/plain'
-        })
 
-        # Should be denied access
-        self.assertEqual(comment_response.status_code, 401)
-        self.assertEqual(comment_response.json()['error'], 'User is not authenticated.')
+    # def test_create_comment_unauthenticated(self):
+    #     """
+    #     Tests creating a comment without being authenticated.
+    #     """
+    #     # Fails since we login to create a post. Unsure 
+    #     # Try to create a comment without logging in
+    #     comment_response = self.client.post(reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]), {
+    #         'comment': 'Nice post!',
+    #         'contentType': 'text/plain'
+    #     })
 
+    #     # Should be denied access
+    #     self.assertEqual(comment_response.status_code, 401)
+    #     self.assertEqual(comment_response.json()['error'], 'User is not authenticated.')
+    
     def test_get_comments(self):
         """
         Tests retrieving all comments on a post.
@@ -108,5 +109,3 @@ class CommentTestCases(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['type'], 'comments')
         self.assertTrue(len(response.json()['comments']) > 0)
-
-    '''

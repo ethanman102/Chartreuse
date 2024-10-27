@@ -1,0 +1,43 @@
+/* We want the navigation bar to be vertical, so the flex-direction is a column for this */
+nav div.container {
+    display: flex;	
+    position: relative; 	
+    height: 100%;	
+    left: 0ch;	
+    height: 70%;	
+    justify-items: left;	
+
+    flex-direction: column;	
+}	
+
+nav {
+    height: 70%;
+
+    display: flex;	
+    position: relative; 
+    flex-direction: column;	
+}
+
+
+ul {	
+    position: fixed;	
+    left: 0ch;	
+
+    width: 15%;	
+    max-height: 80%;	
+    margin-bottom: 20%;	
+}	
+
+/* adjusting spacing and size of the image icons */
+ul li img{	
+    margin: 2ch;	
+    height: 6ch;	
+}	
+
+@media screen and (max-width: 600px) {
+    ul li img{	
+        margin: 1ch;	
+        height: 5ch;	
+        width: 4ch;
+    }	
+}

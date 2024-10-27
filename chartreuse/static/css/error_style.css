@@ -1,7 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap');
-
 html body {
-    background-image: url("background.png");
+    margin-left: 10%;
 }
 .container {
     width: 60%;
@@ -17,19 +15,17 @@ html body {
 
 
     font-family: "Sometype Mono", monospace;
-    /* font-family: monospace; */
     font-weight: 400;
 
 }
 
 .container h4 {
-    color: chartreuse;
-    background-color: #00356b;
+    color:  #00356b;
+    background-color: chartreuse;
     font-size: 4ch;
 
     border-bottom-style: solid;
     border-bottom-color: #1b1b1b;
-    /* code from OpenAI, ChatGPT, "how to put header at the top of div container", 2024-10-10 */
     margin: 0;
 }
 

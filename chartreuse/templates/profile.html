@@ -1,24 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}chartreuse.profile{% endblock %}
+
+{% block content %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="main.css">
     <title>{{ profile.displayName }}</title>
+    {% load static %}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/profile_page.css' %}">
+
 </head>
 <body>
-
-
+    {% block sidenav %}
+    {% include 'navbar.html' %}
+    {% endblock %}
     <!-- Creating a mass container to store main details referring to the specific follower -->
     <div class="profile-box" style="margin-top: 30px;">
-        <div class="container mx-10" style="border: 5px solid black;">
+        <div class="container" id="profile-header">
             <h4>chartreuse.profile</h4>
         </div>
-        <div class="container" style="border: 5px solid black;">
+        <div class="container full-container">
             <div class="row" style="margin-top: 20px; margin-bottom: 20px;">
                 <div class="col-4">
-                    <img src="{{profile.profileImage}}" class="rounded img-fluid" style="width: 200px; height: 200px; object-fit: cover;">
+                    <img src="{{profile.profileImage}}" class="rounded img-fluid pfp-image" style="width: 200px; height: 200px; object-fit: cover;">
                 </div>
                 <div class="col-8">
                     <div class="row">
@@ -26,31 +34,54 @@
                             <h2>{{ profile.displayName }}</h2>
                         </div>
                         <div class="col-3">
-                            <button type="button" class="btn btn-primary w-100">
-                                Followers {{ followers }}
-                            </button>
+                            <form class="follow-forms" method="GET" action="{% url 'chartreuse:user_followers_list' owner_id %}">
+                                <button type="submit" class="btn btn-primary w-100 follow">
+                                    Followers {{ followers }}
+                                </button>
+                            </form>
                         </div>
                         <div class="col-3">
-                            <button type="button" class="btn btn-primary w-100">
-                                Following {{ following }}
-                            </button>
+                            <form class="follow-forms" method="GET" action="{% url 'chartreuse:user_following_list' owner_id %}">
+                                <button type="submit" class="btn btn-primary w-100 follow">
+                                    Following {{ following }}
+                                </button>
+                            </form>
                         </div>
                     </div>
                     <div class="row mt-4">
                     {% if profile.github %}
                         <div class="col-6">
-                            <h3><a href="{{ profile.github }}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">{{ profile.displayName }}'s Github</a></h3>
+                            <h3><a href="{{ profile.github }}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" id="profile-github">{{ profile.displayName }}'s Github</a></h3>
                         </div>
                     {% endif %}
-                    {% if not owner and viewer %}
+                    {% if not owner and viewer_id %}
                         <div class="col-6">
-                            {% if not following and not_request %}
-                            <button class="btn btn-outline-primary btn-lg w-100" type="button">Follow</button>
-                            {% elif sent_request %}
-                            <button class="btn btn-secondary btn-lg w-100" type="button" disabled>Requested</button>
+                            {% if is_following == False and sent_request == False %}
+                            {% url 'chartreuse:profile_follow_request' owner_id viewer_id as follow_request_url %}
+                            <form action="{{follow_request_url}}" method="POST" class="follow_request_form">
+                                {% csrf_token %}
+                                <button class="btn btn-outline-primary btn-lg w-100 follow" type="submit">Follow</button>
+                            </form>
+                            {% elif sent_request == True %}
+                            <button class="btn btn-secondary btn-lg w-100" id="requested" type="button" disabled>Requested</button>
                             {% else %}
-                            <button class="btn btn-primary btn-lg w-100" type="button">Following</button>
+                            {% url 'chartreuse:profile_unfollow' owner_id viewer_id as unfollow_url %}
+                            <form action="{{unfollow_url}}" method="POST" class="unfollow_form">
+                                {% csrf_token %}
+                                <button class="btn btn-primary btn-lg w-100 follow" type="submit">{{follow_relationship}}</button>
+                            </form>
                             {% endif %}
+                        </div>
+                    {% endif %}
+
+
+                    {% if owner %}
+                        <div class="col-6">
+                            <form class="follow-forms" method="GET" action="{% url 'chartreuse:user_friends_list' owner_id %}">
+                                <button type="submit" class="btn btn-primary w-100 follow">
+                                    View Friends!
+                                </button>
+                            </form>
                         </div>
                     {% endif %}
                     </div>
@@ -60,30 +91,68 @@
     </div>
 
     <!-- Tab Bar configuration inspiration taken from Bootstrap V5.0 Docs : https://getbootstrap.com/docs/5.0/components/navs-tabs/, Accessed: October 2 20224-->
-    <div class="tab-bar" style="margin-top: 50px;">
-        <div class="container mx-10" style="border: 5px solid black;"">
-            <nav>
-                <div class="nav nav-tabs nav-justified" id="nav-tab" role="tablist">
-                  <button class="nav-link active" id="nav-posts-tab" data-bs-toggle="tab" data-bs-target="#nav-posts" type="button" role="tab" aria-controls="nav-posts" aria-selected="true">Posts</button>
-                  <button class="nav-link" id="nav-statistics-tab" data-bs-toggle="tab" data-bs-target="#nav-statistics" type="button" role="tab" aria-controls="nav-statistics" aria-selected="false">Statistics</button>
-                  {% if owner %}
-                  <button class="nav-link" id="nav-requests-tab" data-bs-toggle="tab" data-bs-target="#nav-requests" type="button" role="tab" aria-controls="nav-requests" aria-selected="false">Requests
-                    {% if requests %}
-                    <span class="badge bg-danger"> </span>
-                    {% endif %}
-                  </button>
-                  {% endif %}
+    <div class="tab-bar">
+        <div class="container mx-10 full-container">
+            <div class="row">
+                <div class="col-12" id="nav-cols">
+                    <nav>
+                        <div class="nav nav-tabs nav-justified" id="nav-tab" role="tablist">
+                        <button class="nav-link active" id="nav-posts-tab" data-bs-toggle="tab" data-bs-target="#nav-posts" type="button" role="tab" aria-controls="nav-posts" aria-selected="true">Posts</button>
+                        <button class="nav-link" id="nav-statistics-tab" data-bs-toggle="tab" data-bs-target="#nav-statistics" type="button" role="tab" aria-controls="nav-statistics" aria-selected="false">Statistics</button>
+                        {% if owner %}
+                        <button class="nav-link" id="nav-requests-tab" data-bs-toggle="tab" data-bs-target="#nav-requests" type="button" role="tab" aria-controls="nav-requests" aria-selected="false">Requests
+                            {% if requests %}
+                            <span class="badge bg-danger"> </span>
+                            {% endif %}
+                        </button>
+                        {% endif %}
 
+                        </div>
+                    </nav>
                 </div>
-              </nav>
+            </div>
+
               <div class="tab-content" id="nav-tabContent">
                 <!-- Check if any posts have been made by the user. Otherwise prompt a nothing message. NTS: Only display posts related to the posts visibility -->
                 <div class="tab-pane fade show active" id="nav-posts" role="tabpanel" aria-labelledby="nav-posts-tab" tabindex="0">
-                    {% if profile.posts %}
+
+                    {% if posts %}
                     <!-- Loop through all posts of the posting list visible to the user. -->
-                    <h2>This is Where some Posts will be made</h2>
+                    <!-- Code from home_page.html which was provided to Ethan Keys but Julia Dantas. Allows for consistent post -->
+                    {% for post in posts %}
+                    <div class="card mb-3 p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ post.user.profileImage }}"  class="rounded-circle me-3 post-image" width="50" height="50">
+                                <h5 class="card-title">{{ post.user.displayName }}</h5>
+                            </div>
+                            <meta name="csrf-token" content="{{ csrf_token }}">
+                            <div class="d-flex align-items-center mb-3" style="gap: 2ch;">
+                                <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ viewer_id }}">{{ post.likes_count }} likes</button>
+                            </div>
+                        </div>
+            
+                        <a href="{% url 'chartreuse:profile_view_post' owner_id post.url_id %}" class="card-link" style="text-decoration: none;">
+                            <div class="post"> 
+                                <p class="card-title mt-2" style="text-align: left;">{{ post.title }}</p>
+                                {% if post.contentType == "text/plain" %}
+                                    <p class="card-text mt-2" style="text-align: left;">{{ post.content }}</p>
+                                {% elif post.contentType == "image/png" or post.contentType == "image/jpeg" %}
+                                    <div class="d-flex justify-content-start">
+                                        <img src="{{ post.content }}" alt="Post Image" class="img-fluid mt-3" style="border: none; max-width: 20%;">
+                                    </div>
+                                {% endif %}
+                                <p class="card-text mt-2" style="text-align: left;">{{ post.description }}</p>
+            
+                                <p class="text-muted" style="text-align: left;">Published on {{ post.published }}</p>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+
+
                     {% else %}
-                    <h1 class="text-center">there's nothing here... :( {{profile.user.id}}</h1>
+                    <h1 class="text-center">there's nothing here... :(</h1>
                     {% endif %}
                 </div>
 
@@ -98,19 +167,21 @@
 
                     {% url 'chartreuse:profile_follow_accept' follow_request.requestee.url_id follow_request.requester.url_id as accept_url %}
                     {% url 'chartreuse:profile_follow_reject' follow_request.requestee.url_id follow_request.requester.url_id as reject_url %}
-                    <div class="follow-request" style="border: solid black 3px;">
+                    <div class="follow-request">
                         <img src="{{follow_request.requester.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
                         <h5 style="display: inline;">{{follow_request.requester.displayName}} wants to follow you...</h5>
-                        <!-- Accept follow request form -->
-                        <form action="{{accept_url}}" method="POST" class="accept_form">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary">Accept</button>
-                        </form>
-                        <!-- Reject follow request form-->
-                        <form action="{{reject_url}}" method="POST" class="reject_form">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary">Reject</button>
-                        </form>
+                        <div id="decision-forms">
+                            <!-- Accept follow request form -->
+                            <form action="{{accept_url}}" method="POST" class="accept_form">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary" id="accept">Accept</button>
+                            </form>
+                            <!-- Reject follow request form-->
+                            <form action="{{reject_url}}" method="POST" class="reject_form">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary" id="delete">Reject</button>
+                            </form>
+                        </div>
                     </div>
                     {% endfor %}
 
@@ -125,6 +196,7 @@
     </div>
 
 
+    <script src="{% static 'javascript/home_page.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
-</html>
+{% endblock %}

@@ -1,20 +1,116 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% load static %}
 
-<form method="POST" action="/chartreuse/signup/save">
-    <label>Username</label>
-    <input name="username" required type="text"/><br>
-    <label>Password</label>
-    <input name="password1" required type="password"/><br>
-    <label>Type your password again</label>
-    <input name="password2" required type="password"/><br>
-    <label>Display Name</label>
-    <input name="displayname" required type="text"/><br>
-    <label>Github (Optional)</label>
-    <input name="github" type="url" value=""/><br>
-    <input type="submit" value="Signup"/>
-    {% csrf_token %}
-</form>
-
+{% block extra_head %}
+    <meta name="date" content="2024-10-12">
+    <meta name="tags" content="Signup">
+    <meta name="summary" content="Signup page.">
+    <link rel="stylesheet" href="{% static 'css/signup.css' %}">
 {% endblock %}
+
+{% block content %}
+<div class="container-fluid min-vh-100 w-100 d-flex flex-column justify-content-center align-items-center">
+    <div class="container w-50" style="color: chartreuse; background-color: #00356b; font-size: 4ch; border-style: solid; border-color: #1b1b1b;">
+        <h4>Sign Up</h4>
+    </div>
+    <div class="container px-5 py-3 w-50" style="background-color:#f5f5f5; border-style: solid; border-color: #1b1b1b;">
+        <p class="text-center">First things first, let's create your profile!</p>
+        <form method="POST" action="save/">
+            {% csrf_token %}
+            <div class="my-1">
+                <input id="username" name="username" type="text" class="form-control" required placeholder="Enter your username"/>
+            </div>
+            <div class="my-1">
+                <input id="password1" name="password1" type="password" class="form-control" required placeholder="Enter your password"/>
+            </div>
+            <div class="my-1">
+                <input id="password2" name="password2" type="password" class="form-control" required placeholder="Confirm your password"/>
+            </div>
+            <div class="my-1">
+                <input id="displayname" name="displayname" type="text" class="form-control" required placeholder="Enter your display name"/>
+            </div>
+            <div class="my-1">
+                <input id="github" name="github" type="url" class="form-control" placeholder="Your GitHub URL"/>
+            </div>
+            <p class="text-center">Choose one of these profile pics to get started! Don't worry... you can choose a different profile pic later!</p>
+            <div class="pfp-container">
+                <img src="{% static 'images/default_pfp_1.png' %}" class="pfp" alt="Profile Pic 1">
+                <img src="{% static 'images/default_pfp_2.jpg' %}" class="pfp" alt="Profile Pic 2">
+                <img src="{% static 'images/default_pfp_3.jpg' %}" class="pfp" alt="Profile Pic 3">
+            </div>
+            <input type="hidden" id="selected-pfp" name="profile_image" value="">
+            <button type="submit" class="d-block mx-auto my-3">Sign Up</button>
+        </form>
+        <div class="text-center">
+            <a href="/chartreuse/login">Already have an account? Log In</a><br>
+            <a href="/chartreuse/homepage/">Skip signing up and view as a guest user</a>
+        </div>
+    </div>
+</div>
+<script>
+    window.addEventListener('load', () => {
+        let pfps = document.querySelectorAll('.pfp');
+        pfps.forEach(pfp => {
+            pfp.addEventListener('click', () => {
+                document.getElementById('selected-pfp').value = pfp.src;
+                pfps.forEach(pfp => {
+                    pfp.style.border = 'none';
+                });
+                pfp.style.border = '2px solid chartreuse';
+            });
+        });
+    });
+</script>
+{% endblock %}
+
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="date" content="2024-10-12">
+    <meta name="tags" content="Signup">
+    <meta name="summary" content="Signup page.">
+    <title>Chartreuse</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+
+    <script>
+        window.addEventListener('load', main); 
+
+        function main() {
+            let backButton = document.getElementById("back");
+
+            backButton.addEventListener('click', () => {
+                window.location.href = "/chartreuse/"; 
+            });
+        };
+        
+    </script>
+
+</head>
+<body>
+    <div class="container">
+        <article id="header_bar"> 
+            <h4>Sign Up</h4>
+            <button id="back" type="button" class="custom-button">X</button>
+
+        </article>
+       
+        <form method="POST" action="save/">
+            <p>First things first, let's create your profile!</p>
+            {% csrf_token %}
+            <input id="username" name="username" type="text" class="form-control" required placeholder="Enter your username"/>
+            <input id="password1" name="password1" type="password" class="form-control" required placeholder="Enter your password"/>
+            <input id="password2" name="password2" type="password" class="form-control" required placeholder="Confirm your password"/>
+            <input id="displayname" name="displayname" type="text" class="form-control" required placeholder="Enter your display name"/>
+            <input id="github" name="github" type="url" class="form-control" placeholder="Your GitHub URL"/>
+            <input id="profile-image" name="profile-image" type="url" class="form-control" placeholder="Profile Image URL"/>
+            <button type="submit" class="custom-button">Sign Up</button>
+
+            
+        </form>
+    </div>
+</body>
+</html> {% endcomment %}

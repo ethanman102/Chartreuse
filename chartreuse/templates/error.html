@@ -1,27 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <!--referred to W3Schools to properly set charset for html file, https://www.w3schools.com/html/html_charset.asp, 2024-10-10-->
-        <meta charset="UTF-8">
-        <meta name="date"   content="2024-10-10">
-        <meta name="tags"   content="error">
-        <meta name="summary"    content="This is the error page because something went wrong">
-        <title>Error</title>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}chartreuse.error{% endblock %}
+
+{% block extra_head %}
+<head>
+    <link rel="stylesheet"  href="{% static 'css/error_style.css' %}">
+</head>
+{% endblock %}
+
+{% block content %}
+<body>
+
+    {% block sidenav %}
+        {% include 'navbar.html' %}
+    {% endblock %}
+
+    <div class="container">
+        <h4>chartreuse.error</h4>
+
+        <p>
+            Oops, something went wrong :(
+        </p>
+    </div>
+</body>
         
-       
-        <!--<link rel="stylesheet" href="../static\font.css">-->
-        <link rel="stylesheet"  href="../static/css/error_style.css">
 
-    </head>
-
-    <body>
-        <div class="container">
-            <h4>chartreuse.error</h4>
-
-            <p>
-                Oops, something went wrong :(
-            </p>
-        </div>
-
-    </body>
-</html>
+{% endblock %}

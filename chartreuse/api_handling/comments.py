@@ -44,14 +44,14 @@ class CommentViewSet(viewsets.ViewSet):
             description="Adds a comment on a post based on the provided post url",
             responses={
                 200: OpenApiResponse(description="Comment added successfully.", response=CommentSerializer),
-                400: OpenApiResponse(description="Comment already exists."),
+                400: OpenApiResponse(description="Comment already exists or incorrect request body"),
                 401: OpenApiResponse(description="User is not authenticated."),
                 404: OpenApiResponse(description="User not found."),
                 405: OpenApiResponse(description="Method not allowed."),
             }
     )
     @action(detail=False, methods=["POST"])
-    def add_comment(self, request, post_author_id):
+    def create_comment(self, request, post_author_id):
         """
         Adds a comment on a post.
         
@@ -67,27 +67,65 @@ class CommentViewSet(viewsets.ViewSet):
             
         decoded_author_id = unquote(post_author_id)
 
-        try:
-            post = Post.objects.get(id=request.data.get('post_id'), user__url_id=decoded_author_id)
-        except Post.DoesNotExist:
-            return JsonResponse({"error": "Post not found"}, status=404) 
+        # Get the post URL from the request body
+        post_url = request.POST.get('post')
+        if not post_url:
+            return JsonResponse({"error": "Post URL is required"}, status=400)
+        
+        decoded_post_url = unquote(post_url)
+        
+        # Get the user commenting on the post
+        decoded_commenter = unquote(request.user.user.url_id)
+        user_commenting = get_object_or_404(User, url_id=decoded_commenter)
 
-        user = request.user
+        post = get_object_or_404(Post, url_id=decoded_post_url, user=decoded_author_id)
+
         comment_text = request.data.get('comment', '')
         content_type = request.data.get('contentType', 'text/markdown')
 
-        comment = Comment.objects.create(
-            user=user,
+
+        # User get_or_creat to simplify checking if the user already commented on the post
+        comment, created = Comment.objects.get_or_create(
+            user=user_commenting,
             post=post,
             comment=comment_text,
             commentType=content_type,
-            username=user.displayName,
-            password=request.data.get('password')
         )
 
-        comment_serializer = CommentSerializer(comment)
+        if not created:
+            return JsonResponse({"error": "Comment already exists."}, status=400)
+        
+        comment.save()
 
-        return JsonResponse(comment_serializer.data, status=201)
+        # get the comment authors details
+        user_viewset = UserViewSet()
+        user_response = user_viewset.retrieve(request, pk=decoded_commenter)
+
+        if user_response.status_code != 200:
+            return JsonResponse({"error": "Failed to retrieve user details."}, status=user_response.status_code)
+        
+        user_data = json.loads(user_response.content)
+
+        # construct the comment (no likes are included for now since the comment was just created)
+        comment_object = {
+            "type": "comment",
+            "author": {
+                "type": "author",
+                "id": user_data["id"],
+                "page": user_data["page"],
+                "host": user_data["host"],
+                "displayName": user_data["displayName"],
+                "github": user_data["github"],
+                "profileImage": user_data["profileImage"],
+            },
+            "comment": comment_text,
+            "contentType": content_type,
+            "published": comment.dateCreated,
+            "id": comment.url_id,
+            "post": post.url_id,
+        }
+
+        return JsonResponse(comment_object, status=201)
         
     @extend_schema(
         summary="Get all comments on a post",

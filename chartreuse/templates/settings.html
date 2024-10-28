@@ -31,14 +31,13 @@
         </div>
 
         <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-dn" role="tabpanel" aria-labelledby="nav-dn-tab" tabindex="0">...</div>
-            <div class="tab-pane fade" id="nav-password" role="tabpanel" aria-labelledby="nav-password-tab" tabindex="0">
+            <div class="tab-pane fade show active" id="nav-dn" role="tabpanel" aria-labelledby="nav-dn-tab" tabindex="0">
                 <div class="row">
                     <div class="col-12">
                         <h3 id="password-header">Need an easier password? No worries, we got you...</h3>
                     </div>
                 </div>
-                <form method="POST" action="null">
+                <form method="POST">
                     <div class="row">
                         <div class="col-6 offset-3">
                             <input id="old-pass" name="password2" type="password" class="form-control" required placeholder="Enter your old password"/>
@@ -59,32 +58,109 @@
         
                     <div class="row" id="password-error-message-row">
                         <div class="col-6 offset-3">
-                            <p id="password-error">Password Error Message</p>
+                            <p id="password-error" style="visibility: hidden;"></p>
                         </div>
                     </div>
         
                     <div class="row">
                         <div class="col-3 offset-3" id="password-submit-button">
-                            <button type="submit" class="btn btn-primary w-100 follow">Update</button>
+                            <button type="submit" class="btn btn-primary w-100 follow" id="password-submit-button">Update</button>
                         </div>
                         <div class="col-3" id="password-loading">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Processing...</span>
+                            <div class="spinner-border text-primary" role="status" id="passwordSpinner" style="visibility: hidden;">
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
+            <div class="tab-pane fade" id="nav-password" role="tabpanel" aria-labelledby="nav-password-tab" tabindex="0">
+            </div>
             <div class="tab-pane fade" id="nav-pi" role="tabpanel" aria-labelledby="nav-pi-tab" tabindex="0">...</div>
             <div class="tab-pane fade" id="nav-github" role="tabpanel" aria-labelledby="nav-github-tab" tabindex="0">...</div>
         </div>
-
-     
-
-
     </div>
 </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        window.addEventListener('load',main);
+        function main(){
+            var passwordSubmitButton = document.getElementById('password-submit-button');
+            var passwordUpdateMessage = document.getElementById('password-error');
+            var loadingSpinner = document.getElementById('passwordSpinner');
+            var oldPasswordInput = document.getElementById('old-pass');
+            var newPasswordOne = document.getElementById('password1');
+            var newPasswordTwo = document.getElementById('password2');
+
+            function passwordTyping(){
+                if (passwordUpdateMessage.style.visibility === 'visible'){
+                    passwordUpdateMessage.style.visibility = 'hidden';
+                }
+            }
+
+            oldPasswordInput.addEventListener('input',passwordTyping);
+            newPasswordOne.addEventListener('input',passwordTyping);
+            newPasswordTwo.addEventListener('input',passwordTyping);
+
+            passwordSubmitButton.addEventListener('click', async (event) =>{
+
+                event.preventDefault();
+            
+                let oldValue = oldPasswordInput.value;
+                let newValue1 = newPasswordOne.value;
+                let newValue2 = newPasswordTwo.value;
+
+                if (oldValue === '' || newValue1 === '' || newValue2 === ''){
+                    passwordUpdateMessage.innerText = "Please fill out all fields";
+                    passwordUpdateMessage.style.color = "red";
+                    passwordUpdateMessage.style.visibility = "visible";
+                    return;
+                }
+
+                if (newValue1 !== newValue2){
+                    passwordUpdateMessage.innerText = "New passwords do not match";
+                    passwordUpdateMessage.style.color = "red";
+                    passwordUpdateMessage.style.visibility = "visible";
+                    return;
+                }
+
+                loadingSpinner.style.visibility - "visible";
+
+                let response = await fetch('updatePassword/',{
+                    method: 'POST',
+                    headers:{
+                        'X-CSRFToken': '{{ csrf_token }}',  // https://stackoverflow.com/questions/23349883/how-to-pass-csrf-token-to-javascript-file-in-django
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        old_pass: oldValue,
+                        new_pass: newValue1
+                    })
+                });
+
+                let data = await response.json();
+
+                loadingSpinner.style.visibility = 'hidden';
+
+                oldPasswordInput.value = '';
+                newPasswordOne.value = '';
+                newPasswordTwo.value = ''
+
+                if (response.status === 200){
+                    passwordUpdateMessage.innerText = data.success;
+                    passwordSubmitButton.style.color = "chartreuse";
+                    passwordSubmitButton.style.visibility = "visible";
+                }else{
+                    passwordSubmitButton.innerText = data.error;
+                    passwordSubmitButton.style.color = "red";
+                    passwordSubmitButton.style.visibility = "visible";
+                }
+
+            })
+            
+
+        }
+    </script>
 </body>
 </html>

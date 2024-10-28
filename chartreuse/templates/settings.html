@@ -33,6 +33,11 @@
         <div class="tab-content" id="nav-tabContent">
             <div class="tab-pane fade show active" id="nav-dn" role="tabpanel" aria-labelledby="nav-dn-tab" tabindex="0">...</div>
             <div class="tab-pane fade" id="nav-password" role="tabpanel" aria-labelledby="nav-password-tab" tabindex="0">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 id="password-header">Need an easier password? No worries, we got you...</h3>
+                    </div>
+                </div>
                 <form method="POST" action="null">
                     <div class="row">
                         <div class="col-6 offset-3">
@@ -61,6 +66,11 @@
                     <div class="row">
                         <div class="col-3 offset-3" id="password-submit-button">
                             <button type="submit" class="btn btn-primary w-100 follow">Update</button>
+                        </div>
+                        <div class="col-3" id="password-loading">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Processing...</span>
+                            </div>
                         </div>
                     </div>
                 </form>

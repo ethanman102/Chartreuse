@@ -4,7 +4,7 @@ from .api_handling import followers, follow_requests
 from django.conf import settings
 from django.conf.urls.static import static
 from chartreuse.views import  error, test
-from .view import home_page_view, signup_view, login_view, landing_page_view, profile_view, follow_list_view, support_functions, post_view
+from .view import home_page_view, signup_view, login_view, landing_page_view, profile_view, follow_list_view, support_functions, post_view, settings_view
 
 app_name = "chartreuse"
 urlpatterns = [
@@ -54,6 +54,9 @@ urlpatterns = [
 
     # UI testing page -- for debugging
     path("test/", test, name="test"),
+
+    #settings URLS:
+    path('updatePassword/',settings_view.update_password,name='update_password')
 
     # UI Related URLs
     path('', landing_page_view.landing_page, name='home'),

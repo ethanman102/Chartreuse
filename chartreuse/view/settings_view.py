@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 
 
-def update_profile(request):
+def update_password(request):
     if request.method == "POST":
 
         original_password = request.POST.get("old_pass")

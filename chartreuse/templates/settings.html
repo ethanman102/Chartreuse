@@ -39,6 +39,7 @@
                     </div>
                 </div>
                 <form method="POST">
+                    {% csrf_token %}
                     <div class="row">
                         <div class="col-6 offset-3">
                             <input id="old-pass" name="password2" type="password" class="form-control" required placeholder="Enter your old password"/>
@@ -65,7 +66,7 @@
         
                     <div class="row">
                         <div class="col-3 offset-3" id="password-submit-button">
-                            <button type="submit" class="btn btn-primary w-100 follow" id="password-submit-button">Update</button>
+                            <button type="button" class="btn btn-primary w-100 follow" id="password-submit-button">Update</button>
                         </div>
                         <div class="col-3" id="password-loading">
                             <div class="spinner-border text-primary" role="status" id="passwordSpinner" style="visibility: hidden;">
@@ -107,9 +108,9 @@
 
                 event.preventDefault();
             
-                let oldValue = oldPasswordInput.value;
-                let newValue1 = newPasswordOne.value;
-                let newValue2 = newPasswordTwo.value;
+                var oldValue = oldPasswordInput.value;
+                var newValue1 = newPasswordOne.value;
+                var newValue2 = newPasswordTwo.value;
 
                 if (oldValue === '' || newValue1 === '' || newValue2 === ''){
                     passwordUpdateMessage.innerText = "Please fill out all fields";
@@ -125,17 +126,19 @@
                     return;
                 }
 
-                loadingSpinner.style.visibility - "visible";
+                loadingSpinner.style.visibility = "visible";
 
+                console.log(oldValue);
                 let response = await fetch('updatePassword/',{
                     method: 'POST',
                     headers:{
                         'X-CSRFToken': '{{ csrf_token }}',  // https://stackoverflow.com/questions/23349883/how-to-pass-csrf-token-to-javascript-file-in-django
+                                                            // how to pass csrf_token to javascript file in django? Answered by (stack overflow post) aychedee April 28, 2014 on How to embed the csrf token
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        old_pass: oldValue,
-                        new_pass: newValue1
+                        old_pass: `${oldValue}`,
+                        new_pass: `${newValue1}`
                     })
                 });
 
@@ -149,18 +152,20 @@
 
                 if (response.status === 200){
                     passwordUpdateMessage.innerText = data.success;
-                    passwordSubmitButton.style.color = "chartreuse";
-                    passwordSubmitButton.style.visibility = "visible";
+                    passwordUpdateMessage.style.color = "chartreuse";
+                    passwordUpdateMessage.style.visibility = "visible";
                 }else{
-                    passwordSubmitButton.innerText = data.error;
-                    passwordSubmitButton.style.color = "red";
-                    passwordSubmitButton.style.visibility = "visible";
+                    passwordUpdateMessage.innerText = data.error;
+                    passwordUpdateMessage.style.color = "red";
+                    passwordUpdateMessage.style.visibility = "visible";
                 }
 
             })
             
 
         }
+
+        
     </script>
 </body>
 </html>

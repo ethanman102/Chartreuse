@@ -5,21 +5,25 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from ..models import User
+from django.contrib.auth import login as auth_login
+import json
 
 @login_required
 def update_password(request):
     if request.method == "POST":
 
-        original_password = request.POST.get("old_pass")
-        new_password = request.POST.get("new_pass")
+        data = json.loads(request.body)
+        original_password = data.get("old_pass")
+        new_password = data.get("new_pass")
 
-        current_user = request.user
-    
-        if not current_user.check_password(original_password):
+        current_user = AuthUser.objects.get(username=request.user.username)
+            
+        
+        if not current_user.check_password(original_password.strip()):
             response = JsonResponse({"error": "Old password invalid"}, status=403)
             return response
         
+        # validate the password against our own validation steps for passwords.
         try:
             validate_password(new_password)
         except ValidationError as e:
@@ -33,18 +37,26 @@ def update_password(request):
         # Answered By: xyres on May 26, 2015
         current_user.save() 
         
+        auth_login(request,current_user) # relogin the current user
+        
 
         return JsonResponse({'success': 'Password successfully changed'},status=200)
             
-@login_required
-class SettingsView(DetailView):
 
-    model = User
+class SettingsDetailView(DetailView):
+    '''
+    SettingsDetailView
+
+    Purpose: display the settings Page, whilst creating a model object for the context dictionary based on the
+    currently logged in User
+    '''
+
+    model = AuthUser
     template_name = "settings.html"
     context_object_name= "user"
         
     def get_object(self):
         # user's Id can't be obtained since the User model does not explicity state a primary key. Will retrieve the user by grabbing them by the URL pk param.
         authenticated_user = self.request.user
-        return User.objects.filter(user=authenticated_user)
+        return authenticated_user
 

@@ -14,38 +14,64 @@
 
     
     <div class="container full-container">
-
+        <!-- Resource: Bootstrap 5 Nav Tabs documentation, tab navigation base code taken from documentation and modified for project use
+         https://getbootstrap.com/docs/5.3/components/navs-tabs/#base-nav
+         Accessed on October 27, 2024-->
         <div class="row">
             <div col-12>
-                <nav> 
-                    <div class = "nav nav-tabs" id="settings-nav-tab" role="tablist">
-                        <button class="nav-link active" id="settings-display-name-tab" data-bs-toggle="tab" data-bas-target="#settings-display-name" type="button" role="tab" aria-controls="settings-display-name" aria-selected="false">Edit DisplayName</button>
-                        <button class="nav-link" id="settings-password-tab" data-bs-toggle="tab" data-bas-target="#settings-password" type="button" role="tab" aria-controls="settings-password" aria-selected="false">Edit Password</button>
-                        <button class="nav-link" id="settings-profile-image-tab" data-bs-toggle="tab" data-bas-target="#settings-profile-image" type="button" role="tab" aria-controls="settings-profile-image" aria-selected="false">Edit Profile Image</button>
+                <nav>
+                    <div class="nav nav-tabs" id="settings-nav-tab" role="tablist">
+                      <button class="nav-link active" id="nav-dn-tab" data-bs-toggle="tab" data-bs-target="#nav-dn" type="button" role="tab" aria-controls="nav-dn" aria-selected="true">Edit Display Name</button>
+                      <button class="nav-link" id="nav-password-tab" data-bs-toggle="tab" data-bs-target="#nav-password" type="button" role="tab" aria-controls="nav-password" aria-selected="false">Edit Password</button>
+                      <button class="nav-link" id="nav-pi-tab" data-bs-toggle="tab" data-bs-target="#nav-pi" type="button" role="tab" aria-controls="nav-pi" aria-selected="false">Edit Profile Image</button>
+                      <button class="nav-link" id="nav-github-tab" data-bs-toggle="tab" data-bs-target="#nav-github" type="button" role="tab" aria-controls="nav-github" aria-selected="false">Edit Github</button>
                     </div>
-                </nav>
+                  </nav>
             </div>
         </div>
 
-        <form method="POST" action="null">
-            <div class="row">
-                <div class="col-6 offset-3">
-                    <input id="old-pass" name="password2" type="password" class="form-control" required placeholder="Enter your old password"/>
-                </div>
-            </div>
-            <div id="new-passwords">
-                <div class="row">
-                    <div class="col-6 offset-3">
-                        <input id="password1" name="password1" type="password" class="form-control" required placeholder="Enter your new password"/>
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="nav-dn" role="tabpanel" aria-labelledby="nav-dn-tab" tabindex="0">...</div>
+            <div class="tab-pane fade" id="nav-password" role="tabpanel" aria-labelledby="nav-password-tab" tabindex="0">
+                <form method="POST" action="null">
+                    <div class="row">
+                        <div class="col-6 offset-3">
+                            <input id="old-pass" name="password2" type="password" class="form-control" required placeholder="Enter your old password"/>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-6 offset-3">
-                        <input id="password2" name="password2" type="password" class="form-control" required placeholder="Confirm your new password"/>
+                    <div id="new-passwords">
+                        <div class="row">
+                            <div class="col-6 offset-3">
+                                <input id="password1" name="password1" type="password" class="form-control" required placeholder="Enter your new password"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 offset-3">
+                                <input id="password2" name="password2" type="password" class="form-control" required placeholder="Confirm your new password"/>
+                            </div>
+                        </div>
                     </div>
-                </div>
+        
+                    <div class="row" id="password-error-message-row">
+                        <div class="col-6 offset-3">
+                            <p id="password-error">Password Error Message</p>
+                        </div>
+                    </div>
+        
+                    <div class="row">
+                        <div class="col-3 offset-3" id="password-submit-button">
+                            <button type="submit" class="btn btn-primary w-100 follow">Update</button>
+                        </div>
+                    </div>
+                </form>
             </div>
-        </form>
+            <div class="tab-pane fade" id="nav-pi" role="tabpanel" aria-labelledby="nav-pi-tab" tabindex="0">...</div>
+            <div class="tab-pane fade" id="nav-github" role="tabpanel" aria-labelledby="nav-github-tab" tabindex="0">...</div>
+        </div>
+
+     
+
+
     </div>
 </div>
 

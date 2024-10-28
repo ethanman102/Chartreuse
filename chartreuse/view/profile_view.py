@@ -140,6 +140,7 @@ class ProfileDetailView(DetailView):
             current_user_model = get_object_or_404(User,user=current_user)  
             if user.url_id == current_user_model.url_id:
                 # owns the page, should not display follow button etc...
+                context['viewer_id'] = quote(current_user_model.url_id,safe='')
                 context['owner'] = True
                 context['requests'] = self.prepare_follow_requests(user)
                 post_access = "all"

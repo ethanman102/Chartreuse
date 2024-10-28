@@ -29,7 +29,7 @@ def update_password(request):
         return JsonResponse({'success': 'Password successfully changed'},status=200)
             
 @login_required
-def SettingsView(DetailView):
+class SettingsView(DetailView):
 
     model = User
     template_name = "settings.html"

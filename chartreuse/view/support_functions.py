@@ -7,6 +7,7 @@ from chartreuse.models import Follow, FollowRequest, Like, Post, User
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
+import re
 
 def get_post_likes(post_id):
     """
@@ -362,18 +363,38 @@ def setNewProfileImage(request):
     Arguments:
         request: Request object
     '''
-    if request.method == 'POST':
-        image = request.FILES.get('image')
-        image_data = image.read()
-        encoded_image = base64.b64encode(image_data).decode('utf-8')
-        image_content = image.content_type.split('/')[1]
-        content_type = 'image/' + image_content
+    if request.user.is_authenticated:
+        body = json.loads(request.body)
+        user_id = body["user_id"]
+        post_id = body["post_id"]
 
-        current_user = request.user
-        current_user_model = get_object_or_404(User, user=current_user)
-        
-        current_user_model.profile_image = encoded_image
-        current_user_model.save()
+        user = User.objects.get(url_id=unquote(user_id))
+        post = Post.objects.get(url_id=unquote(post_id))
 
-        return redirect('/chartreuse/authors/' + current_user_model.url_id + '/')
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
+        user.profileImage = post.url_id + "/image"
+        user.save()
+        print(user.profileImage)
+
+    return JsonResponse({'success': 'Updated profile picture'}, status=200)
+
+def get_image_post(pfp_url):
+    pattern = r"(?P<host>https?:\/\/.+?herokuapp\.com)\/authors\/(?P<author_serial>\d+)\/posts\/(?P<post_serial>\d+)\/image"
+
+    match = re.search(pattern, pfp_url)
+
+    if match:
+        host = match.group("host")
+        author_serial = match.group("author_serial")
+        post_serial = match.group("post_serial")
+    
+        author = User.objects.filter(url_id=f"{host}/authors/{author_serial}").first()
+        pfp_post = Post.objects.filter(user=author, url_id=f"{host}/authors/{author_serial}/posts/{post_serial}").first()
+
+        if pfp_post and pfp_post.content and pfp_post.contentType in ['image/jpeg', 'image/png']:
+            pfp_url = f"data:{pfp_post.contentType};charset=utf-8;base64, {pfp_post.content}"
+        else:
+            pfp_url = f"{host}/static/images/default_pfp_1.png"
+            user = User.objects.filter(url_id=f"{host}/authors/{author_serial}").first()
+            user.profileImage = f"{host}/static/images/default_pfp_1.png"
+            user.save()
+        return pfp_url

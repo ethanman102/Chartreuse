@@ -19,7 +19,7 @@ class ImageViewSet(viewsets.ViewSet):
         }
     )
     @action(detail=True, methods=["GET"])
-    def retrieve(self, request, author_id, post_id):
+    def retrieve(self, author_id, post_id):
         '''
         Get the image data of a post.
 

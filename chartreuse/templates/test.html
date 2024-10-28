@@ -26,11 +26,9 @@
             const commonmark = window.commonmark;
 
             // variable to track the html element for displaying the commonmark text
-            // error that this string is used before assignment. maybe bc the cm_text isnt valid yet???
-            // cm_String = document.getElementById("cm_text");
             var markString = document.getElementById('cm_content').innerText;
 
-            // let testString = getElementById("test");
+        
             // will need to bundle with esbuild command for the browser import mini package
             var reader = new commonmark.Parser({smart: true});
             var writer = new commonmark.HtmlRenderer({sourcepos: true, softbreak: "<br />"});
@@ -41,7 +39,7 @@
 
             
             // // sets the text to be shown in html file as the rendered Commonmark text 
-            document.getElementById("cm_text").innerHTML = result;
+            document.getElementById('cm_content').innerHTML = result;
         };
 
         
@@ -58,11 +56,15 @@
     <h2>chartreuse.test</h2>
 
     
-    <p id="test"># This is testing</p>
+    <p># This is testing</p>
 
-    <p class="card-text" id="cm_content" style="display: none;">{{ markdown_txt }}</p>
+    <!-- Seems like I can just put the rendered  -->
+    <p class="card-text" id="cm_content">{{ markdown_txt }}</p>
+
+    <!-- First attempt to get commonmark to show up -->
+    <!-- <p class="card-text" id="cm_content" style="display: none;">{{ markdown_txt }}</p> -->
     
-    <!-- rendered commonmark text shows here -->
-    <p id="cm_text"></p>
+    <!-- testing rendered commonmark text shows here -->
+    <!-- <p id="cm_text"></p> -->
 
 {% endblock %}

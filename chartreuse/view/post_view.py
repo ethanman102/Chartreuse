@@ -58,6 +58,7 @@ class PostDetailView(DetailView):
 
         if post.contentType != "text/plain":
             post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+            post.has_image = True
 
         context['post'] = post
         context['logged_in'] = self.request.user.is_authenticated

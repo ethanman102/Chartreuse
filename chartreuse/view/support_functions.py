@@ -354,3 +354,26 @@ def send_follow_request(request):
         return JsonResponse({"follow_request_status": follow_request_status})
     else:
         pass
+
+def setNewProfileImage(request):
+    '''
+    Purpose: Set a new profile image
+
+    Arguments:
+        request: Request object
+    '''
+    if request.method == 'POST':
+        image = request.FILES.get('image')
+        image_data = image.read()
+        encoded_image = base64.b64encode(image_data).decode('utf-8')
+        image_content = image.content_type.split('/')[1]
+        content_type = 'image/' + image_content
+
+        current_user = request.user
+        current_user_model = get_object_or_404(User, user=current_user)
+        
+        current_user_model.profile_image = encoded_image
+        current_user_model.save()
+
+        return redirect('/chartreuse/authors/' + current_user_model.url_id + '/')
+    return JsonResponse({'error': 'Invalid request method'}, status=405)

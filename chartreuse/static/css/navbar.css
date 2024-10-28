@@ -23,22 +23,22 @@ ul {
     position: fixed;	
     left: 0ch;	
 
-    width: 15%;	
-    max-height: 80%;	
+    width: 15%;
+    /* Max height for the whole navbar  */
+    max-height: 50%;	    
     margin-bottom: 20%;	
 }	
 
 /* adjusting spacing and size of the image icons */
 ul li img{	
-    margin: 2ch;	
-    height: 6ch;	
+    margin: 2ch;
+    width: 6ch; 
 }	
 
 /* resizing the navbar for smaller screens */
 @media screen and (max-width: 600px) {
     ul li img{	
         margin: 1ch;	
-        height: 5ch;	
         width: 4ch;
     }	
 }

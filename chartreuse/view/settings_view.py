@@ -15,8 +15,8 @@ def update_password(request):
         new_password = request.POST.get("new_pass")
 
         current_user = request.user
-        
-        if not check_password(original_password,current_user.password):
+    
+        if not current_user.check_password(original_password):
             response = JsonResponse({"error": "Old password invalid"}, status=403)
             return response
         
@@ -26,6 +26,14 @@ def update_password(request):
             return JsonResponse({"error": e.messages}, status=400)
         
         current_user.set_password(new_password)
+
+        # https://stackoverflow.com/questions/30466191/django-set-password-isnt-hashing-passwords
+        # Required to save a User after set_password.
+        # Stackoverflow Post: Django: set_password isn't hashing passwords?
+        # Answered By: xyres on May 26, 2015
+        current_user.save() 
+        
+
         return JsonResponse({'success': 'Password successfully changed'},status=200)
             
 @login_required

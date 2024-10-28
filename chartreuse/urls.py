@@ -56,7 +56,8 @@ urlpatterns = [
     path("test/", test, name="test"),
 
     #settings URLS:
-    path('updatePassword/',settings_view.update_password,name='update_password')
+    path('updatePassword/',settings_view.update_password,name='update_password'),
+    path('settings/',settings_view.SettingsView.as_view(),name="settings"),
 
     # UI Related URLs
     path('', landing_page_view.landing_page, name='home'),

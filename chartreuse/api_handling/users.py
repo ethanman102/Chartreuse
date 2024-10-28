@@ -92,8 +92,8 @@ class UserViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the paginated list of users.
         '''
-        page = request.data.get('page')
-        size = request.data.get('size')
+        page = request.query_params.get('page', 1)
+        size = request.query_params.get('size', 50)
 
         if (page is None):
             page = 1 # Default page is 1

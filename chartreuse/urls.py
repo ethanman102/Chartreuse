@@ -19,7 +19,7 @@ urlpatterns = [
     # Post URLs
     re_path(r"api/authors/(?P<user_id>.+\d)/posts/(?P<post_id>.+\d)/$", posts.PostViewSet.as_view({"get": "get_post", "delete": "remove_post", "put": "update"}), name="post"),
     re_path(r"api/authors/(?P<user_id>.+\d)/posts/$", posts.PostViewSet.as_view({"get": "get_posts", "post": "create_post"}), name="posts"),
-
+    re_path(r"api/post-exists/$", support_functions.check_duplicate_post, name="check_duplicate_post"),
     # Author URLs
     path("api/author/login/", users.UserViewSet.login_user, name="login_user"),
     re_path(r"api/authors/(?P<pk>.+\d)/$", users.UserViewSet.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'}), name="user-detail"),
@@ -48,6 +48,7 @@ urlpatterns = [
     re_path(r"github/(?P<user_id>.+)/events/", github.get_events, name="get_events"),
     re_path(r"github/(?P<user_id>.+)/starred/", github.get_starred, name="get_starred"),
     re_path(r"github/(?P<user_id>.+)/subscriptions/", github.get_subscriptions, name="get_subscriptions"),
+    re_path(r"github/polling/$", support_functions.checkGithubPolling, name="github_polling"),
     
     # error page url
     path("error/", error, name="error"),

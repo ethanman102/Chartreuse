@@ -80,3 +80,6 @@ class FollowRequest(models.Model):
     requestee = models.ForeignKey(User, related_name="follow_requests_received", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     approved = models.BooleanField(default=False)
+
+class GithubPolling(models.Model):
+    last_polled = models.DateTimeField(auto_now_add=True)

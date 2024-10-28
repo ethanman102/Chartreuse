@@ -6,6 +6,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import logout as auth_logout
 
 def login(request):
+    if request.user.is_authenticated:
+        auth_logout(request)
     return render(request, 'login.html')
 
 def logout(request):
@@ -26,5 +28,8 @@ def save_login(request):
 
         if user is not None:
             auth_login(request, user)
+        
+        else:
+            return redirect('/chartreuse/login')
         
         return redirect('/chartreuse/homepage')

@@ -394,7 +394,4 @@ def get_image_post(pfp_url):
             pfp_url = f"data:{pfp_post.contentType};charset=utf-8;base64, {pfp_post.content}"
         else:
             pfp_url = f"{host}/static/images/default_pfp_1.png"
-            user = User.objects.filter(url_id=f"{host}/authors/{author_serial}").first()
-            user.profileImage = f"{host}/static/images/default_pfp_1.png"
-            user.save()
         return pfp_url

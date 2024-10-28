@@ -36,13 +36,8 @@ class ImageViewSet(viewsets.ViewSet):
         author = models.User.objects.filter(url_id=decoded_author_id).first()
         post = models.Post.objects.filter(user=author, url_id=decoded_post_id).first()
 
-        # Check if there is image data
-        if post and post.content and post.contentType in ['image/jpeg;base64', 'image/png;base64']:
-            try:
-                image_data = decode_image(post.content)
-                return HttpResponse(image_data, content_type=post.contentType[:-7])
-            except (base64.binascii.Error, ValueError):
-                return JsonResponse({'error': 'Invalid image data'}, status=404)
+        if post and post.content and post.contentType in ['image/jpeg', 'image/png']:
+            return JsonResponse({"content": post.content, "contentType": post.contentType}, status=200)
         else:
             return JsonResponse({'error': 'Not an image'}, status=404)
 

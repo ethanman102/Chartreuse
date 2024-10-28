@@ -247,7 +247,8 @@ def like_post(request):
         if like:
             like.delete()
         else:
-            Like.objects.create(user=user, post=post)
+            newLike = Like.objects.create(user=user, post=post)
+            newLike.save()
 
         data = {
             "likes_count": get_post_likes(unquote(post_id)).count()
@@ -343,7 +344,7 @@ def send_follow_request(request):
         if follow:
             follow.delete()
             follow_request_status = "Unfollowed"
-        if follow_request:
+        elif follow_request:
             follow_request.delete()
             follow_request_status = "Removed Follow Request"
         else:

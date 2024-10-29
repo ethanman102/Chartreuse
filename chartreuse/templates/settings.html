@@ -58,7 +58,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-3 offset-3" id="password-submit-button">
+                        <div class="col-3 offset-3">
                             <button type="button" class="btn btn-primary w-100" id="dn-submit-button">Update</button>
                         </div>
                         <div class="col-3" id="dn-loading">
@@ -100,7 +100,7 @@
                     </div>
         
                     <div class="row">
-                        <div class="col-3 offset-3" id="password-submit-button">
+                        <div class="col-3 offset-3">
                             <button type="button" class="btn btn-primary w-100" id="password-submit-button">Update</button>
                         </div>
                         <div class="col-3" id="password-loading">
@@ -236,6 +236,11 @@
 
                 loadingSpinner.style.visibility = "visible";
 
+                oldPasswordInput.disabled = 'true';
+                newPasswordOne.disabled = 'true';
+                newPasswordTwo.disabled = 'true';
+                passwordSubmitButton.disabled = 'true';
+
                 let response = await fetch('updatePassword/',{
                     method: 'POST',
                     headers:{
@@ -266,6 +271,12 @@
                     passwordUpdateMessage.style.color = "red";
                     passwordUpdateMessage.style.visibility = "visible";
                 }
+
+                passwordSubmitButton.removeAttribute('disabled');
+                oldPasswordInput.removeAttribute('disabled');
+                newPasswordTwo.removeAttribute('disabled');
+                newPasswordOne.removeAttribute('disabled');
+                
             })
         }  
     </script>

@@ -49,8 +49,8 @@ def update_password(request):
 def update_display_name(request):
     if request.method == "POST":
 
-        data = json.loads(request)
-        new_display_name = data.get("new_display_name")
+        data = json.loads(request.body)
+        new_display_name = data.get("display_name")
 
         current_auth_user = request.user
         current_user_model = get_object_or_404(User,user=current_auth_user)

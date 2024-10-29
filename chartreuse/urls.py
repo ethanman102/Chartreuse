@@ -59,6 +59,7 @@ urlpatterns = [
 
     #settings URLS:
     path('settings/updatePassword/',settings_view.update_password,name='update_password'),
+    path('settings/updateDisplayName/',settings_view.update_display_name,name="update_display_name"),
     path('settings/',login_required(settings_view.SettingsDetailView.as_view()),name="settings"),
 
     # UI Related URLs

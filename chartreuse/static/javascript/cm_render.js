@@ -9,7 +9,7 @@ function main() {
     const commonmark = window.commonmark;
 
     // variable to track the html element for displaying the commonmark text
-    var markString = document.getElementById('cm_content').innerText;
+    var markString = document.getElementById('cm').innerText;
 
 
     // will need to bundle with esbuild command for the browser import mini package

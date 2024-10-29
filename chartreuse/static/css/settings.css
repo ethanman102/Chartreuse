@@ -92,5 +92,9 @@ body,html{
     margin-top: 3ch;
 }
 
+#current-name-text{
+    font-weight: bold;
+    text-decoration: underline;
+}
 
 

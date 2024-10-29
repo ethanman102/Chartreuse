@@ -9,7 +9,11 @@ function main() {
     const commonmark = window.commonmark;
 
     // variable to track the html element for displaying the commonmark text
+    // NOTE - debugger says cm_text is empty.
     var markString = document.getElementById('cm_text').innerText;
+
+    // for debugging 
+    console.log(markString);
 
 
     // will need to bundle with esbuild command for the browser import mini package
@@ -20,10 +24,12 @@ function main() {
     // transform parsed if you like...
     var result = writer.render(parsed); // result is a String
 
+    // for debugging 
+    console.log(result);
     
     // // sets the text to be shown in html file as the rendered Commonmark text 
     document.getElementById('cm_text').innerHTML = result;
 };
 
-// in case I need to budle the JS code later
-// npx esbuild ./webapp/markdown-editor.js --bundle --minify --sourcemap --outfile=./lab2/wiki/static/markdown-editor.min.js
+// in case I need to bundle the JS code later
+// npx esbuild /chartreuse/static/javascript/cm_render.js --bundle --minify --sourcemap --outfile=./chartreuse/static/cm_render.min.js

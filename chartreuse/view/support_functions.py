@@ -124,6 +124,7 @@ def update_post(request, post_id):
             return JsonResponse({'error': 'Post content is required.'}, status=400)
 
         # Determine content type and set appropriate content
+        # add option for commonmark here
         if content:
             content_type = 'text/plain'
             post_content = content

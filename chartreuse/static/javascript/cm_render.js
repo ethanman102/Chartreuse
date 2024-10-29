@@ -2,14 +2,14 @@ import "https://unpkg.com/commonmark@0.29.3/dist/commonmark.js";
 
 'use strict'
 
-
+// waiting for the page to load before 
 window.addEventListener('load', main);
 
 function main() {
     const commonmark = window.commonmark;
 
     // variable to track the html element for displaying the commonmark text
-    var markString = document.getElementById('cm').innerText;
+    var markString = document.getElementById('cm_text').innerText;
 
 
     // will need to bundle with esbuild command for the browser import mini package
@@ -22,5 +22,5 @@ function main() {
 
     
     // // sets the text to be shown in html file as the rendered Commonmark text 
-    document.getElementById('cm_content').innerHTML = result;
+    document.getElementById('cm_text').innerHTML = result;
 };

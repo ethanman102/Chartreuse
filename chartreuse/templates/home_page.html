@@ -48,8 +48,8 @@
                                 <p class="card-text mt-2" style="text-align: left;">{{ post.content }}</p>
                         
                             {% elif post.contentType == "text/commonmark" %}
-                                <p class="card-text mt-2" style="text-align: left;">
-                                    <article id=cm_text>{{ post.content }}</article>
+                                <p class="card-text mt-2" id=cm_text style="text-align: left;">
+                                    {{ post.content }}
                                 </p>
                         
                             {% elif post.contentType == "image/png" or post.contentType == "image/jpeg" %}
@@ -71,7 +71,7 @@
     
     <br></br>
     <script src="{% static 'javascript/home_page.js' %}"></script>
-    <script src="{% static 'cm_render.js' %}"></script> <!-- Load bundled JS -->
+    <script src="{% static 'cm_render.js' %}"></script> <!-- Load bundled JS for commonmark -->
 
 </body>
 {% endblock %}

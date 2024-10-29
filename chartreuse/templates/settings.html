@@ -42,7 +42,7 @@
                         <h5>Current Name:</h5>
                     </div>
                     <div class="col-6">
-                        <h5 id="current-dn-text">{{ displayName }}</h5>
+                        <h5 id="current-dn-text">{{ user.displayName }}</h5>
                     </div>
                 </div>
 
@@ -121,7 +121,7 @@
     <script>
         window.addEventListener('load',displayNameTab);
         function displayNameTab(){
-            var currentDisplayName = '{{displayName}}';
+            var currentDisplayName = '{{user.displayName}}';
 
             var dnInput = document.getElementById('new-dn-input');
             var dnSubmitButton = document.getElementById('dn-submit-button');

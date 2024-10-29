@@ -69,12 +69,12 @@ class SettingsDetailView(DetailView):
     currently logged in User
     '''
 
-    model = AuthUser
+    model = User
     template_name = "settings.html"
     context_object_name= "user"
         
     def get_object(self):
         # user's Id can't be obtained since the User model does not explicity state a primary key. Will retrieve the user by grabbing them by the URL pk param.
         authenticated_user = self.request.user
-        return authenticated_user
+        return get_object_or_404(User,user=authenticated_user)
 

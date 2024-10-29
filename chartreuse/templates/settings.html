@@ -31,7 +31,37 @@
         </div>
 
         <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-dn" role="tabpanel" aria-labelledby="nav-dn-tab" tabindex="0"></div>
+            <div class="tab-pane fade show active" id="nav-dn" role="tabpanel" aria-labelledby="nav-dn-tab" tabindex="0">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 id="dn-header">Feeling different? You can update your display name here!</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3 offset-3">
+                        <h5>Current Name:</h5>
+                    </div>
+                    <div class="col-6">
+                        <h5 id="current-dn-text">{{ Display Name }}</h5>
+                    </div>
+                </div>
+
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-6 offset-3">
+                            <input id="new-dn-input" name="displayname" type="text" class="form-control" required placeholder="Enter your new Display Name" maxlength="20"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3 offset-3" id="password-submit-button">
+                            <button type="button" class="btn btn-primary w-100 follow" id="dn-submit-button">Update</button>
+                        </div>
+                        <div class="col-3" id="dn-loading">
+                            <div class="spinner-border text-primary" role="status" id="dnSpinner" style="visibility: hidden;"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
             <div class="tab-pane fade" id="nav-password" role="tabpanel" aria-labelledby="nav-password-tab" tabindex="0">
                 <div class="row">
                     <div class="col-12">

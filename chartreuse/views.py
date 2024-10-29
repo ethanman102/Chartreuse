@@ -32,7 +32,15 @@ def test(request):
     Arguments:
     request: Request object
     '''
-    test_str = "# Hello and **goodbye** "
+    test_str = """
+    
+    # Hello  
+
+    
+    and 
+     
+    **goodbye** 
+    """
     return render(request, 'test.html', {'markdown_txt': test_str})
 
 

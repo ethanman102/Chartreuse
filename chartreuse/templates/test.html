@@ -31,9 +31,11 @@
         
             // will need to bundle with esbuild command for the browser import mini package
             var reader = new commonmark.Parser({smart: true});
-            var writer = new commonmark.HtmlRenderer({sourcepos: true, softbreak: "<br />"});
+            var writer = new commonmark.HtmlRenderer({sourcepos: true});
             // var writer = new commonmark.HtmlRenderer({sourcepos: true, safe: true, softbreak: "<br />"});
-            var parsed = reader.parse(markString); // parsed is a 'Node' tree
+            var parsed = reader.parse(`# Hello  and **goodbye** `); // parsed is a 'Node' tree
+            // console.log(parsed);
+            // console.log(typeof parsed);
             // transform parsed if you like...
             var result = writer.render(parsed); // result is a String
 

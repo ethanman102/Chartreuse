@@ -7,6 +7,8 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login as auth_login
 import json
+from ..models import User
+from django.shortcuts import get_object_or_404
 
 @login_required
 def update_password(request):
@@ -41,6 +43,22 @@ def update_password(request):
         
 
         return JsonResponse({'success': 'Password successfully changed'},status=200)
+    
+
+@login_required
+def update_display_name(request):
+    if request.method == "POST":
+
+        data = json.loads(request)
+        new_display_name = data.get("new_display_name")
+
+        current_auth_user = request.user
+        current_user_model = get_object_or_404(User,user=current_auth_user)
+
+        current_user_model.displayName = new_display_name
+        current_user_model.save()
+
+        return JsonResponse({'success': 'Display name successfully changed'},status=200)
             
 
 class SettingsDetailView(DetailView):

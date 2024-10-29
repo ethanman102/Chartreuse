@@ -24,3 +24,6 @@ function main() {
     // // sets the text to be shown in html file as the rendered Commonmark text 
     document.getElementById('cm_text').innerHTML = result;
 };
+
+// in case I need to budle the JS code later
+// npx esbuild ./webapp/markdown-editor.js --bundle --minify --sourcemap --outfile=./lab2/wiki/static/markdown-editor.min.js

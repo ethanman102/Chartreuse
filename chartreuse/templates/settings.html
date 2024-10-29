@@ -42,7 +42,7 @@
                         <h5>Current Name:</h5>
                     </div>
                     <div class="col-6">
-                        <h5 id="current-dn-text">{{ Display Name }}</h5>
+                        <h5 id="current-dn-text">{{ displayName }}</h5>
                     </div>
                 </div>
 
@@ -53,8 +53,13 @@
                         </div>
                     </div>
                     <div class="row">
+                        <div class="col-6 offset-3">
+                            <p id="dn-error" style="visibility: hidden;"></p> 
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-3 offset-3" id="password-submit-button">
-                            <button type="button" class="btn btn-primary w-100 follow" id="dn-submit-button">Update</button>
+                            <button type="button" class="btn btn-primary w-100" id="dn-submit-button">Update</button>
                         </div>
                         <div class="col-3" id="dn-loading">
                             <div class="spinner-border text-primary" role="status" id="dnSpinner" style="visibility: hidden;"></div>
@@ -96,7 +101,7 @@
         
                     <div class="row">
                         <div class="col-3 offset-3" id="password-submit-button">
-                            <button type="button" class="btn btn-primary w-100 follow" id="password-submit-button">Update</button>
+                            <button type="button" class="btn btn-primary w-100" id="password-submit-button">Update</button>
                         </div>
                         <div class="col-3" id="password-loading">
                             <div class="spinner-border text-primary" role="status" id="passwordSpinner" style="visibility: hidden;">
@@ -113,10 +118,83 @@
 </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
     <script>
-        window.addEventListener('load',main);
-        function main(){
+        window.addEventListener('load',displayNameTab);
+        function displayNameTab(){
+            var currentDisplayName = '{{displayName}}';
+
+            var dnInput = document.getElementById('new-dn-input');
+            var dnSubmitButton = document.getElementById('dn-submit-button');
+            var currentDisplayNameTextElement = document.getElementById('current-dn-text');
+            var dnSpinner = document.getElementById('dnSpinner');
+            var dnUpdateMessage = document.getElementById('dn-error');
+
+            dnInput.addEventListener('input', ()=>{
+                if (dnUpdateMessage.style.visibility === 'visible'){
+                    dnUpdateMessage.style.visibility = 'hidden';
+                }
+            });
+
+            dnSubmitButton.addEventListener('click', async (event) =>{
+                event.preventDefault();
+
+                if (dnInput.value === ''){
+                    dnUpdateMessage.innerText = "Please provide a new display name";
+                    dnUpdateMessage.style.color = "red";
+                    dnUpdateMessage.style.visibility = 'visible';
+                    return;
+                }
+
+                dnSpinner.style.visibility = 'visible';
+
+                dnSubmitButton.disabled = 'true';
+                dnInput.disabled = 'true'
+                let response = await fetch('updateDisplayName/',{
+                    method: "POST",
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        display_name: `${dnInput.value}`
+                    })
+                });
+
+                if (response.status === 404){
+                    dnUpdateMessage.innerText = "Error updating display name...";
+                    dnUpdateMessage.style.color = 'red';
+                    dnUpdateMessage.style.visibility = 'visible';
+                    dnInput.value = '';
+                    dnSpinner.style.visibility = 'hidden';
+                    dnInput.removeAttribute('disabled');
+                    dnSubmitButton.removeAttribute('disabled');
+                    return;
+                }
+
+                if (response.status === 200){
+                    let data = await response.json();
+                    currentDisplayName = dnInput.value;
+                    dnInput.value = '';
+                    dnUpdateMessage.innerText = data.success;
+                    dnUpdateMessage.style.color = 'chartreuse';
+                    dnUpdateMessage.style.visibility = "visible";
+                    currentDisplayNameTextElement.innerText = currentDisplayName;
+                    dnSpinner.style.visibility = 'hidden';
+                    dnInput.removeAttribute('disabled');
+                    dnSubmitButton.removeAttribute('disabled');
+                    return;
+
+                }
+
+                
+
+            });
+        }
+    </script>
+    <!--Password Scripts-->
+    <script>
+        window.addEventListener('load',passwordTab);
+        function passwordTab(){
             var passwordSubmitButton = document.getElementById('password-submit-button');
             var passwordUpdateMessage = document.getElementById('password-error');
             var loadingSpinner = document.getElementById('passwordSpinner');
@@ -188,13 +266,8 @@
                     passwordUpdateMessage.style.color = "red";
                     passwordUpdateMessage.style.visibility = "visible";
                 }
-
             })
-            
-
-        }
-
-        
+        }  
     </script>
 </body>
 </html>

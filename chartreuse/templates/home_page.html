@@ -3,13 +3,15 @@
 
 {% block title %}chartreuse.homepage{% endblock %}
 
-{% block content %}
-<head>
+
+{% block extra_head %}
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{% static 'css/home_page.css' %}">
 
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
+
     {% block sidenav %}
     {% include 'navbar.html' %}
     {% endblock %}
@@ -48,9 +50,7 @@
                                 <p class="card-text mt-2" style="text-align: left;">{{ post.content }}</p>
                         
                             {% elif post.contentType == "text/commonmark" %}
-                                <p class="card-text mt-2" id=cm_text style="text-align: left;">
-                                    {{ post.content }}
-                                </p>
+                                <p class="card-text mt-2" id=cm_text style="text-align: left;">{{ post.content }}</p>
                         
                             {% elif post.contentType == "image/png" or post.contentType == "image/jpeg" %}
                                 <div class="d-flex justify-content-start">
@@ -71,7 +71,7 @@
     
     <br></br>
     <script src="{% static 'javascript/home_page.js' %}"></script>
-    <script src="{% static 'cm_render.js' %}"></script> <!-- Load bundled JS for commonmark -->
+    <script src="{% static 'javascript/cm_render.js' %}"></script> <!-- Load bundled JS for commonmark -->
 
 </body>
 {% endblock %}

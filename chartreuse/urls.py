@@ -32,6 +32,7 @@ urlpatterns = [
     re_path(r"api/authors/(?P<user_id>.+\d)/posts/(?P<post_id>.+\d)/$", posts.PostViewSet.as_view({"get": "get_post", "delete": "remove_post", "put": "update"}), name="post"),
     re_path(r"api/authors/(?P<user_id>.+\d)/posts/$", posts.PostViewSet.as_view({"get": "get_posts", "post": "create_post"}), name="posts"),
     re_path(r"api/post-exists/$", support_functions.check_duplicate_post, name="check_duplicate_post"),
+    
     # Author URLs
     path("api/author/login/", users.UserViewSet.login_user, name="login_user"),
     re_path(r"api/authors/(?P<pk>.+\d)/$", users.UserViewSet.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'}), name="user-detail"),

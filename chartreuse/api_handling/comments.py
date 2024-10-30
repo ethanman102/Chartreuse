@@ -176,6 +176,10 @@ class CommentViewSet(viewsets.ViewSet):
         
         user_data = json.loads(user_response.content)
 
+        like_viewset = LikeViewSet()
+        response = like_viewset.get_comment_likes(request, comment.user.url_id, comment.post.url_id, comment_id)
+        like_data = json.loads(response.content)
+
         # construct the comment (no likes are included for now since the comment was just created)
         comment_object = {
             "type": "comment",
@@ -193,6 +197,15 @@ class CommentViewSet(viewsets.ViewSet):
             "published": comment.dateCreated,
             "id": comment.url_id,
             "post": comment.post.url_id,
+            "likes": {
+                "type":"likes",
+                "page": like_data["page"],
+                "id": like_data["id"],
+                "page_number": like_data["page_number"],
+                "size": like_data["size"],
+                "count": like_data["count"],
+                "src": like_data["src"],
+            }
         }
 
         # Delete the comment
@@ -236,6 +249,7 @@ class CommentViewSet(viewsets.ViewSet):
 
         else:
             post = get_object_or_404(Post, url_id=decoded_post_url)
+            user_id = post.user.url_id
 
 
         # Get all comments related to the post
@@ -251,6 +265,10 @@ class CommentViewSet(viewsets.ViewSet):
             user_viewset = UserViewSet()
             response = user_viewset.retrieve(request, pk=comment.user.url_id)
             author_data = json.loads(response.content)
+
+            like_viewset = LikeViewSet()
+            response = like_viewset.get_comment_likes(request, user_id, post_id, comment.url_id)
+            like_data = json.loads(response.content)
 
             comment_object = {
                 "type": "comment",
@@ -269,9 +287,14 @@ class CommentViewSet(viewsets.ViewSet):
                 "id": comment.url_id,
                 "post": post.url_id,
                 "likes": {
-                    "type": "likes",
-                    "page": None
-                }  
+                    "type":"likes",
+                    "page": like_data["page"],
+                    "id": like_data["id"],
+                    "page_number": like_data["page_number"],
+                    "size": like_data["size"],
+                    "count": like_data["count"],
+                    "src": like_data["src"],
+                }
             }
 
             filtered_comment_attributes.append(comment_object)
@@ -331,9 +354,9 @@ class CommentViewSet(viewsets.ViewSet):
         response = user_viewset.retrieve(request, pk=comment.user.url_id)
         author_data = json.loads(response.content)
 
-        # like_viewset = LikeViewSet()
-        # response = like_viewset.get_comment_likes(request, user_id, post_id, comment_id)
-        # like_data = json.loads(response.content)
+        like_viewset = LikeViewSet()
+        response = like_viewset.get_comment_likes(request, user_id, post_id, comment_id)
+        like_data = json.loads(response.content)
 
         comment_object = {
             "type": "comment",
@@ -350,7 +373,16 @@ class CommentViewSet(viewsets.ViewSet):
             "contentType": comment.contentType,
             "published": comment.dateCreated,
             "id": comment.url_id,
-            "post": comment.post.url_id
+            "post": comment.post.url_id,
+            "likes": {
+                "type":"likes",
+                "page": like_data["page"],
+                "id": like_data["id"],
+                "page_number": like_data["page_number"],
+                "size": like_data["size"],
+                "count": like_data["count"],
+                "src": like_data["src"],
+            }
 
         }
         return JsonResponse(comment_object, status=200)
@@ -360,7 +392,7 @@ class CommentViewSet(viewsets.ViewSet):
         summary="Gets the list of comments an author has made.",
         description="Retrieves a a paginated list of comment objects from a user based on the user id.",
         responses={
-            200: OpenApiResponse(description="Successfully retrieved comments.", response=CommentSerializer),
+            200: OpenApiResponse(description="Successfully retrieved comments.", response=CommentsSerializer),
             404: OpenApiResponse(description="User, or comment not found"),
             405: OpenApiResponse(description="Method not allowed."),
         }
@@ -403,6 +435,10 @@ class CommentViewSet(viewsets.ViewSet):
 
         # Create the list of comments
         for comment in page_comments:
+            like_viewset = LikeViewSet()
+            response = like_viewset.get_comment_likes(request, user_id, comment.post.url_id, comment.url_id)
+            like_data = json.loads(response.content)
+
             comments_src.append({
                 "type": "comment",
                 "author": {
@@ -419,9 +455,22 @@ class CommentViewSet(viewsets.ViewSet):
                 "published": comment.dateCreated,
                 "id": comment.url_id,
                 "post": comment.post.url_id,
+                "likes": {
+                    "type":"likes",
+                    "page": like_data["page"],
+                    "id": like_data["id"],
+                    "page_number": like_data["page_number"],
+                    "size": like_data["size"],
+                    "count": like_data["count"],
+                    "src": like_data["src"],
+                }
             })   
 
         authors_comments = {
+            "type": "comments",
+            "page_number": page,
+            "size": size,
+            "count": len(comments),
             "src":comments_src
         }   
 

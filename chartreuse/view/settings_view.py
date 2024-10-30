@@ -9,6 +9,7 @@ from django.contrib.auth import login as auth_login
 import json
 from ..models import User
 from django.shortcuts import get_object_or_404
+from urllib.parse import urlparse
 
 @login_required
 def update_password(request):
@@ -76,6 +77,34 @@ def remove_github(request):
         current_user_model.save()
         
         return JsonResponse({'success': 'Associated github removed'},status=200)
+    
+@login_required
+def add_github(request):
+    if request.method == "PUT":
+        data = json.loads(request.body)
+
+        github = data.get('github')
+
+        # check to see if it is a github URL hostname..
+        # https://stackoverflow.com/questions/9530950/parsing-hostname-and-port-from-string-or-url
+        # Stack Overflow Post: Parsing hostname and port from string or url
+        # Purpose: how to validate the hostname of a URL string
+        # Answered by: Maksym Kozlenko on July 21, 2013
+        host = urlparse(github).hostname
+
+        if host.lower() != 'github.com':
+            return JsonResponse({'error': 'Invalid Github URL'},status=400)
+        
+        current_auth_user = request.user
+        current_user_model = get_object_or_404(User,user=current_auth_user)
+
+        current_user_model.github = github
+        current_user_model.save()
+
+        return JsonResponse({'success': 'Github Added successfully'},status=200)
+        
+
+
             
 
 class SettingsDetailView(DetailView):

@@ -222,7 +222,7 @@
             }
 
             let response = await fetch('addGithub/',{
-                method: 'POST',
+                method: 'PUT',
                 headers:{
                     'X-CSRFToken': '{{csrf_token}}',
                     'Content-Type': 'application/json'

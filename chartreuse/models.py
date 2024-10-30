@@ -69,7 +69,7 @@ class Comment(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        self.url_id = f"{self.user.url_id}/commented/{self.pk}"
+        self.url_id = f"{self.user.url_id}/commented/{self.id}"
         super().save(*args, **kwargs)
 
     def __str__(self):

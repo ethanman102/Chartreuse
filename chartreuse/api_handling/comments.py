@@ -20,7 +20,7 @@ class CommentSerializer(serializers.Serializer):
     author = UserSerializer
     comment = serializers.CharField()
     contentType = serializers.CharField()
-    published = serializers.DateTimeField()
+    dateCreated = serializers.DateTimeField()
     id = serializers.URLField()
     post = serializers.URLField()
     likes = LikesSerializer()
@@ -57,7 +57,7 @@ class CommentViewSet(viewsets.ViewSet):
             },
     )
     @action(detail=False, methods=["POST"])
-    def create_comment(self, request, user_id, post_id):
+    def create_comment(self, request, user_id, post_id=None):
         """
         Adds a comment on a post.
         
@@ -74,10 +74,11 @@ class CommentViewSet(viewsets.ViewSet):
             
         decoded_author_id = unquote(user_id)
 
-        # Get the post URL from the request body
-        # post_url = request.POST.get('post')
-        # if not post_url:
-        #     return JsonResponse({"error": "Post URL is required"}, status=400)
+        if not post_id:
+            # Get the post URL from the request body
+            post_id = request.POST.get('id')
+            if not post_id:
+                return JsonResponse({"error": "Post URL is required"}, status=400)
         
         decoded_post_url = unquote(post_id)
         
@@ -92,7 +93,7 @@ class CommentViewSet(viewsets.ViewSet):
         if post_visibility != "PUBLIC" and post_visibility != "UNLISTED" or (post_visibility == "FREINDS" and FriendsViewSet().check_friendship(request, user_id, request.user.user.id).status_code != 200):
             return JsonResponse({"error": "User does not have permission to comment on this post"}, status=401)
 
-        comment_text = request.POST.get('content', '')
+        comment_text = request.POST.get('comment', '')
         content_type = request.POST.get('contentType', 'text/markdown')
 
         # User get_or_creat to simplify checking if the user already commented on the post
@@ -134,7 +135,72 @@ class CommentViewSet(viewsets.ViewSet):
         }
 
         return JsonResponse(comment_object, status=201)
+    
+
+
+    @extend_schema(
+            summary="Deletes a comment on a post",
+            description="Deletes a comment on a post based on the provided comment id",
+            responses={
+                200: OpenApiResponse(description="Comment removed successfully.", response=CommentSerializer),
+                401: OpenApiResponse(description="User is not authenticated."),
+                404: OpenApiResponse(description="Comment not found."),
+                405: OpenApiResponse(description="Method not allowed."),
+            },
+    )
+    @action(detail=False, methods=["DELETE"])
+    def delete_comment(self, request, comment_id):
+        """
+        Adds a comment on a post.
         
+        Parameters:
+            request: rest_framework object containing the request and query parameters.
+            comment_id: the url id of the comment being removed
+            
+        Returns:
+            JsonResponce containing the comment object.  
+        """
+        if not request.user.is_authenticated:
+            return JsonResponse({"error": "User is not authenticated."}, status=401)
+
+        # Get the comment   
+        comment = Comment.objects.filter(url_id = unquote(comment_id)).first()
+    
+        # get the comment authors details
+        request.method = "GET"
+        user_viewset = UserViewSet()
+        user_response = user_viewset.retrieve(request, pk=comment.user.url_id)
+
+        if user_response.status_code != 200:
+            return JsonResponse({"error": "Failed to retrieve user details."}, status=user_response.status_code)
+        
+        user_data = json.loads(user_response.content)
+
+        # construct the comment (no likes are included for now since the comment was just created)
+        comment_object = {
+            "type": "comment",
+            "author": {
+                "type": "author",
+                "id": user_data["id"],
+                "page": user_data["page"],
+                "host": user_data["host"],
+                "displayName": user_data["displayName"],
+                "github": user_data["github"],
+                "profileImage": user_data["profileImage"],
+            },
+            "comment": comment.comment,
+            "contentType": comment.contentType,
+            "published": comment.dateCreated,
+            "id": comment.url_id,
+            "post": comment.post.url_id,
+        }
+
+        # Delete the comment
+        comment.delete()
+
+        return JsonResponse(comment_object, status=200)
+        
+
     @extend_schema(
         summary="Get all comments on a post",
         description="Fetch all comments on a post",
@@ -144,7 +210,7 @@ class CommentViewSet(viewsets.ViewSet):
         }
     )
     @action(detail=False, methods=["GET"])
-    def get_comments(self, request, user_id, post_id):
+    def get_comments(self, request, post_id, user_id=None):
         """
         Gets the comments of a post
         
@@ -156,33 +222,71 @@ class CommentViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing the response   
         """
-        decoded_author_id = unquote(user_id)
-
-        # Get the author
-        author = get_object_or_404(User, url_id=decoded_author_id)
-
         # Decoded the post id
         decoded_post_url = unquote(post_id)
+        
+        if user_id != None:
+            decoded_author_id = unquote(user_id)
 
-        # Get the post
-        post = get_object_or_404(Post, url_id=decoded_post_url, user=author)
+            # Get the author
+            author = get_object_or_404(User, url_id=decoded_author_id)
+
+            # Get the post
+            post = get_object_or_404(Post, url_id=decoded_post_url, user=author)
+
+        else:
+            post = get_object_or_404(Post, url_id=decoded_post_url)
+
 
         # Get all comments related to the post
+        page_number = request.GET.get('page', 1)     # defualt value 1
+        size = request.GET.get('size', 5)       # default value 5
         comments = Comment.objects.filter(post=post)
-        paginator = Paginator(comments, 10)  # Pagination
-        page_number = request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
+        paginator = Paginator(comments, size)  # Pagination
+        page_comments = paginator.get_page(page_number)
 
-        comments_serializer = CommentsSerializer({
-            'type': 'comments',
-            'page': page_obj.number,
-            'id': post.url_id,
-            'page_number': page_obj.number,
-            'size': paginator.per_page,
-            'src': page_obj.object_list,
-        })
+        filtered_comment_attributes =[]
 
-        return JsonResponse(comments_serializer.data, safe=False, status=200)
+        for comment in page_comments:
+            user_viewset = UserViewSet()
+            response = user_viewset.retrieve(request, pk=comment.user.url_id)
+            author_data = json.loads(response.content)
+
+            comment_object = {
+                "type": "comment",
+                "author": {
+                    "type": "author",
+                    "id": author_data["id"],
+                    "page": author_data["page"],
+                    "host": author_data["host"],
+                    "displayName": author_data["displayName"],
+                    "profileImage": author_data["profileImage"],
+
+                },
+                "comment": comment.comment,
+                "contentType": comment.contentType,
+                "published": comment.dateCreated,
+                "id": comment.url_id,
+                "post": post.url_id,
+                "likes": {
+                    "type": "likes",
+                    "page": None
+                }  
+            }
+
+            filtered_comment_attributes.append(comment_object)
+
+        comments_object = {
+            "type": "comments",
+            "page": post.url_id,
+            "id": post.url_id + f"/comments",
+            "page_number": page_number,
+            "size": 5,
+            "count": len(comments),
+            "src": filtered_comment_attributes
+        }
+
+        return JsonResponse(comments_object, safe=False, status=200)
 
     
 
@@ -191,43 +295,134 @@ class CommentViewSet(viewsets.ViewSet):
         description="Retrieves a specific comment object from a user based on the post id, user id, and remote comment id",
         responses={
             200: OpenApiResponse(description="Successfully retrieved comment.", response=CommentSerializer),
-            404: OpenApiResponse(description="User or comment or post not found."),
+            404: OpenApiResponse(description="User, comment, or post not found."),
             405: OpenApiResponse(description="Method not allowed."),
         }
     )
-    @api_view(["GET"])
-    def get_comment(request, post_author_id, post_id, remote_comment_id):
+    @api_view(["GET"]) 
+    def get_comment(request, comment_id, user_id=None, post_id=None):
         """
         Gets a specific comment object from a post
         
         Parameters:
             request: rest_framework object containing the request and query parameters.
-            post_author_id: The id of the user who is commenting on the posts.
-            post_id: The id of the post object.
-            remote_comment_id: the id of the remote comment id
+            user_id: The id of the user who created the posts. (not required)
+            post_id: The id of the post object. (not required)
+            comment_id: the remote/local id of the comment
 
         Returns:
             JsonResponce containing the response   
         """
-        if request.method == "GET":
-            decoded_author_id = unquote(post_author_id)
-            decoded_post_id = unquote(post_id)
+        decoded_comment_id = unquote(comment_id)
 
-            try:
-                post = Post.objects.get(id=decoded_post_id, user__url_id=decoded_author_id)
-            except Post.DoesNotExist:
-                return JsonResponse({"error": "Post not found."}, status=404)
-
-            try:
-                comment = Comment.objects.get(id=remote_comment_id, post=post)
-            except Comment.DoesNotExist:
-                return JsonResponse({"error": "Comment not found."}, status=404)
-
-            comment_serializer = CommentSerializer(comment)
-            return JsonResponse(comment_serializer.data, status=200)
+        if user_id == None or post_id == None:
+            comment = get_object_or_404(Comment, url_id=decoded_comment_id)
 
         else:
-            return JsonResponse({"error": "Method not allowed."}, status=405)
+            decoded_author_id = unquote(user_id)
+            user = get_object_or_404(User, url_id=decoded_author_id)
+
+            decoded_post_id = unquote(post_id)
+            post = get_object_or_404(Post, url_id=decoded_post_id, user=user)
+
+            comment = get_object_or_404(Comment, url_id=decoded_comment_id, post=post)
+
+        user_viewset = UserViewSet()
+        response = user_viewset.retrieve(request, pk=comment.user.url_id)
+        author_data = json.loads(response.content)
+
+        # like_viewset = LikeViewSet()
+        # response = like_viewset.get_comment_likes(request, user_id, post_id, comment_id)
+        # like_data = json.loads(response.content)
+
+        comment_object = {
+            "type": "comment",
+            "author": {
+                "type": "author",
+                "id": author_data["id"],
+                "page": author_data["page"],
+                "host": author_data["host"],
+                "displayName": author_data["displayName"],
+                "github": author_data["github"],
+                "profileImage": author_data["profileImage"]
+            },
+            "comment": comment.comment,
+            "contentType": comment.contentType,
+            "published": comment.dateCreated,
+            "id": comment.url_id,
+            "post": comment.post.url_id
+
+        }
+        return JsonResponse(comment_object, status=200)
+
+
+    @extend_schema(
+        summary="Gets the list of comments an author has made.",
+        description="Retrieves a a paginated list of comment objects from a user based on the user id.",
+        responses={
+            200: OpenApiResponse(description="Successfully retrieved comments.", response=CommentSerializer),
+            404: OpenApiResponse(description="User, or comment not found"),
+            405: OpenApiResponse(description="Method not allowed."),
+        }
+    )
+    @action(detail=False, methods=["GET"])
+    def get_authors_comments(self, request, user_id):
+        """
+        Gets the list of comments an author has made.
         
+        Parameters:
+            request: rest_framework object containing the request and query parameters.
+            user_id: The id of the user who created the comments.
 
+        Returns:
+            JsonResponce containing the response   
+        """
+        # get the paginator page and size (default size 1 and 10)
+        page = request.GET.get('page', 1)
+        size = request.GET.get('size', 10)
 
+        # get the author of the comments
+        decoded_author_id = unquote(user_id)
+        comment_author = get_object_or_404(User, url_id=decoded_author_id)
+
+        # Get all the comments authored by the given user
+        comments = Comment.objects.filter(user=comment_author)
+
+        # Filter the comments based on visibility
+        # not required since comments are local for right now 
+
+        # Paginates likes based on the size
+        comments_paginator = Paginator(comments, size)
+        page_comments = comments_paginator.page(page)
+        comments_src = []
+
+        # Get the authors data
+        user_viewset = UserViewSet()
+        response = user_viewset.retrieve(request, pk=decoded_author_id)
+        author_data = json.loads(response.content)
+
+        # Create the list of comments
+        for comment in page_comments:
+            comments_src.append({
+                "type": "comment",
+                "author": {
+                    "type": "author",
+                    "id": author_data["id"],
+                    "page": author_data["page"],
+                    "host": author_data["host"],
+                    "displayName": author_data["displayName"],
+                    "github": author_data["github"],
+                    "profileImage": author_data["profileImage"]
+                },
+                "comment": comment.comment,
+                "contentType": comment.contentType,
+                "published": comment.dateCreated,
+                "id": comment.url_id,
+                "post": comment.post.url_id,
+            })   
+
+        authors_comments = {
+            "src":comments_src
+        }   
+
+        return JsonResponse(authors_comments, status=200)

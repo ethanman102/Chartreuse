@@ -51,6 +51,7 @@ class CommentTestCases(TestCase):
         })
         self.post_id = quote(self.post_response.json()['id'], safe="")
 
+    
     def test_create_comment(self):
         """
         Tests creating a comment on a post.
@@ -63,7 +64,7 @@ class CommentTestCases(TestCase):
 
         # Create a comment
         comment_response = self.client.post(reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]), {
-            'content': 'Nice post!',
+            'comment': 'Nice post!',
             'contentType': 'text/plain'
         })
 
@@ -108,4 +109,153 @@ class CommentTestCases(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['type'], 'comments')
-        self.assertTrue(len(response.json()['comments']) > 0)
+        self.assertTrue(len(response.json()['src']) > 0)
+
+
+    def test_get_comments_by_pid(self):
+        """
+        Tests retrieving all comments on a post using just the post id.
+        """
+
+        self.client.post(reverse('chartreuse:login_user'), {
+            'username': 'john',
+            'password': '87@398dh817b!'
+        })
+
+        self.client.post(
+            reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]),
+            {'comment': "This is a test comment.", 'contentType': "text/plain"}
+        )
+
+        response = self.client.get(reverse('chartreuse:get_comments_by_pid', args=[self.post_id]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['type'], 'comments')
+        self.assertTrue(len(response.json()['src']) > 0)
+
+    
+    def test_get_comment(self):
+        """
+        Tests retrieving a specific comment on a post.
+        """
+
+        response = self.client.post(reverse('chartreuse:login_user'), {
+            'username': 'john',
+            'password': '87@398dh817b!'
+        })
+
+        response = self.client.post(
+            reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]),
+            {'comment': "This is a test comment.", 'contentType': "text/plain"}
+        )
+       
+        comment_id = quote(response.json()["id"], safe="")
+
+        response = self.client.get(reverse('chartreuse:get_comment', args=[self.user_id_1, self.post_id, comment_id]))
+  
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['type'], 'comment')
+        self.assertTrue(response.json()['comment'], "This is a test comment.")
+
+    
+    def test_get_comment_by_cid(self):
+        """
+        Tests retrieving a specific comment using the comment id.
+        """
+
+        response = self.client.post(reverse('chartreuse:login_user'), {
+            'username': 'john',
+            'password': '87@398dh817b!'
+        })
+
+        response = self.client.post(
+            reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]),
+            {'comment': "This is a test comment.", 'contentType': "text/plain"}
+        )
+       
+        comment_id = quote(response.json()["id"], safe="")
+
+        response = self.client.get(reverse('chartreuse:get_comment_by_cid', args=[comment_id]))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['type'], 'comment')
+        self.assertTrue(response.json()['comment'], "This is a test comment.")
+
+
+    def test_get_authors_comments(self):
+        """
+        Tests retrieving a specific comment using the comment id.
+        """
+
+        response = self.client.post(reverse('chartreuse:login_user'), {
+            'username': 'john',
+            'password': '87@398dh817b!'
+        })
+
+        self.client.post(
+            reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]),
+            {'comment': "This is a test comment.", 'contentType': "text/plain"}
+        )
+
+        self.client.post(
+            reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]),
+            {'comment': "This is a second test comment.", 'contentType': "text/plain"}
+        )
+
+        response = self.client.get(reverse('chartreuse:get_authors_comments', args=[self.user_id_2]))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()['src']), 2)
+        self.assertTrue(response.json()['src'][0]['type'], "comment")
+
+    
+    def test_create_commented_comment(self):
+        """
+        Tests creating a comment on a post using commented route.
+        """
+        # login as user 2 (John Smith)
+        response = self.client.post(reverse('chartreuse:login_user'), {
+            'username': 'john',
+            'password': '87@398dh817b!'
+        })
+
+        # Create a comment
+        comment_response = self.client.post(reverse('chartreuse:get_authors_comments', args=[self.user_id_1]), {
+            'comment': 'Nice post!',
+            'contentType': 'text/plain',
+            'id': self.post_id,
+        })
+
+        # Successfully created comment
+        self.assertEqual(comment_response.status_code, 201)
+        self.assertEqual(comment_response.json()['type'], 'comment')
+        self.assertEqual(comment_response.json()['author']['displayName'], 'John Smith')
+        self.assertEqual(comment_response.json()['comment'], 'Nice post!')
+
+
+    def test_delete_comment(self):
+        """
+        Tests deleting a comment.
+        """
+        # login as user 2 (John Smith)
+        self.client.post(reverse('chartreuse:login_user'), {
+            'username': 'john',
+            'password': '87@398dh817b!'
+        })
+
+        # Create a comment
+        comment_response = self.client.post(reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]), {
+            'comment': 'Nice post!',
+            'contentType': 'text/plain'
+        })
+
+        comment_id = quote(comment_response.json()["id"], safe="")
+
+        # Remove the comment
+        comment_response = self.client.delete(reverse('chartreuse:delete_comment', args=[comment_id]))
+
+        # Successfully created comment
+        self.assertEqual(comment_response.status_code, 200)
+        self.assertEqual(comment_response.json()['type'], 'comment')
+        self.assertEqual(comment_response.json()['author']['displayName'], 'John Smith')
+        self.assertEqual(comment_response.json()['comment'], 'Nice post!')

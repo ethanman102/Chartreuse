@@ -177,7 +177,7 @@
             let githubURLtext = document.getElementById('github-url-text');
             let addGithubMessage = document.getElementById('github-add-message');
 
-            if (currentGithub !== 'None'){
+            if (currentGithub === 'None'){
                 addGithubSection.style.visibility = 'hidden';
             }
 
@@ -213,6 +213,24 @@
 
            githubAddButton.addEventListener('click', async (event) => {
             event.preventDefault();
+
+            if (githubURLInput.value === ''){
+                addGithubMessage.innerText = "Please provide a github";
+                addGithubMessage.style.color = 'red';
+                addGithubMessage.style.visiblity = 'visible';
+                return;
+            }
+
+            let response = await fetch('addGithub/',{
+                method: 'POST',
+                headers:{
+                    'X-CSRFToken': '{{csrf_token}}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    github: `${githubURLInput.value}`
+                })
+            });
 
 
 

@@ -94,7 +94,7 @@ class FollowViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API is useful in managing social relationships by allowing authors to remove followers."
             "\n\n**Why not to use:** If the authors do not exist or are not following each other, the request may fail."
         ),
-        request=FollowerSerializer
+        request=FollowerSerializer,
         responses={
             200: OpenApiResponse(description="Follower removed."),
             400: OpenApiResponse(description="Not a follower."),
@@ -145,7 +145,7 @@ class FollowViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API helps in managing social relationships by fetching all followers of an author."
             "\n\n**Why not to use:** If the author ID is invalid or the author has no followers."
         ),
-        request=FollowerSerializer
+        request=FollowerSerializer,
         responses={
             200: OpenApiResponse(description="Successfully retrieved the list of followers.", response=FollowersSerializer),
             400: OpenApiResponse(description="Invalid request or missing parameters."),

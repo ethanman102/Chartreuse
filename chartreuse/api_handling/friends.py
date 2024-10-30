@@ -40,6 +40,7 @@ class FriendsViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API helps in managing mutual relationships, fetching friends of an author."
             "\n\n**Why not to use:** If the author has no friends or invalid author ID is provided."
         ),
+        request=FriendSerializer
         responses={
             200: OpenApiResponse(description="Successfully retrieved the list of friends.", response=FriendsSerializer),
             404: OpenApiResponse(description="Author not found."),

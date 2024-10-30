@@ -59,6 +59,23 @@ def update_display_name(request):
         current_user_model.save()
 
         return JsonResponse({'success': 'Display name successfully changed'},status=200)
+    
+@login_required
+def remove_github(request):
+    if request.method == "DELETE":
+        data = json.loads(request.body)
+
+        current_github = data.get("current_github")
+        current_auth_user = request.user
+        current_user_model = get_object_or_404(User,user=current_auth_user)
+
+        if (current_user_model.github != current_github):
+            return JsonResponse({'error': 'Server Side Implementation Error'}, status=404)
+        
+        current_user_model.github = None
+        current_user_model.save()
+        
+        return JsonResponse({'success': 'Associated github removed'},status=200)
             
 
 class SettingsDetailView(DetailView):

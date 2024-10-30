@@ -248,6 +248,9 @@
                 githubRemoveButton.style.visibility = 'visible';
                 currentGithub = githubURLInput.value;
                 githubURLInput.value = '';
+                window.setTimeout(()=>{
+                    addGithubMessage.style.visibility = 'hidden';
+                },5000)
             }else{
                 addGithubMessage.style.color = 'red';
                 addGithubMessage.style.visibility = 'visible';

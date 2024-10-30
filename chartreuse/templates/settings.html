@@ -141,11 +141,6 @@
                         <form method="POST">
                             {% csrf_token %}
                             <input id="github-input" name="github-input" type="text" class="form-control" required placeholder="Your GITHUB"/>
-                            <div class="row'">
-                                <div class="col-12">
-                                    <p id="github-add-message">Github add message</p>
-                                </div>
-                            </div>
                             <div class="row">
                                 <div class="col-6">
                                     <button type="button" class="btn btn-primary w-100" id="github-add-button">Add</button>
@@ -155,6 +150,11 @@
                                 </div>
                             </div>
                         </form>
+                    </div>
+                </div>
+                <div class="row'">
+                    <div class="col-6 offset-3">
+                        <p id="github-add-message" style="visibility: hidden;">Github add message</p>
                     </div>
                 </div>
             </div>
@@ -201,7 +201,7 @@
 
                 if (response.status === 200){
                     removeGithubMessage.innerText = data.success;
-                    removeGithubMessage.style.color = 'green';
+                    removeGithubMessage.style.color = 'chartreuse';
                     removeGithubMessage.style.visibility = 'visible';
                     githubRemoveButton.style.visibility = "hidden";
                     currentGithub == 'None';
@@ -214,12 +214,18 @@
            githubAddButton.addEventListener('click', async (event) => {
             event.preventDefault();
 
+            removeGithubMessage.style.visibility = 'hidden';
+
             if (githubURLInput.value === ''){
                 addGithubMessage.innerText = "Please provide a github";
                 addGithubMessage.style.color = 'red';
                 addGithubMessage.style.visiblity = 'visible';
                 return;
             }
+
+            githubAddButton.disabled  = 'true';
+            githubURLInput.disabled = 'true';
+            githubSpinner.style.visibility = 'visible';
 
             let response = await fetch('addGithub/',{
                 method: 'PUT',
@@ -232,8 +238,36 @@
                 })
             });
 
+            let data = await response.json();
 
+            if (response.status === 200){
+                addGithubMessage.innerText = data.success;
+                addGithubMessage.style.color = 'chartreuse';
+                addGithubMessage.style.visibility = 'visible';
+                addGithubSection.style.visibility = 'visible';
+                githubRemoveButton.style.visibility = 'visible';
+                currentGithub = githubURLInput.value;
+                githubURLInput.value = '';
+            }else{
+                addGithubMessage.style.color = 'red';
+                addGithubMessage.style.visibility = 'visible';
+                if (response.status === 400){
+                    addGithubMessage.innerText = data.error;
+                    return;
+                }
+                if (response.status === 404){
+                    addGithubMessage.innerText = 'An error has occured';
+                    return;
+                }
+            }
+            githubURLInput.removeAttribute('disabled');
+            githubAddButton.removeAttribute('disabled');
+            githubSpinner.style.visibility = 'hidden';
+           });
 
+           githubURLInput.addEventListener('input',(event)=>{
+            removeGithubMessage.style.visibility = 'hidden';
+            addGithubMessage.style.visibility = 'hidden';
            })
 
 

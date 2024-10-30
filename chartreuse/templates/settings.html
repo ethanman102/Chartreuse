@@ -133,7 +133,7 @@
                         <button type="button" class="btn btn-primary w-100" id="github-remove-button">Remove</button>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row" id="github-add-section">
                     <div class="col-2 offset-3">
                         <label for="github-input">URL:</label>
                     </div>
@@ -141,9 +141,17 @@
                         <form method="POST">
                             {% csrf_token %}
                             <input id="github-input" name="github-input" type="text" class="form-control" required placeholder="Your GITHUB"/>
+                            <div class="row'">
+                                <div class="col-12">
+                                    <p id="github-add-message">Github add message</p>
+                                </div>
+                            </div>
                             <div class="row">
-                                <div class="col-6 offset-5">
+                                <div class="col-6">
                                     <button type="button" class="btn btn-primary w-100" id="github-add-button">Add</button>
+                                </div>
+                                <div class="col-6">
+                                    <div class="spinner-border text-primary" role="status" id="githubSpinner" style="visibility: hidden;"></div>
                                 </div>
                             </div>
                         </form>
@@ -155,6 +163,65 @@
 </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        window.addEventListener('load',githubTab);
+        function githubTab(){
+            let currentGithub = '{{user.github}}';
+            let addGithubSection = document.getElementById('github-add-section');
+            let githubRemoveButton = document.getElementById('github-remove-button');
+            let githubSpinner = document.getElementById('githubSpinner');
+            let githubAddButton = document.getElementById('github-add-button');
+            let githubURLInput = document.getElementById('github-input');
+            let removeGithubMessage = document.getElementById('github-remove-message');
+            let githubURLtext = document.getElementById('github-url-text');
+            let addGithubMessage = document.getElementById('github-add-message');
+
+            if (currentGithub !== 'None'){
+                addGithubSection.style.visibility = 'hidden';
+            }
+
+            if (currentGithub === 'None'){
+                githubRemoveButton.style.visibility = 'hidden';
+            }
+
+            githubRemoveButton.addEventListener('click', async (event)=>{
+                event.preventDefault();
+                githubRemoveButton.disabled = 'true';
+
+                let response = await fetch('removeGithub/',{
+                    method: 'DELETE',
+                    headers:{
+                        'X-CSRFToken' : '{{csrf_token}}',
+                        'Content-Type' : 'application/json'
+                    }
+                });
+
+                let data = await response.json();
+
+                if (response.status === 200){
+                    removeGithubMessage.innerText = data.success;
+                    removeGithubMessage.style.color = 'green';
+                    removeGithubMessage.style.visibility = 'visible';
+                    githubRemoveButton.style.visibility = "hidden";
+                    currentGithub == 'None';
+                    githubURLtext.innerText = `${currentGithub}`;
+
+                }
+                githubRemoveButton.removeAttribute('disabled');
+            });
+
+           githubAddButton.addEventListener('click', async (event) => {
+            event.preventDefault();
+
+
+
+           })
+
+
+        }
+    </script>
+
     <script>
         window.addEventListener('load',displayNameTab);
         function displayNameTab(){

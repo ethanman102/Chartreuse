@@ -1,0 +1,284 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<body>
+    
+<div class="settings-box" style="margin-top: 30px;">
+    <div class = "container" id="settings-header" style="border: 5px solid black;">
+        <h4>chartreuse.settings</h4>
+    </div>
+
+    
+    <div class="container full-container">
+        <!-- Resource: Bootstrap 5 Nav Tabs documentation, tab navigation base code taken from documentation and modified for project use
+         https://getbootstrap.com/docs/5.3/components/navs-tabs/#base-nav
+         Accessed on October 27, 2024-->
+        <div class="row">
+            <div col-12>
+                <nav>
+                    <div class="nav nav-tabs" id="settings-nav-tab" role="tablist">
+                      <button class="nav-link active" id="nav-dn-tab" data-bs-toggle="tab" data-bs-target="#nav-dn" type="button" role="tab" aria-controls="nav-dn" aria-selected="true">Edit Display Name</button>
+                      <button class="nav-link" id="nav-password-tab" data-bs-toggle="tab" data-bs-target="#nav-password" type="button" role="tab" aria-controls="nav-password" aria-selected="false">Edit Password</button>
+                      <button class="nav-link" id="nav-pi-tab" data-bs-toggle="tab" data-bs-target="#nav-pi" type="button" role="tab" aria-controls="nav-pi" aria-selected="false">Edit Profile Image</button>
+                      <button class="nav-link" id="nav-github-tab" data-bs-toggle="tab" data-bs-target="#nav-github" type="button" role="tab" aria-controls="nav-github" aria-selected="false">Edit Github</button>
+                    </div>
+                  </nav>
+            </div>
+        </div>
+
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="nav-dn" role="tabpanel" aria-labelledby="nav-dn-tab" tabindex="0">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 id="dn-header">Feeling different? You can update your display name here!</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3 offset-3">
+                        <h5>Current Name:</h5>
+                    </div>
+                    <div class="col-6">
+                        <h5 id="current-dn-text">{{ user.displayName }}</h5>
+                    </div>
+                </div>
+
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-6 offset-3">
+                            <input id="new-dn-input" name="displayname" type="text" class="form-control" required placeholder="Enter your new Display Name" maxlength="20"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 offset-3">
+                            <p id="dn-error" style="visibility: hidden;"></p> 
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3 offset-3">
+                            <button type="button" class="btn btn-primary w-100" id="dn-submit-button">Update</button>
+                        </div>
+                        <div class="col-3" id="dn-loading">
+                            <div class="spinner-border text-primary" role="status" id="dnSpinner" style="visibility: hidden;"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="tab-pane fade" id="nav-password" role="tabpanel" aria-labelledby="nav-password-tab" tabindex="0">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 id="password-header">Need a new password? No worries, we got you...</h3>
+                    </div>
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-6 offset-3">
+                            <input id="old-pass" name="password2" type="password" class="form-control" required placeholder="Enter your old password"/>
+                        </div>
+                    </div>
+                    <div id="new-passwords">
+                        <div class="row">
+                            <div class="col-6 offset-3">
+                                <input id="password1" name="password1" type="password" class="form-control" required placeholder="Enter your new password"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 offset-3">
+                                <input id="password2" name="password2" type="password" class="form-control" required placeholder="Confirm your new password"/>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="row" id="password-error-message-row">
+                        <div class="col-6 offset-3">
+                            <p id="password-error" style="visibility: hidden;"></p>
+                        </div>
+                    </div>
+        
+                    <div class="row">
+                        <div class="col-3 offset-3">
+                            <button type="button" class="btn btn-primary w-100" id="password-submit-button">Update</button>
+                        </div>
+                        <div class="col-3" id="password-loading">
+                            <div class="spinner-border text-primary" role="status" id="passwordSpinner" style="visibility: hidden;">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            </div>
+            <div class="tab-pane fade" id="nav-pi" role="tabpanel" aria-labelledby="nav-pi-tab" tabindex="0">...</div>
+            <div class="tab-pane fade" id="nav-github" role="tabpanel" aria-labelledby="nav-github-tab" tabindex="0">...</div>
+        </div>
+    </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        window.addEventListener('load',displayNameTab);
+        function displayNameTab(){
+            var currentDisplayName = '{{user.displayName}}';
+
+            var dnInput = document.getElementById('new-dn-input');
+            var dnSubmitButton = document.getElementById('dn-submit-button');
+            var currentDisplayNameTextElement = document.getElementById('current-dn-text');
+            var dnSpinner = document.getElementById('dnSpinner');
+            var dnUpdateMessage = document.getElementById('dn-error');
+
+            dnInput.addEventListener('input', ()=>{
+                if (dnUpdateMessage.style.visibility === 'visible'){
+                    dnUpdateMessage.style.visibility = 'hidden';
+                }
+            });
+
+            dnSubmitButton.addEventListener('click', async (event) =>{
+                event.preventDefault();
+
+                if (dnInput.value === ''){
+                    dnUpdateMessage.innerText = "Please provide a new display name";
+                    dnUpdateMessage.style.color = "red";
+                    dnUpdateMessage.style.visibility = 'visible';
+                    return;
+                }
+
+                dnSpinner.style.visibility = 'visible';
+
+                dnSubmitButton.disabled = 'true';
+                dnInput.disabled = 'true'
+                let response = await fetch('updateDisplayName/',{
+                    method: "POST",
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        display_name: `${dnInput.value}`
+                    })
+                });
+
+                if (response.status === 404){
+                    dnUpdateMessage.innerText = "Error updating display name...";
+                    dnUpdateMessage.style.color = 'red';
+                    dnUpdateMessage.style.visibility = 'visible';
+                    dnInput.value = '';
+                    dnSpinner.style.visibility = 'hidden';
+                    dnInput.removeAttribute('disabled');
+                    dnSubmitButton.removeAttribute('disabled');
+                    return;
+                }
+
+                if (response.status === 200){
+                    let data = await response.json();
+                    currentDisplayName = dnInput.value;
+                    dnInput.value = '';
+                    dnUpdateMessage.innerText = data.success;
+                    dnUpdateMessage.style.color = 'chartreuse';
+                    dnUpdateMessage.style.visibility = "visible";
+                    currentDisplayNameTextElement.innerText = currentDisplayName;
+                    dnSpinner.style.visibility = 'hidden';
+                    dnInput.removeAttribute('disabled');
+                    dnSubmitButton.removeAttribute('disabled');
+                    return;
+
+                }
+
+                
+
+            });
+        }
+    </script>
+    <!--Password Scripts-->
+    <script>
+        window.addEventListener('load',passwordTab);
+        function passwordTab(){
+            var passwordSubmitButton = document.getElementById('password-submit-button');
+            var passwordUpdateMessage = document.getElementById('password-error');
+            var loadingSpinner = document.getElementById('passwordSpinner');
+            var oldPasswordInput = document.getElementById('old-pass');
+            var newPasswordOne = document.getElementById('password1');
+            var newPasswordTwo = document.getElementById('password2');
+
+            function passwordTyping(){
+                if (passwordUpdateMessage.style.visibility === 'visible'){
+                    passwordUpdateMessage.style.visibility = 'hidden';
+                }
+            }
+
+            oldPasswordInput.addEventListener('input',passwordTyping);
+            newPasswordOne.addEventListener('input',passwordTyping);
+            newPasswordTwo.addEventListener('input',passwordTyping);
+
+            passwordSubmitButton.addEventListener('click', async (event) =>{
+
+                event.preventDefault();
+            
+                var oldValue = oldPasswordInput.value;
+                var newValue1 = newPasswordOne.value;
+                var newValue2 = newPasswordTwo.value;
+
+                if (oldValue === '' || newValue1 === '' || newValue2 === ''){
+                    passwordUpdateMessage.innerText = "Please fill out all fields";
+                    passwordUpdateMessage.style.color = "red";
+                    passwordUpdateMessage.style.visibility = "visible";
+                    return;
+                }
+
+                if (newValue1 !== newValue2){
+                    passwordUpdateMessage.innerText = "New passwords do not match";
+                    passwordUpdateMessage.style.color = "red";
+                    passwordUpdateMessage.style.visibility = "visible";
+                    return;
+                }
+
+                loadingSpinner.style.visibility = "visible";
+
+                oldPasswordInput.disabled = 'true';
+                newPasswordOne.disabled = 'true';
+                newPasswordTwo.disabled = 'true';
+                passwordSubmitButton.disabled = 'true';
+
+                let response = await fetch('updatePassword/',{
+                    method: 'POST',
+                    headers:{
+                        'X-CSRFToken': '{{ csrf_token }}',  // https://stackoverflow.com/questions/23349883/how-to-pass-csrf-token-to-javascript-file-in-django
+                                                            // how to pass csrf_token to javascript file in django? Answered by (stack overflow post) aychedee April 28, 2014 on How to embed the csrf token
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        old_pass: `${oldValue}`,
+                        new_pass: `${newValue1}`
+                    })
+                });
+
+                let data = await response.json();
+
+                loadingSpinner.style.visibility = 'hidden';
+
+                oldPasswordInput.value = '';
+                newPasswordOne.value = '';
+                newPasswordTwo.value = ''
+
+                if (response.status === 200){
+                    passwordUpdateMessage.innerText = data.success;
+                    passwordUpdateMessage.style.color = "chartreuse";
+                    passwordUpdateMessage.style.visibility = "visible";
+                }else{
+                    passwordUpdateMessage.innerText = data.error;
+                    passwordUpdateMessage.style.color = "red";
+                    passwordUpdateMessage.style.visibility = "visible";
+                }
+
+                passwordSubmitButton.removeAttribute('disabled');
+                oldPasswordInput.removeAttribute('disabled');
+                newPasswordTwo.removeAttribute('disabled');
+                newPasswordOne.removeAttribute('disabled');
+                
+            })
+        }  
+    </script>
+</body>
+</html>

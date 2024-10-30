@@ -3,10 +3,11 @@ import json
 from urllib.parse import quote, unquote
 from urllib.request import urlopen
 
-from chartreuse.models import Follow, FollowRequest, Like, Post, User
+from chartreuse.models import Follow, FollowRequest, Like, Post, User, GithubPolling
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
+from datetime import datetime, timedelta, timezone
 
 def get_post_likes(post_id):
     """
@@ -247,7 +248,8 @@ def like_post(request):
         if like:
             like.delete()
         else:
-            Like.objects.create(user=user, post=post)
+            newLike = Like.objects.create(user=user, post=post)
+            newLike.save()
 
         data = {
             "likes_count": get_post_likes(unquote(post_id)).count()
@@ -343,7 +345,7 @@ def send_follow_request(request):
         if follow:
             follow.delete()
             follow_request_status = "Unfollowed"
-        if follow_request:
+        elif follow_request:
             follow_request.delete()
             follow_request_status = "Removed Follow Request"
         else:
@@ -353,3 +355,62 @@ def send_follow_request(request):
         return JsonResponse({"follow_request_status": follow_request_status})
     else:
         pass
+
+def check_duplicate_post(request):
+    """
+    Checks if a post with the given title, description, and content already exists for the author.
+
+    Parameters:
+        author_id: The id of the author.
+        title: The title of the post.
+        description: The description of the post.
+        content: The content of the post.
+
+    Returns:
+        JSON response indicating whether a duplicate post exists.
+    """
+    if request.method == "POST":
+
+        # Access the parameters from the JSON body
+        author_id = request.POST.get("author_id")
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+        content = request.POST.get("content")
+
+        # Decode the author_id if it's URL-encoded
+        author_id = unquote(author_id)
+
+        # Retrieve the author user object
+        author = get_object_or_404(User, url_id=author_id)
+
+        # Check for duplicates
+        post_exists = Post.objects.filter(
+            user=author, title=title, description=description, content=content
+        ).exists()
+
+        return JsonResponse({'exists': post_exists})
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=400)
+    
+def checkGithubPolling(request):
+    '''
+    Purpose: Check whether we need to poll github for new events
+
+    Arguments:
+        request: Request object
+    '''
+    last_poll = GithubPolling.objects.last()
+
+    if last_poll is None:
+        new_poll = GithubPolling()
+        new_poll.save()
+        return JsonResponse({'poll': 'True'})
+
+    time_now = datetime.now(timezone.utc)
+    time_diff = time_now - last_poll.last_polled
+    if time_diff > timedelta(minutes=10):
+        new_poll = GithubPolling()
+        new_poll.save()
+        return JsonResponse({'poll': 'True'})
+    else:
+        return JsonResponse({'poll': 'False'})

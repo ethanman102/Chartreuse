@@ -3,12 +3,12 @@
 body,html{
     font-family: "Sometype Mono", monospace;
     margin-left: 10%;
-    margin-right: 3ch;
 }
+
+
 
 .full-container{
     background-color:  #dddddd; 
-    margin-bottom: 5ch;
     border-left: 5px solid black;
     border-right: 5px solid black;
     border-bottom:5px solid black ;

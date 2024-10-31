@@ -126,9 +126,14 @@ def update_post(request, post_id):
 
         # Determine content type and set appropriate content
         # add option for commonmark here
-        if content:
+        if (content_type == "text/plain") and content:
             content_type = 'text/plain'
             post_content = content
+
+        elif (content_type == "text/commonmark") and content:
+            content_type = "text/commonmark"    # not sure this is necessary
+            post_content = content
+
         elif image:
             image_data = image.read()
             encoded_image = base64.b64encode(image_data).decode('utf-8')

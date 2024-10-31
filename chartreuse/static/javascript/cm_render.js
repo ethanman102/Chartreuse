@@ -1,5 +1,3 @@
-import "https://unpkg.com/commonmark@0.29.3/dist/commonmark.js";
-
 'use strict'
 
 // waiting for the page to load before 
@@ -10,6 +8,7 @@ function main() {
 
     // variable to track the html element for displaying the commonmark text
     // NOTE - debugger says cm_text is empty.
+    // POSSIBILITY: text/commonmark is never properly assigned 
     var markString = document.getElementById('cm_text').innerText;
 
     // for debugging 

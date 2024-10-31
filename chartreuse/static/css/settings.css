@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap');
+
+body,html{
+    font-family: "Sometype Mono", monospace;
+    margin-left: 10%;
+}
+
+
+
+.full-container{
+    background-color:  #dddddd; 
+    border-left: 5px solid black;
+    border-right: 5px solid black;
+    border-bottom:5px solid black ;
+}
+
+.btn{
+    border-radius: 0;
+    background-color: #00356B;
+    color: white;
+    transition: box-shadow 0.3s ease;
+}
+
+.btn:hover{
+    background-color: #00356B;
+    box-shadow: 6px 6px 0px #000000;
+}
+
+.form-control{
+    width: 90%;
+    color: #00356b;
+    background-color: rgb(203, 247, 159);
+    padding: 12px 20px;
+    margin: 8px 0;
+    border: 1px solid #000000;
+    border-radius: 4px;
+
+}
+
+#settings-header{
+    background-color: #00356B;
+}
+
+#settings-header > h4{
+    font-weight: bold;
+    color: chartreuse;
+}
+
+#nav-dn-tab,#nav-pi-tab,#nav-password-tab,#nav-github-tab{
+    background-color: #c9c9c9;
+    border-radius: 0;
+}
+
+.nav-link{
+    color: white;
+    border: none;
+}
+
+.nav-tabs > button{
+    padding-right: 1ch;
+}
+
+.nav-tabs > button:hover{
+    color: white;
+    box-shadow: #000000 5px 5px;
+    margin-right: 1ch;
+}
+
+.nav-tabs > .active{
+    border: 1px solid white;
+    border-bottom: none;
+    text-decoration: underline;
+    font-weight: bold;
+    box-shadow: #000000 5px 5px;
+    margin-right: 1ch;
+    
+}
+
+
+.nav-cols{
+    padding-top: 1ch;
+    background-color: #c9c9c9; 
+    padding-bottom: 1ch;
+}
+
+.nav-row{
+    border-bottom: solid 5px black;
+    
+}
+
+#new-passwords{
+    margin-top: 3ch;
+}
+
+#current-name-text{
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+
+

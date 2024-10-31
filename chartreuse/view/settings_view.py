@@ -3,12 +3,13 @@ from django.contrib.auth.models import User as AuthUser
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseNotAllowed
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login as auth_login
 import json
 from ..models import User
 from django.shortcuts import get_object_or_404
+from urllib.parse import urlparse
 
 @login_required
 def update_password(request):
@@ -43,6 +44,7 @@ def update_password(request):
         
 
         return JsonResponse({'success': 'Password successfully changed'},status=200)
+    return HttpResponseNotAllowed(['POST'])
     
 
 @login_required
@@ -59,6 +61,54 @@ def update_display_name(request):
         current_user_model.save()
 
         return JsonResponse({'success': 'Display name successfully changed'},status=200)
+    return HttpResponseNotAllowed(['POST'])
+    
+@login_required
+def remove_github(request):
+    if request.method == "DELETE":
+        data = json.loads(request.body)
+
+        current_github = data.get("current_github")
+        current_auth_user = request.user
+        current_user_model = get_object_or_404(User,user=current_auth_user)
+
+        if (current_user_model.github != current_github):
+            return JsonResponse({'error': 'Server Side Implementation Error'}, status=500)
+        
+        current_user_model.github = None
+        current_user_model.save()
+        
+        return JsonResponse({'success': 'Associated github removed'},status=200)
+    return HttpResponseNotAllowed(['DELETE'])
+    
+@login_required
+def add_github(request):
+    if request.method == "PUT":
+        data = json.loads(request.body)
+
+        github = data.get('github')
+
+        # check to see if it is a github URL hostname..
+        # https://stackoverflow.com/questions/9530950/parsing-hostname-and-port-from-string-or-url
+        # Stack Overflow Post: Parsing hostname and port from string or url
+        # Purpose: how to validate the hostname of a URL string
+        # Answered by: Maksym Kozlenko on July 21, 2013
+        host = urlparse(github).hostname
+
+        if host == None or host.lower() != 'github.com':
+            return JsonResponse({'error': 'Invalid Github URL'},status=400)
+        
+        current_auth_user = request.user
+        current_user_model = get_object_or_404(User,user=current_auth_user)
+
+        current_user_model.github = github
+        current_user_model.save()
+
+        return JsonResponse({'success': 'Github Added successfully'},status=200)
+    return HttpResponseNotAllowed(['PUT'])
+        
+
+
             
 
 class SettingsDetailView(DetailView):

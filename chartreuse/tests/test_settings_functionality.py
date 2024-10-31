@@ -91,7 +91,7 @@ class TestSettingsViews(TestCase):
 
     def test_removing_github(self):
         self.client.force_login(self.auth_user_1)
-        response = self.client.post(reverse('chartreuse:remove_github'),{
+        response = self.client.delete(reverse('chartreuse:remove_github'),{
             'current_github': self.user_1.github
         },content_type='application/json')
 
@@ -103,7 +103,7 @@ class TestSettingsViews(TestCase):
     def test_server_github_remove_error(self):
 
         self.client.force_login(self.auth_user_1)
-        response = self.client.post(reverse('chartreuse:remove_github'),{
+        response = self.client.delete(reverse('chartreuse:remove_github'),{
             'current_github': 'thisShouldRaiseAnErroForUnMatchingCurrentGithub'
         },content_type='application/json')
     
@@ -115,7 +115,7 @@ class TestSettingsViews(TestCase):
     
     def test_add_github(self):
         self.client.force_login(self.auth_user_2)
-        response = self.client.post(reverse('chartreuse:remove_github'),{
+        response = self.client.put(reverse('chartreuse:add_github'),{
             'github': 'https://github.com/'
         },content_type='application/json')
 
@@ -127,7 +127,7 @@ class TestSettingsViews(TestCase):
     
     def test_reject_non_github(self):
         self.client.force_login(self.auth_user_2)
-        response = self.client.post(reverse('chartreuse:remove_github'),{
+        response = self.client.put(reverse('chartreuse:add_github'),{
             'github': 'HORRIBLEURL'
         },content_type='application/json')
 

@@ -10,7 +10,7 @@ class User(models.Model):
     url_id = models.URLField(primary_key=True)
     displayName = models.CharField(max_length=100)
     host = models.URLField()
-    github = models.URLField()
+    github = models.URLField(null=True,blank=True)
     profileImage = models.URLField()
     dateCreated  = models.DateTimeField(auto_now_add=True)
 
@@ -34,7 +34,7 @@ class Post(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Post(id={self.id}, url_id={self.url_id}, title={self.title}, description={self.description}, contentType={self.contentType}, content={self.content}, user={self.user}, published={self.published}, visibility={self.visibility})"
+        return f"Post(id={self.id}, url_id={self.url_id}, title={self.title}, description={self.description}, user={self.user}, published={self.published}, visibility={self.visibility})"
 
 class Like(models.Model):
     id = models.AutoField(primary_key=True)

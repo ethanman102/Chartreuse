@@ -194,7 +194,10 @@
                     headers:{
                         'X-CSRFToken' : '{{csrf_token}}',
                         'Content-Type' : 'application/json'
-                    }
+                    },
+                    body: JSON.stringify({
+                        current_github: `${currentGithub}`
+                    })
                 });
 
                 let data = await response.json();

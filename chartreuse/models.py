@@ -10,7 +10,7 @@ class User(models.Model):
     url_id = models.URLField(primary_key=True)
     displayName = models.CharField(max_length=100)
     host = models.URLField()
-    github = models.URLField()
+    github = models.URLField(null=True,blank=True)
     profileImage = models.URLField()
     dateCreated  = models.DateTimeField(auto_now_add=True)
 

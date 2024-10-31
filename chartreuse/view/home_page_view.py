@@ -1,8 +1,9 @@
 from django.shortcuts import get_object_or_404
-from chartreuse.models import User, Follow, Like, FollowRequest
+from chartreuse.models import User, Follow, Like, FollowRequest, Post
 from django.views.generic.detail import DetailView
 from urllib.parse import quote
 from chartreuse.view.support_functions import get_followed, get_all_public_posts, get_posts
+from . import support_functions
 
 class FeedDetailView(DetailView):
     '''
@@ -78,6 +79,8 @@ class FeedDetailView(DetailView):
                 post.url_id = quote(post.url_id, safe='')
                 if post.contentType != "text/plain":
                     post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+                
+                post.user.profileImage = support_functions.get_image_post(post.user.profileImage)
 
             return posts
         

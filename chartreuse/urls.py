@@ -57,6 +57,7 @@ urlpatterns = [
 
     # Image URLs
     path('api/authors/<int:author_id>/posts/<int:post_id>/image', images.ImageViewSet.retrieve, name='get_image_post'),
+    path('set-profile-image/', support_functions.setNewProfileImage, name='set_profile_image'),
 
     # Github URLs
     re_path(r"github/(?P<user_id>.+)/events/", github.get_events, name="get_events"),
@@ -72,6 +73,8 @@ urlpatterns = [
 
     #settings URLS:
     path('settings/updatePassword/',settings_view.update_password,name='update_password'),
+    path('settings/removeGithub/',settings_view.remove_github,name="remove_github"),
+    path('settings/addGithub/',settings_view.add_github,name="add_github"),
     path('settings/updateDisplayName/',settings_view.update_display_name,name="update_display_name"),
     path('settings/',login_required(settings_view.SettingsDetailView.as_view()),name="settings"),
 

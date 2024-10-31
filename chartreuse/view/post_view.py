@@ -3,6 +3,7 @@ from django.views.generic.detail import DetailView
 from chartreuse.models import Post, Like, Follow, User, FollowRequest
 from urllib.parse import quote, unquote
 from django.shortcuts import redirect
+from . import support_functions
 
 class PostDetailView(DetailView):
     '''
@@ -58,6 +59,9 @@ class PostDetailView(DetailView):
 
         if post.contentType != "text/plain":
             post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+            post.has_image = True
+
+        post.user.profileImage = support_functions.get_image_post(post.user.profileImage)
 
         context['post'] = post
         context['logged_in'] = self.request.user.is_authenticated

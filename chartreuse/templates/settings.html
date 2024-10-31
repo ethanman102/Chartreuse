@@ -3,7 +3,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    {%load static%}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/settings.css' %}">
 </head>
 <body>
     
@@ -17,10 +19,10 @@
         <!-- Resource: Bootstrap 5 Nav Tabs documentation, tab navigation base code taken from documentation and modified for project use
          https://getbootstrap.com/docs/5.3/components/navs-tabs/#base-nav
          Accessed on October 27, 2024-->
-        <div class="row">
-            <div col-12>
+        <div class="row nav-row">
+            <div class="col-12 nav-cols">
                 <nav>
-                    <div class="nav nav-tabs" id="settings-nav-tab" role="tablist">
+                    <div class="nav nav-tabs nav-justified" id="settings-nav-tab" role="tablist">
                       <button class="nav-link active" id="nav-dn-tab" data-bs-toggle="tab" data-bs-target="#nav-dn" type="button" role="tab" aria-controls="nav-dn" aria-selected="true">Edit Display Name</button>
                       <button class="nav-link" id="nav-password-tab" data-bs-toggle="tab" data-bs-target="#nav-password" type="button" role="tab" aria-controls="nav-password" aria-selected="false">Edit Password</button>
                       <button class="nav-link" id="nav-pi-tab" data-bs-toggle="tab" data-bs-target="#nav-pi" type="button" role="tab" aria-controls="nav-pi" aria-selected="false">Edit Profile Image</button>
@@ -39,7 +41,7 @@
                 </div>
                 <div class="row">
                     <div class="col-3 offset-3">
-                        <h5>Current Name:</h5>
+                        <h5 id="current-name-text">Current Name:</h5>
                     </div>
                     <div class="col-6">
                         <h5 id="current-dn-text">{{ user.displayName }}</h5>
@@ -104,20 +106,188 @@
                             <button type="button" class="btn btn-primary w-100" id="password-submit-button">Update</button>
                         </div>
                         <div class="col-3" id="password-loading">
-                            <div class="spinner-border text-primary" role="status" id="passwordSpinner" style="visibility: hidden;">
-                            </div>
+                            <div class="spinner-border text-primary" role="status" id="passwordSpinner" style="visibility: hidden;"></div>
                         </div>
                     </div>
                 </form>
             </div>
-            </div>
             <div class="tab-pane fade" id="nav-pi" role="tabpanel" aria-labelledby="nav-pi-tab" tabindex="0">...</div>
-            <div class="tab-pane fade" id="nav-github" role="tabpanel" aria-labelledby="nav-github-tab" tabindex="0">...</div>
+            <div class="tab-pane fade" id="nav-github" role="tabpanel" aria-labelledby="nav-github-tab" tabindex="0">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 id="github-prompt-message">Want to change the github associated with your account?</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 current-github-text">
+                        <h5>Current Github:</h5>
+                    </div>
+                    <div class="col-6">
+                        <p id="github-url-text">{{user.github}}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3 offset-6" id="github-remove-div">
+                        <button type="button" class="btn btn-primary w-100" id="github-remove-button">Remove</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <p id="github-remove-message" style="visibility: hidden;">remove message</p>
+                    </div>
+                </div>
+                <div class="row" id="github-add-section">
+                    <div class="col-2 offset-3">
+                        <label for="github-input">URL:</label>
+                    </div>
+                    <div class="col-4">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input id="github-input" name="github-input" type="text" class="form-control" required placeholder="Your GITHUB"/>
+                            <div class="row">
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-primary w-100" id="github-add-button">Add</button>
+                                </div>
+                                <div class="col-6">
+                                    <div class="spinner-border text-primary" role="status" id="githubSpinner" style="visibility: hidden;"></div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row'">
+                    <div class="col-6 offset-3">
+                        <p id="github-add-message" style="visibility: hidden;">Github add message</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        window.addEventListener('load',githubTab);
+        function githubTab(){
+            let currentGithub = '{{user.github}}';
+            let addGithubSection = document.getElementById('github-add-section');
+            let githubRemoveButton = document.getElementById('github-remove-button');
+            let githubSpinner = document.getElementById('githubSpinner');
+            let githubAddButton = document.getElementById('github-add-button');
+            let githubURLInput = document.getElementById('github-input');
+            let removeGithubMessage = document.getElementById('github-remove-message');
+            let githubURLtext = document.getElementById('github-url-text');
+            let addGithubMessage = document.getElementById('github-add-message');
+
+            if (currentGithub !== 'None'){
+                addGithubSection.style.visibility = 'hidden';
+            }
+
+            if (currentGithub === 'None'){
+                githubRemoveButton.style.visibility = 'hidden';
+            }
+
+            githubRemoveButton.addEventListener('click', async (event)=>{
+                event.preventDefault();
+                githubRemoveButton.disabled = 'true';
+
+                let response = await fetch('removeGithub/',{
+                    method: 'DELETE',
+                    headers:{
+                        'X-CSRFToken' : '{{csrf_token}}',
+                        'Content-Type' : 'application/json'
+                    },
+                    body: JSON.stringify({
+                        current_github: `${currentGithub}`
+                    })
+                });
+
+                let data = await response.json();
+
+                if (response.status === 200){
+                    removeGithubMessage.innerText = data.success;
+                    removeGithubMessage.style.color = 'chartreuse';
+                    removeGithubMessage.style.visibility = 'visible';
+                    githubRemoveButton.style.visibility = "hidden";
+                    currentGithub == 'None';
+                    githubURLtext.innerText = 'None';
+                    githubRemoveButton.style.visibility = 'hidden';
+                    addGithubSection.style.visibility = 'visible';
+
+                }
+                githubRemoveButton.removeAttribute('disabled');
+                
+            });
+
+           githubAddButton.addEventListener('click', async (event) => {
+                event.preventDefault();
+
+                removeGithubMessage.style.visibility = 'hidden';
+
+                if (githubURLInput.value === ''){
+                    addGithubMessage.innerText = "Please provide a github";
+                    addGithubMessage.style.color = 'red';
+                    addGithubMessage.style.visibility = 'visible';
+                    return;
+                }
+
+                githubAddButton.disabled  = 'true';
+                githubURLInput.disabled = 'true';
+                githubSpinner.style.visibility = 'visible';
+
+                let response = await fetch('addGithub/',{
+                    method: 'PUT',
+                    headers:{
+                        'X-CSRFToken': '{{csrf_token}}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        github: `${githubURLInput.value}`
+                    })
+                });
+
+                let data = await response.json();
+
+                if (response.status === 200){
+                    addGithubMessage.innerText = data.success;
+                    addGithubMessage.style.color = 'chartreuse';
+                    addGithubMessage.style.visibility = 'visible';
+                    addGithubSection.style.visibility = 'hidden';
+                    githubRemoveButton.style.visibility = 'visible';
+                    currentGithub = githubURLInput.value;
+                    githubURLInput.value = '';
+                    githubURLtext.innerText = currentGithub;
+                    window.setTimeout(()=>{
+                        addGithubMessage.style.visibility = 'hidden';
+                    },5000)
+                }else{
+                    addGithubMessage.style.color = 'red';
+                    addGithubMessage.style.visibility = 'visible';
+                    if (response.status === 400){
+                        addGithubMessage.innerText = data.error;
+                    }
+                    if (response.status === 404){
+                        addGithubMessage.innerText = 'An error has occured';
+                    }
+                    githubURLInput.value = '';
+                }
+                githubURLInput.removeAttribute('disabled');
+                githubAddButton.removeAttribute('disabled');
+                githubSpinner.style.visibility = 'hidden';
+                
+            });
+
+            githubURLInput.addEventListener('input',(event)=>{
+                removeGithubMessage.style.visibility = 'hidden';
+                addGithubMessage.style.visibility = 'hidden';
+            });
+           
+
+
+        }
+    </script>
+
     <script>
         window.addEventListener('load',displayNameTab);
         function displayNameTab(){

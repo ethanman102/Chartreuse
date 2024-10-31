@@ -6,6 +6,7 @@ from chartreuse.models import User,Like,Comment,Post,Follow,FollowRequest
 from django.views.generic.detail import DetailView
 from django.http import HttpResponseNotAllowed
 from urllib.parse import unquote, quote
+from . import support_functions
 
 def follow_accept(request,followed,follower):
 
@@ -130,6 +131,8 @@ class ProfileDetailView(DetailView):
         user = context['profile']
         context['owner_id'] = quote(user.url_id,safe='')
 
+        context['profile'].profileImage = support_functions.get_image_post(context['profile'].profileImage)
+
         post_access = "public" # default following status, will be updated after!
 
         # checking if user is authenticated or anonymous
@@ -243,13 +246,17 @@ class ProfileDetailView(DetailView):
         elif post_access == "unlisted":
             posts = Post.objects.filter(visibility="PUBLIC",user=user) | Post.objects.filter(visibility="UNLISTED",user=user)
         else:
-            posts = Post.objects.filter(user=user)
+            posts = Post.objects.filter(user=user).exclude(visibility="DELETED")
 
         # Resource: https://www.w3schools.com/django/django_queryset_orderby.php 
         # This Resource by W3 Schools titled: 'Django QuerySet - Order By' helped us to understand how to order a queryset from descending order!
         posts.order_by("-published")
         posts = [post for post in posts]
         posts = sorted(posts, key=lambda post: post.published, reverse=True)
+        
+        for post in posts:
+            post.user.profileImage = support_functions.get_image_post(post.user.profileImage)
+
         return posts
         
 

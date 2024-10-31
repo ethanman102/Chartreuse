@@ -94,3 +94,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+
+document.querySelectorAll('.pfp-button').forEach(button => {
+    button.addEventListener('click', function() {
+        const postId = this.getAttribute('data-post-id');
+        const userId = this.getAttribute('data-user-id');
+        const url = `/chartreuse/set-profile-image/`; 
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                post_id: postId,
+                user_id: userId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            window.location.reload();
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});

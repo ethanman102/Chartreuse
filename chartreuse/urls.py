@@ -44,6 +44,7 @@ urlpatterns = [
 
     # Image URLs
     path('api/authors/<int:author_id>/posts/<int:post_id>/image', images.ImageViewSet.retrieve, name='get_image_post'),
+    path('set-profile-image/', support_functions.setNewProfileImage, name='set_profile_image'),
 
     # Github URLs
     re_path(r"github/(?P<user_id>.+)/events/", github.get_events, name="get_events"),

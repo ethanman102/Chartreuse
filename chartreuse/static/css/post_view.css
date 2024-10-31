@@ -58,6 +58,17 @@ p {
     background-color: #000000;
 }
 
+.pfp-button {
+    color: #000000;
+    background-color: #ffffff;
+    border-color: black;
+}
+
+.pfp-button:hover {
+    color: #ffffff;
+    background-color: #000000;
+}
+
 a {
     text-decoration: none;
 }

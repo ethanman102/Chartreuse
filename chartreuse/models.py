@@ -10,7 +10,7 @@ class User(models.Model):
     url_id = models.URLField(primary_key=True)
     displayName = models.CharField(max_length=100)
     host = models.URLField()
-    github = models.URLField()
+    github = models.URLField(null=True,blank=True)
     profileImage = models.URLField()
     dateCreated  = models.DateTimeField(auto_now_add=True)
 
@@ -80,3 +80,6 @@ class FollowRequest(models.Model):
     requestee = models.ForeignKey(User, related_name="follow_requests_received", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     approved = models.BooleanField(default=False)
+
+class GithubPolling(models.Model):
+    last_polled = models.DateTimeField(auto_now_add=True)

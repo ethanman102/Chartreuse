@@ -44,7 +44,7 @@ def update_password(request):
         
 
         return JsonResponse({'success': 'Password successfully changed'},status=200)
-    return HttpResponseNotAllowed()
+    return HttpResponseNotAllowed(['POST'])
     
 
 @login_required
@@ -61,7 +61,7 @@ def update_display_name(request):
         current_user_model.save()
 
         return JsonResponse({'success': 'Display name successfully changed'},status=200)
-    return HttpResponseNotAllowed()
+    return HttpResponseNotAllowed(['POST'])
     
 @login_required
 def remove_github(request):
@@ -79,7 +79,7 @@ def remove_github(request):
         current_user_model.save()
         
         return JsonResponse({'success': 'Associated github removed'},status=200)
-    return HttpResponseNotAllowed()
+    return HttpResponseNotAllowed(['DELETE'])
     
 @login_required
 def add_github(request):
@@ -105,7 +105,7 @@ def add_github(request):
         current_user_model.save()
 
         return JsonResponse({'success': 'Github Added successfully'},status=200)
-    return HttpResponseNotAllowed()
+    return HttpResponseNotAllowed(['PUT'])
         
 
 

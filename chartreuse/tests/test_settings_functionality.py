@@ -137,6 +137,42 @@ class TestSettingsViews(TestCase):
 
         self.assertEqual(updated.github,None)
 
+    def test_add_github_method_not_allowed(self):
+        self.client.force_login(self.auth_user_2)
+        response = self.client.post(reverse('chartreuse:add_github'),{
+            'github': 'HORRIBLEURL'
+        },content_type='application/json')
+
+        self.assertEqual(response.status_code,405)
+    
+    def test_remove_github_method_not_allowed(self):
+        self.client.force_login(self.auth_user_2)
+        response = self.client.get(reverse('chartreuse:remove_github'),{
+            'github': 'HORRIBLEURL'
+        },content_type='application/json')
+
+        self.assertEqual(response.status_code,405)
+
+    def test_change_display_name_method_not_allowed(self):
+        self.client.force_login(self.auth_user_2)
+        response = self.client.get(reverse('chartreuse:update_display_name'),{
+            'github': 'HORRIBLEURL'
+        },content_type='application/json')
+
+        self.assertEqual(response.status_code,405)
+
+    def test_update_password_method_not_allowed(self):
+        self.client.force_login(self.auth_user_2)
+        response = self.client.get(reverse('chartreuse:update_password'),{
+            'github': 'HORRIBLEURL'
+        },content_type='application/json')
+
+        self.assertEqual(response.status_code,405)
+
+
+
+
+
         
 
         

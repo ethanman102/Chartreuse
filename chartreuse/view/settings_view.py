@@ -3,7 +3,7 @@ from django.contrib.auth.models import User as AuthUser
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseNotAllowed
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login as auth_login
 import json
@@ -44,6 +44,7 @@ def update_password(request):
         
 
         return JsonResponse({'success': 'Password successfully changed'},status=200)
+    return HttpResponseNotAllowed()
     
 
 @login_required
@@ -60,6 +61,7 @@ def update_display_name(request):
         current_user_model.save()
 
         return JsonResponse({'success': 'Display name successfully changed'},status=200)
+    return HttpResponseNotAllowed()
     
 @login_required
 def remove_github(request):
@@ -77,6 +79,7 @@ def remove_github(request):
         current_user_model.save()
         
         return JsonResponse({'success': 'Associated github removed'},status=200)
+    return HttpResponseNotAllowed()
     
 @login_required
 def add_github(request):
@@ -102,6 +105,7 @@ def add_github(request):
         current_user_model.save()
 
         return JsonResponse({'success': 'Github Added successfully'},status=200)
+    return HttpResponseNotAllowed()
         
 
 

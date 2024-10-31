@@ -10,7 +10,7 @@ from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 
 from ..models import Like, User, Post
-from .posts import PostSerializer
+
 from .users import UserSerializer, UserViewSet
 from urllib.parse import unquote
 
@@ -260,7 +260,6 @@ class LikeViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API helps in getting all likes related to a post, useful for tracking engagement."
             "\n\n**Why not to use:** If the post doesn't exist, or if you do not require all likes on a post."
         ),
-        request=PostSerializer,
         responses={
             200: OpenApiResponse(description="Successfully retrieved all likes.", response=LikesSerializer),
             405: OpenApiResponse(description="Method not allowed."),
@@ -367,7 +366,7 @@ class LikeViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** To track all the posts and comments that a particular user has liked."
             "\n\n**Why not to use:** If you are not interested in a user's likes or if the user ID is not valid."
         ),
-        request=UserSerializer
+        request=UserSerializer,
         parameters=[
             OpenApiParameter(name="page", description="Page number for pagination.", required=False, type=int),
             OpenApiParameter(name="size", description="Number of likes per page.", required=False, type=int),

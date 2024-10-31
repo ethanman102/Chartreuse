@@ -380,7 +380,7 @@ class UserViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API enables users to authenticate and access their accounts securely."
             "\n\n**Why not to use:** If the credentials are invalid or missing, the login attempt will fail."
         ),
-        request=UserSerializer
+        request=UserSerializer,
         responses={
             200: OpenApiResponse(description="User logged in successfully."),
             400: OpenApiResponse(description="Invalid credentials."),

@@ -33,3 +33,6 @@ function main() {
 
 // in case I need to bundle the JS code later
 // npx esbuild /chartreuse/static/javascript/cm_render.js --bundle --minify --sourcemap --outfile=./chartreuse/static/cm_render.min.js
+
+// add this to citations page later 
+// https://stackoverflow.com/questions/42237388/syntaxerror-import-declarations-may-only-appear-at-top-level-of-a-module

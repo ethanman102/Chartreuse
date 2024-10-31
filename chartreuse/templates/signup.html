@@ -50,6 +50,7 @@
 </div>
 <script>
     window.addEventListener('load', () => {
+        // for the default profile image choosing
         const pfp1 = document.querySelector('img[alt="Profile Pic 1"]');
         const pfp2 = document.querySelector('img[alt="Profile Pic 2"]');
         const pfp3 = document.querySelector('img[alt="Profile Pic 3"]');
@@ -62,6 +63,31 @@
                     pfp.classList.remove("selected");
                 });
                 pfp.classList.add("selected");
+            });
+        });
+
+        // for handling form errors
+        const form = document.querySelector('form');
+        form.addEventListener('submit', (event) => {
+            // prevent the form from submitting just yet
+            event.preventDefault();
+
+            const formData = new FormData(form);
+            // csrfmiddlewaretoken is the actual field name in the http request used by {% csrf_token %}
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;  // Get CSRF token
+
+            console.log(formData);
+
+            fetch('save/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': csrfToken,  // Include the CSRF token in headers
+                    }
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.error);
             });
         });
     });

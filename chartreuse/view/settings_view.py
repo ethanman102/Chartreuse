@@ -92,7 +92,7 @@ def add_github(request):
         # Answered by: Maksym Kozlenko on July 21, 2013
         host = urlparse(github).hostname
 
-        if host.lower() != 'github.com':
+        if host == None or host.lower() != 'github.com':
             return JsonResponse({'error': 'Invalid Github URL'},status=400)
         
         current_auth_user = request.user

@@ -133,6 +133,11 @@
                         <button type="button" class="btn btn-primary w-100" id="github-remove-button">Remove</button>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-6">
+                        <p id="github-remove-message" style="visibility: hidden;">remove message</p>
+                    </div>
+                </div>
                 <div class="row" id="github-add-section">
                     <div class="col-2 offset-3">
                         <label for="github-input">URL:</label>
@@ -177,7 +182,7 @@
             let githubURLtext = document.getElementById('github-url-text');
             let addGithubMessage = document.getElementById('github-add-message');
 
-            if (currentGithub === 'None'){
+            if (currentGithub !== 'None'){
                 addGithubSection.style.visibility = 'hidden';
             }
 
@@ -208,73 +213,79 @@
                     removeGithubMessage.style.visibility = 'visible';
                     githubRemoveButton.style.visibility = "hidden";
                     currentGithub == 'None';
-                    githubURLtext.innerText = `${currentGithub}`;
+                    githubURLtext.innerText = 'None';
+                    githubRemoveButton.style.visibility = 'hidden';
+                    addGithubSection.style.visibility = 'visible';
 
                 }
                 githubRemoveButton.removeAttribute('disabled');
+                
             });
 
            githubAddButton.addEventListener('click', async (event) => {
-            event.preventDefault();
+                event.preventDefault();
 
-            removeGithubMessage.style.visibility = 'hidden';
+                removeGithubMessage.style.visibility = 'hidden';
 
-            if (githubURLInput.value === ''){
-                addGithubMessage.innerText = "Please provide a github";
-                addGithubMessage.style.color = 'red';
-                addGithubMessage.style.visiblity = 'visible';
-                return;
-            }
+                if (githubURLInput.value === ''){
+                    console.log('entered')
+                    addGithubMessage.innerText = "Please provide a github";
+                    addGithubMessage.style.color = 'red';
+                    addGithubMessage.style.visiblity = 'visible';
+                    return;
+                }
 
-            githubAddButton.disabled  = 'true';
-            githubURLInput.disabled = 'true';
-            githubSpinner.style.visibility = 'visible';
+                githubAddButton.disabled  = 'true';
+                githubURLInput.disabled = 'true';
+                githubSpinner.style.visibility = 'visible';
 
-            let response = await fetch('addGithub/',{
-                method: 'PUT',
-                headers:{
-                    'X-CSRFToken': '{{csrf_token}}',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    github: `${githubURLInput.value}`
-                })
+                let response = await fetch('addGithub/',{
+                    method: 'PUT',
+                    headers:{
+                        'X-CSRFToken': '{{csrf_token}}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        github: `${githubURLInput.value}`
+                    })
+                });
+
+                let data = await response.json();
+
+                if (response.status === 200){
+                    addGithubMessage.innerText = data.success;
+                    addGithubMessage.style.color = 'chartreuse';
+                    addGithubMessage.style.visibility = 'visible';
+                    addGithubSection.style.visibility = 'hidden';
+                    githubRemoveButton.style.visibility = 'visible';
+                    currentGithub = githubURLInput.value;
+                    githubURLInput.value = '';
+                    githubURLtext.innerText = currentGithub;
+                    window.setTimeout(()=>{
+                        addGithubMessage.style.visibility = 'hidden';
+                    },5000)
+                }else{
+                    addGithubMessage.style.color = 'red';
+                    addGithubMessage.style.visibility = 'visible';
+                    if (response.status === 400){
+                        addGithubMessage.innerText = data.error;
+                    }
+                    if (response.status === 404){
+                        addGithubMessage.innerText = 'An error has occured';
+                    }
+                    githubURLInput.value = '';
+                }
+                githubURLInput.removeAttribute('disabled');
+                githubAddButton.removeAttribute('disabled');
+                githubSpinner.style.visibility = 'hidden';
+                
             });
 
-            let data = await response.json();
-
-            if (response.status === 200){
-                addGithubMessage.innerText = data.success;
-                addGithubMessage.style.color = 'chartreuse';
-                addGithubMessage.style.visibility = 'visible';
-                addGithubSection.style.visibility = 'visible';
-                githubRemoveButton.style.visibility = 'visible';
-                currentGithub = githubURLInput.value;
-                githubURLInput.value = '';
-                window.setTimeout(()=>{
-                    addGithubMessage.style.visibility = 'hidden';
-                },5000)
-            }else{
-                addGithubMessage.style.color = 'red';
-                addGithubMessage.style.visibility = 'visible';
-                if (response.status === 400){
-                    addGithubMessage.innerText = data.error;
-                    return;
-                }
-                if (response.status === 404){
-                    addGithubMessage.innerText = 'An error has occured';
-                    return;
-                }
-            }
-            githubURLInput.removeAttribute('disabled');
-            githubAddButton.removeAttribute('disabled');
-            githubSpinner.style.visibility = 'hidden';
-           });
-
-           githubURLInput.addEventListener('input',(event)=>{
-            removeGithubMessage.style.visibility = 'hidden';
-            addGithubMessage.style.visibility = 'hidden';
-           })
+            githubURLInput.addEventListener('input',(event)=>{
+                removeGithubMessage.style.visibility = 'hidden';
+                addGithubMessage.style.visibility = 'hidden';
+            });
+           
 
 
         }

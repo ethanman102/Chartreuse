@@ -1,5 +1,5 @@
 from django.urls import path, re_path
-from .api_handling import users, likes, images, github, friends, posts
+from .api_handling import users, likes, images, github, friends, posts, comments
 from .api_handling import followers, follow_requests
 from django.conf import settings
 from django.conf.urls.static import static
@@ -11,16 +11,29 @@ app_name = "chartreuse"
 urlpatterns = [
     # Like URLs
     re_path(r"api/authors/(?P<user_id>.+\d)/inbox/$", likes.LikeViewSet.as_view({'post': 'add_like', 'delete': 'remove_like'}), name="like"),
+    re_path(r"api/authors/(?P<user_id>.+\d)/posts/(?P<post_id>.+\d)/comments/(?P<comment_id>.+\d)/likes/$", likes.LikeViewSet.as_view({'get': 'get_comment_likes'}), name="comment_likes"),
     re_path(r"api/authors/(?P<user_id>.+\d)/posts/(?P<post_id>.+\d)/likes/$", likes.LikeViewSet.get_post_likes, name="post_likes"),
-    re_path(r"api/authors/(?P<user_id>.+\d)/posts/(?P<post_id>.+\d)/comments/(?P<comment_id>.+\d)/likes/$", likes.LikeViewSet.get_comment_likes, name="comment_likes"),
+    
 
     re_path(r"api/authors/(?P<user_id>.+\d)/liked/(?P<like_id>.+\d)/$", likes.LikeViewSet.get_like, name="get_like_object"),
     re_path(r"api/authors/(?P<user_id>.+\d)/liked/$", likes.LikeViewSet.user_likes, name="get_liked"),
+
+    # Comment URLs 
+    re_path(r"api/authors/(?P<user_id>.+)/posts/(?P<post_id>.+)/comments/add/$", comments.CommentViewSet.as_view({'post': 'create_comment'}), name="create_comment"),
+    re_path(r"api/authors/(?P<user_id>.+)/posts/(?P<post_id>.+)/comment/(?P<comment_id>.+)/$", comments.CommentViewSet.get_comment, name="get_comment"),
+    re_path(r"api/comment/(?P<comment_id>.+)/remove/$", comments.CommentViewSet.as_view({"delete":"delete_comment"}), name="delete_comment"), 
+    re_path(r"api/comment/(?P<comment_id>.+)/$", comments.CommentViewSet.get_comment, name="get_comment_by_cid"), 
+    re_path(r"api/authors/(?P<user_id>.+)/posts/(?P<post_id>.+)/comments/$", comments.CommentViewSet.as_view({'get': 'get_comments'}), name="get_comments"),
+    re_path(r"api/posts/(?P<post_id>.+)/comments/$", comments.CommentViewSet.as_view({'get': 'get_comments'}), name="get_comments_by_pid"),
+    re_path(r"api/authors/(?P<user_id>.+)/commented/$", comments.CommentViewSet.as_view({'get': "get_authors_comments", 'post': "create_comment"}), name="get_authors_comments"),
+    re_path(r"api/authors/(?P<user_id>.+)/commented/(?P<comment_id>.+)/$", comments.CommentViewSet.get_comment, name="get_commented"),
+    re_path(r"api/commented/(?P<comment_id>.+)/$", comments.CommentViewSet.get_comment, name="get_commented_by_cid"), 
 
     # Post URLs
     re_path(r"api/authors/(?P<user_id>.+\d)/posts/(?P<post_id>.+\d)/$", posts.PostViewSet.as_view({"get": "get_post", "delete": "remove_post", "put": "update"}), name="post"),
     re_path(r"api/authors/(?P<user_id>.+\d)/posts/$", posts.PostViewSet.as_view({"get": "get_posts", "post": "create_post"}), name="posts"),
     re_path(r"api/post-exists/$", support_functions.check_duplicate_post, name="check_duplicate_post"),
+    
     # Author URLs
     path("api/author/login/", users.UserViewSet.login_user, name="login_user"),
     re_path(r"api/authors/(?P<pk>.+\d)/$", users.UserViewSet.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'}), name="user-detail"),
@@ -31,7 +44,7 @@ urlpatterns = [
     re_path(r"api/authors/(?P<author_id>.+\d)/followers/(?P<foreign_author_id>.+\d)/remove", followers.FollowViewSet.as_view({'delete': 'remove_follower'}), name="remove_follower"),
     re_path(r"api/authors/(?P<author_id>.+\d)/followers/(?P<foreign_author_id>.+\d)", followers.FollowViewSet.as_view({'post': 'add_follower', 'put': 'add_follower'}), name="add_follower"),
     re_path(r"api/authors/(?P<author_id>.+\d)/followers", followers.FollowViewSet.as_view({'get': 'get_followers'}), name="get_followers"),
-
+    
     # Follow Request API URLs
     re_path(r"api/authors/(?P<author_id>.+\d)/follow-requests/send", follow_requests.FollowRequestViewSet.as_view({'post': 'send_follow_request'}), name="send_follow_request"),
     path("api/follow-requests/<int:request_id>/accept", follow_requests.FollowRequestViewSet.as_view({'post': 'accept_follow_request'}), name="accept_follow_request"),

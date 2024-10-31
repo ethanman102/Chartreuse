@@ -36,11 +36,29 @@ class Post(models.Model):
     def __str__(self):
         return f"Post(id={self.id}, url_id={self.url_id}, title={self.title}, description={self.description}, user={self.user}, published={self.published}, visibility={self.visibility})"
 
-class Like(models.Model):
+class Comment(models.Model):
     id = models.AutoField(primary_key=True)
     url_id = models.URLField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    comment = models.TextField()
+    contentType = models.CharField(max_length=50, choices=CONTENT_TYPE_CHOICES, default='text/markdown')
+    dateCreated = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.url_id = f"{self.user.url_id}/commented/{self.id}"
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Comment(id={self.id}, url_id={self.url_id}, contentType={self.contentType}, content={self.comment}, user={self.user}, published={self.dateCreated})"
+
+class Like(models.Model):
+    id = models.AutoField(primary_key=True)
+    url_id = models.URLField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True, blank=True)
     dateCreated = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -54,17 +72,6 @@ class Like(models.Model):
     
     def __str__(self):
         return f"Like(id={self.id}, url_id={self.url_id}, user={self.user}, post={self.post}, dateCreated={self.dateCreated})"
-
-class Comment(models.Model):
-    id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    comment = models.TextField()
-    commentType = models.CharField(max_length=50, choices=CONTENT_TYPE_CHOICES, default='text/markdown')
-    dateCreated = models.DateTimeField(auto_now_add=True)
-    username = models.CharField(max_length=100)
-    password = models.CharField(max_length=100)
-    #date_created  = models.DateTimeField(auto_now_add=True)
 
 class Follow(models.Model):
     follower = models.ForeignKey(User, related_name="following", on_delete=models.CASCADE) # Use user.following to get all the users that a user is following

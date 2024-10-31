@@ -288,7 +288,7 @@ class PostViewSet(viewsets.ViewSet):
 
         author = User.objects.get(url_id=decoded_user_id)
 
-        post = Post.objects.filter(user=author, url_id=decoded_post_id)[0]
+        post = Post.objects.filter(user=author, url_id=decoded_post_id).first() #[0]
 
         user_viewset = UserViewSet()
         response = user_viewset.retrieve(request, pk=decoded_user_id)

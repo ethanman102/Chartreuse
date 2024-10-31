@@ -9,8 +9,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 
-from ..models import Like, User, Post
-
+from ..models import Like, User, Post, Comment
 from .users import UserSerializer, UserViewSet
 from urllib.parse import unquote
 
@@ -87,9 +86,18 @@ class LikeViewSet(viewsets.ViewSet):
         post = Post.objects.get(url_id=decoded_post_id)
 
         decoded_post_url = unquote(post_url)
-        
-        # Use get_or_create to simplify checking if the user already liked the post
-        like, created = Like.objects.get_or_create(user=user_liking, post=post)
+
+        # Check if liking a comment
+        comment_url = request.POST.get('comment')
+        if comment_url != None:
+            decoded_comment_id = unquote(comment_url)
+            comment = Comment.objects.get(url_id=decoded_comment_id)
+            # Use get_or_create to simplify checking if the user already liked the post
+            like, created = Like.objects.get_or_create(user=user_liking, post=post, comment=comment)
+
+        else:
+            # Use get_or_create to simplify checking if the user already liked the post
+            like, created = Like.objects.get_or_create(user=user_liking, post=post)
         
         if not created:
             return JsonResponse({"error": "Like already exists."}, status=400)
@@ -266,7 +274,7 @@ class LikeViewSet(viewsets.ViewSet):
         }
     )
     @api_view(["GET"])
-    def get_post_likes(self, request, user_id, post_id):
+    def get_post_likes(request, user_id, post_id):
         '''
         This function handles getting all likes on a post.
         '''
@@ -350,12 +358,73 @@ class LikeViewSet(viewsets.ViewSet):
             405: OpenApiResponse(description="Method not allowed."),
         }
     )
-    @api_view(["GET"])
+    @action(detail=False, methods=["GET"])
     def get_comment_likes(self, request, user_id, post_id, comment_id):
         '''
         This function handles getting all likes on a comment.
         '''
-        pass # Placeholder for now since posts have not been implemented yet
+        decoded_user_id = unquote(user_id)
+        decoded_post_id = unquote(post_id)
+        decoded_comment_id = unquote(comment_id)
+    
+        user = get_object_or_404(User, url_id=decoded_user_id)
+        post = get_object_or_404(Post, url_id=decoded_post_id)
+        comment = get_object_or_404(Comment, url_id=decoded_comment_id)
+
+        likes = Like.objects.filter(user=user, post=post, comment=comment)
+
+        request.method = 'GET'
+        user_viewset = UserViewSet()
+        response = user_viewset.retrieve(request, pk=decoded_user_id)
+
+        data = json.loads(response.content)
+
+        page = request.GET.get('page', 1)   # Default page is 1
+        size = request.GET.get('size', 50)  # Default size is 50
+        
+        request.method = 'GET'
+        user_viewset = UserViewSet() 
+        response = user_viewset.retrieve(request, pk=decoded_user_id)
+        data = json.loads(response.content)
+        
+        # Paginates likes based on the size
+        likes_paginator = Paginator(likes, size)
+
+        page_likes = likes_paginator.page(page)
+
+        # Since we have some additional fields, we only want to return the required ones
+        filtered_likes_attributes = []
+        for like in page_likes:
+
+            likeObject = {
+                "type": "likes",
+                "author": {
+                    "type": "author",
+                    "id": data["id"],
+                    "page": data["page"],
+                    "host": data["host"],
+                    "displayName": data["displayName"],
+                    "github": data["github"],
+                    "profileImage": data["profileImage"]
+                },
+                "published": like.dateCreated,
+                "id": like.url_id,
+                "object": like.post.url_id
+            }
+
+            filtered_likes_attributes.append(likeObject)
+
+        userLikes = {
+            "type": "likes",
+            "page": str(post.url_id),
+            "id": str(comment.url_id) + "/likes/",
+            "page_number": page,
+            "size": size,
+            "count": len(likes),
+            "src": filtered_likes_attributes
+        }
+
+        return JsonResponse(userLikes, safe=False)
 
     @extend_schema(
         summary="Gets all likes made by a user",

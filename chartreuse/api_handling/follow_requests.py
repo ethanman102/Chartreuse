@@ -63,8 +63,9 @@ class FollowRequestViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API enables authors to initiate follow requests, enhancing social interaction in the application."
             "\n\n**Why not to use:** If the target author does not exist, or if the follow request is improperly structured, the request may fail."
         ),
+        request=ObjectSerializer,
         responses={
-            200: OpenApiResponse(description="Follow request sent."),
+            200: OpenApiResponse(description="Follow request sent.", response=FollowRequestSerializer),
             400: OpenApiResponse(description="Follow request already sent."),
             404: OpenApiResponse(description="Author not found."),
             405: OpenApiResponse(description="Method not allowed."),
@@ -110,6 +111,7 @@ class FollowRequestViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API facilitates the acceptance of follow requests, enhancing the social connectivity within the application."
             "\n\n**Why not to use:** If the follow request does not exist or has already been accepted/declined, the request may fail."
         ),
+        request=FollowRequestSerializer,
         responses={
             200: OpenApiResponse(description="Follow request accepted."),
             404: OpenApiResponse(description="Follow request not found."),
@@ -152,6 +154,7 @@ class FollowRequestViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API facilitates the management of follow requests, allowing authors to maintain control over their connections."
             "\n\n**Why not to use:** If the follow request does not exist or has already been accepted/declined, the request may fail."
         ),
+        request=FollowRequestSerializer,
         responses={
             200: OpenApiResponse(description="Follow request rejected."),
             404: OpenApiResponse(description="Follow request not found."),
@@ -191,6 +194,7 @@ class FollowRequestViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API allows authors to manage their incoming follow requests and decide whom to connect with."
             "\n\n**Why not to use:** If the user is not authenticated, or if there are no pending follow requests, the request may not yield the expected results."
         ),
+        request=ActorSerializer,
         responses={
             200: OpenApiResponse(description="List of follow requests retrieved successfully.", response=FollowRequestsSerializer),
             401: OpenApiResponse(description="Unauthorized access. User must be logged in."),

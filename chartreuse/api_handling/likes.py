@@ -10,6 +10,7 @@ from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 
 from ..models import Like, User, Post
+
 from .users import UserSerializer, UserViewSet
 from urllib.parse import unquote
 
@@ -48,6 +49,7 @@ class LikeViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This endpoint provides a way to track and reflect user engagement with posts."
             "\n\n**Why not to use:** Do not use this if the user has already liked the post, or if the user is not authenticated."
         ),
+        request=LikeSerializer,
         responses={
             200: OpenApiResponse(description="Like added successfully.", response=LikeSerializer),
             400: OpenApiResponse(description="Like already exists."),
@@ -130,6 +132,7 @@ class LikeViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This endpoint allows users to retract their engagement on posts by removing the like."
             "\n\n**Why not to use:** Do not use this if the user hasn't liked the post or if the user is not authenticated."
         ),
+        request=LikeSerializer,
         responses={
             200: OpenApiResponse(description="Like deleted successfully.", response=LikeSerializer),
             400: OpenApiResponse(description="Like does not exist."),
@@ -363,12 +366,13 @@ class LikeViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** To track all the posts and comments that a particular user has liked."
             "\n\n**Why not to use:** If you are not interested in a user's likes or if the user ID is not valid."
         ),
+        request=UserSerializer,
         parameters=[
             OpenApiParameter(name="page", description="Page number for pagination.", required=False, type=int),
             OpenApiParameter(name="size", description="Number of likes per page.", required=False, type=int),
         ],
         responses={
-            200: OpenApiResponse(description="Successfully retrieved all likes.", response=LikeSerializer),
+            200: OpenApiResponse(description="Successfully retrieved all likes.", response=LikesSerializer),
             405: OpenApiResponse(description="Method not allowed."),
         }
     )

@@ -41,20 +41,20 @@ class CommentViewSet(viewsets.ViewSet):
     serializer_class = CommentSerializer
 
     @extend_schema(
-            summary="Adds a comment on a post",
-            description="Adds a comment on a post based on the provided post url",
-            parameters=[
-                OpenApiParameter(name="content", description="The comment content.", required=False, type=str),
-                OpenApiParameter(name="contentType", description="The comments content type.", required=False, type=str),
-                # OpenApiParameter(name="post", description="The post url id", required=True, type=str),
-            ],
-            responses={
-                200: OpenApiResponse(description="Comment added successfully.", response=CommentSerializer),
-                400: OpenApiResponse(description="Comment already exists or incorrect request body"),
-                401: OpenApiResponse(description="User is not authenticated."),
-                404: OpenApiResponse(description="User not found."),
-                405: OpenApiResponse(description="Method not allowed."),
-            },
+        summary="Adds a comment on a post",
+        description="Adds a comment on a post based on the provided post url",
+        parameters=[
+            OpenApiParameter(name="content", description="The comment content.", required=False, type=str),
+            OpenApiParameter(name="contentType", description="The comments content type.", required=False, type=str),
+            OpenApiParameter(name="id", description="The post url id", required=True, type=str),
+        ],
+        responses={
+            201: OpenApiResponse(description="Comment added successfully.", response=CommentSerializer),
+            400: OpenApiResponse(description="Incorrect request body"),
+            401: OpenApiResponse(description="User is not authenticated."),
+            404: OpenApiResponse(description="User not found."),
+            405: OpenApiResponse(description="Method not allowed."),
+        },
     )
     @action(detail=False, methods=["POST"])
     def create_comment(self, request, user_id, post_id=None):
@@ -165,6 +165,8 @@ class CommentViewSet(viewsets.ViewSet):
 
         # Get the comment   
         comment = Comment.objects.filter(url_id = unquote(comment_id)).first()
+        if not comment:
+            return JsonResponse({"error": "Comment not found."}, status=404)
     
         # get the comment authors details
         request.method = "GET"
@@ -217,9 +219,14 @@ class CommentViewSet(viewsets.ViewSet):
     @extend_schema(
         summary="Get all comments on a post",
         description="Fetch all comments on a post",
+        parameters=[
+            OpenApiParameter(name="size", description="the size of the comments paginator", required=False, type=str),
+            OpenApiParameter(name="page", description="the page number of the comments paginator", required=False, type=str),
+        ],
         responses={
             200: OpenApiResponse(description="List of comments retrieved successfully.", response=CommentsSerializer),
-            404: OpenApiResponse(description="Post not found."),
+            404: OpenApiResponse(description="Post or User not found."),
+            405: OpenApiResponse(description="Method not allowed."),
         }
     )
     @action(detail=False, methods=["GET"])
@@ -340,6 +347,8 @@ class CommentViewSet(viewsets.ViewSet):
 
         if user_id == None or post_id == None:
             comment = get_object_or_404(Comment, url_id=decoded_comment_id)
+            post_id = comment.post.url_id
+            user_id = comment.post.user.url_id
 
         else:
             decoded_author_id = unquote(user_id)
@@ -391,6 +400,10 @@ class CommentViewSet(viewsets.ViewSet):
     @extend_schema(
         summary="Gets the list of comments an author has made.",
         description="Retrieves a a paginated list of comment objects from a user based on the user id.",
+        parameters=[
+            OpenApiParameter(name="size", description="the size of the comments paginator", required=False, type=str),
+            OpenApiParameter(name="page", description="the page number of the comments paginator", required=False, type=str),
+        ],
         responses={
             200: OpenApiResponse(description="Successfully retrieved comments.", response=CommentsSerializer),
             404: OpenApiResponse(description="User, or comment not found"),

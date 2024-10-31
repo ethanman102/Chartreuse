@@ -231,7 +231,7 @@ class CommentTestCases(TestCase):
         self.assertEqual(comment_response.json()['type'], 'comment')
         self.assertEqual(comment_response.json()['author']['displayName'], 'John Smith')
         self.assertEqual(comment_response.json()['comment'], 'Nice post!')
-
+    
 
     def test_delete_comment(self):
         """

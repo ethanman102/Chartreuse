@@ -57,8 +57,8 @@ class Like(models.Model):
     id = models.AutoField(primary_key=True)
     url_id = models.URLField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    comment = models.ForeignObject(Comment, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True, blank=True)
     dateCreated = models.DateTimeField(auto_now_add=True)
 
     class Meta:

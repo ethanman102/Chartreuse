@@ -71,7 +71,7 @@ def remove_github(request):
         current_user_model = get_object_or_404(User,user=current_auth_user)
 
         if (current_user_model.github != current_github):
-            return JsonResponse({'error': 'Server Side Implementation Error'}, status=404)
+            return JsonResponse({'error': 'Server Side Implementation Error'}, status=500)
         
         current_user_model.github = None
         current_user_model.save()

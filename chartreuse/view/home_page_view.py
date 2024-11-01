@@ -78,7 +78,7 @@ class FeedDetailView(DetailView):
                 post.likes_count = Like.objects.filter(post=post).count()
                 post.url_id = quote(post.url_id, safe='')
 
-                if post.contentType != ("text/plain" and "text/commonmark"):
+                if post.contentType != ("text/plain" or "text/commonmark"):
                     post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
                 
                 post.user.profileImage = support_functions.get_image_post(post.user.profileImage)

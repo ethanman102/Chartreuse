@@ -50,6 +50,7 @@
 
                     {% elif post.contentType == "text/commonmark" %}
                         <p class="card-text" id="cm_text" style="text-align: left;">{{ post.content }}</p>
+                        <p class="card-text" id="cm_result" style="text-align: left;"></p>
 
                     {% elif post.contentType == "image/png" or post.contentType == "image/jpeg" %}
                         <div class="text-center">

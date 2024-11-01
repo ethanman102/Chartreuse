@@ -259,6 +259,7 @@ class UserViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This endpoint is useful for user account removal, typically used in admin dashboards or user account deletion flows."
             "\n\n**Why not to use:** Be cautious when using this endpoint as it will permanently delete the user data."
         ),
+        request=UserSerializer,
         responses={
             204: OpenApiResponse(description="User deleted successfully."),
             404: OpenApiResponse(description="User not found."),
@@ -379,6 +380,7 @@ class UserViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API enables users to authenticate and access their accounts securely."
             "\n\n**Why not to use:** If the credentials are invalid or missing, the login attempt will fail."
         ),
+        request=UserSerializer,
         responses={
             200: OpenApiResponse(description="User logged in successfully."),
             400: OpenApiResponse(description="Invalid credentials."),

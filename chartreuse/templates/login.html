@@ -1,25 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="date" content="2024-10-12">
-    <meta name="tags" content="Login">
-    <meta name="summary" content="Login page.">
-    <title>Chartreuse</title>
+{% extends "base.html" %}
 
-    {% load static %}
+{% load static %}
+
+{% block extra_head %}
+    <meta name="date" content="2024-10-12">
+    <meta name="tags" content="Log in">
+    <meta name="summary" content="Login page.">
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
-</head>
-<body>
-    <div class="container">
-        <h4>Login</h4>
-        <form method="POST" action="authenticate/">
-            <p>Now, let's log in!</p>
-            {% csrf_token %}
-            <input id="username" name="username" type="text" class="form-control" required placeholder="Enter your username"/>
-            <input id="password" name="password" type="password" class="form-control" required placeholder="Enter your password"/>
-            <button type="submit" class="custom-button">Log In</button>
-        </form>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid min-vh-100 w-100 d-flex flex-column justify-content-center align-items-center">
+    <div class="container w-50" style="color: chartreuse; background-color: #00356b; font-size: 4ch; border-style: solid; border-color: #1b1b1b;">
+        <h4>Log in</h4>
     </div>
-</body>
-</html>
+    <div class="container px-5 py-3 w-50" style="background-color:#f5f5f5; border-style: solid; border-color: #1b1b1b;">
+        <p class="text-center">Let's log in!</p>
+        <form method="POST" action="authenticate/">
+            {% csrf_token %}
+            <div class="my-1">
+                <input id="username" name="username" type="text" class="form-control" required placeholder="Enter your username"/>
+            </div>
+            <div class="my-1">
+                <input id="password" name="password" type="password" class="form-control" required placeholder="Enter your password"/>
+            </div>
+            <button type="submit" class="d-block mx-auto my-3">Log In</button>
+        </form>
+        <div class="text-center">
+            <a href="/chartreuse/signup">Don't have an account? Sign Up</a><br>
+            <a href="/chartreuse/homepage/">Skip logging in and view as a guest user</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

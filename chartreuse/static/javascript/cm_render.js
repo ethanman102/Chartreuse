@@ -4,8 +4,9 @@
 document.addEventListener("DOMContentLoaded", function() {
     const commonmark = window.commonmark;
 
+    // following lines are from the https://github.com/commonmark/commonmark.js repo's README
+
     // variable to track the html element for displaying the commonmark text
-    // NOTE - debugger says cm_text is empty.
     var markString = document.getElementById("cm_text").innerText;
 
     // for debugging 
@@ -19,9 +20,6 @@ document.addEventListener("DOMContentLoaded", function() {
     var parsed = reader.parse(markString); // parsed is a 'Node' tree
     // transform parsed if you like...
     var result = writer.render(parsed); // result is a String
-
-    // for debugging 
-    console.log(result);
     
     // // sets the text to be shown in html file as the rendered Commonmark text 
     document.getElementById("cm_text").innerHTML = result;

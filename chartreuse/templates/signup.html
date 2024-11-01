@@ -85,9 +85,44 @@
                         'X-CSRFToken': csrfToken,  // Include the CSRF token in headers
                     }
             })
-            .then(response => response.json())
+            .then(response => {
+                if(response.redirected) {
+                    window.location.href = response.url;    // in case everything goes well
+                } else {
+                    return response.json();
+                }
+            })
             .then(data => {
-                alert(data.error);
+                // in case we reach this line, an error has occurred
+                // remove all previous warning messages, if any
+                document.querySelectorAll('.errorMessage').forEach(element => {
+                    element.remove();
+                });
+                
+                const dataError = data.error;
+                if(dataError.constructor === Array) {
+                    const password2 = document.getElementById('password2');
+                    data.error.forEach(error => {
+                        //errorString += error + '\n';
+                        const p = document.createElement('p');
+                        p.className = 'errorMessage';
+                        p.textContent = error
+                        p.style.color = 'red';
+                        password2.insertAdjacentElement('afterend', p);
+                    });
+                } else {
+                    let inputElement = null;
+                    if (dataError === 'Username already exists.') {
+                        inputElement = document.getElementById('username');
+                    } else {
+                        inputElement = document.getElementById('password2');
+                    }
+                    const p = document.createElement('p');
+                    p.className = 'errorMessage';
+                    p.textContent = dataError;
+                    p.style.color = 'red';
+                    inputElement.insertAdjacentElement('afterend', p);
+                }
             });
         });
     });

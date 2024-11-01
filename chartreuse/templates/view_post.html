@@ -48,7 +48,8 @@
                     {% if post.contentType == "text/plain" %}
                         <p class="card-text" style="text-align: left;">{{ post.content }}</p>
 
-                    {% elif post.contentType == "text/commonmark" %}
+                    {% elif post.contentType == "commonmark" %}
+                        <p>Hello</p>
                         <p class="card-text" id="cm_text" style="text-align: left;">{{ post.content }}</p>
                         <p class="card-text" id="cm_result" style="text-align: left;"></p>
 

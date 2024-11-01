@@ -126,12 +126,12 @@ def update_post(request, post_id):
 
         # Determine content type and set appropriate content
         # add option for commonmark here
-        if (content_type == "text/plain") and content:
+        if (content_type == 'plain') and content:
             content_type = 'text/plain'
             post_content = content
 
-        elif (content_type == "text/commonmark") and content:
-            content_type = "text/commonmark"    # not sure this is necessary
+        elif (content_type == 'commonmark') and content:
+            content_type = 'text/commonmark'    
             post_content = content
 
         elif image:
@@ -203,6 +203,7 @@ def save_post(request):
 
         elif content and (content_type == 'commonmark'):
             content_type = 'text/commonmark'
+            print(content_type)
             post_content = content 
         
         elif image:

@@ -1,8 +1,8 @@
 'use strict'
 
-// waiting for the page to load before 
-// window.addEventListener('load', main);
+// ISSUE: somewhere, the contentType is being saved as "commonmark" instead of "text/commonmark"
 
+// waiting for the page to load
 document.addEventListener("DOMContentLoaded", function() {
     const commonmark = window.commonmark;
 

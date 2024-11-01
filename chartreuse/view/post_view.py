@@ -57,9 +57,12 @@ class PostDetailView(DetailView):
 
         post.url_id = quote(post.url_id, safe='')
 
+
         if post.contentType != ("text/plain" or "text/commonmark"):
             post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
             post.has_image = True
+
+    
 
         post.user.profileImage = support_functions.get_image_post(post.user.profileImage)
 

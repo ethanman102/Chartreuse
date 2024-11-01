@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
     console.log(result);
     
     // // sets the text to be shown in html file as the rendered Commonmark text 
-    document.getElementById("cm_result").innerHTML = result;
+    document.getElementById("cm_text").innerHTML = result;
 })
 
 // function main() {

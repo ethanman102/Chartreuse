@@ -189,9 +189,6 @@ def save_post(request):
         current_user_model = get_object_or_404(User, user=current_user)
         
 
-        # printing the content_type 
-        print(content_type)
-
         # Ensure that either content, image, or image URL is provided
         if not content_type and not image and not image_url:
             return JsonResponse({'error': 'Post content is required.'}, status=400)
@@ -202,10 +199,8 @@ def save_post(request):
             post_content = content
 
         elif content and (content_type == 'commonmark'):
-             # for debugging 
             print("hi")
             content_type = 'text/commonmark'
-            print(content_type)
             post_content = content 
         
         elif image:

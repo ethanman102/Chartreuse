@@ -202,6 +202,8 @@ def save_post(request):
             post_content = content
 
         elif content and (content_type == 'commonmark'):
+             # for debugging 
+            print("hi")
             content_type = 'text/commonmark'
             print(content_type)
             post_content = content 

@@ -303,11 +303,12 @@
 
                 // https://stackoverflow.com/questions/8499633/how-to-display-base64-images-in-html
                 if (response.status === 200){
-                    imageUploadMessage.style.color = 'chartreuse';
-                    imageUploadMessage.innerText = 'Profile picture updated';
-                    imageUploadMessage.style.visibility = 'visible';
                     let imageBytes = data.image;
                     let srcString = `data:${file.type};charset=utf-8;base64, ${imageBytes}`;
+                    imageUploadMessage.style.color = 'chartreuse';
+                    imageUploadMessage.innerText = data.success;
+                    imageUploadMessage.style.visibility = 'visible';
+                    currentImage.setAttribute('src',srcString);
                     return;
                 }
 

@@ -10,6 +10,7 @@ import json
 from ..models import User
 from django.shortcuts import get_object_or_404
 from urllib.parse import urlparse
+import base64
 
 @login_required
 def update_password(request):
@@ -106,6 +107,34 @@ def add_github(request):
 
         return JsonResponse({'success': 'Github Added successfully'},status=200)
     return HttpResponseNotAllowed(['PUT'])
+
+
+@login_required
+def upload_profile_picture(request):
+    if request.method == "POST":
+
+        file_to_read = None
+        file_name_to_read = None
+        for filename,file in request.FILES.iteritems():
+            file_name_to_read = filename
+            file_to_read = file
+        
+        if (file_to_read == None or file_name_to_read == None):
+            return JsonResponse({'error': 'No file provided'},status=400)
+        
+        image_data = file_to_read.read()
+        encoded_image = base64.b64encode(image_data).decode('utf-8')
+
+        return JsonResponse({'success':f'Profile picture updated to: {file_name_to_read}','image':encoded_image},status=200)
+
+    
+
+
+
+
+
+    return HttpResponseNotAllowed(['POST'])
+
         
 
 

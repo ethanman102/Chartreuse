@@ -4,6 +4,7 @@ from django.views.generic.detail import DetailView
 from urllib.parse import quote
 from chartreuse.view.post_utils import get_all_public_posts, get_posts, get_image_post
 from chartreuse.view.follow_utils import get_followed
+from django.core.paginator import Paginator
 
 class FeedDetailView(DetailView):
     '''
@@ -128,7 +129,10 @@ class FeedDetailView(DetailView):
             context['logged_in'] = False
         
         posts = self.get_posts()
-        context['posts'] = posts
+        paginator = Paginator(posts, 5)  # Show 5 posts per page
+        page_number = self.request.GET.get('page')  # Get the current page number from the URL
+        page_obj = paginator.get_page(page_number)  # Get the posts for the current page
+        context['posts'] = page_obj 
 
         user_details = self.get_user_details()
         context['user_details'] = user_details

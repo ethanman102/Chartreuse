@@ -119,7 +119,7 @@
                     </div>
                 </div>
 
-                <!--REQUIRE TO ADD CONTAINER HERE!!-->
+                
                 <div class="row">
                     <div class="col-12">
                         <div class="d-flex justify-content-center mb-3">
@@ -172,6 +172,17 @@
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col-6 offset-3">
+                        <h5 id="current-image-header">Current Profile Picture</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 offset-3">
+                        <img id="current-image" class="rounded img-fluid pfp-image" style="width: 200px; height: 200px; object-fit: cover; border: solid black 2px;">
+                    </div>
+                </div>
+
 
 
             </div>
@@ -221,16 +232,6 @@
                 <div class="row'">
                     <div class="col-6 offset-3">
                         <p id="github-add-message" style="visibility: hidden;">Github add message</p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6 offset-3">
-                        <h5 id="current-image-header">Current Profile Picture</h5>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6 offset-3">
-                        <img id="current-image">
                     </div>
                 </div>
             </div>
@@ -293,10 +294,16 @@
                     return;
                 }
 
+                let fileBody = new FormData()
+                fileBody.append('file',file)
+
 
                 let response = await fetch('uploadProfileImage/',{
                     method: 'POST',
-                    body: file
+                    headers:{
+                        'X-CSRFToken' : '{{csrf_token}}'
+                    },
+                    body: fileBody
                 });
 
                 let data = await response.json();

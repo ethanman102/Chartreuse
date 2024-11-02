@@ -115,10 +115,13 @@ def upload_profile_picture(request):
 
         file_to_read = None
         file_name_to_read = None
-        for filename,file in request.FILES.iteritems():
+        for filename,file in request.FILES.items():
+            print(filename)
             file_name_to_read = filename
             file_to_read = file
+        print(request.FILES,'sup')
         
+        print('HEY')
         if (file_to_read == None or file_name_to_read == None):
             return JsonResponse({'error': 'No file provided'},status=400)
         

@@ -6,10 +6,31 @@ paths:
   /chartreuse/api/author/login/:
     post:
       operationId: api_author_login_create
-      description: Logs in a user based on the provided user details.
+      description: |-
+        Logs in a user based on the provided user details.
+
+        **When to use:** Use this endpoint when an author wants to access their account.
+
+        **How to use:** Send a POST request with the required `username` and `password` fields in the request body.
+
+        **Why to use:** This API enables users to authenticate and access their accounts securely.
+
+        **Why not to use:** If the credentials are invalid or missing, the login attempt will fail.
       summary: Login a user
       tags:
       - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
       security:
       - cookieAuth: []
       - basicAuth: []
@@ -101,6 +122,361 @@ paths:
           description: Newly created user details.
         '400':
           description: Username already exists.
+  /chartreuse/api/authors/{author_id}/follow-requests/send:
+    post:
+      operationId: api_authors_follow_requests_send_create
+      description: |-
+        Sends a follow request to a specified author based on the provided author ID.
+
+        **When to use:** Use this endpoint when an author wants to request to follow another author.
+
+        **How to use:** Send a POST request with the `author_id` of the author to whom the follow request is being sent.
+
+        **Why to use:** This API enables authors to initiate follow requests, enhancing social interaction in the application.
+
+        **Why not to use:** If the target author does not exist, or if the follow request is improperly structured, the request may fail.
+      summary: Send a follow request
+      parameters:
+      - in: path
+        name: author_id
+        schema:
+          type: string
+          pattern: ^.+\d$
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Object'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Object'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Object'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowRequest'
+          description: Follow request sent.
+        '400':
+          description: Follow request already sent.
+        '404':
+          description: Author not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/authors/{author_id}/followers:
+    get:
+      operationId: api_authors_followers_retrieve
+      description: |-
+        Retrieves the list of followers for an author based on the provided author ID.
+
+        **When to use:** Use this endpoint to fetch a list of all followers for a specific author.
+
+        **How to use:** Send a GET request with the `author_id` in the URL.
+
+        **Why to use:** This API helps in managing social relationships by fetching all followers of an author.
+
+        **Why not to use:** If the author ID is invalid or the author has no followers.
+      summary: Retrieve list of followers for a specific author
+      parameters:
+      - in: path
+        name: author_id
+        schema:
+          type: string
+          pattern: ^.+\d$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Followers'
+          description: Successfully retrieved the list of followers.
+        '400':
+          description: Invalid request or missing parameters.
+        '404':
+          description: Author not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/authors/{author_id}/followers/{foreign_author_id}:
+    post:
+      operationId: api_authors_followers_create
+      description: |-
+        Adds a new follower to the author's list based on the provided author IDs.
+
+        **When to use:** Use this endpoint when an author wants to follow another author
+
+        **How to use:** Send a POST request with the `author_id` (current author) and `foreign_author_id` (the author who will follow).
+
+        **Why to use:** This API facilitates the creation of follow relationships between authors, useful in social applications.
+
+        **Why not to use:** If either author does not exist, or if the follow request is not properly structured, the request may fail.
+      summary: Add a follower
+      parameters:
+      - in: path
+        name: author_id
+        schema:
+          type: string
+          pattern: ^.+\d$
+        required: true
+      - in: path
+        name: foreign_author_id
+        schema:
+          type: string
+          pattern: ^.+\d$
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Follower'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Follower'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Follower'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Follower'
+          description: Follower added
+        '404':
+          description: Author not found.
+        '405':
+          description: Method not allowed.
+    put:
+      operationId: api_authors_followers_update
+      description: |-
+        Adds a new follower to the author's list based on the provided author IDs.
+
+        **When to use:** Use this endpoint when an author wants to follow another author
+
+        **How to use:** Send a POST request with the `author_id` (current author) and `foreign_author_id` (the author who will follow).
+
+        **Why to use:** This API facilitates the creation of follow relationships between authors, useful in social applications.
+
+        **Why not to use:** If either author does not exist, or if the follow request is not properly structured, the request may fail.
+      summary: Add a follower
+      parameters:
+      - in: path
+        name: author_id
+        schema:
+          type: string
+          pattern: ^.+\d$
+        required: true
+      - in: path
+        name: foreign_author_id
+        schema:
+          type: string
+          pattern: ^.+\d$
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Follower'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Follower'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Follower'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Follower'
+          description: Follower added
+        '404':
+          description: Author not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/authors/{author_id}/followers/{foreign_author_id}/is_follower:
+    get:
+      operationId: api_authors_followers_is_follower_retrieve
+      description: |-
+        Checks if a particular foreign author is following the specified author.
+
+        **When to use:** Use this endpoint to verify if a foreign author (by `foreign_author_id`) is following a particular author (by `author_id`).
+
+        **How to use:** Send a GET request with both `author_id` and `foreign_author_id` in the URL to check the follower relationship.
+
+        **Why to use:** This API helps in checking social relationships, determining if one specific author follows another.
+
+        **Why not to use:** If the provided IDs are invalid or if no follower relationship exists.
+      summary: Check if a specific author is a follower
+      parameters:
+      - in: path
+        name: author_id
+        schema:
+          type: string
+          pattern: ^.+\d$
+        required: true
+      - in: path
+        name: foreign_author_id
+        schema:
+          type: string
+          pattern: ^.+\d$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: Is a follower
+        '404':
+          description: Not a follower
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/authors/{author_id}/followers/{foreign_author_id}/remove:
+    delete:
+      operationId: api_authors_followers_remove_destroy
+      description: |-
+        Removes an author from the follower list of another author based on the provided author IDs.
+
+        **When to use:** Use this endpoint when an author wants to unfollow another author.
+
+        **How to use:** Send a DELETE request with the `author_id` (current author) and `foreign_author_id` (the author to be unfollowed).
+
+        **Why to use:** This API is useful in managing social relationships by allowing authors to remove followers.
+
+        **Why not to use:** If the authors do not exist or are not following each other, the request may fail.
+      summary: Remove a follower
+      parameters:
+      - in: path
+        name: author_id
+        schema:
+          type: string
+          pattern: ^.+\d$
+        required: true
+      - in: path
+        name: foreign_author_id
+        schema:
+          type: string
+          pattern: ^.+\d$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: Follower removed.
+        '400':
+          description: Not a follower.
+        '404':
+          description: Author not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/authors/{author_id}/friends:
+    get:
+      operationId: api_authors_friends_retrieve
+      description: |-
+        Retrieves the list of friends (mutual followers) for an author based on the provided author ID.
+
+        **When to use:** Use this endpoint to fetch a list of all friends of a specific author. A friend is defined as an author who follows and is followed by the same author.
+
+        **How to use:** Send a GET request with the `author_id` in the URL.
+
+        **Why to use:** This API helps in managing mutual relationships, fetching friends of an author.
+
+        **Why not to use:** If the author has no friends or invalid author ID is provided.
+      summary: Retrieve list of friends for a specific author
+      parameters:
+      - in: path
+        name: author_id
+        schema:
+          type: string
+          pattern: ^.+\d$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Friends'
+          description: Successfully retrieved the list of friends.
+        '404':
+          description: Author not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/authors/{author_id}/friends/{foreign_author_id}/check_friendship:
+    get:
+      operationId: api_authors_friends_check_friendship_retrieve
+      description: |-
+        Checks whether two authors (identified by their author IDs) are mutual followers (friends). A friend is defined as someone who both follows and is followed by the same author.
+
+        **When to use:** Use this endpoint when you need to verify the friendship (mutual following) between two authors.
+
+        **How to use:** Send a GET request with the `author_id` (the current author) and `foreign_author_id` (the author to check friendship with).
+
+        **Why to use:** This API helps determine if two authors have a mutual following relationship.
+
+        **Why not to use:** Don't use this to check a one-way relationship.
+      summary: Check if two authors are friends (mutual followers)
+      parameters:
+      - in: path
+        name: author_id
+        schema:
+          type: string
+          pattern: ^.+\d$
+        required: true
+      - in: path
+        name: foreign_author_id
+        schema:
+          type: string
+          pattern: ^.+\d$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: Authors are friends
+        '404':
+          description: Authors are not friends
+        '405':
+          description: Method not allowed.
   /chartreuse/api/authors/{id}/:
     get:
       operationId: api_authors_retrieve
@@ -120,7 +496,7 @@ paths:
         name: id
         schema:
           type: string
-          pattern: ^.+$
+          pattern: ^.+\d$
         required: true
       tags:
       - api
@@ -155,7 +531,7 @@ paths:
         name: id
         schema:
           type: string
-          pattern: ^.+$
+          pattern: ^.+\d$
         required: true
       tags:
       - api
@@ -203,7 +579,7 @@ paths:
         name: id
         schema:
           type: string
-          pattern: ^.+$
+          pattern: ^.+\d$
         required: true
       tags:
       - api
@@ -218,6 +594,165 @@ paths:
           description: User not found.
         '401':
           description: You do not have permission to delete this user.
+  /chartreuse/api/authors/{user_id}/commented/:
+    get:
+      operationId: api_authors_commented_retrieve
+      description: |-
+        Retrieves a a paginated list of comment objects from a user based on the user id.
+
+        **When to use:** Use this endpoint to retrieve all comments made by a specific author. This is useful when tracking or displaying an author's activity across posts.
+
+        **How to use:** Send a GET request with the `user_id` in the URL, along with optional `size` and `page` query parameters to manage pagination.
+
+        **Why to use:** This API facilitates access to an author's comments, enabling efficient management and display of content created by a specific user.
+
+        **Why not to use:** Avoid using this if the specified author has no comments, or if the user ID is invalid, which will result in a 404 response.
+      summary: Gets the list of comments an author has made.
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: string
+        description: the page number of the comments paginator
+      - in: query
+        name: size
+        schema:
+          type: string
+        description: the size of the comments paginator
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comments'
+          description: Successfully retrieved comments.
+        '404':
+          description: User, or comment not found
+        '405':
+          description: Method not allowed.
+    post:
+      operationId: api_authors_commented_create
+      description: |-
+        Adds a comment on a post based on the provided post url
+
+        **When to use:** Use this endpoint to add a comment to an existing post by providing the `user_id` (post author) and `post_id` (post being commented on) in the URL, along with the comment content in the request body.
+
+        **How to use:** Send a POST request with `content` and `contentType` as parameters, and the `user_id` and `post_id` in the URL.
+
+        **Why to use:** This API allows users to interact with posts by commenting, which can enhance engagement on the platform.
+
+        **Why not to use:** If the post does not exist or if the comment parameters are incorrect.
+      summary: Adds a comment on a post
+      parameters:
+      - in: query
+        name: content
+        schema:
+          type: string
+        description: The comment content.
+      - in: query
+        name: contentType
+        schema:
+          type: string
+        description: The comments content type.
+      - in: query
+        name: id
+        schema:
+          type: string
+        description: The post url id
+        required: true
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Comment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Comment'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: Comment added successfully.
+        '400':
+          description: Incorrect request body
+        '401':
+          description: User is not authenticated.
+        '404':
+          description: User not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/authors/{user_id}/commented/{comment_id}/:
+    get:
+      operationId: api_authors_commented_retrieve_2
+      description: |-
+        Retrieves a specific comment object from a user based on the post id, user id, and remote comment id
+
+        **When to use:** Use this endpoint to retrieve a unique comment on a post by providing the `comment_id` and `post_id`. Optionally, the `user_id` can be used to further specify the author.
+
+        **How to use:** Send a GET request with `comment_id` and `post_id` in the URL. The optional `user_id` parameter can help identify the author of the post if needed.
+
+        **Why to use:** This API is useful for retrieving a particular comment's details, enabling targeted access for comment management or display.
+
+        **Why not to use:** Do not use if the comment, user, or post does not exist, as this will result in a 404 response.
+      summary: Gets a specific comment from a user
+      parameters:
+      - in: path
+        name: comment_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: Successfully retrieved comment.
+        '404':
+          description: User, comment, or post not found.
+        '405':
+          description: Method not allowed.
   /chartreuse/api/authors/{user_id}/inbox/:
     post:
       operationId: api_authors_inbox_create
@@ -237,7 +772,7 @@ paths:
         name: user_id
         schema:
           type: string
-          pattern: ^.+$
+          pattern: ^.+\d$
         required: true
       tags:
       - api
@@ -289,7 +824,7 @@ paths:
         name: user_id
         schema:
           type: string
-          pattern: ^.+$
+          pattern: ^.+\d$
         required: true
       tags:
       - api
@@ -338,7 +873,7 @@ paths:
         name: user_id
         schema:
           type: string
-          pattern: ^.+$
+          pattern: ^.+\d$
         required: true
       tags:
       - api
@@ -351,7 +886,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Like'
+                $ref: '#/components/schemas/Likes'
           description: Successfully retrieved all likes.
         '405':
           description: Method not allowed.
@@ -374,13 +909,13 @@ paths:
         name: like_id
         schema:
           type: string
-          pattern: ^.+$
+          pattern: ^.+\d$
         required: true
       - in: path
         name: user_id
         schema:
           type: string
-          pattern: ^.+$
+          pattern: ^.+\d$
         required: true
       tags:
       - api
@@ -428,7 +963,7 @@ paths:
         name: user_id
         schema:
           type: string
-          pattern: ^.+$
+          pattern: ^.+\d$
         required: true
       - in: query
         name: user_id
@@ -446,7 +981,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Post'
+                $ref: '#/components/schemas/Posts'
           description: Successfully retrieved all posts.
         '405':
           description: Method not allowed.
@@ -490,7 +1025,7 @@ paths:
         name: user_id
         schema:
           type: string
-          pattern: ^.+$
+          pattern: ^.+\d$
         required: true
       - in: query
         name: visibility
@@ -549,7 +1084,7 @@ paths:
         name: post_id
         schema:
           type: string
-          pattern: ^.+$
+          pattern: ^.+\d$
         required: true
       - in: query
         name: post_id
@@ -560,7 +1095,7 @@ paths:
         name: user_id
         schema:
           type: string
-          pattern: ^.+$
+          pattern: ^.+\d$
         required: true
       - in: query
         name: user_id
@@ -621,7 +1156,7 @@ paths:
         name: post_id
         schema:
           type: string
-          pattern: ^.+$
+          pattern: ^.+\d$
         required: true
       - in: query
         name: title
@@ -632,7 +1167,7 @@ paths:
         name: user_id
         schema:
           type: string
-          pattern: ^.+$
+          pattern: ^.+\d$
         required: true
       - in: query
         name: visibility
@@ -694,13 +1229,13 @@ paths:
         name: post_id
         schema:
           type: string
-          pattern: ^.+$
+          pattern: ^.+\d$
         required: true
       - in: path
         name: user_id
         schema:
           type: string
-          pattern: ^.+$
+          pattern: ^.+\d$
         required: true
       tags:
       - api
@@ -723,20 +1258,20 @@ paths:
           description: User not found.
         '405':
           description: Method not allowed.
-  /chartreuse/api/authors/{user_id}/posts/{post_id}/comments/{comment_id}/likes:
+  /chartreuse/api/authors/{user_id}/posts/{post_id}/comment/{comment_id}/:
     get:
-      operationId: api_authors_posts_comments_likes_retrieve
+      operationId: api_authors_posts_comment_retrieve
       description: |-
-        Gets all likes on a comment from a post based on the provided post ID, comment ID, and user ID.
+        Retrieves a specific comment object from a user based on the post id, user id, and remote comment id
 
-        **When to use:** Use this endpoint when you need to fetch all the likes for a particular comment.
+        **When to use:** Use this endpoint to retrieve a unique comment on a post by providing the `comment_id` and `post_id`. Optionally, the `user_id` can be used to further specify the author.
 
-        **How to use:** Send a GET request with the `user_id`, `post_id`, and `comment_id` in the URL.
+        **How to use:** Send a GET request with `comment_id` and `post_id` in the URL. The optional `user_id` parameter can help identify the author of the post if needed.
 
-        **Why to use:** This endpoint is helpful to track how many likes a specific comment has received.
+        **Why to use:** This API is useful for retrieving a particular comment's details, enabling targeted access for comment management or display.
 
-        **Why not to use:** If you're not interested in the comment likes or if the comment doesn't exist.
-      summary: Gets all likes on a comment from a post
+        **Why not to use:** Do not use if the comment, user, or post does not exist, as this will result in a 404 response.
+      summary: Gets a specific comment from a user
       parameters:
       - in: path
         name: comment_id
@@ -764,10 +1299,187 @@ paths:
       - {}
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: Successfully retrieved comment.
+        '404':
+          description: User, comment, or post not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/authors/{user_id}/posts/{post_id}/comments/:
+    get:
+      operationId: api_authors_posts_comments_retrieve
+      description: |-
+        Fetches all comments for a given post, optionally supporting pagination parameters to manage the number of comments per page and the page number.
+
+        **When to use:** Use this endpoint to retrieve all comments associated with a post by providing the `post_id` (required) and optionally, `size` and `page` parameters for pagination.
+
+        **How to use:** Send a GET request with the `post_id` in the URL and include optional `size` and `page` query parameters if pagination is desired.
+
+        **Why to use:** This API allows users to view all comments on a post, supporting pagination for efficient data handling in applications with high comment volumes.
+
+        **Why not to use:** If the post does not exist or if an invalid page or size parameter is provided.
+      summary: Get all comments on a post
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: string
+        description: the page number of the comments paginator
+      - in: path
+        name: post_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      - in: query
+        name: size
+        schema:
+          type: string
+        description: the size of the comments paginator
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comments'
+          description: List of comments retrieved successfully.
+        '404':
+          description: Post or User not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/authors/{user_id}/posts/{post_id}/comments/{comment_id}/likes/:
+    get:
+      operationId: api_authors_posts_comments_likes_retrieve
+      description: |-
+        Gets all likes on a comment from a post based on the provided post ID, comment ID, and user ID.
+
+        **When to use:** Use this endpoint when you need to fetch all the likes for a particular comment.
+
+        **How to use:** Send a GET request with the `user_id`, `post_id`, and `comment_id` in the URL.
+
+        **Why to use:** This endpoint is helpful to track how many likes a specific comment has received.
+
+        **Why not to use:** If you're not interested in the comment likes or if the comment doesn't exist.
+      summary: Gets all likes on a comment from a post
+      parameters:
+      - in: path
+        name: comment_id
+        schema:
+          type: string
+          pattern: ^.+\d$
+        required: true
+      - in: path
+        name: post_id
+        schema:
+          type: string
+          pattern: ^.+\d$
+        required: true
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+\d$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
           description: Successfully retrieved all likes.
         '405':
           description: Method not allowed.
-  /chartreuse/api/authors/{user_id}/posts/{post_id}/likes:
+  /chartreuse/api/authors/{user_id}/posts/{post_id}/comments/add/:
+    post:
+      operationId: api_authors_posts_comments_add_create
+      description: |-
+        Adds a comment on a post based on the provided post url
+
+        **When to use:** Use this endpoint to add a comment to an existing post by providing the `user_id` (post author) and `post_id` (post being commented on) in the URL, along with the comment content in the request body.
+
+        **How to use:** Send a POST request with `content` and `contentType` as parameters, and the `user_id` and `post_id` in the URL.
+
+        **Why to use:** This API allows users to interact with posts by commenting, which can enhance engagement on the platform.
+
+        **Why not to use:** If the post does not exist or if the comment parameters are incorrect.
+      summary: Adds a comment on a post
+      parameters:
+      - in: query
+        name: content
+        schema:
+          type: string
+        description: The comment content.
+      - in: query
+        name: contentType
+        schema:
+          type: string
+        description: The comments content type.
+      - in: query
+        name: id
+        schema:
+          type: string
+        description: The post url id
+        required: true
+      - in: path
+        name: post_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Comment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Comment'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: Comment added successfully.
+        '400':
+          description: Incorrect request body
+        '401':
+          description: User is not authenticated.
+        '404':
+          description: User not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/authors/{user_id}/posts/{post_id}/likes/:
     get:
       operationId: api_authors_posts_likes_retrieve
       description: |-
@@ -786,10 +1498,46 @@ paths:
         name: post_id
         schema:
           type: string
-          pattern: ^.+$
+          pattern: ^.+\d$
         required: true
       - in: path
         name: user_id
+        schema:
+          type: string
+          pattern: ^.+\d$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Likes'
+          description: Successfully retrieved all likes.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/comment/{comment_id}/:
+    get:
+      operationId: api_comment_retrieve
+      description: |-
+        Retrieves a specific comment object from a user based on the post id, user id, and remote comment id
+
+        **When to use:** Use this endpoint to retrieve a unique comment on a post by providing the `comment_id` and `post_id`. Optionally, the `user_id` can be used to further specify the author.
+
+        **How to use:** Send a GET request with `comment_id` and `post_id` in the URL. The optional `user_id` parameter can help identify the author of the post if needed.
+
+        **Why to use:** This API is useful for retrieving a particular comment's details, enabling targeted access for comment management or display.
+
+        **Why not to use:** Do not use if the comment, user, or post does not exist, as this will result in a 404 response.
+      summary: Gets a specific comment from a user
+      parameters:
+      - in: path
+        name: comment_id
         schema:
           type: string
           pattern: ^.+$
@@ -805,8 +1553,242 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Likes'
-          description: Successfully retrieved all likes.
+                $ref: '#/components/schemas/Comment'
+          description: Successfully retrieved comment.
+        '404':
+          description: User, comment, or post not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/comment/{comment_id}/remove/:
+    delete:
+      operationId: api_comment_remove_destroy
+      description: |-
+        Deletes a comment on a post based on the provided comment id
+
+        **When to use:** Use this endpoint to remove a comment that was previously added to a post by providing the `comment_id` in the URL.
+
+        **How to use:** Send a DELETE request with the `comment_id` in the URL to specify which comment should be removed.
+
+        **Why to use:** This API is useful for managing user-generated content, allowing users or admins to delete comments when necessary.
+
+        **Why not to use:** If the `comment_id` does not exist or if the user lacks authorization to delete the comment.
+      summary: Deletes a comment on a post
+      parameters:
+      - in: path
+        name: comment_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: Comment removed successfully.
+        '401':
+          description: User is not authenticated.
+        '404':
+          description: Comment not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/commented/{comment_id}/:
+    get:
+      operationId: api_commented_retrieve
+      description: |-
+        Retrieves a specific comment object from a user based on the post id, user id, and remote comment id
+
+        **When to use:** Use this endpoint to retrieve a unique comment on a post by providing the `comment_id` and `post_id`. Optionally, the `user_id` can be used to further specify the author.
+
+        **How to use:** Send a GET request with `comment_id` and `post_id` in the URL. The optional `user_id` parameter can help identify the author of the post if needed.
+
+        **Why to use:** This API is useful for retrieving a particular comment's details, enabling targeted access for comment management or display.
+
+        **Why not to use:** Do not use if the comment, user, or post does not exist, as this will result in a 404 response.
+      summary: Gets a specific comment from a user
+      parameters:
+      - in: path
+        name: comment_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: Successfully retrieved comment.
+        '404':
+          description: User, comment, or post not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/follow-requests:
+    get:
+      operationId: api_follow_requests_retrieve
+      description: |-
+        Retrieves the list of pending follow requests for the logged-in user.
+
+        **When to use:** Use this endpoint when you want to check the follow requests that are awaiting your approval.
+
+        **How to use:** Send a GET request to retrieve the list of follow requests.
+
+        **Why to use:** This API allows authors to manage their incoming follow requests and decide whom to connect with.
+
+        **Why not to use:** If the user is not authenticated, or if there are no pending follow requests, the request may not yield the expected results.
+      summary: Get follow requests for a user
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowRequests'
+          description: List of follow requests retrieved successfully.
+        '401':
+          description: Unauthorized access. User must be logged in.
+        '404':
+          description: No follow requests found for the logged-in user.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/follow-requests/{request_id}/accept:
+    post:
+      operationId: api_follow_requests_accept_create
+      description: |-
+        Accepts a follow request from another author based on the provided request ID.
+
+        **When to use:** Use this endpoint when an author wants to accept a follow request from another author.
+
+        **How to use:** Send a POST request with the `request_id` of the follow request to be accepted.
+
+        **Why to use:** This API facilitates the acceptance of follow requests, enhancing the social connectivity within the application.
+
+        **Why not to use:** If the follow request does not exist or has already been accepted/declined, the request may fail.
+      summary: Accept a follow request
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FollowRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FollowRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FollowRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: Follow request accepted.
+        '404':
+          description: Follow request not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/follow-requests/{request_id}/reject:
+    delete:
+      operationId: api_follow_requests_reject_destroy
+      description: |-
+        Rejects a follow request from another author based on the provided follow request ID.
+
+        **When to use:** Use this endpoint when an author wants to decline a follow request from another author.
+
+        **How to use:** Send a POST request with the `request_id` of the follow request to be rejected.
+
+        **Why to use:** This API facilitates the management of follow requests, allowing authors to maintain control over their connections.
+
+        **Why not to use:** If the follow request does not exist or has already been accepted/declined, the request may fail.
+      summary: Reject a follow request
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: Follow request rejected.
+        '404':
+          description: Follow request not found.
+        '405':
+          description: Method not allowed.
+  /chartreuse/api/posts/{post_id}/comments/:
+    get:
+      operationId: api_posts_comments_retrieve
+      description: |-
+        Fetches all comments for a given post, optionally supporting pagination parameters to manage the number of comments per page and the page number.
+
+        **When to use:** Use this endpoint to retrieve all comments associated with a post by providing the `post_id` (required) and optionally, `size` and `page` parameters for pagination.
+
+        **How to use:** Send a GET request with the `post_id` in the URL and include optional `size` and `page` query parameters if pagination is desired.
+
+        **Why to use:** This API allows users to view all comments on a post, supporting pagination for efficient data handling in applications with high comment volumes.
+
+        **Why not to use:** If the post does not exist or if an invalid page or size parameter is provided.
+      summary: Get all comments on a post
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: string
+        description: the page number of the comments paginator
+      - in: path
+        name: post_id
+        schema:
+          type: string
+          pattern: ^.+$
+        required: true
+      - in: query
+        name: size
+        schema:
+          type: string
+        description: the size of the comments paginator
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comments'
+          description: List of comments retrieved successfully.
+        '404':
+          description: Post or User not found.
         '405':
           description: Method not allowed.
   /chartreuse/github/{user_id}/events/:
@@ -1053,6 +2035,36 @@ paths:
           description: ''
 components:
   schemas:
+    Actor:
+      type: object
+      properties:
+        type:
+          type: string
+          default: author
+        id:
+          type: string
+          format: uri
+        host:
+          type: string
+          format: uri
+        displayName:
+          type: string
+        page:
+          type: string
+          format: uri
+        github:
+          type: string
+          format: uri
+        profileImage:
+          type: string
+          format: uri
+      required:
+      - displayName
+      - github
+      - host
+      - id
+      - page
+      - profileImage
     Comment:
       type: object
       properties:
@@ -1063,7 +2075,7 @@ components:
           type: string
         contentType:
           type: string
-        published:
+        dateCreated:
           type: string
           format: date-time
         id:
@@ -1077,10 +2089,10 @@ components:
       required:
       - comment
       - contentType
+      - dateCreated
       - id
       - likes
       - post
-      - published
     Comments:
       type: object
       properties:
@@ -1107,6 +2119,118 @@ components:
       - page_number
       - size
       - src
+    FollowRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          default: follow
+        summary:
+          type: string
+        actor:
+          $ref: '#/components/schemas/Actor'
+        object:
+          $ref: '#/components/schemas/Object'
+      required:
+      - actor
+      - object
+      - summary
+    FollowRequests:
+      type: object
+      properties:
+        type:
+          type: string
+          default: follow_requests
+        follow_requests:
+          type: array
+          items:
+            $ref: '#/components/schemas/FollowRequest'
+      required:
+      - follow_requests
+    Follower:
+      type: object
+      properties:
+        type:
+          type: string
+          default: author
+        id:
+          type: string
+          format: uri
+        host:
+          type: string
+          format: uri
+        displayName:
+          type: string
+        page:
+          type: string
+          format: uri
+        github:
+          type: string
+          format: uri
+        profileImage:
+          type: string
+          format: uri
+      required:
+      - displayName
+      - github
+      - host
+      - id
+      - page
+      - profileImage
+    Followers:
+      type: object
+      properties:
+        type:
+          type: string
+          default: followers
+        followers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Follower'
+      required:
+      - followers
+    Friend:
+      type: object
+      properties:
+        type:
+          type: string
+          default: author
+        id:
+          type: string
+          format: uri
+        host:
+          type: string
+          format: uri
+        displayName:
+          type: string
+        page:
+          type: string
+          format: uri
+        github:
+          type: string
+          format: uri
+        profileImage:
+          type: string
+          format: uri
+      required:
+      - displayName
+      - github
+      - host
+      - id
+      - page
+      - profileImage
+    Friends:
+      type: object
+      properties:
+        type:
+          type: string
+          default: friends
+        friends:
+          type: array
+          items:
+            $ref: '#/components/schemas/Friend'
+      required:
+      - friends
     Like:
       type: object
       properties:
@@ -1158,6 +2282,36 @@ components:
       - page_number
       - size
       - src
+    Object:
+      type: object
+      properties:
+        type:
+          type: string
+          default: author
+        id:
+          type: string
+          format: uri
+        host:
+          type: string
+          format: uri
+        displayName:
+          type: string
+        page:
+          type: string
+          format: uri
+        github:
+          type: string
+          format: uri
+        profileImage:
+          type: string
+          format: uri
+      required:
+      - displayName
+      - github
+      - host
+      - id
+      - page
+      - profileImage
     Post:
       type: object
       properties:
@@ -1197,6 +2351,18 @@ components:
       - likes
       - published
       - title
+    Posts:
+      type: object
+      properties:
+        type:
+          type: string
+          default: posts
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+      required:
+      - posts
     User:
       type: object
       properties:

@@ -11,6 +11,8 @@ from ..models import User, Post
 from django.shortcuts import get_object_or_404
 from urllib.parse import urlparse
 import base64
+from .support_functions import get_image_post
+from urllib.request import urlopen
 
 @login_required
 def update_password(request):
@@ -148,6 +150,51 @@ def upload_profile_picture(request):
 
     return HttpResponseNotAllowed(['POST'])
 
+
+@login_required
+def upload_url_picture(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        image_url = data.get('url')
+
+        # code for converting to URL borrowed with permission from Julia Dantas from our groups support_functions.py save_post file
+        image_content = image_url.split('.')[-1]
+
+        if image_content not in ['png','jpg','jpeg']:
+            return JsonResponse({'error':'Invalid media type. (.png and .jpeg accepted)'},status=415)
+
+        mime_type = 'image/' + image_content + ';base64'
+        try:
+            with urlopen(image_url) as url:
+                f = url.read()
+                encoded_string = base64.b64encode(f).decode("utf-8")
+        except Exception as e:
+            return JsonResponse({'error':'Failed to retrieve image'},400)
+        encoded_image = encoded_string
+
+        current_auth_user = request.user
+        current_user_model = User.objects.get(user=current_auth_user)
+
+        new_picture = Post(
+            title="profile pic",
+            contentType = mime_type,
+            content = encoded_image,
+            user = current_user_model,
+            visibility = 'DELETED'
+        )
+
+        new_picture.save()
+
+        profile_pic_url = new_picture.url_id + '/image'
+        current_user_model.profileImage = profile_pic_url
+
+        current_user_model.save()
+
+        return JsonResponse({'success':'Profile picture updated','image':encoded_image},status=200)
+    return HttpResponseNotAllowed(['POST'])
+
+
         
 
 
@@ -168,5 +215,7 @@ class SettingsDetailView(DetailView):
     def get_object(self):
         # user's Id can't be obtained since the User model does not explicity state a primary key. Will retrieve the user by grabbing them by the URL pk param.
         authenticated_user = self.request.user
-        return get_object_or_404(User,user=authenticated_user)
+        user = get_object_or_404(User,user=authenticated_user)
+        user.profileImage = get_image_post(user.profileImage)
+        return user
 

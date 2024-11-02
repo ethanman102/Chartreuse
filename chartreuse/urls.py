@@ -9,6 +9,11 @@ from .view import home_page_view, signup_view, login_view, landing_page_view, pr
 
 app_name = "chartreuse"
 urlpatterns = [
+    # Post Comment URLs
+    re_path(r"comment/$",support_functions.add_comment,name="add_comment"),
+    re_path(r"comment/(?P<comment_id>.+)/delete/$",support_functions.delete_comment,name="delete_comment"),
+    re_path(r"comment/like/$",support_functions.like_comment,name="like_comment"),
+
     # Like URLs
     re_path(r"api/authors/(?P<user_id>.+\d)/inbox/$", likes.LikeViewSet.as_view({'post': 'add_like', 'delete': 'remove_like'}), name="like"),
     re_path(r"api/authors/(?P<user_id>.+\d)/posts/(?P<post_id>.+\d)/comments/(?P<comment_id>.+\d)/likes/$", likes.LikeViewSet.as_view({'get': 'get_comment_likes'}), name="comment_likes"),

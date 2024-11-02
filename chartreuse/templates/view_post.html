@@ -52,8 +52,6 @@
                     {% elif post.contentType == "text/commonmark" %}
                 
                         <p class="card-text" id="cm_text" style="text-align: left;">{{ post.content }}</p>
-                        <!-- <p class="card-text" id="cm_result" style="text-align: left;"></p> -->
-
 
                     {% elif post.contentType == "image/png" or post.contentType == "image/jpeg" %}
                         <div class="text-center">
@@ -74,6 +72,50 @@
                         <button class="btn pfp-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">Set pfp</button>
                         {% endif %}
                         <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">{{ post.likes_count }} likes</button>
+                    </div>
+
+                    <div class="mt-5">
+                        <h3 style="text-align: left;">Comments</h3>
+                    
+                        {% if logged_in %}
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <textarea class="form-control" name="comment" id="comment-text" rows="3" placeholder="Add a comment..." required></textarea>
+                            </div>
+                            <button style="text-align: left;" type="submit" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" class="btn comment-button">Submit Comment</button>
+                        {% endif %}
+                        <br></br>
+                    
+                        <div id="comments-section">
+                            {% for comment in comments %}
+                                <div class="card comment-card mb-3 p-4" style="border-radius: 10px;">
+                                    <div class="d-flex mb-4 align-items-center">
+                                        <a href="/chartreuse/authors/{{ comment.user.url_id }}/" style="text-decoration: none; color:black;">
+                                            <img src="{{ comment.user.profileImage }}" alt="{{ comment.user.displayName }} Avatar" class="rounded-circle me-3" width="40" height="40">
+                                        </a>
+                                        <div class="flex-grow-1 text-center" style="background-color: white;">
+                                            <a href="/chartreuse/authors/{{ comment.user.url_id }}/" style="text-decoration: none; color:black; text-align: left; background-color: white;">
+                                                <h5 class="mb-0">{{ comment.user.displayName }}</h5>
+                                            </a>
+                                        </div>
+                                        <div class="d-flex align-items-center ms-2">
+                                            {% if comment.is_author %}
+                                                <a href="/chartreuse/comment/{{ comment.url_id }}/delete/" class="btn btn-link p-0" title="Delete Comment">
+                                                    <img src="{% static 'css/icons/delete-button.svg' %}" alt="Delete" width="30" height="30">
+                                                </a>
+                                            {% endif %}
+                                            <button class="btn like-comment-button ms-2" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-comment-id="{{ comment.url_id }}" data-host="{{ user_details.host }}">
+                                                {{ comment.likes_count }} likes
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p style="text-align: left;">{{ comment.comment }}</p>
+                                    <p style="text-align: left;">Commented on {{ comment.dateCreated }}</p>
+                                </div>
+                            {% empty %}
+                                <p>No comments yet. Be the first to comment!</p>
+                            {% endfor %}
+                        </div>                                                 
                     </div>
                 </div>
             </div>

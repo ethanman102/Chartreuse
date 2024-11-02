@@ -42,7 +42,13 @@ class CommentViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Adds a comment on a post",
-        description="Adds a comment on a post based on the provided post url",
+        description=(
+            "Adds a comment on a post based on the provided post url"
+            "\n\n**When to use:** Use this endpoint to add a comment to an existing post by providing the `user_id` (post author) and `post_id` (post being commented on) in the URL, along with the comment content in the request body."
+            "\n\n**How to use:** Send a POST request with `content` and `contentType` as parameters, and the `user_id` and `post_id` in the URL."
+            "\n\n**Why to use:** This API allows users to interact with posts by commenting, which can enhance engagement on the platform."
+            "\n\n**Why not to use:** If the post does not exist or if the comment parameters are incorrect."
+        ),
         parameters=[
             OpenApiParameter(name="content", description="The comment content.", required=False, type=str),
             OpenApiParameter(name="contentType", description="The comments content type.", required=False, type=str),
@@ -140,7 +146,13 @@ class CommentViewSet(viewsets.ViewSet):
 
     @extend_schema(
             summary="Deletes a comment on a post",
-            description="Deletes a comment on a post based on the provided comment id",
+            description=(
+                "Deletes a comment on a post based on the provided comment id"
+                "\n\n**When to use:** Use this endpoint to remove a comment that was previously added to a post by providing the `comment_id` in the URL."
+                "\n\n**How to use:** Send a DELETE request with the `comment_id` in the URL to specify which comment should be removed."
+                "\n\n**Why to use:** This API is useful for managing user-generated content, allowing users or admins to delete comments when necessary."
+                "\n\n**Why not to use:** If the `comment_id` does not exist or if the user lacks authorization to delete the comment."
+            ),
             responses={
                 200: OpenApiResponse(description="Comment removed successfully.", response=CommentSerializer),
                 401: OpenApiResponse(description="User is not authenticated."),
@@ -218,7 +230,13 @@ class CommentViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Get all comments on a post",
-        description="Fetch all comments on a post",
+        description=(
+            "Fetches all comments for a given post, optionally supporting pagination parameters to manage the number of comments per page and the page number."
+            "\n\n**When to use:** Use this endpoint to retrieve all comments associated with a post by providing the `post_id` (required) and optionally, `size` and `page` parameters for pagination."
+            "\n\n**How to use:** Send a GET request with the `post_id` in the URL and include optional `size` and `page` query parameters if pagination is desired."
+            "\n\n**Why to use:** This API allows users to view all comments on a post, supporting pagination for efficient data handling in applications with high comment volumes."
+            "\n\n**Why not to use:** If the post does not exist or if an invalid page or size parameter is provided."
+        ),
         parameters=[
             OpenApiParameter(name="size", description="the size of the comments paginator", required=False, type=str),
             OpenApiParameter(name="page", description="the page number of the comments paginator", required=False, type=str),
@@ -322,7 +340,13 @@ class CommentViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Gets a specific comment from a user",
-        description="Retrieves a specific comment object from a user based on the post id, user id, and remote comment id",
+        description=(
+            "Retrieves a specific comment object from a user based on the post id, user id, and remote comment id"
+            "\n\n**When to use:** Use this endpoint to retrieve a unique comment on a post by providing the `comment_id` and `post_id`. Optionally, the `user_id` can be used to further specify the author."
+            "\n\n**How to use:** Send a GET request with `comment_id` and `post_id` in the URL. The optional `user_id` parameter can help identify the author of the post if needed."
+            "\n\n**Why to use:** This API is useful for retrieving a particular comment's details, enabling targeted access for comment management or display."
+            "\n\n**Why not to use:** Do not use if the comment, user, or post does not exist, as this will result in a 404 response."
+        ),
         responses={
             200: OpenApiResponse(description="Successfully retrieved comment.", response=CommentSerializer),
             404: OpenApiResponse(description="User, comment, or post not found."),
@@ -399,7 +423,13 @@ class CommentViewSet(viewsets.ViewSet):
 
     @extend_schema(
         summary="Gets the list of comments an author has made.",
-        description="Retrieves a a paginated list of comment objects from a user based on the user id.",
+        description=(
+            "Retrieves a a paginated list of comment objects from a user based on the user id."
+            "\n\n**When to use:** Use this endpoint to retrieve all comments made by a specific author. This is useful when tracking or displaying an author's activity across posts."
+            "\n\n**How to use:** Send a GET request with the `user_id` in the URL, along with optional `size` and `page` query parameters to manage pagination."
+            "\n\n**Why to use:** This API facilitates access to an author's comments, enabling efficient management and display of content created by a specific user."
+            "\n\n**Why not to use:** Avoid using this if the specified author has no comments, or if the user ID is invalid, which will result in a 404 response."
+        ),
         parameters=[
             OpenApiParameter(name="size", description="the size of the comments paginator", required=False, type=str),
             OpenApiParameter(name="page", description="the page number of the comments paginator", required=False, type=str),

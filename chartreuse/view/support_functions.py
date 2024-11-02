@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
 import re
+from chartreuse.views import Host
 from datetime import datetime, timedelta, timezone
 
 def get_post_likes(post_id):
@@ -123,10 +124,12 @@ def update_post(request, post_id):
         # Ensure that either content, image, or image URL is provided
         if not content_type and not image and not image_url:
             return JsonResponse({'error': 'Post content is required.'}, status=400)
+    
+        print(content_type)
 
         # Determine content type and set appropriate content
         # add option for commonmark here
-        if (content_type == 'plain') and content:
+        if (content_type == 'text') and content:
             content_type = 'text/plain'
             post_content = content
 
@@ -138,10 +141,14 @@ def update_post(request, post_id):
             image_data = image.read()
             encoded_image = base64.b64encode(image_data).decode('utf-8')
             image_content = image.content_type.split('/')[1]
+            if image_content not in ['jpeg', 'png', 'jpg']:
+                image_content = 'png'
             content_type = 'image/' + image_content
             post_content = encoded_image
         elif image_url:
             image_content = image_url.split('.')[-1]
+            if image_content not in ['jpeg', 'png', 'jpg']:
+                image_content = 'png'
             content_type = 'image/' + image_content
             try:
                 with urlopen(image_url) as url:
@@ -199,7 +206,6 @@ def save_post(request):
             post_content = content
 
         elif content and (content_type == 'commonmark'):
-            print("hi")
             content_type = 'text/commonmark'
             post_content = content 
         
@@ -207,10 +213,14 @@ def save_post(request):
             image_data = image.read()
             encoded_image = base64.b64encode(image_data).decode('utf-8')
             image_content = image.content_type.split('/')[1]
+            if image_content not in ['jpeg', 'png', 'jpg']:
+                image_content = 'png'
             content_type = 'image/' + image_content
             post_content = encoded_image
         elif image_url:
             image_content = image_url.split('.')[-1]
+            if image_content not in ['jpeg', 'png', 'jpg']:
+                image_content = 'png'
             content_type = 'image/' + image_content
             try:
                 with urlopen(image_url) as url:
@@ -426,7 +436,6 @@ def setNewProfileImage(request):
 
 def get_image_post(pfp_url):
     pattern = r"(?P<host>https?:\/\/.+?herokuapp\.com)\/authors\/(?P<author_serial>\d+)\/posts\/(?P<post_serial>\d+)\/image"
-
     match = re.search(pattern, pfp_url)
 
     if match:
@@ -437,10 +446,12 @@ def get_image_post(pfp_url):
         author = User.objects.filter(url_id=f"{host}/authors/{author_serial}").first()
         pfp_post = Post.objects.filter(user=author, url_id=f"{host}/authors/{author_serial}/posts/{post_serial}").first()
 
-        if pfp_post and pfp_post.content and pfp_post.contentType in ['image/jpeg', 'image/png']:
+        if pfp_post and pfp_post.content and pfp_post.contentType in ['image/jpeg', 'image/png', 'image/webp', 'image/jpg']:
             pfp_url = f"data:{pfp_post.contentType};charset=utf-8;base64, {pfp_post.content}"
         else:
-            pfp_url = f"{host}/static/images/default_pfp_1.png"
+            pfp_url = f"{Host.host}/static/images/default_pfp_1.png"
+        return pfp_url
+    else:
         return pfp_url
         
 def checkGithubPolling(request):

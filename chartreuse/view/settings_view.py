@@ -194,7 +194,6 @@ def upload_url_picture(request):
         current_user_model.profileImage = profile_pic_url
 
         current_user_model.save()
-        print('content here',mime_type)
 
         return JsonResponse({'success':'Profile picture updated','image':encoded_image,"mimeType":mime_type},status=200)
     return HttpResponseNotAllowed(['POST'])

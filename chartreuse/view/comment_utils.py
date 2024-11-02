@@ -43,7 +43,7 @@ def get_comments(post_id):
     post_id = unquote(post_id)
     post = Post.objects.get(url_id=post_id)
 
-    comments = Comment.objects.filter(post=post)
+    comments = Comment.objects.filter(post=post).order_by('-dateCreated')
 
     return comments
 

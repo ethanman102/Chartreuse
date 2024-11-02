@@ -39,10 +39,20 @@
                             <input class="form-check-input" type="radio" name="content_type" id="textOption" value="text" checked>
                             <label class="form-check-label" for="textOption">Text</label>
                         </div>
+
+                        <div class="form-check me-3">
+                            <input class="form-check-input" type="radio" name="content_type" id="textOption" value="commonmark">
+                            <label class="form-check-label" for="textOption">Commonmark</label>
+                        </div>
+
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="content_type" id="imageOption" value="image">
                             <label class="form-check-label" for="imageOption">Image</label>
                         </div>
+
+                    <!-- {% elif post.contentType == "text/commonmark" %} -->
+
+
                     {% else %}
                         <div class="form-check me-3">
                             <input class="form-check-input" type="radio" name="content_type" id="textOption" value="text">

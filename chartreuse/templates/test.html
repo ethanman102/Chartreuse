@@ -3,11 +3,7 @@
 
 {% block title %}chartreuse.test{% endblock %}
 
-{% block content %}
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+{% block extra_head %}
     <style>
         html body {
             margin-left: 10%;
@@ -15,34 +11,45 @@
     </style>
 
     <script type="module">
+        // Consider switching to https://github.com/markdown-it/markdown-it?tab=readme-ov-file#markdown-it-
+        // Their docs: https://markdown-it.github.io/markdown-it/
+        // import markdownIt from 'https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/+esm'
+        
         import "https://unpkg.com/commonmark@0.29.3/dist/commonmark.js";
+
+        'use strict'
+        
 
         window.addEventListener('load', main);
 
         function main() {
             const commonmark = window.commonmark;
 
-            // let testString = getElementById("test");
+            // variable to track the html element for displaying the commonmark text
+            var markString = document.getElementById('cm_content').innerText;
+
+        
             // will need to bundle with esbuild command for the browser import mini package
             var reader = new commonmark.Parser({smart: true});
-            var writer = new commonmark.HtmlRenderer({sourcepos: true, safe: true, softbreak: "<br />"});
-            var parsed = reader.parse("Hello **world**"); // parsed is a 'Node' tree
+            var writer = new commonmark.HtmlRenderer({sourcepos: true});
+            // var writer = new commonmark.HtmlRenderer({sourcepos: true, safe: true, softbreak: "<br />"});
+            var parsed = reader.parse(`# Hello  and **goodbye** `); // parsed is a 'Node' tree
+            // console.log(parsed);
+            // console.log(typeof parsed);
             // transform parsed if you like...
             var result = writer.render(parsed); // result is a String
 
-            // variable to track the html element for displaying the commonmark text
-            document.getElementById("cm_text").innerHTML = result;
-
+            
             // // sets the text to be shown in html file as the rendered Commonmark text 
-            // htmlString.textContent = result;
+            document.getElementById('cm_content').innerHTML = result;
         };
 
         
     </script>
-    <!-- <script src="{% static 'javascript/cm_edit.min.js' %}"></script> -->
-</head>
 
-<body> 
+{% endblock %}
+
+{% block content %}
 
     {% block sidenav %}
         {% include 'navbar.html' %}
@@ -51,12 +58,15 @@
     <h2>chartreuse.test</h2>
 
     
-    <p id="test"># This is testing</p>
+    <p># This is testing</p>
 
-    <p id="cm_text">
-        <!-- rendered commonmark text shows here -->
-    </p>
+    <!-- Seems like I can just put the rendered  -->
+    <p class="card-text" id="cm_content">{{ markdown_txt }}</p>
 
-</body>
+    <!-- First attempt to get commonmark to show up -->
+    <!-- <p class="card-text" id="cm_content" style="display: none;">{{ markdown_txt }}</p> -->
+    
+    <!-- testing rendered commonmark text shows here -->
+    <!-- <p id="cm_text"></p> -->
 
 {% endblock %}

@@ -125,9 +125,15 @@ def update_post(request, post_id):
             return JsonResponse({'error': 'Post content is required.'}, status=400)
 
         # Determine content type and set appropriate content
-        if content:
+        # add option for commonmark here
+        if (content_type == 'plain') and content:
             content_type = 'text/plain'
             post_content = content
+
+        elif (content_type == 'commonmark') and content:
+            content_type = 'text/commonmark'    
+            post_content = content
+
         elif image:
             image_data = image.read()
             encoded_image = base64.b64encode(image_data).decode('utf-8')
@@ -182,14 +188,21 @@ def save_post(request):
         current_user = request.user
         current_user_model = get_object_or_404(User, user=current_user)
         
+
         # Ensure that either content, image, or image URL is provided
         if not content_type and not image and not image_url:
             return JsonResponse({'error': 'Post content is required.'}, status=400)
 
         # Determine content type and set appropriate content
-        if content:
+        if content and (content_type == 'text'):
             content_type = 'text/plain'
             post_content = content
+
+        elif content and (content_type == 'commonmark'):
+            print("hi")
+            content_type = 'text/commonmark'
+            post_content = content 
+        
         elif image:
             image_data = image.read()
             encoded_image = base64.b64encode(image_data).decode('utf-8')

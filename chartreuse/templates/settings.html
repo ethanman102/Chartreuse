@@ -363,6 +363,59 @@
 
             imageInput.addEventListener('change',onSelectFile);
 
+            imageUploadSubmitButton.addEventListener('click',async (event)=>{
+                event.preventDefault();
+                if (imageUrlInput.value === ''){
+                    imageUploadMessage.style.color = 'red';
+                    imageUploadMessage.innerText = 'Please provide a .png or .jpg url';
+                    imageUploadMessage.style.visibility = 'visible';
+                    return
+                }
+
+                imageSpinner.style.visibility = 'visible';
+                imageUrlInput.disabled = 'true';
+                uploadImageOption.disabled = 'true';
+                urlImageOption.disabled = 'true';
+                imageUploadSubmitButton.disabled = 'true';
+
+                let response = await fetch('uploadImageUrl/',{
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{csrf_token}}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        url: imageUrlInput.value
+                    })
+                });
+
+                let data = await response.json();
+
+                if (response.status === 415 || response.status === 400){
+                    imageUploadMessage.style.color = 'red';
+                    imageUploadMessage.innerText = data.error;
+                    imageUploadMessage.style.visibility = 'visible';
+                }else if(response.status === 200){
+                    imageUploadMessage.style.color = 'chartreuse';
+                    imageUploadMessage.innerText = data.success;
+                    imageUploadMessage.style.visibility = 'visible';
+                    let imageBytes = data.image;
+                    let type = data.mimeType
+                    let srcString = `data:${type};charset=utf-8;base64, ${imageBytes}`;
+                    currentImage.setAttribute('src',srcString);
+                }
+                
+                imageSpinner.style.visibility = 'hidden';
+                urlImageOption.removeAttribute('disabled');
+                uploadImageOption.removeAttribute('disabled');
+                imageUrlInput.removeAttribute('disabled');
+                imageUploadSubmitButton.removeAttribute('disabled');
+                imageUrlInput.value = '';
+
+
+
+            });
+
 
         }
 

@@ -168,7 +168,7 @@ def upload_url_picture(request):
         if image_content not in ['png','jpg','jpeg']:
             return JsonResponse({'error':'Invalid media type. (.png and .jpeg accepted)'},status=415)
 
-        mime_type = 'image/' + image_content + ';base64'
+        mime_type = 'image/' + image_content 
         try:
             with urlopen(image_url) as url:
                 f = url.read()
@@ -182,7 +182,7 @@ def upload_url_picture(request):
 
         new_picture = Post(
             title="profile pic",
-            contentType = mime_type,
+            contentType = mime_type + ';base64',
             content = encoded_image,
             user = current_user_model,
             visibility = 'DELETED'
@@ -194,8 +194,9 @@ def upload_url_picture(request):
         current_user_model.profileImage = profile_pic_url
 
         current_user_model.save()
+        print('content here',mime_type)
 
-        return JsonResponse({'success':'Profile picture updated','image':encoded_image},status=200)
+        return JsonResponse({'success':'Profile picture updated','image':encoded_image,"mimeType":mime_type},status=200)
     return HttpResponseNotAllowed(['POST'])
 
 

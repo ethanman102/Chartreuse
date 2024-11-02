@@ -183,8 +183,11 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-6 offset-3">
+                    <div class="col-3 offset-3">
                         <h5 id="current-image-header">Current Profile Picture</h5>
+                    </div>
+                    <div class="col-3">
+                        <div class="spinner-border text-primary" role="status" id="imageSpinner" style="visibility: hidden;"></div>
                     </div>
                 </div>
                 <div class="row">
@@ -307,6 +310,11 @@
                 let fileBody = new FormData()
                 fileBody.append('file',file)
 
+                imageSpinner.style.visibility = 'visible';
+                imageInput.disabled = 'true';
+                uploadImageOption.disabled = 'true';
+                urlImageOption.disabled = 'true';
+
 
                 let response = await fetch('uploadProfileImage/',{
                     method: 'POST',
@@ -326,12 +334,13 @@
                     imageUploadMessage.innerText = data.success;
                     imageUploadMessage.style.visibility = 'visible';
                     currentImage.setAttribute('src',srcString);
-                    return;
                 }
 
+                imageSpinner.style.visibility = 'hidden';
+                urlImageOption.removeAttribute('disabled');
+                uploadImageOption.removeAttribute('disabled');
+                imageInput.removeAttribute('disabled');
                 
-
-
             }
 
             const onSelectFile = () => {

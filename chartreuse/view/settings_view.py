@@ -7,7 +7,7 @@ from django.http import JsonResponse, HttpResponseNotAllowed
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login as auth_login
 import json
-from ..models import User
+from ..models import User, Post
 from django.shortcuts import get_object_or_404
 from urllib.parse import urlparse
 import base64
@@ -116,25 +116,35 @@ def upload_profile_picture(request):
         file_to_read = None
         file_name_to_read = None
         for filename,file in request.FILES.items():
-            print(filename)
             file_name_to_read = filename
             file_to_read = file
-        print(request.FILES)
-        
-        
+            
+    
         if (file_to_read == None or file_name_to_read == None):
             return JsonResponse({'error': 'No file provided'},status=400)
+        
+        mime_type = file_to_read.content_type + ';base64'
         
         image_data = file_to_read.read()
         encoded_image = base64.b64encode(image_data).decode('utf-8')
 
-        return JsonResponse({'success':f'Profile picture updated to: {file_name_to_read}','image':encoded_image},status=200)
+        current_auth_user = request.user
+        current_user_model = User.objects.get(user = current_auth_user)
 
-    
+        new_picture = Post(
+            title="profile pic",
+            contentType = mime_type,
+            content = encoded_image,
+            user = current_user_model,
+            visibility = 'DELETED'
+        )
+        new_picture.save()
 
+        profile_pic_url = new_picture.url_id + '/image'
 
-
-
+        current_user_model.profileImage = profile_pic_url
+        current_user_model.save()
+        return JsonResponse({'success':'Profile picture updated','image':encoded_image},status=200)
 
     return HttpResponseNotAllowed(['POST'])
 

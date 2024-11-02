@@ -95,7 +95,6 @@ a {
     display: flex;
     justify-content: center;
     margin: 20px 0;
-    font-family: 'Courier New', Courier, monospace; /* Retro font */
 }
 
 .step-links {
@@ -115,14 +114,14 @@ a {
 }
 
 .pagination-button:hover {
-    background-color: #01162b; /* Darker background on hover */
-    color: chartreuse; /* White text on hover */
+    background-color: #01162b;
+    color: chartreuse;
 }
 
 .current {
     padding: 10px 15px;
     margin: 0 5px;
-    background-color: #ffffff; /* Burlywood */
-    color: #000000; /* White text */
+    background-color: #ffffff;
+    color: #000000;
     border-radius: 5px;
 }

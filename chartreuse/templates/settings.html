@@ -263,6 +263,8 @@
         window.addEventListener('load',imageTab);
         function imageTab(){
 
+            // Code for hiding and displaying radio buttons and form inputs gladly borrowed with permission from group member Julia Dantas
+            // in the file add_post.html
             let uploadImageOption = document.getElementById('uploadImageOption');
             let urlImageOption = document.getElementById('urlImageOption');
             let uploadImageContent = document.getElementById('uploadImageContent');
@@ -299,10 +301,15 @@
             });
 
             // https://stackoverflow.com/questions/2036158/validate-image-type-using-javascript
+            // Stack overflot post: Validate image type using javascript
+            // Purpose: ensure that uploaded file is either jpg or png...
+            // lOGIC of conditional below implemented through the learning of the .type attribute through the post of author: pubudu sachintha (march 3 2021)
 
             // https://stackoverflow.com/questions/36067767/how-do-i-upload-a-file-with-the-js-fetch-api
             // Resource: Stack Overflow (How do I upload a file with the JS fetch API?) post on how to upload a file to the backend with a fetch api request. This code is modified from
             // The answer post by Damien on March 18, 2016
+            // Furthermore, the same code was also adapted to fit Author: Integ (November 27, 2016) form data approach as files were not being
+            // sent to request.FILES but rather the request.body
             const changeProfileImage = async (file) =>{
 
                 if (file.type !== "image/png" && file.type !== "image/jpeg"){
@@ -332,6 +339,8 @@
                 let data = await response.json();
 
                 // https://stackoverflow.com/questions/8499633/how-to-display-base64-images-in-html
+                // Stackoverflow post:How to display Base64 images in HTML
+                // Learned how to construct the correct src for base 64 images through author Hemant Metalia's post on December 14, 2011 
                 if (response.status === 200){
                     let imageBytes = data.image;
                     let srcString = `data:${file.type};charset=utf-8;base64, ${imageBytes}`;
@@ -353,7 +362,6 @@
             }
 
             imageInput.addEventListener('change',onSelectFile);
-            // https://stackoverflow.com/questions/4234589/validation-of-file-extension-before-uploading-file
 
 
         }

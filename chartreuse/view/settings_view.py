@@ -117,11 +117,15 @@ def upload_profile_picture(request):
 
         file_to_read = None
         file_name_to_read = None
+        # Resource: https://stackoverflow.com/questions/3111779/how-can-i-get-the-file-name-from-request-files
+        # Stack overflow post: How can I get the file name from request.FILES?
+        # Purpose: learned how to retrieve files of request.FILES wiithout knowing the file name,
+        # Code inspired by mipadi's post on June 24, 2010
         for filename,file in request.FILES.items():
             file_name_to_read = filename
             file_to_read = file
             
-    
+        
         if (file_to_read == None or file_name_to_read == None):
             return JsonResponse({'error': 'No file provided'},status=400)
         

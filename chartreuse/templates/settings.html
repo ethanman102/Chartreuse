@@ -1,4 +1,11 @@
-<html lang="en">
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}chartreuse.profile{% endblock %}
+
+{% block content %}
+
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +15,9 @@
     <link rel="stylesheet" href="{% static 'css/settings.css' %}">
 </head>
 <body>
+    {% block sidenav %}
+    {% include 'navbar.html' %}
+    {% endblock %}
     
 <div class="settings-box" style="margin-top: 30px;">
     <div class = "container" id="settings-header" style="border: 5px solid black;">
@@ -168,7 +178,7 @@
 
                 <div class="row">
                     <div class="col-6 offset-3">
-                        <p id="image-upload-message">Image Upload Message</p>
+                        <p id="image-upload-message" style="visibility: hidden;">Image Upload Message</p>
                     </div>
                 </div>
 
@@ -179,7 +189,7 @@
                 </div>
                 <div class="row">
                     <div class="col-6 offset-3">
-                        <img id="current-image" class="rounded img-fluid pfp-image" style="width: 200px; height: 200px; object-fit: cover; border: solid black 2px;">
+                        <img id="current-image" class="rounded img-fluid pfp-image" style="width: 200px; height: 200px; object-fit: cover; border: solid black 2px;margin-bottom: 2ch;">
                     </div>
                 </div>
 
@@ -620,4 +630,4 @@
         }  
     </script>
 </body>
-</html>
+{% endblock %}

@@ -27,8 +27,9 @@ def add_comment(request):
             content_type = body.get('contentType', 'text/plain')
 
             # Create and save the comment
-            comment = Comment(user=user, post=post, comment=comment_text, contentType=content_type)
-            comment.save()
+            if (comment_text != ""):
+                comment = Comment(user=user, post=post, comment=comment_text, contentType=content_type)
+                comment.save()
 
             return JsonResponse({'success': 'Comment added successfully.'})
         else:

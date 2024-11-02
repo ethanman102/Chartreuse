@@ -97,5 +97,14 @@ body,html{
     text-decoration: underline;
 }
 
+.hidden {
+    display: none;
+}
+
+#current-image-header{
+    text-decoration: underline;
+    font-weight: bold;
+}
+
 
 

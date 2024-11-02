@@ -1,4 +1,11 @@
-<html lang="en">
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}chartreuse.profile{% endblock %}
+
+{% block content %}
+
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +15,9 @@
     <link rel="stylesheet" href="{% static 'css/settings.css' %}">
 </head>
 <body>
+    {% block sidenav %}
+    {% include 'navbar.html' %}
+    {% endblock %}
     
 <div class="settings-box" style="margin-top: 30px;">
     <div class = "container" id="settings-header" style="border: 5px solid black;">
@@ -111,7 +121,89 @@
                     </div>
                 </form>
             </div>
-            <div class="tab-pane fade" id="nav-pi" role="tabpanel" aria-labelledby="nav-pi-tab" tabindex="0">...</div>
+            <div class="tab-pane fade" id="nav-pi" role="tabpanel" aria-labelledby="nav-pi-tab" tabindex="0">
+
+                <div class="row">
+                    <div class="col-12">
+                        <h4>Want to change your look? Feel free to change your profile picture here!</h4>
+                    </div>
+                </div>
+
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-center mb-3">
+                            <div class="form-check mb-3 me-3">
+                                <input class="form-check-input" type="radio" name="image_type" id="uploadImageOption" value="upload" checked>
+                                <label class="form-check-label" for="uploadImageOption">
+                                    Upload Image
+                                </label>
+                            </div>
+                            <div class="form-check mb-3 me-3">
+                                <input class="form-check-input" type="radio" name="image_type" id="urlImageOption" value="url">
+                                <label class="form-check-label" for="urlImageOption">
+                                    Provide Image URL
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="uploadImageContent">
+                    <div class="row">
+                        <div class="col-6 offset-3">
+                            <label for="image" class="form-label">Upload Image</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 offset-3">
+                            <input type="file" class="form-control" id="image" name="image">
+                        </div>
+                    </div>
+                </div>
+                
+
+                <div id="urlImageContent" class="hidden">
+                    <div class="row">
+                        <div class="col-6 offset-3">
+                            <label for="image_url" class="form-label">Image URL</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 offset-3">
+                            <input type="url" class="form-control" id="image_url" name="image_url" placeholder="Enter image URL">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3 offset-3">
+                            <button type="button" class="btn btn-primary w-100" id="image-submit-button">Upload</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6 offset-3">
+                        <p id="image-upload-message" style="visibility: hidden;">Image Upload Message</p>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-3 offset-3">
+                        <h5 id="current-image-header">Current Profile Picture:</h5>
+                    </div>
+                    <div class="col-3">
+                        <div class="spinner-border text-primary" role="status" id="imageSpinner" style="visibility: hidden;"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 offset-3" style="text-align: center;">
+                        <img src = '{{user.profileImage}}'id="current-image" class="rounded img-fluid pfp-image" style="width: 200px; height: 200px; object-fit: cover; border: solid black 2px;margin-bottom: 2ch;">
+                    </div>
+                </div>
+
+
+
+            </div>
             <div class="tab-pane fade" id="nav-github" role="tabpanel" aria-labelledby="nav-github-tab" tabindex="0">
                 <div class="row">
                     <div class="col-12">
@@ -166,6 +258,168 @@
 </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        window.addEventListener('load',imageTab);
+        function imageTab(){
+
+            // Code for hiding and displaying radio buttons and form inputs gladly borrowed with permission from group member Julia Dantas
+            // in the file add_post.html
+            let uploadImageOption = document.getElementById('uploadImageOption');
+            let urlImageOption = document.getElementById('urlImageOption');
+            let uploadImageContent = document.getElementById('uploadImageContent');
+            let urlImageContent = document.getElementById('urlImageContent');
+            let imageInput = document.getElementById('image');
+            let imageUrlInput = document.getElementById('image_url');
+
+            let imageUploadMessage= document.getElementById('image-upload-message');
+            let imageSpinner = document.getElementById('imageSpinner');
+
+            let imageUploadSubmitButton = document.getElementById('image-submit-button');
+
+            let currentImage = document.getElementById('current-image');
+
+        
+            uploadImageOption.addEventListener('change', function() {
+            if (uploadImageOption.checked) {
+                uploadImageContent.classList.remove('hidden');
+                urlImageContent.classList.add('hidden');
+                imageInput.required = true;
+                imageUrlInput.required = false;
+                imageUrlInput.value = '';
+            }
+        });
+        
+            urlImageOption.addEventListener('change', function() {
+                if (urlImageOption.checked) {
+                    urlImageContent.classList.remove('hidden');
+                    uploadImageContent.classList.add('hidden');
+                    imageInput.required = false;
+                    imageUrlInput.required = true;
+                    imageInput.value = '';
+                }
+            });
+
+            // https://stackoverflow.com/questions/2036158/validate-image-type-using-javascript
+            // Stack overflot post: Validate image type using javascript
+            // Purpose: ensure that uploaded file is either jpg or png...
+            // lOGIC of conditional below implemented through the learning of the .type attribute through the post of author: pubudu sachintha (march 3 2021)
+
+            // https://stackoverflow.com/questions/36067767/how-do-i-upload-a-file-with-the-js-fetch-api
+            // Resource: Stack Overflow (How do I upload a file with the JS fetch API?) post on how to upload a file to the backend with a fetch api request. This code is modified from
+            // The answer post by Damien on March 18, 2016
+            // Furthermore, the same code was also adapted to fit Author: Integ (November 27, 2016) form data approach as files were not being
+            // sent to request.FILES but rather the request.body
+            const changeProfileImage = async (file) =>{
+
+                if (file.type !== "image/png" && file.type !== "image/jpeg"){
+                    imageUploadMessage.style.color = 'red';
+                    imageUploadMessage.innerText = 'Please provide a .png or .jpg file';
+                    imageUploadMessage.style.visibility = 'visible';
+                    return;
+                }
+
+                let fileBody = new FormData()
+                fileBody.append('file',file)
+
+                imageSpinner.style.visibility = 'visible';
+                imageInput.disabled = 'true';
+                uploadImageOption.disabled = 'true';
+                urlImageOption.disabled = 'true';
+
+
+                let response = await fetch('uploadProfileImage/',{
+                    method: 'POST',
+                    headers:{
+                        'X-CSRFToken' : '{{csrf_token}}'
+                    },
+                    body: fileBody
+                });
+
+                let data = await response.json();
+
+                // https://stackoverflow.com/questions/8499633/how-to-display-base64-images-in-html
+                // Stackoverflow post:How to display Base64 images in HTML
+                // Learned how to construct the correct src for base 64 images through author Hemant Metalia's post on December 14, 2011 
+                if (response.status === 200){
+                    let imageBytes = data.image;
+                    let srcString = `data:${file.type};charset=utf-8;base64, ${imageBytes}`;
+                    imageUploadMessage.style.color = 'chartreuse';
+                    imageUploadMessage.innerText = data.success;
+                    imageUploadMessage.style.visibility = 'visible';
+                    currentImage.setAttribute('src',srcString);
+                }
+
+                imageSpinner.style.visibility = 'hidden';
+                urlImageOption.removeAttribute('disabled');
+                uploadImageOption.removeAttribute('disabled');
+                imageInput.removeAttribute('disabled');
+
+            }
+
+            const onSelectFile = () => {
+                changeProfileImage(imageInput.files[0]);
+            }
+
+            imageInput.addEventListener('change',onSelectFile);
+
+            imageUploadSubmitButton.addEventListener('click',async (event)=>{
+                event.preventDefault();
+                if (imageUrlInput.value === ''){
+                    imageUploadMessage.style.color = 'red';
+                    imageUploadMessage.innerText = 'Please provide a .png or .jpg url';
+                    imageUploadMessage.style.visibility = 'visible';
+                    return
+                }
+
+                imageSpinner.style.visibility = 'visible';
+                imageUrlInput.disabled = 'true';
+                uploadImageOption.disabled = 'true';
+                urlImageOption.disabled = 'true';
+                imageUploadSubmitButton.disabled = 'true';
+
+                let response = await fetch('uploadImageUrl/',{
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{csrf_token}}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        url: imageUrlInput.value
+                    })
+                });
+
+                let data = await response.json();
+
+                if (response.status === 415 || response.status === 400){
+                    imageUploadMessage.style.color = 'red';
+                    imageUploadMessage.innerText = data.error;
+                    imageUploadMessage.style.visibility = 'visible';
+                }else if(response.status === 200){
+                    imageUploadMessage.style.color = 'chartreuse';
+                    imageUploadMessage.innerText = data.success;
+                    imageUploadMessage.style.visibility = 'visible';
+                    let imageBytes = data.image;
+                    let type = data.mimeType
+                    let srcString = `data:${type};charset=utf-8;base64, ${imageBytes}`;
+                    currentImage.setAttribute('src',srcString);
+                }
+                
+                imageSpinner.style.visibility = 'hidden';
+                urlImageOption.removeAttribute('disabled');
+                uploadImageOption.removeAttribute('disabled');
+                imageUrlInput.removeAttribute('disabled');
+                imageUploadSubmitButton.removeAttribute('disabled');
+                imageUrlInput.value = '';
+
+
+
+            });
+
+
+        }
+
+    </script>
 
     <script>
         window.addEventListener('load',githubTab);
@@ -451,4 +705,4 @@
         }  
     </script>
 </body>
-</html>
+{% endblock %}

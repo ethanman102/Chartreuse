@@ -2,7 +2,11 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.auth.hashers import check_password
-from ..models import User
+from ..models import User, Post
+from django.core.files.uploadedfile import SimpleUploadedFile
+import base64
+from urllib.request import urlopen
+
 
 
 class TestSettingsViews(TestCase):
@@ -168,6 +172,99 @@ class TestSettingsViews(TestCase):
         },content_type='application/json')
 
         self.assertEqual(response.status_code,405)
+
+    def test_upload_picture_not_allowed(self):
+        self.client.force_login(self.auth_user_2)
+        response = self.client.put(reverse('chartreuse:upload_profile_picture'),{
+            'file':open('chartreuse/static/images/buba.jpg')
+        })
+
+        self.assertEqual(response.status_code,405)
+
+    def test_upload_file_no_file(self):
+        self.client.force_login(self.auth_user_2)
+        response = self.client.post(reverse('chartreuse:upload_profile_picture'))
+
+        self.assertEqual(response.status_code,400)
+
+    def test_upload_picture_OK(self):
+        self.client.force_login(self.auth_user_2)
+        # https://stackoverflow.com/questions/11170425/how-to-unit-test-file-upload-in-django
+        # Stack overflow post: HOW TO UNIT TEST FILE UPLOAD IN DJANGO
+        # purpose: how to send a mock image to the api, and test it's ability to change profile post.
+        # simpleuploadedfile method utilized from author: Danilo Cabello (posted answer December 7, 2014)
+        image = SimpleUploadedFile("test.png",b"file_content",content_type='image/png')
+        response = self.client.post(reverse('chartreuse:upload_profile_picture'),{
+            'file':image
+        })
+
+        encoded_image = base64.b64encode(b'file_content').decode('utf-8')
+        
+
+        self.assertEqual(response.status_code,200)
+        data = response.json()
+        self.assertEqual(data.get('image'),encoded_image)
+
+        new_image = Post.objects.filter(user=self.user_2)
+
+        self.assertEqual(new_image.count(),1)
+        new_image = new_image.first()
+        self.assertEqual(new_image.content,encoded_image)
+        
+        updated = User.objects.get(user=self.auth_user_2)
+
+        self.assertEqual(updated.profileImage,new_image.url_id + '/image')
+
+    def test_upload_url_method_not_allowed(self):
+        self.client.force_login(self.auth_user_2)
+        response = self.client.put(reverse('chartreuse:upload_url_picture'),{
+            'url': 'https://kirby.nintendo.com/assets/img/about/char-kirby.png'
+        })
+
+        self.assertEqual(response.status_code,405)
+    
+    def test_upload_incorrect_url_type(self):
+        self.client.force_login(self.auth_user_2)
+        response = self.client.post(reverse('chartreuse:upload_url_picture'),{
+            'url': 'https://kirby.nintendo.com/assets/img/about/char-kirby.pdf'
+        },content_type='application/json')
+
+        self.assertEqual(response.status_code,415)
+    
+    def test_upload_image_url_OK(self):
+        self.client.force_login(self.auth_user_2)
+        response = self.client.post(reverse('chartreuse:upload_url_picture'),{
+            'url': 'https://kirby.nintendo.com/assets/img/about/char-kirby.png'
+        },content_type='application/json')
+
+        self.assertEqual(response.status_code,200)
+
+        try:
+            with urlopen('https://kirby.nintendo.com/assets/img/about/char-kirby.png') as url:
+                f = url.read()
+                encoded_string = base64.b64encode(f).decode("utf-8")
+        except Exception as e:
+            self.assertEqual('fail',"FAIL")
+
+        new_image = Post.objects.filter(user=self.user_2)
+        self.assertEqual(new_image.count(),1)
+
+        new_image = new_image.first()
+    
+        self.assertEqual(new_image.content,encoded_string)
+
+        updated = User.objects.get(user=self.auth_user_2)
+        self.assertEqual(updated.profileImage,new_image.url_id + '/image')
+    
+
+
+
+
+
+
+        
+
+
 
 
 

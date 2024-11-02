@@ -76,7 +76,9 @@ urlpatterns = [
     path('settings/removeGithub/',settings_view.remove_github,name="remove_github"),
     path('settings/addGithub/',settings_view.add_github,name="add_github"),
     path('settings/updateDisplayName/',settings_view.update_display_name,name="update_display_name"),
-    path('settings/',login_required(settings_view.SettingsDetailView.as_view()),name="settings"),
+    path('settings/uploadProfileImage/',settings_view.upload_profile_picture,name='upload_profile_picture'),
+    path('settings/uploadImageUrl/',settings_view.upload_url_picture,name='upload_url_picture'),
+    path('settings/',login_required(settings_view.SettingsDetailView.as_view(),login_url='chartreuse:login'),name="settings"),
 
     # UI Related URLs
     path('', landing_page_view.landing_page, name='home'),

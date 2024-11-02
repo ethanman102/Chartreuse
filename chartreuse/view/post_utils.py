@@ -1,133 +1,14 @@
 import base64
 import json
-from urllib.parse import quote, unquote
+import re
+from urllib.parse import unquote
 from urllib.request import urlopen
 
-from chartreuse.models import Follow, FollowRequest, Like, Post, User, GithubPolling, Comment
+from chartreuse.models import Like, Post, User
+from chartreuse.views import Host
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
-import re
-from chartreuse.views import Host
-from datetime import datetime, timedelta, timezone
-
-def add_comment(request):
-    try:
-        if request.user.is_authenticated:
-            body = json.loads(request.body)
-            user_id = body["user_id"]
-            post_id = body["post_id"]
-
-            user = User.objects.get(url_id=unquote(user_id))
-            post = Post.objects.get(url_id=unquote(post_id))
-            
-            # Parse the JSON body to get the comment text and content type
-            body = json.loads(request.body)
-            comment_text = body.get('comment', '')
-            content_type = body.get('contentType', 'text/plain')
-
-            # Create and save the comment
-            if (comment_text != ""):
-                comment = Comment(user=user, post=post, comment=comment_text, contentType=content_type)
-                comment.save()
-
-            return JsonResponse({'success': 'Comment added successfully.'})
-        else:
-            return JsonResponse({'error': 'User not authenticated'}, status=403)
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-    
-def get_comments(post_id):
-    '''
-    Purpose: Get all comments for a post
-
-    Arguments:
-        request: Request object
-        post_id: The id of the post object
-    '''
-    post_id = unquote(post_id)
-    post = Post.objects.get(url_id=post_id)
-
-    comments = Comment.objects.filter(post=post)
-
-    return comments
-
-def like_comment(request):
-    """
-    Like a comment.
-
-    Parameters:
-        request: rest_framework object containing the request and query parameters.
-        user_id: The id of the user who liked the comment.
-        comment_id: The id of the comment object.
-
-    Returns:
-        JsonResponse containing the comment object.
-    """
-    if request.user.is_authenticated:
-        body = json.loads(request.body)
-        user_id = body["user_id"]
-        comment_id = body["comment_id"]
-
-        user = User.objects.get(url_id=unquote(user_id))
-        comment = Comment.objects.get(url_id=unquote(comment_id))
-
-        # first check if the user has already liked the comment
-        like = Like.objects.filter(user=user, comment=comment)
-
-        if like:
-            like.delete()
-        else:
-            newLike = Like.objects.create(user=user, comment=comment)
-            newLike.save()
-
-        data = {
-            "likes_count": get_comment_likes(unquote(comment_id)).count()
-        }
-        return JsonResponse(data)
-    else:
-        pass
-
-def get_comment_likes(comment_id):
-    """
-    Gets all likes for a comment.
-
-    Parameters:
-        request: rest_framework object containing the request and query parameters.
-        comment_id: The id of the comment object.
-
-    Returns:
-        JsonResponse containing the likes for a comment.
-    """
-    comment = Comment.objects.get(url_id=comment_id)
-
-    likes = Like.objects.filter(comment=comment)
-
-    return likes
-
-def delete_comment(request, comment_id):
-    '''
-    Purpose: View to delete a comment
-
-    Arguments:
-        request: Request object
-        comment_id: The id of the comment object
-    '''
-    comment = get_object_or_404(Comment, url_id=comment_id)
-
-    # Check if user is authenticated
-    if request.user.is_authenticated:
-        current_user = request.user
-        current_user_model = get_object_or_404(User, user=current_user)
-        
-        # Check if the current user is the author of the comment
-        if current_user_model == comment.user:
-            comment.delete()
-        
-        post = comment.post
-        post_id = quote(post.url_id, safe='')
-    
-    return redirect('/chartreuse/homepage/post/' + post_id + '/')
 
 def get_post_likes(post_id):
     """
@@ -155,23 +36,6 @@ def add_post(request):
     '''
     if request.user.is_authenticated:
         return render(request, 'add_post.html')
-    else:
-        return redirect('/chartreuse/signup/')
-
-def view_profile(request):
-    '''
-    Purpose: View to render the profile page
-
-    Arguments:
-        request: Request object
-    '''
-    if request.user.is_authenticated:
-
-        current_user = request.user
-        current_user_model = User.objects.get(user=current_user)
-        url_id = quote(current_user_model.url_id, safe='')
-
-        return redirect(f'/chartreuse/authors/{url_id}/')
     else:
         return redirect('/chartreuse/signup/')
 
@@ -430,74 +294,6 @@ def get_posts(user_id, post_type):
 
     return posts
 
-def get_followed(author_id):
-    '''
-    Retrieves the list of users that the author follows.
-
-    Parameters:
-        request: HttpRequest object containing the request.
-        author_id: The id of the author whose followed users are being retrieved.
-
-    Returns:
-        JsonResponse with the list of followers.
-    '''
-    decoded_author_id = unquote(author_id)
-
-    # Fetch the author based on the provided author_id
-    author = get_object_or_404(User, url_id=decoded_author_id)
-    
-    # Get all followers for the author
-    followed = Follow.objects.filter(follower=author)
-
-    followed_list = []
-    
-    # Create a list of follower details to be included in the response
-    for follower in followed:
-        user = follower.followed
-        followed_list.append(user)
-
-    return followed_list
-
-def send_follow_request(request):
-    """
-    Sends a follow request to a user.
-
-    Parameters:
-        request: rest_framework object containing the request and query parameters.
-    
-    Returns:
-        JsonResponse containing the follow request status.
-    """
-    if request.user.is_authenticated:
-        body = json.loads(request.body)
-        user_id = body["user_id"]
-        post_id = body["post_id"]
-
-        user = User.objects.get(url_id=unquote(user_id))
-        post = Post.objects.get(url_id=unquote(post_id))
-
-        post_author = post.user
-
-        # first check if the user has already followed the author
-        follow = Follow.objects.filter(follower=user, followed=post_author)
-
-        follow_request= FollowRequest.objects.filter(requester=user, requestee=post_author)
-        follow_request_status = None
-
-        if follow:
-            follow.delete()
-            follow_request_status = "Unfollowed"
-        elif follow_request:
-            follow_request.delete()
-            follow_request_status = "Removed Follow Request"
-        else:
-            FollowRequest.objects.create(requester=user, requestee=post_author)
-            follow_request_status = "Sent Follow Request"
-
-        return JsonResponse({"follow_request_status": follow_request_status})
-    else:
-        pass
-
 def check_duplicate_post(request):
     """
     Checks if a post with the given title, description, and content already exists for the author.
@@ -534,24 +330,6 @@ def check_duplicate_post(request):
     else:
         return JsonResponse({'error': 'Invalid request method.'}, status=400)
     
-def setNewProfileImage(request):
-    '''
-    Purpose: Set a new profile image
-    '''
-    if request.user.is_authenticated:
-        body = json.loads(request.body)
-        user_id = body["user_id"]
-        post_id = body["post_id"]
-
-        user = User.objects.get(url_id=unquote(user_id))
-        post = Post.objects.get(url_id=unquote(post_id))
-
-        user.profileImage = post.url_id + "/image"
-        user.save()
-        print(user.profileImage)
-
-    return JsonResponse({'success': 'Updated profile picture'}, status=200)
-
 def get_image_post(pfp_url):
     pattern = r"(?P<host>https?:\/\/.+?herokuapp\.com)\/authors\/(?P<author_serial>\d+)\/posts\/(?P<post_serial>\d+)\/image"
     match = re.search(pattern, pfp_url)
@@ -571,26 +349,3 @@ def get_image_post(pfp_url):
         return pfp_url
     else:
         return pfp_url
-        
-def checkGithubPolling(request):
-    '''
-    Purpose: Check whether we need to poll github for new events
-
-    Arguments:
-        request: Request object
-    '''
-    last_poll = GithubPolling.objects.last()
-
-    if last_poll is None:
-        new_poll = GithubPolling()
-        new_poll.save()
-        return JsonResponse({'poll': 'True'})
-
-    time_now = datetime.now(timezone.utc)
-    time_diff = time_now - last_poll.last_polled
-    if time_diff > timedelta(minutes=10):
-        new_poll = GithubPolling()
-        new_poll.save()
-        return JsonResponse({'poll': 'True'})
-    else:
-        return JsonResponse({'poll': 'False'})

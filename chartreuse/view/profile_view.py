@@ -1,12 +1,9 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import generic
-from django.contrib.auth.models import User as AuthUser
-from django.urls import reverse
+from django.shortcuts import redirect, get_object_or_404
 from chartreuse.models import User,Like,Comment,Post,Follow,FollowRequest
 from django.views.generic.detail import DetailView
 from django.http import HttpResponseNotAllowed
 from urllib.parse import unquote, quote
-from . import support_functions
+from . import post_utils
 
 def follow_accept(request,followed,follower):
 
@@ -131,7 +128,7 @@ class ProfileDetailView(DetailView):
         user = context['profile']
         context['owner_id'] = quote(user.url_id,safe='')
 
-        context['profile'].profileImage = support_functions.get_image_post(context['profile'].profileImage)
+        context['profile'].profileImage = post_utils.get_image_post(context['profile'].profileImage)
 
         post_access = "public" # default following status, will be updated after!
 
@@ -255,7 +252,7 @@ class ProfileDetailView(DetailView):
         posts = sorted(posts, key=lambda post: post.published, reverse=True)
         
         for post in posts:
-            post.user.profileImage = support_functions.get_image_post(post.user.profileImage)
+            post.user.profileImage = post_utils.get_image_post(post.user.profileImage)
 
         return posts
         

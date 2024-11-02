@@ -47,7 +47,6 @@
                     
                     {% if post.contentType == "text/plain" %}
                         <p class="card-text" style="text-align: left;">{{ post.content }}</p>
-    
 
                     {% elif post.contentType == "text/commonmark" %}
                 
@@ -68,7 +67,7 @@
                         {% if not is_author %}
                         <button class="btn follow-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}"> {{ post.following_status }}</button>
                         {% endif %}
-                        {% if post.has_image %}
+                        {% if post.has_image and logged_in %}
                         <button class="btn pfp-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">Set pfp</button>
                         {% endif %}
                         <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">{{ post.likes_count }} likes</button>
@@ -79,11 +78,12 @@
                     
                         {% if logged_in %}
                             {% csrf_token %}
-                            <div class="mb-3">
+                            <div class="mb-3" style="text-align: left;">
                                 <textarea class="form-control" name="comment" id="comment-text" rows="3" placeholder="Add a comment..." required></textarea>
                             </div>
-                            <button style="text-align: left;" type="submit" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" class="btn comment-button">Submit Comment</button>
+                            <button type="submit" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" class="btn comment-button" style="width: auto; display: block; text-align: left;">Submit Comment</button>
                         {% endif %}
+
                         <br></br>
                     
                         <div id="comments-section">
@@ -113,7 +113,7 @@
                                     <p style="text-align: left;">Commented on {{ comment.dateCreated }}</p>
                                 </div>
                             {% empty %}
-                                <p>No comments yet. Be the first to comment!</p>
+                                <p style="width: auto; display: block; text-align: left;">No comments yet. Be the first to comment!</p>
                             {% endfor %}
                         </div>                                                 
                     </div>

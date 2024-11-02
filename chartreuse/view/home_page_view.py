@@ -94,6 +94,7 @@ class FeedDetailView(DetailView):
                 post.following_status = "Sign up to follow!"
                 if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
                     post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+                post.user.profileImage = support_functions.get_image_post(post.user.profileImage)
             
             return posts
 

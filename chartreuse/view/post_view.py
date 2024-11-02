@@ -69,7 +69,7 @@ class PostDetailView(DetailView):
         comments = support_functions.get_comments(post.url_id)
         for comment in comments:
             comment.user.profileImage = support_functions.get_image_post(comment.user.profileImage)
-            if (comment.user.url_id == current_user_model.url_id):
+            if ((self.request.user.is_authenticated) and (comment.user.url_id == current_user_model.url_id)):
                 comment.is_author = True
             comment.url_id = quote(comment.url_id, safe='')
             comment.likes_count = Like.objects.filter(comment=comment).count()

@@ -13,9 +13,20 @@ from urllib.parse import urlparse
 import base64
 from .post_utils import get_image_post
 from urllib.request import urlopen
+from random import choice
 
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework.decorators import action, api_view
+
+PROFILE_PICTURE_TITLES = [
+    "Look out! I'm reading to 'serve' with this new image file as my new profile picture!",
+    "Hey guys, check out my new profile picture!",
+    "I have changed my profile picture",
+    "Does this new profile picture make my butt look big?",
+    "Thought I should change it up with a new look for my profile picture!",
+    "It's still me! I just have this new profile picture!",
+    "This is my new profile picture"
+]
 
 @extend_schema(
     summary="Update the password for the current user",
@@ -344,11 +355,12 @@ def upload_profile_picture(request):
         current_user_model = User.objects.get(user = current_auth_user)
 
         new_picture = Post(
-            title="profile pic",
+            title= choice(PROFILE_PICTURE_TITLES),
             contentType = mime_type,
             content = encoded_image,
             user = current_user_model,
-            visibility = 'DELETED'
+            visibility = 'PUBLIC',
+            description = "My new profile picture!"
         )
         new_picture.save()
 
@@ -431,11 +443,12 @@ def upload_url_picture(request):
         current_user_model = User.objects.get(user=current_auth_user)
 
         new_picture = Post(
-            title="profile pic",
+            title= choice(PROFILE_PICTURE_TITLES),
             contentType = mime_type + ';base64',
             content = encoded_image,
             user = current_user_model,
-            visibility = 'DELETED'
+            visibility = 'PUBLIC',
+            description = "My new profile picture!"
         )
 
         new_picture.save()

@@ -139,7 +139,7 @@
                                     <p class="card-text mt-2" style="text-align: left;">{{ post.content }}</p>
 
                                 {% elif post.contentType == "text/commonmark" %}
-                                    <p class="card-text mt-2" id="cm_text" style="text-align: left;">{{ post.content }}</p>
+                                    <p class="card-text mt-2 cm_text" style="text-align: left;">{{ post.content }}</p>
 
                                 {% elif post.contentType == "image/png" or post.contentType == "image/jpeg" %}
                                     <div class="d-flex justify-content-start">

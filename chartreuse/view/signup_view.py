@@ -38,6 +38,7 @@ def save_signup(request):
         # Create the AuthUser instance
         authUser = AuthUser.objects.create_user(username=username)
         authUser.set_password(password_1)
+        authUser.is_active = False
         authUser.save()
 
         if (profileImage == ""):

@@ -76,8 +76,6 @@
             // csrfmiddlewaretoken is the actual field name in the http request used by {% csrf_token %}
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;  // Get CSRF token
 
-            console.log(formData);
-
             fetch('save/', {
                     method: 'POST',
                     body: formData,

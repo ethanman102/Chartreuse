@@ -69,10 +69,66 @@ p {
     background-color: #000000;
 }
 
+.comment-button {
+    color: #000000;
+    background-color: #ffffff;
+    border-color: black;
+}
+
+.comment-button:hover {
+    color: #ffffff;
+    background-color: #000000;
+}
+
+.comment-card {
+    border-color: black;
+    transition: box-shadow 0.3s ease;
+}
+
+.comment-card:hover {
+    box-shadow: 6px 6px 0px #0000005d;
+}
+
+.like-comment-button {
+    color: chartreuse;
+    background-color: #00356b;
+    border-bottom-style: solid;
+    text-align: center;
+    border-bottom-color: #1b1b1b;
+    border-radius: 0;
+    box-shadow: none;
+    text-decoration: none;
+    padding: 10px 10px;
+    transition: box-shadow 0.3s ease;
+}
+
+.like-comment-button:hover {
+    color: chartreuse;
+    background-color: #01254a;
+    box-shadow: 6px 6px 0px #000000;
+}
+
 a {
     text-decoration: none;
 }
 
 img {
     border: none;
+}
+
+.disabled-like-button {
+    color: chartreuse;
+    background-color: #00356b;
+    border-bottom-style: solid;
+    text-align: center;
+    border-bottom-color: #1b1b1b;
+    border-radius: 0;
+    box-shadow: none;
+    text-decoration: none;
+    padding: 10px 20px;
+}
+
+.disabled-follow-button {
+    color:#000000;
+    border-color: black;
 }

@@ -64,6 +64,24 @@
                         </a>
                     </div>
                     {% endfor %}
+
+                    <div class="pagination">
+                        <span class="step-links">
+                            {% if posts.has_previous %}
+                                <a href="?page=1" class="pagination-button">&laquo; first</a>
+                                <a href="?page={{ posts.previous_page_number }}" class="pagination-button">previous</a>
+                            {% endif %}
+                            
+                            <span class="current">
+                                Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+                            </span>
+                            
+                            {% if posts.has_next %}
+                                <a href="?page={{ posts.next_page_number }}" class="pagination-button">next</a>
+                                <a href="?page={{ posts.paginator.num_pages }}" class="pagination-button">last &raquo;</a>
+                            {% endif %}
+                        </span>
+                    </div>                    
                 </div>
             </div>
         </div>

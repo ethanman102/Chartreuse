@@ -277,6 +277,3 @@ django/
 
 # static files
 staticfiles
-
-# migrations folder
-migrations/

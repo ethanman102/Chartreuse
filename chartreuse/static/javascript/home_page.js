@@ -120,3 +120,69 @@ document.querySelectorAll('.pfp-button').forEach(button => {
         .catch(error => console.error('Error:', error));
     });
 });
+
+document.querySelectorAll('.comment-button').forEach(button => {
+    button.addEventListener('click', function() {
+        const postId = this.getAttribute('data-post-id');
+        const userId = this.getAttribute('data-user-id');
+        const commentText = document.getElementById('comment-text').value;
+        const url = `/chartreuse/comment/`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                post_id: postId,
+                user_id: userId,
+                comment: commentText,
+                contentType: 'text/plain'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Success:', data);
+                window.location.reload();
+            } else {
+                console.error('Error:', data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
+
+document.querySelectorAll('.like-comment-button').forEach(button => {
+    button.addEventListener('click', function(event) {
+        const postId = this.getAttribute('data-post-id');
+        const userId = this.getAttribute('data-user-id');
+        const commentId = this.getAttribute('data-comment-id');
+        const url = `/chartreuse/comment/like/`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,  // Use the CSRF token from the cookie
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                post_id: postId,
+                user_id: userId,
+                comment_id: commentId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            if (data.likes_count) {
+                this.innerText = `${data.likes_count} likes`;  // Update the like count on the button
+            } else {
+                console.error('Failed to like post:', data.error);
+            }
+            window.location.reload();  // Reload the page to update the like count
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});

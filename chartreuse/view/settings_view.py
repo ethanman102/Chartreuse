@@ -11,7 +11,7 @@ from ..models import User, Post
 from django.shortcuts import get_object_or_404
 from urllib.parse import urlparse
 import base64
-from .support_functions import get_image_post
+from .post_utils import get_image_post
 from urllib.request import urlopen
 
 @login_required

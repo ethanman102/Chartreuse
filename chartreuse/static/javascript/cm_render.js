@@ -4,8 +4,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     const commonmark = window.commonmark;
 
-    // Used OpenAI, ChatGPT
-    // variable to track the html element for displaying the commonmark text
+    // refer to citation 11 on AI/LLM Citations on our wiki page: https://github.com/uofa-cmput404/f24-project-chartreuse/wiki/AI-LLM-Citations
     var postStrings = document.querySelectorAll("p.cm_text");
     
     var markStrings = Array.from(postStrings).map(function(post) {

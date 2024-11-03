@@ -14,8 +14,54 @@ import base64
 from .post_utils import get_image_post
 from urllib.request import urlopen
 
+from drf_spectacular.utils import extend_schema, OpenApiResponse
+from rest_framework.decorators import action, api_view
+
+@extend_schema(
+    summary="Update the password for the current user",
+    description=(
+        "Allows an authenticated user to update their password by providing their current password and a new password."
+        "\n\n**When to use:** Use this endpoint when a user wants to securely change their password."
+        "\n\n**How to use:** Send a POST request containing `old_pass` (the current password) and `new_pass` (the new desired password) in JSON format."
+        "\n\n**Why to use:** This API enhances security by allowing users to update their password, requiring the current password for verification."
+        "\n\n**Why not to use:** Avoid using if you are content with your current password."
+    ),
+    request={
+        "old_pass": str,
+        "new_pass": str
+    },
+    responses={
+        200: OpenApiResponse(
+            description="Password successfully changed."
+        ),
+        400: OpenApiResponse(
+            description="New password did not meet validation requirements."
+        ),
+        403: OpenApiResponse(
+            description="Old password invalid."
+        ),
+        405: OpenApiResponse(
+            description="Method not allowed"
+        ),
+    }
+)    
 @login_required
 def update_password(request):
+    """
+    Updates the password for the currently authenticated user.
+
+    Parameters:
+        request: HttpRequest object containing the user's request data, including JSON with:
+            - "old_pass": The user's current password (required for verification).
+            - "new_pass": The new password the user wishes to set.
+
+    Returns:
+        JsonResponse:
+            - 200: Success message when password is successfully changed.
+            - 400: Error message if the new password does not meet validation requirements.
+            - 403: Error message if the old password is incorrect.
+            - 405: Error message if the request method is not allowed.
+    """
     if request.method == "POST":
 
         data = json.loads(request.body)
@@ -50,8 +96,45 @@ def update_password(request):
     return HttpResponseNotAllowed(['POST'])
     
 
+@extend_schema(
+    summary="Update the display name for the current user",
+    description=(
+        "Allows an authenticated user to update their display name by providing a new display name in the request body."
+        "\n\n**When to use:** Use this endpoint when a user wants to change their public display name."
+        "\n\n**How to use:** Send a POST request with `display_name` as a JSON parameter containing the new desired display name."
+        "\n\n**Why to use:** This endpoint provides a way for users to personalize or update their display name, which will be shown on their profile and in interactions across the application."
+        "\n\n**Why not to use:** Avoid using if the display name update functionality is not required or if the request method is not allowed."
+    ),
+    request={
+        "display_name": str
+    },
+    responses={
+        200: OpenApiResponse(
+            description="Display name successfully changed."
+        ),
+        404: OpenApiResponse(
+            description="User not found."
+        ),
+        405: OpenApiResponse(
+            description="Method not allowed: Only POST requests are supported."
+        ),
+    }
+)
 @login_required
 def update_display_name(request):
+    """
+    Updates the display name for the currently authenticated user.
+
+    Parameters:
+        request: HttpRequest object containing the request data with JSON:
+            - "display_name": The new display name the user wishes to set.
+
+    Returns:
+        JsonResponse:
+            - 200: Success message when the display name is successfully changed.
+            - 404: Error message if the user is not found.
+            - 405: Error message if the request method is not POST.
+    """
     if request.method == "POST":
 
         data = json.loads(request.body)
@@ -66,8 +149,50 @@ def update_display_name(request):
         return JsonResponse({'success': 'Display name successfully changed'},status=200)
     return HttpResponseNotAllowed(['POST'])
     
+@extend_schema(
+    summary="Remove the GitHub account associated with the current user",
+    description=(
+        "Allows an authenticated user to remove the GitHub account linked to their profile by confirming the current GitHub username. "
+        "This endpoint accepts a DELETE request with the current GitHub username, unlinks it from the user's profile, and saves the changes."
+        "\n\n**When to use:** Use this endpoint when a user wants to disassociate their GitHub account from their profile."
+        "\n\n**How to use:** Send a DELETE request with `current_github` as a JSON parameter containing the currently associated GitHub username."
+        "\n\n**Why to use:** This endpoint provides a way for users to remove their GitHub account association for privacy or profile updating purposes."
+        "\n\n**Why not to use:** Avoid using if the GitHub account is not associated or if the request method is not DELETE."
+    ),
+    request={
+        "current_github": str
+    },
+    responses={
+        200: OpenApiResponse(
+            description="Associated github removed"
+        ),
+        404: OpenApiResponse(
+            description="User not found."
+        ),
+        405: OpenApiResponse(
+            description="Method not allowed"
+        ),
+        500: OpenApiResponse(
+            description="Server Side Implementation Error"
+        ),
+    }
+)
 @login_required
 def remove_github(request):
+    """
+    Removes the GitHub account associated with the currently authenticated user.
+
+    Parameters:
+        request: HttpRequest object containing the request data with JSON:
+            - "current_github": The GitHub username currently linked to the user's profile.
+
+    Returns:
+        JsonResponse:
+            - 200: Success message if the GitHub association is successfully removed.
+            - 404: Error message if the user is not found.
+            - 405: Error message if the request method is not DELETE.
+            - 500: Error message if the provided GitHub username does not match the user's associated GitHub.
+    """
     if request.method == "DELETE":
         data = json.loads(request.body)
 
@@ -84,8 +209,49 @@ def remove_github(request):
         return JsonResponse({'success': 'Associated github removed'},status=200)
     return HttpResponseNotAllowed(['DELETE'])
     
+@extend_schema(
+    summary="Add a GitHub account to the current user's profile",
+    description=(
+        "Allows an authenticated user to associate a GitHub account with their profile by providing a valid GitHub URL."
+        "\n\n**When to use:** Use this endpoint when a user wants to link their GitHub account to their profile."
+        "\n\n**How to use:** Send a PUT request with `github` as a JSON parameter containing the GitHub URL."
+        "\n\n**Why to use:** This endpoint provides a way for users to add a GitHub account to their profile to showcase their projects and contributions."
+        "\n\n**Why not to use:** Avoid using if the URL provided is not a GitHub link or if the request method is not PUT."
+    ),
+    request={
+        "github": str
+    },
+    responses={
+        200: OpenApiResponse(
+            description="Github Added successfully"
+        ),
+        400: OpenApiResponse(
+            description="Invalid GitHub URL"
+        ),
+        404: OpenApiResponse(
+            description="User not found."
+        ),
+        405: OpenApiResponse(
+            description="Method not allowed: Only PUT requests are supported."
+        ),
+    }
+)
 @login_required
 def add_github(request):
+    """
+    Adds a GitHub account to the currently authenticated user's profile.
+
+    Parameters:
+        request: HttpRequest object containing the request data with JSON:
+            - "github": The GitHub URL to be associated with the user's profile.
+
+    Returns:
+        JsonResponse:
+            - 200: Success message if the GitHub account is added successfully.
+            - 400: Error message if the provided GitHub URL is invalid.
+            - 404: Error message if the user is not found.
+            - 405: Error message if the request method is not PUT.
+    """
     if request.method == "PUT":
         data = json.loads(request.body)
 
@@ -110,9 +276,49 @@ def add_github(request):
         return JsonResponse({'success': 'Github Added successfully'},status=200)
     return HttpResponseNotAllowed(['PUT'])
 
-
+@extend_schema(
+    summary="Upload a profile picture for the current user",
+    description=(
+        "Allows an authenticated user to upload a new profile picture, which will be saved as a base64-encoded image."
+        "\n\n**When to use:** Use this endpoint to update the user's profile picture by sending a file in the request."
+        "\n\n**How to use:** Send a POST request with the image file in the `request.FILES` payload."
+        "\n\n**Why to use:** This endpoint updates the user's profile picture URL and provides an encoded version of the image."
+        "\n\n**Why not to use:** Avoid using if you do not need a profile picture."
+    ),
+    request={
+        "image": str
+    },
+    responses={
+        200: OpenApiResponse(
+            description="Profile picture updated",
+            examples={"success": "Profile picture updated", "image": "base64-encoded-image-data"}
+        ),
+        400: OpenApiResponse(
+            description="No file provided."
+        ),
+        404: OpenApiResponse(
+            description="User not found."
+        ),
+        405: OpenApiResponse(
+            description="Method not allowed."
+        ),
+    }
+)
 @login_required
 def upload_profile_picture(request):
+    """
+    Uploads a profile picture for the currently authenticated user.
+
+    Parameters:
+        request: HttpRequest object containing the uploaded image file in `request.FILES`.
+
+    Returns:
+        JsonResponse:
+            - 200: Success message if the profile picture is uploaded successfully.
+            - 400: Error message if no file is provided in the request.
+            - 404: Error message if the user is not found.
+            - 405: Error message if the request method is not POST.
+    """
     if request.method == "POST":
 
         file_to_read = None
@@ -155,8 +361,52 @@ def upload_profile_picture(request):
     return HttpResponseNotAllowed(['POST'])
 
 
+@extend_schema(
+    summary="Upload a profile picture from a URL for the current user",
+    description=(
+        "Allows an authenticated user to upload a new profile picture by providing an image URL."
+        "\n\n**When to use:** Use this endpoint to update the user's profile picture with an image from a direct URL."
+        "\n\n**How to use:** Send a POST request with a JSON body containing the `url` key with the image URL as the value."
+        "\n\n**Why to use:** This endpoint retrieves, encodes, and stores the image, updating the user's profile image URL."
+        "\n\n**Why not to use:** Avoid using if the image is not in .png, .jpg, or .jpeg format."
+    ),
+    request={
+        "application/json": OpenApiResponse(
+            description="JSON body containing an image URL.",
+            examples={"url": "https://example.com/image.jpg"}
+        )
+    },
+    responses={
+        200: OpenApiResponse(
+            description="Profile picture updated",
+            examples={
+                "success": "Profile picture updated",
+                "image": "base64-encoded-image-data",
+                "mimeType": "image/png;base64"
+            }
+        ),
+        400: OpenApiResponse(description="Failed to retrieve image."),
+        404: OpenApiResponse(description="User not found."),
+        415: OpenApiResponse(description="Unsupported media type: only .png and .jpeg images are accepted."),
+        405: OpenApiResponse(description="Method not allowed"),
+    }
+)
 @login_required
 def upload_url_picture(request):
+    """
+    Uploads a profile picture from a URL for the currently authenticated user.
+
+    Parameters:
+        request: HttpRequest object containing a JSON body with `url` key for the image URL.
+
+    Returns:
+        JsonResponse:
+            - 200: Success message with base64-encoded image data and MIME type if the profile picture is uploaded successfully.
+            - 400: Error message if the image could not be retrieved from the URL.
+            - 404: Error message if the user is not found.
+            - 415: Error message if the media type is unsupported (.png, .jpg, and .jpeg only).
+            - 405: Error message if the request method is not POST.
+    """
     if request.method == "POST":
         data = json.loads(request.body)
 
@@ -197,10 +447,6 @@ def upload_url_picture(request):
 
         return JsonResponse({'success':'Profile picture updated','image':encoded_image,"mimeType":mime_type},status=200)
     return HttpResponseNotAllowed(['POST'])
-
-
-        
-
 
             
 

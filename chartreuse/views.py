@@ -34,9 +34,7 @@ def test(request):
     '''
     test_str = """
     
-    # Hello  
-
-    
+    # Hello <br> 
     and 
      
     **goodbye** 

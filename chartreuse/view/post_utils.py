@@ -1,14 +1,14 @@
 import base64
 import json
-from urllib.parse import quote, unquote
+import re
+from urllib.parse import unquote
 from urllib.request import urlopen
 
-from chartreuse.models import Follow, FollowRequest, Like, Post, User, GithubPolling
+from chartreuse.models import Like, Post, User
+from chartreuse.views import Host
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
-import re
-from datetime import datetime, timedelta, timezone
 
 def get_post_likes(post_id):
     """
@@ -36,23 +36,6 @@ def add_post(request):
     '''
     if request.user.is_authenticated:
         return render(request, 'add_post.html')
-    else:
-        return redirect('/chartreuse/signup/')
-
-def view_profile(request):
-    '''
-    Purpose: View to render the profile page
-
-    Arguments:
-        request: Request object
-    '''
-    if request.user.is_authenticated:
-
-        current_user = request.user
-        current_user_model = User.objects.get(user=current_user)
-        url_id = quote(current_user_model.url_id, safe='')
-
-        return redirect(f'/chartreuse/authors/{url_id}/')
     else:
         return redirect('/chartreuse/signup/')
 
@@ -123,10 +106,12 @@ def update_post(request, post_id):
         # Ensure that either content, image, or image URL is provided
         if not content_type and not image and not image_url:
             return JsonResponse({'error': 'Post content is required.'}, status=400)
+    
+        print(content_type)
 
         # Determine content type and set appropriate content
         # add option for commonmark here
-        if (content_type == 'plain') and content:
+        if (content_type == 'text') and content:
             content_type = 'text/plain'
             post_content = content
 
@@ -138,10 +123,14 @@ def update_post(request, post_id):
             image_data = image.read()
             encoded_image = base64.b64encode(image_data).decode('utf-8')
             image_content = image.content_type.split('/')[1]
+            if image_content not in ['jpeg', 'png', 'jpg']:
+                image_content = 'png'
             content_type = 'image/' + image_content
             post_content = encoded_image
         elif image_url:
             image_content = image_url.split('.')[-1]
+            if image_content not in ['jpeg', 'png', 'jpg']:
+                image_content = 'png'
             content_type = 'image/' + image_content
             try:
                 with urlopen(image_url) as url:
@@ -199,7 +188,6 @@ def save_post(request):
             post_content = content
 
         elif content and (content_type == 'commonmark'):
-            print("hi")
             content_type = 'text/commonmark'
             post_content = content 
         
@@ -207,10 +195,14 @@ def save_post(request):
             image_data = image.read()
             encoded_image = base64.b64encode(image_data).decode('utf-8')
             image_content = image.content_type.split('/')[1]
+            if image_content not in ['jpeg', 'png', 'jpg']:
+                image_content = 'png'
             content_type = 'image/' + image_content
             post_content = encoded_image
         elif image_url:
             image_content = image_url.split('.')[-1]
+            if image_content not in ['jpeg', 'png', 'jpg']:
+                image_content = 'png'
             content_type = 'image/' + image_content
             try:
                 with urlopen(image_url) as url:
@@ -302,74 +294,6 @@ def get_posts(user_id, post_type):
 
     return posts
 
-def get_followed(author_id):
-    '''
-    Retrieves the list of users that the author follows.
-
-    Parameters:
-        request: HttpRequest object containing the request.
-        author_id: The id of the author whose followed users are being retrieved.
-
-    Returns:
-        JsonResponse with the list of followers.
-    '''
-    decoded_author_id = unquote(author_id)
-
-    # Fetch the author based on the provided author_id
-    author = get_object_or_404(User, url_id=decoded_author_id)
-    
-    # Get all followers for the author
-    followed = Follow.objects.filter(follower=author)
-
-    followed_list = []
-    
-    # Create a list of follower details to be included in the response
-    for follower in followed:
-        user = follower.followed
-        followed_list.append(user)
-
-    return followed_list
-
-def send_follow_request(request):
-    """
-    Sends a follow request to a user.
-
-    Parameters:
-        request: rest_framework object containing the request and query parameters.
-    
-    Returns:
-        JsonResponse containing the follow request status.
-    """
-    if request.user.is_authenticated:
-        body = json.loads(request.body)
-        user_id = body["user_id"]
-        post_id = body["post_id"]
-
-        user = User.objects.get(url_id=unquote(user_id))
-        post = Post.objects.get(url_id=unquote(post_id))
-
-        post_author = post.user
-
-        # first check if the user has already followed the author
-        follow = Follow.objects.filter(follower=user, followed=post_author)
-
-        follow_request= FollowRequest.objects.filter(requester=user, requestee=post_author)
-        follow_request_status = None
-
-        if follow:
-            follow.delete()
-            follow_request_status = "Unfollowed"
-        elif follow_request:
-            follow_request.delete()
-            follow_request_status = "Removed Follow Request"
-        else:
-            FollowRequest.objects.create(requester=user, requestee=post_author)
-            follow_request_status = "Sent Follow Request"
-
-        return JsonResponse({"follow_request_status": follow_request_status})
-    else:
-        pass
-
 def check_duplicate_post(request):
     """
     Checks if a post with the given title, description, and content already exists for the author.
@@ -406,27 +330,8 @@ def check_duplicate_post(request):
     else:
         return JsonResponse({'error': 'Invalid request method.'}, status=400)
     
-def setNewProfileImage(request):
-    '''
-    Purpose: Set a new profile image
-    '''
-    if request.user.is_authenticated:
-        body = json.loads(request.body)
-        user_id = body["user_id"]
-        post_id = body["post_id"]
-
-        user = User.objects.get(url_id=unquote(user_id))
-        post = Post.objects.get(url_id=unquote(post_id))
-
-        user.profileImage = post.url_id + "/image"
-        user.save()
-        print(user.profileImage)
-
-    return JsonResponse({'success': 'Updated profile picture'}, status=200)
-
 def get_image_post(pfp_url):
     pattern = r"(?P<host>https?:\/\/.+?herokuapp\.com)\/authors\/(?P<author_serial>\d+)\/posts\/(?P<post_serial>\d+)\/image"
-
     match = re.search(pattern, pfp_url)
 
     if match:
@@ -437,31 +342,10 @@ def get_image_post(pfp_url):
         author = User.objects.filter(url_id=f"{host}/authors/{author_serial}").first()
         pfp_post = Post.objects.filter(user=author, url_id=f"{host}/authors/{author_serial}/posts/{post_serial}").first()
 
-        if pfp_post and pfp_post.content and pfp_post.contentType in ['image/jpeg', 'image/png']:
+        if pfp_post and pfp_post.content and pfp_post.contentType in ['image/jpeg', 'image/png', 'image/webp', 'image/jpg']:
             pfp_url = f"data:{pfp_post.contentType};charset=utf-8;base64, {pfp_post.content}"
         else:
-            pfp_url = f"{host}/static/images/default_pfp_1.png"
+            pfp_url = f"{Host.host}/static/images/default_pfp_1.png"
         return pfp_url
-        
-def checkGithubPolling(request):
-    '''
-    Purpose: Check whether we need to poll github for new events
-
-    Arguments:
-        request: Request object
-    '''
-    last_poll = GithubPolling.objects.last()
-
-    if last_poll is None:
-        new_poll = GithubPolling()
-        new_poll.save()
-        return JsonResponse({'poll': 'True'})
-
-    time_now = datetime.now(timezone.utc)
-    time_diff = time_now - last_poll.last_polled
-    if time_diff > timedelta(minutes=10):
-        new_poll = GithubPolling()
-        new_poll.save()
-        return JsonResponse({'poll': 'True'})
     else:
-        return JsonResponse({'poll': 'False'})
+        return pfp_url

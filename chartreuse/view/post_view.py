@@ -3,7 +3,7 @@ from django.views.generic.detail import DetailView
 from chartreuse.models import Post, Like, Follow, User, FollowRequest
 from urllib.parse import quote, unquote
 from django.shortcuts import redirect
-from . import support_functions
+from . import comment_utils, post_utils
 
 class PostDetailView(DetailView):
     '''
@@ -59,12 +59,22 @@ class PostDetailView(DetailView):
 
         
         if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
+            print(post.contentType)
             post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
             post.has_image = True
-    
-    
 
-        post.user.profileImage = support_functions.get_image_post(post.user.profileImage)
+        post.user.profileImage = post_utils.get_image_post(post.user.profileImage)
+
+        # get post comments
+        comments = comment_utils.get_comments(post.url_id)
+        for comment in comments:
+            comment.user.profileImage = post_utils.get_image_post(comment.user.profileImage)
+            if ((self.request.user.is_authenticated) and (comment.user.url_id == current_user_model.url_id)):
+                comment.is_author = True
+            comment.url_id = quote(comment.url_id, safe='')
+            comment.likes_count = Like.objects.filter(comment=comment).count()
+
+        context['comments'] = comments
 
         context['post'] = post
         context['logged_in'] = self.request.user.is_authenticated

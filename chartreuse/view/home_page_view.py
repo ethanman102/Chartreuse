@@ -1,9 +1,10 @@
 from django.shortcuts import get_object_or_404
-from chartreuse.models import User, Follow, Like, FollowRequest, Post
+from chartreuse.models import User, Follow, Like, FollowRequest
 from django.views.generic.detail import DetailView
 from urllib.parse import quote
-from chartreuse.view.support_functions import get_followed, get_all_public_posts, get_posts
-from . import support_functions
+from chartreuse.view.post_utils import get_all_public_posts, get_posts, get_image_post
+from chartreuse.view.follow_utils import get_followed
+from django.core.paginator import Paginator
 
 class FeedDetailView(DetailView):
     '''
@@ -81,7 +82,7 @@ class FeedDetailView(DetailView):
                 if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
                     post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
                 
-                post.user.profileImage = support_functions.get_image_post(post.user.profileImage)
+                post.user.profileImage = get_image_post(post.user.profileImage)
 
             return posts
         
@@ -94,6 +95,7 @@ class FeedDetailView(DetailView):
                 post.following_status = "Sign up to follow!"
                 if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
                     post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+                post.user.profileImage = get_image_post(post.user.profileImage)
             
             return posts
 
@@ -127,7 +129,10 @@ class FeedDetailView(DetailView):
             context['logged_in'] = False
         
         posts = self.get_posts()
-        context['posts'] = posts
+        paginator = Paginator(posts, 5)  # Show 5 posts per page
+        page_number = self.request.GET.get('page')  # Get the current page number from the URL
+        page_obj = paginator.get_page(page_number)  # Get the posts for the current page
+        context['posts'] = page_obj 
 
         user_details = self.get_user_details()
         context['user_details'] = user_details

@@ -39,27 +39,44 @@
                             <input class="form-check-input" type="radio" name="content_type" id="textOption" value="text" checked>
                             <label class="form-check-label" for="textOption">Text</label>
                         </div>
-
                         <div class="form-check me-3">
-                            <input class="form-check-input" type="radio" name="content_type" id="textOption" value="commonmark">
-                            <label class="form-check-label" for="textOption">Commonmark</label>
+                            <input class="form-check-input" type="radio" name="content_type" id="commonmarkOption" value="commonmark">
+                            <label class="form-check-label" for="commonmarkOption">
+                                Commonmark
+                            </label>
                         </div>
-
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="content_type" id="imageOption" value="image">
                             <label class="form-check-label" for="imageOption">Image</label>
                         </div>
-
-                    <!-- {% elif post.contentType == "text/commonmark" %} -->
-
-
+                    {% elif post.contentType == "image/png" or post.contentType == "image/jpg" %}
+                        <div class="form-check me-3">
+                            <input class="form-check-input" type="radio" name="content_type" id="textOption" value="text">
+                            <label class="form-check-label" for="textOption">Text</label>
+                        </div>
+                        <div class="form-check me-3">
+                            <input class="form-check-input" type="radio" name="content_type" id="commonmarkOption" value="commonmark">
+                            <label class="form-check-label" for="commonmarkOption">
+                                Commonmark
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="content_type" id="imageOption" value="image" checked>
+                            <label class="form-check-label" for="imageOption">Image</label>
+                        </div>
                     {% else %}
                         <div class="form-check me-3">
                             <input class="form-check-input" type="radio" name="content_type" id="textOption" value="text">
                             <label class="form-check-label" for="textOption">Text</label>
                         </div>
+                        <div class="form-check me-3">
+                            <input class="form-check-input" type="radio" name="content_type" id="commonmarkOption" value="commonmark" checked>
+                            <label class="form-check-label" for="commonmarkOption">
+                                Commonmark
+                            </label>
+                        </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="content_type" id="imageOption" value="image" checked>
+                            <input class="form-check-input" type="radio" name="content_type" id="imageOption" value="image">
                             <label class="form-check-label" for="imageOption">Image</label>
                         </div>
                     {% endif %}
@@ -91,7 +108,7 @@
                             <input type="url" class="form-control" id="image_url" name="image_url" placeholder="Enter image URL">
                         </div>
                     </div>
-                {% else %}
+                {% elif post.contentType == "image/png" or post.contentType == "image/jpg" %}
                     <div id="textContent" class="hidden">
                         <label for="content" class="hidden">Content</label>
                         <textarea class="form-control" id="content" name="content" rows="5"></textarea>
@@ -112,6 +129,32 @@
                             <input type="file" class="form-control" id="image" name="image">
                         </div>
     
+                        <div id="urlImageContent" class="hidden">
+                            <label for="image_url" class="form-label">Image URL</label>
+                            <input type="url" class="form-control" id="image_url" name="image_url" placeholder="Enter image URL">
+                        </div>
+                    </div>
+                {% else %}
+                    <div id="textContent">
+                        <label for="content" class="form-label">Content</label>
+                        <textarea class="form-control" id="content" name="content" rows="5">{{ post.content }}</textarea>
+                    </div>
+
+                    <div id="imageContent" class="hidden">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="image_type" id="uploadImageOption" value="upload" checked>
+                            <label class="form-check-label" for="uploadImageOption">Upload Image</label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="image_type" id="urlImageOption" value="url">
+                            <label class="form-check-label" for="urlImageOption">Provide Image URL</label>
+                        </div>
+
+                        <div id="uploadImageContent">
+                            <label for="image" class="form-label">Upload Image</label>
+                            <input type="file" class="form-control" id="image" name="image">
+                        </div>
+
                         <div id="urlImageContent" class="hidden">
                             <label for="image_url" class="form-label">Image URL</label>
                             <input type="url" class="form-control" id="image_url" name="image_url" placeholder="Enter image URL">
@@ -142,6 +185,7 @@
     <script>
         const textOption = document.getElementById('textOption');
         const imageOption = document.getElementById('imageOption');
+        const commonmarkOption = document.getElementById('commonmarkOption');
         const textContent = document.getElementById('textContent');
         const imageContent = document.getElementById('imageContent');
         const uploadImageOption = document.getElementById('uploadImageOption');
@@ -154,6 +198,18 @@
     
         textOption.addEventListener('change', function() {
             if (textOption.checked) {
+                textContent.classList.remove('hidden');
+                imageContent.classList.add('hidden');
+                textArea.required = true;
+                imageInput.required = false;
+                imageUrlInput.required = false;
+                imageInput.value = '';
+                imageUrlInput.value = '';
+            }
+        });
+
+        commonmarkOption.addEventListener('change', function() {
+            if (commonmarkOption.checked) {
                 textContent.classList.remove('hidden');
                 imageContent.classList.add('hidden');
                 textArea.required = true;
@@ -205,7 +261,5 @@
         });
 
     </script>    
-
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script> -->
 </body>
 {% endblock %}

@@ -152,6 +152,7 @@ img {
     border-color: black;
 }
 
+
 .view-repost-button {
     color:#000000;
     border: solid black 2px;
@@ -161,4 +162,8 @@ img {
 .view-repost-button:hover {
     color: #ffffff;
     background-color: #000000;
+  
+p img {
+    max-width: 100%;
+    height: auto;
 }

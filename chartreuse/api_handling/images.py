@@ -1,8 +1,8 @@
 import base64
 from urllib.request import urlopen
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from rest_framework import viewsets
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 from .. import models
 from urllib.parse import unquote
@@ -19,7 +19,7 @@ class ImageViewSet(viewsets.ViewSet):
         }
     )
     @action(detail=True, methods=["GET"])
-    def retrieve(self, author_id, post_id):
+    def retrieve(self, request, *args, **kwargs):
         '''
         Get the image data of a post.
 
@@ -31,6 +31,10 @@ class ImageViewSet(viewsets.ViewSet):
         Returns:
             HttpResponse containing the image data of the post.
         '''
+        # Extract the author_id and post_id from kwargs
+        author_id = kwargs.get('author_id')
+        post_id = kwargs.get('post_id')
+        
         decoded_author_id = unquote(author_id)
         decoded_post_id = unquote(post_id)
         author = models.User.objects.filter(url_id=decoded_author_id).first()

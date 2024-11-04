@@ -347,7 +347,8 @@ def upload_profile_picture(request):
             return JsonResponse({'error': 'No file provided'},status=400)
         
         mime_type = file_to_read.content_type 
-        print(mime_type)
+    
+        
         
         image_data = file_to_read.read()
         encoded_image = base64.b64encode(image_data).decode('utf-8')
@@ -364,10 +365,9 @@ def upload_profile_picture(request):
             description = "My new profile picture!"
         )
 
-        print(new_picture.contentType)
         new_picture.save()
-        print(new_picture.contentType)
-
+        url = posdt.url
+      
         profile_pic_url = new_picture.url_id + '/image'
 
         current_user_model.profileImage = profile_pic_url

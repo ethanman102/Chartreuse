@@ -187,6 +187,9 @@ def save_post(request):
             content_type = 'text/plain'
             post_content = content
 
+        elif content and (content_type == 'repost'):
+            post_content = content
+
         elif content and (content_type == 'commonmark'):
             content_type = 'text/commonmark'
             post_content = content 

@@ -2,7 +2,7 @@ from django import template
 
 register = template.Library()
 
-@register.inclusion_tag('profile_post_varient.html')
+@register.inclusion_tag('layouts/profile_post_varient.html')
 def show_profile_post(post,owner_id,viewer_id):
     return {"post":post,
             "owner_id" : owner_id,

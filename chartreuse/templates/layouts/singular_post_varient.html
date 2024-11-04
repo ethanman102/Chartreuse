@@ -22,7 +22,7 @@
             {% endif %}
             {% if post.repost %}
             <div class="d-flex">
-                <button class="btn view-repost-button" onclick="location.href = '{% url 'chartreuse:profile_view_post'  post.user.url_id post.url_id %}'"  id="view-repost-button">View Repost</button>
+                <button class="btn view-repost-button" onclick="location.href = '{% url 'chartreuse:profile_view_post'  post.user.url_id post.url_id %}'"  id="view-repost-button">View Post</button>
             </div>   
             {% endif %}
             

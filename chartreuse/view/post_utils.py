@@ -1,9 +1,11 @@
 import base64
 import json
-from urllib.parse import quote, unquote
+import re
+from urllib.parse import unquote,quote
 from urllib.request import urlopen
 
-from chartreuse.models import Follow, FollowRequest, Like, Post, User
+from chartreuse.models import Like, Post, User
+from chartreuse.views import Host
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
@@ -34,23 +36,6 @@ def add_post(request):
     '''
     if request.user.is_authenticated:
         return render(request, 'add_post.html')
-    else:
-        return redirect('/chartreuse/signup/')
-
-def view_profile(request):
-    '''
-    Purpose: View to render the profile page
-
-    Arguments:
-        request: Request object
-    '''
-    if request.user.is_authenticated:
-
-        current_user = request.user
-        current_user_model = User.objects.get(user=current_user)
-        url_id = quote(current_user_model.url_id, safe='')
-
-        return redirect(f'/chartreuse/authors/{url_id}/')
     else:
         return redirect('/chartreuse/signup/')
 
@@ -121,19 +106,31 @@ def update_post(request, post_id):
         # Ensure that either content, image, or image URL is provided
         if not content_type and not image and not image_url:
             return JsonResponse({'error': 'Post content is required.'}, status=400)
+    
+        print(content_type)
 
         # Determine content type and set appropriate content
-        if content:
+        # add option for commonmark here
+        if (content_type == 'text') and content:
             content_type = 'text/plain'
             post_content = content
+
+        elif (content_type == 'commonmark') and content:
+            content_type = 'text/commonmark'    
+            post_content = content
+
         elif image:
             image_data = image.read()
             encoded_image = base64.b64encode(image_data).decode('utf-8')
             image_content = image.content_type.split('/')[1]
+            if image_content not in ['jpeg', 'png', 'jpg']:
+                image_content = 'png'
             content_type = 'image/' + image_content
             post_content = encoded_image
         elif image_url:
             image_content = image_url.split('.')[-1]
+            if image_content not in ['jpeg', 'png', 'jpg']:
+                image_content = 'png'
             content_type = 'image/' + image_content
             try:
                 with urlopen(image_url) as url:
@@ -160,6 +157,43 @@ def update_post(request, post_id):
         return redirect('/chartreuse/homepage/post/' + post_id + '/')
     return redirect('/chartreuse/error/')
 
+def repost(request):
+    '''
+    Purpose: API endpoint to repost a POST!
+
+    Arguments:
+        request: Request object
+    '''
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        title = data.get('title')
+
+        content_type = data.get('content_type')
+        if (content_type != 'repost'):
+            return JsonResponse({'error':'Can not process a non-repost'},status=400)
+        
+        content = unquote(data.get('content'))
+        
+        description = data.get('description')
+        reposter_auth_model = request.user
+        reposter_user_model = User.objects.get(user=reposter_auth_model)
+
+
+
+        repost = Post(
+            user = reposter_user_model,
+            contentType = content_type,
+            description = description,
+            title = title,
+            content = content
+        )
+
+        repost.save()
+
+        return JsonResponse({"success": "You have successfully reposted this post!"})
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
 @csrf_exempt
 def save_post(request):
     '''
@@ -180,22 +214,35 @@ def save_post(request):
         current_user = request.user
         current_user_model = get_object_or_404(User, user=current_user)
         
+
         # Ensure that either content, image, or image URL is provided
         if not content_type and not image and not image_url:
             return JsonResponse({'error': 'Post content is required.'}, status=400)
 
         # Determine content type and set appropriate content
-        if content:
+        if content and (content_type == 'text'):
             content_type = 'text/plain'
             post_content = content
+
+        elif content and (content_type == 'repost'):
+            post_content = content
+
+        elif content and (content_type == 'commonmark'):
+            content_type = 'text/commonmark'
+            post_content = content 
+        
         elif image:
             image_data = image.read()
             encoded_image = base64.b64encode(image_data).decode('utf-8')
             image_content = image.content_type.split('/')[1]
+            if image_content not in ['jpeg', 'png', 'jpg']:
+                image_content = 'png'
             content_type = 'image/' + image_content
             post_content = encoded_image
         elif image_url:
             image_content = image_url.split('.')[-1]
+            if image_content not in ['jpeg', 'png', 'jpg']:
+                image_content = 'png'
             content_type = 'image/' + image_content
             try:
                 with urlopen(image_url) as url:
@@ -247,7 +294,8 @@ def like_post(request):
         if like:
             like.delete()
         else:
-            Like.objects.create(user=user, post=post)
+            newLike = Like.objects.create(user=user, post=post)
+            newLike.save()
 
         data = {
             "likes_count": get_post_likes(unquote(post_id)).count()
@@ -286,70 +334,98 @@ def get_posts(user_id, post_type):
 
     return posts
 
-def get_followed(author_id):
-    '''
-    Retrieves the list of users that the author follows.
+def check_duplicate_post(request):
+    """
+    Checks if a post with the given title, description, and content already exists for the author.
 
     Parameters:
-        request: HttpRequest object containing the request.
-        author_id: The id of the author whose followed users are being retrieved.
+        author_id: The id of the author.
+        title: The title of the post.
+        description: The description of the post.
+        content: The content of the post.
 
     Returns:
-        JsonResponse with the list of followers.
-    '''
-    decoded_author_id = unquote(author_id)
-
-    # Fetch the author based on the provided author_id
-    author = get_object_or_404(User, url_id=decoded_author_id)
-    
-    # Get all followers for the author
-    followed = Follow.objects.filter(follower=author)
-
-    followed_list = []
-    
-    # Create a list of follower details to be included in the response
-    for follower in followed:
-        user = follower.followed
-        followed_list.append(user)
-
-    return followed_list
-
-def send_follow_request(request):
+        JSON response indicating whether a duplicate post exists.
     """
-    Sends a follow request to a user.
+    if request.method == "POST":
 
-    Parameters:
-        request: rest_framework object containing the request and query parameters.
-    
-    Returns:
-        JsonResponse containing the follow request status.
-    """
-    if request.user.is_authenticated:
-        body = json.loads(request.body)
-        user_id = body["user_id"]
-        post_id = body["post_id"]
+        # Access the parameters from the JSON body
+        author_id = request.POST.get("author_id")
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+        content = request.POST.get("content")
 
-        user = User.objects.get(url_id=unquote(user_id))
-        post = Post.objects.get(url_id=unquote(post_id))
+        # Decode the author_id if it's URL-encoded
+        author_id = unquote(author_id)
 
-        post_author = post.user
+        # Retrieve the author user object
+        author = get_object_or_404(User, url_id=author_id)
 
-        # first check if the user has already followed the author
-        follow = Follow.objects.filter(follower=user, followed=post_author)
+        # Check for duplicates
+        post_exists = Post.objects.filter(
+            user=author, title=title, description=description, content=content
+        ).exists()
 
-        follow_request= FollowRequest.objects.filter(requester=user, requestee=post_author)
-        follow_request_status = None
-
-        if follow:
-            follow.delete()
-            follow_request_status = "Unfollowed"
-        if follow_request:
-            follow_request.delete()
-            follow_request_status = "Removed Follow Request"
-        else:
-            FollowRequest.objects.create(requester=user, requestee=post_author)
-            follow_request_status = "Sent Follow Request"
-
-        return JsonResponse({"follow_request_status": follow_request_status})
+        return JsonResponse({'exists': post_exists})
     else:
-        pass
+        return JsonResponse({'error': 'Invalid request method.'}, status=400)
+    
+def get_image_post(pfp_url):
+    pattern = r"(?P<host>https?:\/\/.+?herokuapp\.com)\/authors\/(?P<author_serial>\d+)\/posts\/(?P<post_serial>\d+)\/image"
+    match = re.search(pattern, pfp_url)
+
+    if match:
+        host = match.group("host")
+        author_serial = match.group("author_serial")
+        post_serial = match.group("post_serial")
+    
+        author = User.objects.filter(url_id=f"{host}/authors/{author_serial}").first()
+        pfp_post = Post.objects.filter(user=author, url_id=f"{host}/authors/{author_serial}/posts/{post_serial}").first()
+
+        if pfp_post and pfp_post.content and pfp_post.contentType in ['image/jpeg', 'image/png', 'image/webp', 'image/jpg']:
+            pfp_url = f"data:{pfp_post.contentType};charset=utf-8;base64, {pfp_post.content}"
+        else:
+            pfp_url = f"{Host.host}/static/images/default_pfp_1.png"
+        return pfp_url
+    else:
+        return pfp_url
+    
+def prepare_posts(posts):
+    '''
+    Purpose: to add the current like count to the post and percent encode their ids to allow for navigation to the post.
+
+    Arguments:
+    posts: list of post objects
+    '''
+    prepared = []
+    for post in posts:
+        if post.contentType == "repost":
+            post.content = unquote(post.content)
+            original_post = Post.objects.get(url_id=post.content)
+
+            repost_time = post.published
+                
+                
+            repost_user = post.user
+            repost_url = post.url_id
+
+            post = original_post
+
+            post.repost = True
+            post.repost_user = repost_user
+            post.repost_url = repost_url
+            post.likes_count = Like.objects.filter(post=original_post).count()
+            post.repost_time = repost_time
+            post.user.profileImage = get_image_post(post.user.profileImage)
+
+        else:
+            post.likes_count = Like.objects.filter(post=post).count()
+               
+                
+        if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
+            post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+        post.url_id = quote(post.url_id,safe='')
+            
+        prepared.append(post)
+        
+    return prepared

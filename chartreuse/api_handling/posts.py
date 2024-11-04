@@ -30,6 +30,13 @@ class PostSerializer(serializers.Serializer):
     class Meta:
         fields = ['type', 'title', 'id', 'decription', 'contentType', 'content', 'author', 'comments', 'likes', 'published', 'visibility']
 
+class PostsSerializer(serializers.Serializer):
+    type = serializers.CharField(default="posts")
+    posts = PostSerializer(many=True)
+
+    class Meta:
+        fields = ['type', 'posts']
+
 class PostViewSet(viewsets.ViewSet):
     serializer_class = PostSerializer
 
@@ -42,6 +49,7 @@ class PostViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API is useful when users need to share content, such as articles, status updates, or other posts."
             "\n\n**Why not to use:** If the user is not authenticated, the post cannot be created, and this endpoint should not be used."
         ),
+        request=PostSerializer,
         parameters=[
             OpenApiParameter(name="visibility", description="visibilility of the post.", required=False, type=str),
             OpenApiParameter(name="title", description="title of the post.", required=True, type=str),
@@ -142,6 +150,7 @@ class PostViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API is useful for users who want to remove their own posts from the platform."
             "\n\n**Why not to use:** If the post does not exist or if the user is not authenticated, the post cannot be deleted."
         ),
+        request=PostSerializer,
         parameters=[
             OpenApiParameter(name="post", description="the post url.", required=True, type=str),
         ],
@@ -249,6 +258,7 @@ class PostViewSet(viewsets.ViewSet):
                 "\n\n**Why to use:** This API helps in retrieving the content and metadata of a post, useful for viewing posts in detail."
                 "\n\n**Why not to use:** If the post is restricted to FRIENDS only and the user is not friends with the author, access will be denied."
             ),
+            request=PostSerializer,
             parameters=[
             OpenApiParameter(name="user_id", description="The id of the user requesting the post.", required=False, type=str),
             OpenApiParameter(name="post_id", description="The ID of the post to retrieve (required).", required=False, type=str),
@@ -278,7 +288,7 @@ class PostViewSet(viewsets.ViewSet):
 
         author = User.objects.get(url_id=decoded_user_id)
 
-        post = Post.objects.filter(user=author, url_id=decoded_post_id)[0]
+        post = Post.objects.filter(user=author, url_id=decoded_post_id).first() #[0]
 
         user_viewset = UserViewSet()
         response = user_viewset.retrieve(request, pk=decoded_user_id)
@@ -384,6 +394,7 @@ class PostViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API allows authors to manage their posts effectively by updating essential information."
             "\n\n**Why not to use:** If the post does not exist or if the user is not authorized to modify the post, the update will fail."
         ),
+        request=PostSerializer,
         parameters=[
             OpenApiParameter(name="visibility", description="visibilility of the post.", required=False, type=str),
             OpenApiParameter(name="title", description="title of the post.", required=False, type=str),
@@ -518,13 +529,14 @@ class PostViewSet(viewsets.ViewSet):
             "\n\n**Why to use:** This API helps in fetching recent content from an author, which is useful for displaying updates or new posts."
             "\n\n**Why not to use:** If the author does not exist or if the request is not properly formatted, the retrieval may fail."
         ),
+        request=UserSerializer,
         parameters=[
             OpenApiParameter(name="page", description="Page number for pagination.", required=False, type=int),
             OpenApiParameter(name="size", description="Number of posts per page.", required=False, type=int),
             OpenApiParameter(name="user_id", description="The id of the request user.", required=False, type=str),
         ],
         responses={
-            200: OpenApiResponse(description="Successfully retrieved all posts.", response=PostSerializer),
+            200: OpenApiResponse(description="Successfully retrieved all posts.", response=PostsSerializer),
             405: OpenApiResponse(description="Method not allowed."),
         }
     )

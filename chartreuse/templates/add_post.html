@@ -13,7 +13,7 @@
 <body class="bg-light">
     
     {% block sidenav %}
-    {% include 'navbar.html' %}
+        {% include 'navbar.html' %}
     {% endblock %}
 
     <div class="container vh-100 d-flex justify-content-center align-items-center">
@@ -30,11 +30,18 @@
                     <input type="text" class="form-control" id="description" name="description" required placeholder="Enter post description">
     
                     <label class="form-label mt-3">Choose Content Type</label>
-                    <div class="d-flex justify-content-center mb-3"></div>
+                    <div class="d-flex justify-content-center mb-3" id="content-type-radio"></div>
                         <div class="form-check me-3">
                             <input class="form-check-input" type="radio" name="content_type" id="textOption" value="text" checked>
                             <label class="form-check-label" for="textOption">
                                 Text
+                            </label>
+                        </div>
+
+                        <div class="form-check me-3">
+                            <input class="form-check-input" type="radio" name="content_type" id="textOption" value="commonmark">
+                            <label class="form-check-label" for="textOption">
+                                Commonmark
                             </label>
                         </div>
     
@@ -45,6 +52,8 @@
                             </label>
                         </div>
                     </div>
+
+                    <article style="font-weight: 600;">If your are making a commonmark post with an image post from our site, please make sure the URL ends with "/image"</article>
     
                     <div id="textContent" class="my-3 px-3">
                         <label for="content" class="form-label">Content</label>

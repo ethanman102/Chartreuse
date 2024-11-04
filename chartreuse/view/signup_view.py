@@ -19,7 +19,7 @@ def save_signup(request):
         password_2 = request.POST.get('password2')
         displayName = request.POST.get('displayname')
         github = request.POST.get('github', '')  # Default to empty string if not provided
-        profileImage = request.POST.get('profile_image', f'{Host.host}static/images/default_pfp_1.png')  # Default to empty string if not provided
+        profileImage = request.POST.get('profile_image', 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/static/images/default_pfp_1.png')  # Default to empty string if not provided
 
         # Check if the username already exists
         if AuthUser.objects.filter(username=username).exists():
@@ -38,7 +38,11 @@ def save_signup(request):
         # Create the AuthUser instance
         authUser = AuthUser.objects.create_user(username=username)
         authUser.set_password(password_1)
+        authUser.is_active = False
         authUser.save()
+
+        if (profileImage == ""):
+            profileImage = 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/static/images/default_pfp_1.png'
 
         # Create the custom User model instance
         id = Host.host + "authors/" + str(authUser.id)

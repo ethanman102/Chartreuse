@@ -1,11 +1,9 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import generic
-from django.contrib.auth.models import User as AuthUser
-from django.urls import reverse
+from django.shortcuts import redirect, get_object_or_404
 from chartreuse.models import User,Like,Comment,Post,Follow,FollowRequest
 from django.views.generic.detail import DetailView
 from django.http import HttpResponseNotAllowed
 from urllib.parse import unquote, quote
+from . import post_utils
 
 def follow_accept(request,followed,follower):
 
@@ -130,6 +128,8 @@ class ProfileDetailView(DetailView):
         user = context['profile']
         context['owner_id'] = quote(user.url_id,safe='')
 
+        context['profile'].profileImage = post_utils.get_image_post(context['profile'].profileImage)
+
         post_access = "public" # default following status, will be updated after!
 
         # checking if user is authenticated or anonymous
@@ -140,6 +140,7 @@ class ProfileDetailView(DetailView):
             current_user_model = get_object_or_404(User,user=current_user)  
             if user.url_id == current_user_model.url_id:
                 # owns the page, should not display follow button etc...
+                context['viewer_id'] = quote(current_user_model.url_id,safe='')
                 context['owner'] = True
                 context['requests'] = self.prepare_follow_requests(user)
                 post_access = "all"
@@ -179,8 +180,9 @@ class ProfileDetailView(DetailView):
 
         # posts that can be viewed by the current user visiting.
         posts = self.get_posts(post_access,user)
-        self.prepare_posts(posts)
+        posts = post_utils.prepare_posts(posts)
         context['posts'] = posts
+        
 
         return context
         
@@ -208,21 +210,7 @@ class ProfileDetailView(DetailView):
                 follow_request.requestee.url_id = quote(follow_request.requestee.url_id,safe='')
         return follow_requests
     
-    def prepare_posts(self,posts):
-        '''
-        Purpose: to add the current like count to the post and percent encode their ids to allow for navigation to the post.
-
-        Arguments:
-        posts: list of post objects
-        '''
-
-        for post in posts:
-            post.likes_count = Like.objects.filter(post=post).count()
-            if post.contentType != "text/plain":
-                post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
-            post.url_id = quote(post.url_id,safe='')
-    
-        # no return because mutability of lists.
+   
 
     def get_posts(self,post_access,user):
 
@@ -242,13 +230,17 @@ class ProfileDetailView(DetailView):
         elif post_access == "unlisted":
             posts = Post.objects.filter(visibility="PUBLIC",user=user) | Post.objects.filter(visibility="UNLISTED",user=user)
         else:
-            posts = Post.objects.filter(user=user)
+            posts = Post.objects.filter(user=user).exclude(visibility="DELETED")
 
         # Resource: https://www.w3schools.com/django/django_queryset_orderby.php 
         # This Resource by W3 Schools titled: 'Django QuerySet - Order By' helped us to understand how to order a queryset from descending order!
         posts.order_by("-published")
         posts = [post for post in posts]
         posts = sorted(posts, key=lambda post: post.published, reverse=True)
+        
+        for post in posts:
+            post.user.profileImage = post_utils.get_image_post(post.user.profileImage)
+
         return posts
         
 

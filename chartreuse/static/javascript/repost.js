@@ -14,7 +14,13 @@ function main(){
             headers: {
                 'X-CSRFToken': csrfToken,
                 'Content-Type': 'application/json',
-            }
+            },
+            body: JSON.stringify({
+               content_type: 'repost',
+               title:  'REPOST: ',
+               visibility: 'PUBLIC',
+               description: 'Check out this post by: '
+            })
 
         });
     }

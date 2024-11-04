@@ -157,6 +157,43 @@ def update_post(request, post_id):
         return redirect('/chartreuse/homepage/post/' + post_id + '/')
     return redirect('/chartreuse/error/')
 
+def repost(request):
+    '''
+    Purpose: API endpoint to repost a POST!
+
+    Arguments:
+        request: Request object
+    '''
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        title = data.get('title')
+
+        content_type = data.get('content_type')
+        if (content_type != 'repost'):
+            return JsonResponse({'error':'Can not process a non-repost'},status=400)
+        
+        content = data.get('content')
+        
+        description = data.get('description')
+        reposter_auth_model = request.user
+        reposter_user_model = User.objects.get(user=reposter_auth_model)
+
+        original_post = get_object_or_404(Post,url_id=content)
+
+        repost = Post(
+            user = reposter_user_model,
+            content_type = content_type,
+            description = description,
+            title = 
+        )
+
+
+
+        
+
+        
+
 @csrf_exempt
 def save_post(request):
     '''

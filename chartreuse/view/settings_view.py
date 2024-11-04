@@ -366,7 +366,7 @@ def upload_profile_picture(request):
         )
 
         new_picture.save()
-        url = posdt.url
+        
       
         profile_pic_url = new_picture.url_id + '/image'
 
@@ -454,8 +454,6 @@ def upload_url_picture(request):
             visibility = 'PUBLIC',
             description = "My new profile picture!"
         )
-
-        print(new_picture)
 
         new_picture.save()
 

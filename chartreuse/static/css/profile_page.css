@@ -229,3 +229,7 @@ h5{
 .card:hover {
     box-shadow: 6px 6px 0px #0000005d;
 }
+
+.cm_text img {
+    size: inherit;
+}

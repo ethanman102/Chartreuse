@@ -3,6 +3,7 @@ from urllib.request import urlopen
 from django.http import JsonResponse
 from .. import models
 from urllib.parse import unquote
+from django.http import HttpResponse
 
 def retrieve(request, post_id):
     '''
@@ -20,7 +21,13 @@ def retrieve(request, post_id):
     post = models.Post.objects.filter(url_id=decoded_post_id).first()
 
     if post and post.content and post.contentType in ['image/jpeg', 'image/png']:
-        return JsonResponse({"image": f"data:{post.contentType};charset=utf-8;base64, {post.content}"}, status=200)
+        data_url = f"data:{post.contentType};base64,{post.content}"
+        
+        # Create the HTML response with the embedded image
+        html_content = f"""
+        <img src="{data_url}" alt="Image" />
+        """
+        return HttpResponse(html_content, content_type='text/html')
     else:
         return JsonResponse({'error': 'Not an image'}, status=404)
 

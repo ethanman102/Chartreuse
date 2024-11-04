@@ -2,9 +2,10 @@ from django.shortcuts import get_object_or_404
 from chartreuse.models import User, Follow, Like, FollowRequest
 from django.views.generic.detail import DetailView
 from urllib.parse import quote
-from chartreuse.view.post_utils import get_all_public_posts, get_posts, get_image_post
+from chartreuse.view.post_utils import get_all_public_posts, get_posts, get_image_post,prepare_posts
 from chartreuse.view.follow_utils import get_followed
 from django.core.paginator import Paginator
+
 
 class FeedDetailView(DetailView):
     '''
@@ -48,6 +49,13 @@ class FeedDetailView(DetailView):
             follow_requests = FollowRequest.objects.filter(requester=current_user_model)
             follow_request_url_ids = [follow_request.requestee.url_id for follow_request in follow_requests]
 
+            reposts = public_posts.filter(contentType='repost')
+            needed_reposts = reposts.filter(user__url_id__in=following_url_ids)
+            unneeded_reposts = reposts.difference(needed_reposts)
+
+            public_posts = public_posts.difference(unneeded_reposts)
+
+
             # get all posts from the users that the current user follows
             for follower in following:
                 unlisted_posts = get_posts(follower.url_id, 'UNLISTED')
@@ -62,25 +70,21 @@ class FeedDetailView(DetailView):
 
             for post in posts:
                 post.following_status = 'Following'
-            
-            for post in public_posts:
+
+            # Combine all posts and sort by date published
+            posts.extend(public_posts)
+            posts = sorted(posts, key=lambda post: post.published, reverse=True)
+
+            posts = prepare_posts(posts)
+
+            for post in posts:
                 if (post.user.url_id in following_url_ids):
                     post.following_status = 'Following'
                 elif (post.user.url_id in follow_request_url_ids):
                     post.following_status = 'Pending'
                 else:
                     post.following_status = 'Follow'
-
-            # Combine all posts and sort by date published
-            posts.extend(public_posts)
-            posts = sorted(posts, key=lambda post: post.published, reverse=True)
-
-            for post in posts:
-                post.likes_count = Like.objects.filter(post=post).count()
-                post.url_id = quote(post.url_id, safe='')
-
-                if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
-                    post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+                
                 
                 post.user.profileImage = get_image_post(post.user.profileImage)
 
@@ -108,6 +112,7 @@ class FeedDetailView(DetailView):
             current_user_model = get_object_or_404(User, user=current_user)
 
             current_user_model.url_id = quote(current_user_model.url_id, safe='')
+            print(current_user_model.url_id)
 
             return current_user_model
         else:

@@ -230,8 +230,21 @@ h5{
     box-shadow: 6px 6px 0px #0000005d;
 }
 
+
+.view-repost-button {
+    color:#000000;
+    border: solid black 2px;
+    background-color: white;
+}
+
+.view-repost-button:hover {
+    color: #ffffff;
+    background-color: #000000;
+}
+
 p img {
     max-width: 100%;
     height: auto;
 }
+
 

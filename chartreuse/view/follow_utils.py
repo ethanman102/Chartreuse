@@ -48,6 +48,9 @@ def send_follow_request(request):
         user_id = body["user_id"]
         post_id = body["post_id"]
 
+        print(user_id)
+        print(post_id)
+
         user = User.objects.get(url_id=unquote(user_id))
         post = Post.objects.get(url_id=unquote(post_id))
 

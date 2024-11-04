@@ -347,7 +347,8 @@ def upload_profile_picture(request):
             return JsonResponse({'error': 'No file provided'},status=400)
         
         mime_type = file_to_read.content_type 
-        print(mime_type)
+    
+        
         
         image_data = file_to_read.read()
         encoded_image = base64.b64encode(image_data).decode('utf-8')
@@ -364,10 +365,9 @@ def upload_profile_picture(request):
             description = "My new profile picture!"
         )
 
-        print(new_picture.contentType)
         new_picture.save()
-        print(new_picture.contentType)
-
+        
+      
         profile_pic_url = new_picture.url_id + '/image'
 
         current_user_model.profileImage = profile_pic_url
@@ -455,8 +455,6 @@ def upload_url_picture(request):
             description = "My new profile picture!"
         )
 
-        print(new_picture)
-
         new_picture.save()
 
         profile_pic_url = new_picture.url_id + '/image'
@@ -486,5 +484,7 @@ class SettingsDetailView(DetailView):
         authenticated_user = self.request.user
         user = get_object_or_404(User,user=authenticated_user)
         user.profileImage = get_image_post(user.profileImage)
-        return user
 
+        if ((user.github == None) or (user.github == "")):
+            user.github = "None"
+        return user

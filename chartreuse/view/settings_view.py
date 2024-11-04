@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 import base64
 from .post_utils import get_image_post
 from urllib.request import urlopen
-from random import choice
+import random
 
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework.decorators import action, api_view
@@ -346,7 +346,8 @@ def upload_profile_picture(request):
         if (file_to_read == None or file_name_to_read == None):
             return JsonResponse({'error': 'No file provided'},status=400)
         
-        mime_type = file_to_read.content_type + ';base64'
+        mime_type = file_to_read.content_type 
+        print(mime_type)
         
         image_data = file_to_read.read()
         encoded_image = base64.b64encode(image_data).decode('utf-8')
@@ -355,14 +356,17 @@ def upload_profile_picture(request):
         current_user_model = User.objects.get(user = current_auth_user)
 
         new_picture = Post(
-            title= choice(PROFILE_PICTURE_TITLES),
+            title= random.choice(PROFILE_PICTURE_TITLES),
             contentType = mime_type,
             content = encoded_image,
             user = current_user_model,
             visibility = 'PUBLIC',
             description = "My new profile picture!"
         )
+
+        print(new_picture.contentType)
         new_picture.save()
+        print(new_picture.contentType)
 
         profile_pic_url = new_picture.url_id + '/image'
 
@@ -443,13 +447,15 @@ def upload_url_picture(request):
         current_user_model = User.objects.get(user=current_auth_user)
 
         new_picture = Post(
-            title= choice(PROFILE_PICTURE_TITLES),
-            contentType = mime_type + ';base64',
+            title= random.choice(PROFILE_PICTURE_TITLES),
+            contentType = mime_type,
             content = encoded_image,
             user = current_user_model,
             visibility = 'PUBLIC',
             description = "My new profile picture!"
         )
+
+        print(new_picture)
 
         new_picture.save()
 

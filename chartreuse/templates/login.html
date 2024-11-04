@@ -32,4 +32,49 @@
         </div>
     </div>
 </div>
+<script>
+    window.addEventListener('load', () => {
+        // handle form errors
+        const form = document.querySelector('form');
+        form.addEventListener('submit', (event) => {
+            // prevent the form from submitting just yet
+            event.preventDefault();
+            const formData = new FormData(form);
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value; // get the csrf token
+            
+            fetch('authenticate/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': csrfToken, // include the csrf token in headers
+                }
+            })
+            .then(response => {
+                if(response.redirected) {
+                    window.location.href = response.url; // if everything goes well, redirect to the homepage
+                } else {
+                    return response.json();
+                }
+            })
+            .then(data => {
+                document.querySelectorAll('.errorMessage').forEach(element => {
+                    element.remove(); // remove any previous error messages
+                });
+
+                const dataError = data.error;
+                let inputElement = null;
+                if (dataError === 'Invalid password.') {
+                    inputElement = document.getElementById('password');
+                } else {
+                    inputElement = document.getElementById('username');
+                }
+                const p = document.createElement('p');
+                p.className = 'errorMessage';
+                p.textContent = dataError;
+                p.style.color ='red';
+                inputElement.insertAdjacentElement('afterend', p);
+            });
+        });
+    });
+</script>
 {% endblock %}

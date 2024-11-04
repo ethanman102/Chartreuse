@@ -8,7 +8,8 @@ from django.contrib.auth.decorators import login_required
 from .view import home_page_view, profile_utils, signup_view, login_view, landing_page_view, profile_view, follow_list_view, post_view, settings_view, post_utils, comment_utils, follow_utils
 app_name = "chartreuse"
 urlpatterns = [
-    re_path(r"homepage/post/(?P<post_id>.+)/image$", images.retrieve, name='get_image_post'),
+    re_path(r"homepage/post/(?P<post_id>.+)/image$", images.retrieve_from_homepage, name='get_image_post'),
+    re_path(r"authors/(?P<author_id>.+)/post/(?P<post_id>.+)/image$", images.retrieve_from_profile, name='get_image_post_profile'),
 
     # Post Comment URLs
     re_path(r"comment/$",comment_utils.add_comment,name="add_comment"),

@@ -6,7 +6,7 @@ from urllib.parse import unquote
 from django.shortcuts import redirect
 from pathlib import Path
 
-def retrieve(request, post_id):
+def retrieve_from_homepage(request, post_id):
     '''
     Get the image data of a post.
 
@@ -27,14 +27,46 @@ def retrieve(request, post_id):
         # Define the path for saving the image
         images_dir = Path("chartreuse/static/images")
         images_dir.mkdir(parents=True, exist_ok=True)  # Ensure the directory exists
-        image_path = images_dir / "output.png"  # Save as .png based on post content type
+        image_path = images_dir / f"{post.id}.png"  # Save as .png based on post content type
 
         # Write the decoded image data to the file
         with image_path.open("wb") as f:
             f.write(image_data)
 
         # Redirect to the saved image
-        return redirect(f"/static/images/output.png")
+        return redirect(f"/static/images/{post.id}.png")
+    else:
+        return JsonResponse({'error': 'Not an image'}, status=404)
+
+def retrieve_from_profile(request, author_id, post_id):
+    '''
+    Get the image data of a post.
+
+    Parameters:
+        request: HttpRequest object containing the request and query parameters.
+        post_id: The ID of the post.
+    
+    Returns:
+        HttpResponse containing the image data of the post.
+    '''    
+    decoded_post_id = unquote(post_id)
+    post = models.Post.objects.filter(url_id=decoded_post_id).first()
+
+    if post and post.content and post.contentType in ['image/jpeg', 'image/png']:
+        # Decode base64 image data from the post content
+        image_data = base64.b64decode(post.content)
+
+        # Define the path for saving the image
+        images_dir = Path("chartreuse/static/images")
+        images_dir.mkdir(parents=True, exist_ok=True)  # Ensure the directory exists
+        image_path = images_dir / f"{post.id}.png"  # Save as .png based on post content type
+
+        # Write the decoded image data to the file
+        with image_path.open("wb") as f:
+            f.write(image_data)
+
+        # Redirect to the saved image
+        return redirect(f"/static/images/{post.id}.png")
     else:
         return JsonResponse({'error': 'Not an image'}, status=404)
 

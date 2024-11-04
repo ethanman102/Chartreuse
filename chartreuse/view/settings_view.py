@@ -19,7 +19,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework.decorators import action, api_view
 
 PROFILE_PICTURE_TITLES = [
-    "Look out! I'm reading to 'serve' with this new image file as my new profile picture!",
+    "Look out! I'm ready to 'serve' with this new image file as my new profile picture!",
     "Hey guys, check out my new profile picture!",
     "I have changed my profile picture",
     "Does this new profile picture make my butt look big?",

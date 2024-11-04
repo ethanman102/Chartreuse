@@ -21,11 +21,19 @@ def retrieve(request, post_id):
     post = models.Post.objects.filter(url_id=decoded_post_id).first()
 
     if post and post.content and post.contentType in ['image/jpeg', 'image/png']:
-        data_url = f"data:{post.contentType};base64,{post.content}"
+        data_url = f"data:image/png;base64, {post.content}"
         
         # Create the HTML response with the embedded image
         html_content = f"""
-        <img src="{data_url}" alt="Image" />
+        <html style="height: 100%;">
+            <head>
+                <meta name="viewport" content="width=device-width, minimum-scale=0.1">
+                <title>{post.content}</title>
+            </head>
+            <body style="margin: 0px; height: 100%; background-color: rgb(14, 14, 14);">
+                <img style="display: block;-webkit-user-select: none;margin: auto;cursor: zoom-in;background-color: hsl(0, 0%, 90%);transition: background-color 300ms;" src="{data_url}" width="754" height="424">
+            </body>
+        </html>
         """
         return HttpResponse(html_content, content_type='text/html')
     else:

@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function() {
         var writer = new commonmark.HtmlRenderer({sourcepos: true, safe: true, softbreak: "<br />"});
         var parsed = reader.parse(markString); // parsed is a 'Node' tree
         // transform parsed if you like...
-        // Check if there is an image 
+        
         
         var result = writer.render(parsed); // result is a String
 

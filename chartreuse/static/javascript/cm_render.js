@@ -8,15 +8,12 @@ document.addEventListener("DOMContentLoaded", function() {
     var postStrings = document.querySelectorAll("p.cm_text");
     
     var markStrings = Array.from(postStrings).map(function(post) {
-        // for debugging 
-        // console.log(post.textContent);
-        let markString = post.innerText
+        let markString = post.innerText // getting the string from the post 
 
         // following lines are from the https://github.com/commonmark/commonmark.js repo's README
 
-        var reader = new commonmark.Parser({smart: true, linebreak: "<br>"});
+        var reader = new commonmark.Parser({smart: true, linebreak: "<br />"});
         var writer = new commonmark.HtmlRenderer({sourcepos: true, safe: true, softbreak: "<br />"});
-        // var writer = new commonmark.HtmlRenderer({sourcepos: true, safe: true, softbreak: "<br />"});
         var parsed = reader.parse(markString); // parsed is a 'Node' tree
         // transform parsed if you like...
         // Check if there is an image 

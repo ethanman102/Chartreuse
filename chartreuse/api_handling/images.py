@@ -37,7 +37,7 @@ class ImageViewSet(viewsets.ViewSet):
         post = models.Post.objects.filter(user=author, url_id=decoded_post_id).first()
 
         if post and post.content and post.contentType in ['image/jpeg', 'image/png']:
-            return JsonResponse({"content": post.content, "contentType": post.contentType}, status=200)
+            return JsonResponse({"image": f"data:{post.contentType};charset=utf-8;base64, {post.content}"}, status=200)
         else:
             return JsonResponse({'error': 'Not an image'}, status=404)
 

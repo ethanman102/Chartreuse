@@ -179,21 +179,21 @@ def repost(request):
         reposter_auth_model = request.user
         reposter_user_model = User.objects.get(user=reposter_auth_model)
 
-        original_post = get_object_or_404(Post,url_id=content)
+
 
         repost = Post(
             user = reposter_user_model,
             content_type = content_type,
             description = description,
-            title = 
+            title = title,
+            content = content
         )
 
+        repost.save()
 
-
-        
-
-        
-
+        return JsonResponse({"success": "You have successfully reposted this post!"})
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
 @csrf_exempt
 def save_post(request):
     '''

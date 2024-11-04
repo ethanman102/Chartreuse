@@ -1,49 +1,28 @@
 import base64
 from urllib.request import urlopen
 from django.http import JsonResponse
-from rest_framework import viewsets
-from rest_framework.decorators import action
-from drf_spectacular.utils import extend_schema, OpenApiResponse
 from .. import models
 from urllib.parse import unquote
 
-class ImageViewSet(viewsets.ViewSet):
+def retrieve(request, post_id):
+    '''
+    Get the image data of a post.
 
-    @extend_schema(
-        summary="Gets the image data from a post",
-        description=("Gets the image data from a post. The image data is returned as a base64 encoded string."),
-        responses={
-            200: OpenApiResponse(description="Successfully retrieved post image."),
-            404: OpenApiResponse(description="Image not found."),
-            405: OpenApiResponse(description="Method not allowed."),
-        }
-    )
-    @action(detail=True, methods=["GET"])
-    def retrieve(self, request, *args, **kwargs):
-        '''
-        Get the image data of a post.
+    Parameters:
+        request: HttpRequest object containing the request and query parameters.
+        author_id: The ID of the author of the post.
+        post_id: The ID of the post.
+    
+    Returns:
+        HttpResponse containing the image data of the post.
+    '''    
+    decoded_post_id = unquote(post_id)
+    post = models.Post.objects.filter(url_id=decoded_post_id).first()
 
-        Parameters:
-            request: HttpRequest object containing the request and query parameters.
-            author_id: The ID of the author of the post.
-            post_id: The ID of the post.
-        
-        Returns:
-            HttpResponse containing the image data of the post.
-        '''
-        # Extract the author_id and post_id from kwargs
-        author_id = kwargs.get('author_id')
-        post_id = kwargs.get('post_id')
-        
-        decoded_author_id = unquote(author_id)
-        decoded_post_id = unquote(post_id)
-        author = models.User.objects.filter(url_id=decoded_author_id).first()
-        post = models.Post.objects.filter(user=author, url_id=decoded_post_id).first()
-
-        if post and post.content and post.contentType in ['image/jpeg', 'image/png']:
-            return JsonResponse({"image": f"data:{post.contentType};charset=utf-8;base64, {post.content}"}, status=200)
-        else:
-            return JsonResponse({'error': 'Not an image'}, status=404)
+    if post and post.content and post.contentType in ['image/jpeg', 'image/png']:
+        return JsonResponse({"image": f"data:{post.contentType};charset=utf-8;base64, {post.content}"}, status=200)
+    else:
+        return JsonResponse({'error': 'Not an image'}, status=404)
 
 def encode_image(image_path):
     '''

@@ -106,5 +106,9 @@ body,html{
     font-weight: bold;
 }
 
+.card{
+    box-shadow: 6px 6px 0px #000000;
+}
+
 
 

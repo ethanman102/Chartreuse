@@ -21,7 +21,7 @@
     
 <div class="settings-box" style="margin-top: 30px;">
     <div class = "container" id="settings-header" style="border: 5px solid black;">
-        <h4>chartreuse.settings</h4>
+        <h4 id="header">chartreuse.settings</h4>
     </div>
 
     
@@ -43,213 +43,220 @@
         </div>
 
         <div class="tab-content" id="nav-tabContent">
+            
             <div class="tab-pane fade show active" id="nav-dn" role="tabpanel" aria-labelledby="nav-dn-tab" tabindex="0">
-                <div class="row">
-                    <div class="col-12">
-                        <h3 id="dn-header">Feeling different? You can update your display name here!</h3>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-3 offset-3">
-                        <h5 id="current-name-text">Current Name:</h5>
-                    </div>
-                    <div class="col-6">
-                        <h5 id="current-dn-text">{{ user.displayName }}</h5>
-                    </div>
-                </div>
-
-                <form method="POST">
+                <div class="card mb-3 p-4 mx-4 my-3 p-3" style="border-radius: 10px;">
                     <div class="row">
-                        <div class="col-6 offset-3">
-                            <input id="new-dn-input" name="displayname" type="text" class="form-control" required placeholder="Enter your new Display Name" maxlength="20"/>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-6 offset-3">
-                            <p id="dn-error" style="visibility: hidden;"></p> 
+                        <div class="col-12">
+                            <h3 id="dn-header">Feeling different? You can update your display name here!</h3>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-3 offset-3">
-                            <button type="button" class="btn btn-primary w-100" id="dn-submit-button">Update</button>
+                            <h5 id="current-name-text">Current Name:</h5>
                         </div>
-                        <div class="col-3" id="dn-loading">
-                            <div class="spinner-border text-primary" role="status" id="dnSpinner" style="visibility: hidden;"></div>
+                        <div class="col-6">
+                            <h5 id="current-dn-text">{{ user.displayName }}</h5>
                         </div>
                     </div>
-                </form>
+
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-6 offset-3">
+                                <input id="new-dn-input" name="displayname" type="text" class="form-control" required placeholder="Enter your new Display Name" maxlength="20"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 offset-3">
+                                <p id="dn-error" style="visibility: hidden;"></p> 
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3 offset-3">
+                                <button type="button" class="btn btn-primary w-100" id="dn-submit-button">Update</button>
+                            </div>
+                            <div class="col-3" id="dn-loading">
+                                <div class="spinner-border text-primary" role="status" id="dnSpinner" style="visibility: hidden;"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>  
             </div>
             <div class="tab-pane fade" id="nav-password" role="tabpanel" aria-labelledby="nav-password-tab" tabindex="0">
-                <div class="row">
-                    <div class="col-12">
-                        <h3 id="password-header">Need a new password? No worries, we got you...</h3>
+                <div class="card mb-3 p-4 mx-4 my-3 p-3" style="border-radius: 10px;">
+                    <div class="row">
+                        <div class="col-12">
+                            <h3 id="password-header" class="card-title">Need a new password? No worries, we got you...</h3>
+                        </div>
                     </div>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-6 offset-3">
+                                <input id="old-pass" name="password2" type="password" class="form-control" required placeholder="Enter your old password"/>
+                            </div>
+                        </div>
+                        <div id="new-passwords">
+                            <div class="row">
+                                <div class="col-6 offset-3">
+                                    <input id="password1" name="password1" type="password" class="form-control" required placeholder="Enter your new password"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 offset-3">
+                                    <input id="password2" name="password2" type="password" class="form-control" required placeholder="Confirm your new password"/>
+                                </div>
+                            </div>
+                        </div>
+            
+                        <div class="row" id="password-error-message-row">
+                            <div class="col-6 offset-3">
+                                <p id="password-error" style="visibility: hidden;"></p>
+                            </div>
+                        </div>
+            
+                        <div class="row">
+                            <div class="col-3 offset-3">
+                                <button type="button" class="btn btn-primary w-100" id="password-submit-button">Update</button>
+                            </div>
+                            <div class="col-3" id="password-loading">
+                                <div class="spinner-border text-primary" role="status" id="passwordSpinner" style="visibility: hidden;"></div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-                <form method="POST">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-6 offset-3">
-                            <input id="old-pass" name="password2" type="password" class="form-control" required placeholder="Enter your old password"/>
-                        </div>
-                    </div>
-                    <div id="new-passwords">
-                        <div class="row">
-                            <div class="col-6 offset-3">
-                                <input id="password1" name="password1" type="password" class="form-control" required placeholder="Enter your new password"/>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6 offset-3">
-                                <input id="password2" name="password2" type="password" class="form-control" required placeholder="Confirm your new password"/>
-                            </div>
-                        </div>
-                    </div>
-        
-                    <div class="row" id="password-error-message-row">
-                        <div class="col-6 offset-3">
-                            <p id="password-error" style="visibility: hidden;"></p>
-                        </div>
-                    </div>
-        
-                    <div class="row">
-                        <div class="col-3 offset-3">
-                            <button type="button" class="btn btn-primary w-100" id="password-submit-button">Update</button>
-                        </div>
-                        <div class="col-3" id="password-loading">
-                            <div class="spinner-border text-primary" role="status" id="passwordSpinner" style="visibility: hidden;"></div>
-                        </div>
-                    </div>
-                </form>
             </div>
             <div class="tab-pane fade" id="nav-pi" role="tabpanel" aria-labelledby="nav-pi-tab" tabindex="0">
-
-                <div class="row">
-                    <div class="col-12">
-                        <h4>Want to change your look? Feel free to change your profile picture here!</h4>
+                <div class="card mb-3 p-4 mx-4 my-3 p-3" style="border-radius: 10px;">
+                    <div class="row">
+                        <div class="col-12">
+                            <h4>Want to change your look? Feel free to change your profile picture here!</h4>
+                        </div>
                     </div>
-                </div>
 
-                
-                <div class="row">
-                    <div class="col-12">
-                        <div class="d-flex justify-content-center mb-3">
-                            <div class="form-check mb-3 me-3">
-                                <input class="form-check-input" type="radio" name="image_type" id="uploadImageOption" value="upload" checked>
-                                <label class="form-check-label" for="uploadImageOption">
-                                    Upload Image
-                                </label>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-center mb-3">
+                                <div class="form-check mb-3 me-3">
+                                    <input class="form-check-input" type="radio" name="image_type" id="uploadImageOption" value="upload" checked>
+                                    <label class="form-check-label" for="uploadImageOption">
+                                        Upload Image
+                                    </label>
+                                </div>
+                                <div class="form-check mb-3 me-3">
+                                    <input class="form-check-input" type="radio" name="image_type" id="urlImageOption" value="url">
+                                    <label class="form-check-label" for="urlImageOption">
+                                        Provide Image URL
+                                    </label>
+                                </div>
                             </div>
-                            <div class="form-check mb-3 me-3">
-                                <input class="form-check-input" type="radio" name="image_type" id="urlImageOption" value="url">
-                                <label class="form-check-label" for="urlImageOption">
-                                    Provide Image URL
-                                </label>
+                        </div>
+                    </div>
+                    
+                    <div id="uploadImageContent">
+                        <div class="row">
+                            <div class="col-6 offset-3">
+                                <label for="image" class="form-label">Upload Image</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 offset-3">
+                                <input type="file" class="form-control" id="image" name="image">
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <div id="uploadImageContent">
-                    <div class="row">
-                        <div class="col-6 offset-3">
-                            <label for="image" class="form-label">Upload Image</label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-6 offset-3">
-                            <input type="file" class="form-control" id="image" name="image">
-                        </div>
-                    </div>
-                </div>
-                
+                    
 
-                <div id="urlImageContent" class="hidden">
-                    <div class="row">
-                        <div class="col-6 offset-3">
-                            <label for="image_url" class="form-label">Image URL</label>
+                    <div id="urlImageContent" class="hidden">
+                        <div class="row">
+                            <div class="col-6 offset-3">
+                                <label for="image_url" class="form-label">Image URL</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 offset-3">
+                                <input type="url" class="form-control" id="image_url" name="image_url" placeholder="Enter image URL">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3 offset-3">
+                                <button type="button" class="btn btn-primary w-100" id="image-submit-button">Upload</button>
+                            </div>
                         </div>
                     </div>
+
                     <div class="row">
                         <div class="col-6 offset-3">
-                            <input type="url" class="form-control" id="image_url" name="image_url" placeholder="Enter image URL">
+                            <p id="image-upload-message" style="visibility: hidden;">Image Upload Message</p>
                         </div>
                     </div>
+                    
                     <div class="row">
                         <div class="col-3 offset-3">
-                            <button type="button" class="btn btn-primary w-100" id="image-submit-button">Upload</button>
+                            <h5 id="current-image-header">Current Profile Picture:</h5>
+                        </div>
+                        <div class="col-3">
+                            <div class="spinner-border text-primary" role="status" id="imageSpinner" style="visibility: hidden;"></div>
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-6 offset-3">
-                        <p id="image-upload-message" style="visibility: hidden;">Image Upload Message</p>
+                    <div class="row">
+                        <div class="col-6 offset-3" style="text-align: center;">
+                            <img src = '{{user.profileImage}}'id="current-image" class="rounded img-fluid pfp-image" style="width: 200px; height: 200px; object-fit: cover; border: solid black 2px;margin-bottom: 2ch;">
+                        </div>
                     </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-3 offset-3">
-                        <h5 id="current-image-header">Current Profile Picture:</h5>
-                    </div>
-                    <div class="col-3">
-                        <div class="spinner-border text-primary" role="status" id="imageSpinner" style="visibility: hidden;"></div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6 offset-3" style="text-align: center;">
-                        <img src = '{{user.profileImage}}'id="current-image" class="rounded img-fluid pfp-image" style="width: 200px; height: 200px; object-fit: cover; border: solid black 2px;margin-bottom: 2ch;">
-                    </div>
-                </div>
 
 
-
+                </div>
             </div>
             <div class="tab-pane fade" id="nav-github" role="tabpanel" aria-labelledby="nav-github-tab" tabindex="0">
-                <div class="row">
-                    <div class="col-12">
-                        <h3 id="github-prompt-message">Want to change the github associated with your account?</h3>
+                <div class="card mb-3 p-4 mx-4 my-3 p-3" style="border-radius: 10px;">
+                    <div class="row">
+                        <div class="col-12">
+                            <h3 id="github-prompt-message">Want to change the github associated with your account?</h3>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-6 current-github-text">
-                        <h5>Current Github:</h5>
+                    <div class="row">
+                        <div class="col-6 current-github-text">
+                            <h5>Current Github:</h5>
+                        </div>
+                        <div class="col-6">
+                            <p id="github-url-text">{{user.github}}</p>
+                        </div>
                     </div>
-                    <div class="col-6">
-                        <p id="github-url-text">{{user.github}}</p>
+                    <div class="row">
+                        <div class="col-3 offset-6" id="github-remove-div">
+                            <button type="button" class="btn btn-primary w-100" id="github-remove-button">Remove</button>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-3 offset-6" id="github-remove-div">
-                        <button type="button" class="btn btn-primary w-100" id="github-remove-button">Remove</button>
+                    <div class="row">
+                        <div class="col-6">
+                            <p id="github-remove-message" style="visibility: hidden;">remove message</p>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-6">
-                        <p id="github-remove-message" style="visibility: hidden;">remove message</p>
-                    </div>
-                </div>
-                <div class="row" id="github-add-section">
-                    <div class="col-2 offset-3">
-                        <label for="github-input">URL:</label>
-                    </div>
-                    <div class="col-4">
-                        <form method="POST">
-                            {% csrf_token %}
-                            <input id="github-input" name="github-input" type="text" class="form-control" required placeholder="Your GITHUB"/>
-                            <div class="row">
-                                <div class="col-6">
-                                    <button type="button" class="btn btn-primary w-100" id="github-add-button">Add</button>
+                    <div class="row" id="github-add-section">
+                        <div class="col-2 offset-3">
+                            <label for="github-input">URL:</label>
+                        </div>
+                        <div class="col-4">
+                            <form method="POST">
+                                {% csrf_token %}
+                                <input id="github-input" name="github-input" type="text" class="form-control" required placeholder="Your GITHUB"/>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-primary w-100" id="github-add-button">Add</button>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="spinner-border text-primary" role="status" id="githubSpinner" style="visibility: hidden;"></div>
+                                    </div>
                                 </div>
-                                <div class="col-6">
-                                    <div class="spinner-border text-primary" role="status" id="githubSpinner" style="visibility: hidden;"></div>
-                                </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
-                </div>
-                <div class="row'">
-                    <div class="col-6 offset-3">
-                        <p id="github-add-message" style="visibility: hidden;">Github add message</p>
+                    <div class="row'">
+                        <div class="col-6 offset-3">
+                            <p id="github-add-message" style="visibility: hidden;">Github add message</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -258,7 +265,7 @@
 </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
+    <script src="{% static 'javascript/page_header.js' %}"></script>
     <script>
         window.addEventListener('load',imageTab);
         function imageTab(){

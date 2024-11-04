@@ -210,8 +210,7 @@ class ProfileDetailView(DetailView):
                 follow_request.requestee.url_id = quote(follow_request.requestee.url_id,safe='')
         return follow_requests
     
-    
-        # no return because mutability of lists.
+   
 
     def get_posts(self,post_access,user):
 

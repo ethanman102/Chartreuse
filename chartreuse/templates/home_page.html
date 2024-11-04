@@ -7,7 +7,7 @@
 {% block extra_head %}
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{% static 'css/home_page.css' %}">
-
+    {% load timeline_post_layouts %}
 {% endblock %}
 
 {% block content %}
@@ -28,42 +28,33 @@
                 </div>
             
                 {% for post in posts %}
-                <div class="card mb-3 p-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <a href="/chartreuse/authors/{{ post.user.url_id }}/" style="text-decoration: none; color:black">
+
+                    {% if post.repost %}
+                    <div class="card mb-3 p-4" style="background-color: rgb(246, 255, 247);">
+                        <div class="d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
-                                <img src="{{ post.user.profileImage }}" alt="{{ post.user.displayName }} Avatar" class="rounded-circle me-3" width="50" height="50">
-                                <h5 class="card-title">{{ post.user.displayName }}</h5>
+                                <img src="{{ post.repost_user.profileImage }}"  class="rounded-circle me-3 post-image" width="50" height="50">
+                                <h5 class="card-title">{{ post.repost_user.displayName }}</h5>
                             </div>
-                        </a>
-                        <meta name="csrf-token" content="{{ csrf_token }}">
-                        <div class="d-flex align-items-center mb-3" style="gap: 2ch;">
-                            <button class="btn follow-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}"> {{ post.following_status }}</button>
-                            <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}">{{ post.likes_count }} likes</button>
+                            <div class="d-flex align-items-center mb-3" style="gap: 2ch;">
+                                <button class="btn view-repost-button" onclick="location.href = '{% url 'chartreuse:profile_view_post' post.repost_user.url_id post.repost_url %}'"  id="view-repost-button">View Repost</button>
+                            </div>
                         </div>
-                    </div>
-        
-                    <a href="/chartreuse/homepage/post/{{ post.url_id }}/" class="card-link" style="text-decoration: none;">
-                        <div class="post"> 
-                            <p class="card-title mt-2" style="font-size: 1.8rem; font-weight: bold; text-align: left;">{{ post.title }}</p>
-                            {% if post.contentType == "text/plain" %}
-                                <p class="card-text mt-2" style="text-align: left;">{{ post.content }}</p>
-                        
-                            {% elif post.contentType == "text/commonmark" %}
-                                <p class="card-text mt-2 cm_text" style="text-align: left;">{{ post.content }}</p>
-                        
-                            {% elif post.contentType == "image/png" or post.contentType == "image/jpeg" %}
-                                <div class="d-flex justify-content-start">
-                                    <img src="{{ post.content }}" alt="Post Image" class="img-fluid mt-3" style="border: none; max-width: 20%;">
-                                </div>
-                            {% endif %}
-                            
-                            <p class="card-text mt-2" style="text-align: left;">{{ post.description }}</p>
-                            <p class="text-muted" style="text-align: left;">Published on {{ post.published }}</p>
+                        <h3 class="card-title mt-2" style="text-align: left;">{{ post.repost_user.displayName }} reposted a post:</h3>
+                        {% if post.visibility == 'DELETED' %}
+                        <div class = "card mb-3 p-4">
+                            <h1>Looks like the original post was deleted :(</h1>
                         </div>
-                        </a>
+                        {% else %}
+                            {% show_feed_post post post.user.url_id user_details.url_id%}
+                        {% endif %}
+                        <p class="text-muted" style="text-align: left;">Reposted on {{ post.repost_time }}</p>
                     </div>
-                    {% endfor %}
+                    {% else %}
+                        {% show_feed_post post post.user.url_id user_details.url_id%}
+                    {% endif %}
+
+                {% endfor %}
 
                     <div class="pagination">
                         <span class="step-links">

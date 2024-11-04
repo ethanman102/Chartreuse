@@ -59,7 +59,6 @@ class PostDetailView(DetailView):
 
         
         if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
-            print(post.contentType)
             post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
             post.has_image = True
 

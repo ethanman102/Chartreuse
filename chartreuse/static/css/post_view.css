@@ -132,3 +132,8 @@ img {
     color:#000000;
     border-color: black;
 }
+
+p img {
+    max-width: 100%;
+    height: auto;
+}

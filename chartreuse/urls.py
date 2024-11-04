@@ -8,6 +8,9 @@ from django.contrib.auth.decorators import login_required
 from .view import home_page_view, profile_utils, signup_view, login_view, landing_page_view, profile_view, follow_list_view, post_view, settings_view, post_utils, comment_utils, follow_utils
 app_name = "chartreuse"
 urlpatterns = [
+    re_path(r"homepage/post/(?P<post_id>.+)/image$", images.retrieve_from_homepage, name='get_image_post'),
+    re_path(r"authors/(?P<author_id>.+)/post/(?P<post_id>.+)/image$", images.retrieve_from_profile, name='get_image_post_profile'),
+
     # Post Comment URLs
     re_path(r"comment/$",comment_utils.add_comment,name="add_comment"),
     re_path(r"comment/(?P<comment_id>.+)/delete/$",comment_utils.delete_comment,name="delete_comment"),
@@ -60,7 +63,7 @@ urlpatterns = [
     re_path(r"api/authors/(?P<author_id>.+\d)/friends", friends.FriendsViewSet.as_view({'get': 'get_friends'}), name="get_friends"),
 
     # Image URLs
-    path('api/authors/<int:author_id>/posts/<int:post_id>/image', images.ImageViewSet.retrieve, name='get_image_post'),
+ 
     path('set-profile-image/', profile_utils.setNewProfileImage, name='set_profile_image'),
 
     # Github URLs
@@ -106,7 +109,7 @@ urlpatterns = [
     re_path(r'homepage/post/(?P<post_id>.+)/', post_view.PostDetailView.as_view(), name='view-post'),
 
     # Follow Request URLs
-    re_path(r"authors/(?P<url_id>.+)/post/(?P<post_id>.+)/",post_view.PostDetailView.as_view(),name="profile_view_post"),
+    re_path(r"authors/(?P<url_id>.+)/post/(?P<post_id>.+)/$",post_view.PostDetailView.as_view(),name="profile_view_post"),
     re_path(r"authors/accept/(?P<followed>.+)/(?P<follower>.+)/", profile_view.follow_accept,name="profile_follow_accept"),
     re_path(r"authors/reject/(?P<followed>.+)/(?P<follower>.+)/", profile_view.follow_reject,name="profile_follow_reject"),
     re_path(r"authors/unfollow/(?P<followed>.+)/(?P<follower>.+)/",profile_view.profile_unfollow,name="profile_unfollow"),

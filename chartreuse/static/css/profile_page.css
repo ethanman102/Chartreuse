@@ -229,3 +229,9 @@ h5{
 .card:hover {
     box-shadow: 6px 6px 0px #0000005d;
 }
+
+p img {
+    max-width: 100%;
+    height: auto;
+}
+

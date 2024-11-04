@@ -484,5 +484,7 @@ class SettingsDetailView(DetailView):
         authenticated_user = self.request.user
         user = get_object_or_404(User,user=authenticated_user)
         user.profileImage = get_image_post(user.profileImage)
-        return user
 
+        if ((user.github == None) or (user.github == "")):
+            user.github = "None"
+        return user

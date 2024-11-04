@@ -51,6 +51,7 @@ document.querySelectorAll('.follow-button').forEach(button => {
         const postId = this.getAttribute('data-post-id');
         const userId = this.getAttribute('data-user-id');
         const url = 'send-follow-request/'; 
+        console.log(postId, userId);
         fetch(url, {
             method: 'POST',
             headers: {

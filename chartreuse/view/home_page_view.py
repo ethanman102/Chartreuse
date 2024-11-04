@@ -56,7 +56,6 @@ class FeedDetailView(DetailView):
             public_posts = public_posts.difference(unneeded_reposts)
 
 
-
             # get all posts from the users that the current user follows
             for follower in following:
                 unlisted_posts = get_posts(follower.url_id, 'UNLISTED')
@@ -113,6 +112,7 @@ class FeedDetailView(DetailView):
             current_user_model = get_object_or_404(User, user=current_user)
 
             current_user_model.url_id = quote(current_user_model.url_id, safe='')
+            print(current_user_model.url_id)
 
             return current_user_model
         else:

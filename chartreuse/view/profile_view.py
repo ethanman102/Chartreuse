@@ -230,11 +230,14 @@ class ProfileDetailView(DetailView):
                 repost_url = post.url_id
 
                 post = original_post
+
                 post.repost = True
                 post.repost_user = repost_user
                 post.repost_url = repost_url
                 post.likes_count = Like.objects.filter(post=original_post).count()
                 post.repost_time = repost_time
+                post.user.profileImage = post_utils.get_image_post(post.user.profileImage)
+
             else:
                 post.likes_count = Like.objects.filter(post=post).count()
                

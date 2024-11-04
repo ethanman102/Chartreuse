@@ -136,8 +136,14 @@
                                 </div>
                             </div>
                             <h3 class="card-title mt-2" style="text-align: left;">{{ post.repost_user.displayName }} reposted a post:</h3>
-                            {% show_post post owner_id viewer_id%}
-                            <p class="text-muted" style="text-align: left;">Published on {{ post.repost_time }}</p>
+                            {% if post.visibility == 'DELETED' %}
+                            <div class = "card mb-3 p-4">
+                                <h1>Looks like the original post was deleted :(</h1>
+                            </div>
+                            {% else %}
+                                {% show_post post owner_id viewer_id%}
+                            {% endif %}
+                            <p class="text-muted" style="text-align: left;">Reposted on {{ post.repost_time }}</p>
                         </div>
                         {% else %}
                             {% show_post post owner_id viewer_id%}

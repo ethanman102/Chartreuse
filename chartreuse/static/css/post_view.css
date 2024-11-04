@@ -151,3 +151,14 @@ img {
     color:#000000;
     border-color: black;
 }
+
+.view-repost-button {
+    color:#000000;
+    border: solid black 2px;
+    background-color: white;
+}
+
+.view-repost-button:hover {
+    color: #ffffff;
+    background-color: #000000;
+}

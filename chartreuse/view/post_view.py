@@ -48,8 +48,8 @@ class PostDetailView(DetailView):
             current_user = self.request.user
             current_user_model = get_object_or_404(User, user=current_user)
 
-            is_following = Follow.objects.filter(follower=current_user_model, followed=post_owner).exists()
-            requested_follow = FollowRequest.objects.filter(requester=current_user_model, requestee=post_owner).exists()
+            is_following = Follow.objects.filter(follower=current_user_model, followed=post.user).exists()
+            requested_follow = FollowRequest.objects.filter(requester=current_user_model, requestee=post.user).exists()
             if (is_following):
                 post.following_status = "Following"
             elif (requested_follow):
@@ -57,7 +57,7 @@ class PostDetailView(DetailView):
             else:
                 post.following_status = "Follow"
 
-            is_followed = Follow.objects.filter(follower=post_owner, followed=current_user_model).exists()
+            is_followed = Follow.objects.filter(follower=post.user, followed=current_user_model).exists()
             if ((not is_followed) and (not is_following) and (post.visibility == "FRIENDS") and (post_owner != current_user_model)):
                 return redirect('/chartreuse/homepage')
             
@@ -87,8 +87,11 @@ class PostDetailView(DetailView):
 
         context['post'] = post
         context['logged_in'] = self.request.user.is_authenticated
-        if (post_owner == current_user_model):
+        if (post.user == current_user_model):
             context['is_author'] = True
+        
+        if (repost and post_owner==current_user_model):
+            context['repost_author'] = True
         context['user_details'] = current_user_model
 
         return context
@@ -112,4 +115,5 @@ class PostDetailView(DetailView):
         post.likes_count = Like.objects.filter(post=original_post).count()
         post.repost_time = repost_time
         post.user.profileImage = post_utils.get_image_post(post.user.profileImage)
+        return post
 

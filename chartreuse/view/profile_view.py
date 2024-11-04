@@ -180,7 +180,7 @@ class ProfileDetailView(DetailView):
 
         # posts that can be viewed by the current user visiting.
         posts = self.get_posts(post_access,user)
-        posts = self.prepare_posts(posts)
+        posts = post_utils.prepare_posts(posts)
         context['posts'] = posts
         
 
@@ -210,45 +210,6 @@ class ProfileDetailView(DetailView):
                 follow_request.requestee.url_id = quote(follow_request.requestee.url_id,safe='')
         return follow_requests
     
-    def prepare_posts(self,posts):
-        '''
-        Purpose: to add the current like count to the post and percent encode their ids to allow for navigation to the post.
-
-        Arguments:
-        posts: list of post objects
-        '''
-        prepared = []
-        for post in posts:
-            if post.contentType == "repost":
-                post.content = unquote(post.content)
-                original_post = Post.objects.get(url_id=post.content)
-
-                repost_time = post.published
-                
-                
-                repost_user = post.user
-                repost_url = post.url_id
-
-                post = original_post
-
-                post.repost = True
-                post.repost_user = repost_user
-                post.repost_url = repost_url
-                post.likes_count = Like.objects.filter(post=original_post).count()
-                post.repost_time = repost_time
-                post.user.profileImage = post_utils.get_image_post(post.user.profileImage)
-
-            else:
-                post.likes_count = Like.objects.filter(post=post).count()
-               
-                
-            if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
-                post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
-            post.url_id = quote(post.url_id,safe='')
-            
-            prepared.append(post)
-        
-        return prepared
     
         # no return because mutability of lists.
 

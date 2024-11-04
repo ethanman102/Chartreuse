@@ -1,7 +1,7 @@
 import base64
 import json
 import re
-from urllib.parse import unquote
+from urllib.parse import unquote,quote
 from urllib.request import urlopen
 
 from chartreuse.models import Like, Post, User
@@ -389,3 +389,43 @@ def get_image_post(pfp_url):
         return pfp_url
     else:
         return pfp_url
+    
+def prepare_posts(posts):
+    '''
+    Purpose: to add the current like count to the post and percent encode their ids to allow for navigation to the post.
+
+    Arguments:
+    posts: list of post objects
+    '''
+    prepared = []
+    for post in posts:
+        if post.contentType == "repost":
+            post.content = unquote(post.content)
+            original_post = Post.objects.get(url_id=post.content)
+
+            repost_time = post.published
+                
+                
+            repost_user = post.user
+            repost_url = post.url_id
+
+            post = original_post
+
+            post.repost = True
+            post.repost_user = repost_user
+            post.repost_url = repost_url
+            post.likes_count = Like.objects.filter(post=original_post).count()
+            post.repost_time = repost_time
+            post.user.profileImage = get_image_post(post.user.profileImage)
+
+        else:
+            post.likes_count = Like.objects.filter(post=post).count()
+               
+                
+        if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
+            post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+            post.url_id = quote(post.url_id,safe='')
+            
+            prepared.append(post)
+        
+    return prepared

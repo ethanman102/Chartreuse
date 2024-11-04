@@ -7,8 +7,8 @@ from django import template
 
 register = template.Library()
 
-@register.inclusion_tag('layouts/profile_post_varient.html')
-def show_profile_post(post,owner_id,viewer_id):
+@register.inclusion_tag('layouts/feed_post_varient.html')
+def show_feed_post(post,owner_id,viewer_id):
     return {"post":post,
             "owner_id" : owner_id,
             "viewer_id" : viewer_id}

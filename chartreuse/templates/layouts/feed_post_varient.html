@@ -1,9 +1,11 @@
 <div class="card mb-3 p-4">
     <div class="d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center">
-            <img src="{{ post.user.profileImage }}"  class="rounded-circle me-3 post-image" width="50" height="50">
-            <h5 class="card-title">{{ post.user.displayName }}</h5>
-        </div>
+        <a href="/chartreuse/authors/{{ post.user.url_id }}/" style="text-decoration: none; color:black"></a>
+            <div class="d-flex align-items-center">
+                <img src="{{ post.user.profileImage }}"  class="rounded-circle me-3 post-image" width="50" height="50">
+                <h5 class="card-title">{{ post.user.displayName }}</h5>
+            </div>
+        </a>
         <meta name="csrf-token" content="{{ csrf_token }}">
         <div class="d-flex align-items-center mb-3" style="gap: 2ch;">
             <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ viewer_id }}">{{ post.likes_count }} likes</button>
@@ -25,7 +27,6 @@
                 </div>
             {% endif %}
             <p class="card-text mt-2" style="text-align: left;">{{ post.description }}</p>
-
             <p class="text-muted" style="text-align: left;">Published on {{ post.published }}</p>
         </div>  
     </a>

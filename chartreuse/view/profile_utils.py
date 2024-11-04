@@ -64,3 +64,4 @@ def checkGithubPolling(request):
         return JsonResponse({'poll': 'True'})
     else:
         return JsonResponse({'poll': 'False'})
+    

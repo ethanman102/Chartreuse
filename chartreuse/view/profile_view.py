@@ -222,6 +222,8 @@ class ProfileDetailView(DetailView):
             if post.contentType == "repost":
                 post.content = unquote(post.content)
                 original_post = Post.objects.get(url_id=post.content)
+
+                repost_time = post.published
                 
                 
                 repost_user = post.user
@@ -232,6 +234,7 @@ class ProfileDetailView(DetailView):
                 post.repost_user = repost_user
                 post.repost_url = repost_url
                 post.likes_count = Like.objects.filter(post=original_post).count()
+                post.repost_time = repost_time
             else:
                 post.likes_count = Like.objects.filter(post=post).count()
                

@@ -131,9 +131,13 @@
                                     <img src="{{ post.repost_user.profileImage }}"  class="rounded-circle me-3 post-image" width="50" height="50">
                                     <h5 class="card-title">{{ post.repost_user.displayName }}</h5>
                                 </div>
+                                <div class="d-flex align-items-center mb-3" style="gap: 2ch;">
+                                    <button class="btn view-repost-button" data-post-id="{{ post.url_id }}" data-user-id="{{ viewer_id }}">View Repost</button>
+                                </div>
                             </div>
                             <h3 class="card-title mt-2" style="text-align: left;">{{ post.repost_user.displayName }} reposted a post:</h3>
                             {% show_post post owner_id viewer_id%}
+                            <p class="text-muted" style="text-align: left;">Published on {{ post.repost_time }}</p>
                         </div>
                         {% else %}
                             {% show_post post owner_id viewer_id%}

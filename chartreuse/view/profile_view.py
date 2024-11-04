@@ -180,8 +180,9 @@ class ProfileDetailView(DetailView):
 
         # posts that can be viewed by the current user visiting.
         posts = self.get_posts(post_access,user)
-        self.prepare_posts(posts)
+        posts = self.prepare_posts(posts)
         context['posts'] = posts
+        
 
         return context
         
@@ -216,12 +217,32 @@ class ProfileDetailView(DetailView):
         Arguments:
         posts: list of post objects
         '''
-
+        prepared = []
         for post in posts:
-            post.likes_count = Like.objects.filter(post=post).count()
+            if post.contentType == "repost":
+                post.content = unquote(post.content)
+                original_post = Post.objects.get(url_id=post.content)
+                
+                
+                repost_user = post.user
+                repost_url = post.url_id
+
+                post = original_post
+                post.repost = True
+                post.repost_user = repost_user
+                post.repost_url = repost_url
+                post.likes_count = Like.objects.filter(post=original_post).count()
+            else:
+                post.likes_count = Like.objects.filter(post=post).count()
+               
+                
             if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
                 post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
             post.url_id = quote(post.url_id,safe='')
+            
+            prepared.append(post)
+        
+        return prepared
     
         # no return because mutability of lists.
 

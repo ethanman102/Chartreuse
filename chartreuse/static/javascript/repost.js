@@ -1,4 +1,17 @@
-import { getCookie } from "./home_page";
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 
 const csrfToken = getCookie('csrftoken');
 
@@ -6,9 +19,12 @@ window.addEventListener('load',main);
 
 function main(){
     const repostButton = document.querySelector('.repost-button');
+    let content = repostButton.getAttribute('data-post-id');
+    
 
     const repost = async () => {
         let url = 'repost/'
+        console.log(content)
 
         repostButton.disabled = 'true';
         let response = await fetch(url,{
@@ -21,7 +37,8 @@ function main(){
                content_type: 'repost',
                title:  'REPOST: ',
                visibility: 'PUBLIC',
-               description: 'Check out this super cool post!'
+               description: 'Check out this super cool post!',
+               content: content
             })
 
         });

@@ -173,7 +173,7 @@ def repost(request):
         if (content_type != 'repost'):
             return JsonResponse({'error':'Can not process a non-repost'},status=400)
         
-        content = data.get('content')
+        content = unquote(data.get('content'))
         
         description = data.get('description')
         reposter_auth_model = request.user
@@ -183,7 +183,7 @@ def repost(request):
 
         repost = Post(
             user = reposter_user_model,
-            content_type = content_type,
+            contentType = content_type,
             description = description,
             title = title,
             content = content

@@ -3,7 +3,8 @@ from urllib.request import urlopen
 from django.http import JsonResponse
 from .. import models
 from urllib.parse import unquote
-from django.http import HttpResponse
+from django.shortcuts import redirect
+from pathlib import Path
 
 def retrieve(request, post_id):
     '''
@@ -11,7 +12,6 @@ def retrieve(request, post_id):
 
     Parameters:
         request: HttpRequest object containing the request and query parameters.
-        author_id: The ID of the author of the post.
         post_id: The ID of the post.
     
     Returns:
@@ -21,23 +21,23 @@ def retrieve(request, post_id):
     post = models.Post.objects.filter(url_id=decoded_post_id).first()
 
     if post and post.content and post.contentType in ['image/jpeg', 'image/png']:
-        data_url = f"data:image/png;base64, {post.content}"
-        
-        # Create the HTML response with the embedded image
-        html_content = f"""
-        <html style="height: 100%;">
-            <head>
-                <meta name="viewport" content="width=device-width, minimum-scale=0.1">
-                <title>{post.content}</title>
-            </head>
-            <body style="margin: 0px; height: 100%; background-color: rgb(14, 14, 14);">
-                <img style="display: block;-webkit-user-select: none;margin: auto;cursor: zoom-in;background-color: hsl(0, 0%, 90%);transition: background-color 300ms;" src="{data_url}" width="754" height="424">
-            </body>
-        </html>
-        """
-        return HttpResponse(html_content, content_type='text/html')
+        # Decode base64 image data from the post content
+        image_data = base64.b64decode(post.content)
+
+        # Define the path for saving the image
+        images_dir = Path("chartreuse/static/images")
+        images_dir.mkdir(parents=True, exist_ok=True)  # Ensure the directory exists
+        image_path = images_dir / "output.png"  # Save as .png based on post content type
+
+        # Write the decoded image data to the file
+        with image_path.open("wb") as f:
+            f.write(image_data)
+
+        # Redirect to the saved image
+        return redirect(f"/static/images/output.png")
     else:
         return JsonResponse({'error': 'Not an image'}, status=404)
+
 
 def encode_image(image_path):
     '''

@@ -180,8 +180,9 @@ class ProfileDetailView(DetailView):
 
         # posts that can be viewed by the current user visiting.
         posts = self.get_posts(post_access,user)
-        self.prepare_posts(posts)
+        posts = post_utils.prepare_posts(posts)
         context['posts'] = posts
+        
 
         return context
         
@@ -209,21 +210,7 @@ class ProfileDetailView(DetailView):
                 follow_request.requestee.url_id = quote(follow_request.requestee.url_id,safe='')
         return follow_requests
     
-    def prepare_posts(self,posts):
-        '''
-        Purpose: to add the current like count to the post and percent encode their ids to allow for navigation to the post.
-
-        Arguments:
-        posts: list of post objects
-        '''
-
-        for post in posts:
-            post.likes_count = Like.objects.filter(post=post).count()
-            if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
-                post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
-            post.url_id = quote(post.url_id,safe='')
-    
-        # no return because mutability of lists.
+   
 
     def get_posts(self,post_access,user):
 

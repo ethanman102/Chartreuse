@@ -1,7 +1,7 @@
 import base64
 import json
 import re
-from urllib.parse import unquote
+from urllib.parse import unquote,quote
 from urllib.request import urlopen
 
 from chartreuse.models import Like, Post, User
@@ -157,6 +157,43 @@ def update_post(request, post_id):
         return redirect('/chartreuse/homepage/post/' + post_id + '/')
     return redirect('/chartreuse/error/')
 
+def repost(request):
+    '''
+    Purpose: API endpoint to repost a POST!
+
+    Arguments:
+        request: Request object
+    '''
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        title = data.get('title')
+
+        content_type = data.get('content_type')
+        if (content_type != 'repost'):
+            return JsonResponse({'error':'Can not process a non-repost'},status=400)
+        
+        content = unquote(data.get('content'))
+        
+        description = data.get('description')
+        reposter_auth_model = request.user
+        reposter_user_model = User.objects.get(user=reposter_auth_model)
+
+
+
+        repost = Post(
+            user = reposter_user_model,
+            contentType = content_type,
+            description = description,
+            title = title,
+            content = content
+        )
+
+        repost.save()
+
+        return JsonResponse({"success": "You have successfully reposted this post!"})
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
 @csrf_exempt
 def save_post(request):
     '''
@@ -185,6 +222,9 @@ def save_post(request):
         # Determine content type and set appropriate content
         if content and (content_type == 'text'):
             content_type = 'text/plain'
+            post_content = content
+
+        elif content and (content_type == 'repost'):
             post_content = content
 
         elif content and (content_type == 'commonmark'):
@@ -349,3 +389,43 @@ def get_image_post(pfp_url):
         return pfp_url
     else:
         return pfp_url
+    
+def prepare_posts(posts):
+    '''
+    Purpose: to add the current like count to the post and percent encode their ids to allow for navigation to the post.
+
+    Arguments:
+    posts: list of post objects
+    '''
+    prepared = []
+    for post in posts:
+        if post.contentType == "repost":
+            post.content = unquote(post.content)
+            original_post = Post.objects.get(url_id=post.content)
+
+            repost_time = post.published
+                
+                
+            repost_user = post.user
+            repost_url = post.url_id
+
+            post = original_post
+
+            post.repost = True
+            post.repost_user = repost_user
+            post.repost_url = repost_url
+            post.likes_count = Like.objects.filter(post=original_post).count()
+            post.repost_time = repost_time
+            post.user.profileImage = get_image_post(post.user.profileImage)
+
+        else:
+            post.likes_count = Like.objects.filter(post=post).count()
+               
+                
+        if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
+            post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+        post.url_id = quote(post.url_id,safe='')
+            
+        prepared.append(post)
+        
+    return prepared

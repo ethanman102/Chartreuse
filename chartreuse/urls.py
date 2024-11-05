@@ -102,6 +102,7 @@ urlpatterns = [
 
     re_path(r'.+/like-post/', post_utils.like_post, name='like-post'),
     re_path(r'.+/send-follow-request/', follow_utils.send_follow_request, name='send-follow-request'),
+    re_path(r'.+/repost/', post_utils.repost,name='repost'),
 
     re_path(r'homepage/post/(?P<post_id>.+)/edit/', post_utils.edit_post, name='edit-post'),
     re_path(r'homepage/post/(?P<post_id>.+)/delete/', post_utils.delete_post, name='delete-post'),

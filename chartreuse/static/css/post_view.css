@@ -114,6 +114,10 @@ a {
 
 img {
     border: none;
+
+    /* for making sure images are contained within the post container */
+    max-width: 100%;
+    height: auto;
 }
 
 .disabled-like-button {
@@ -133,7 +137,3 @@ img {
     border-color: black;
 }
 
-p img {
-    max-width: 100%;
-    height: auto;
-}

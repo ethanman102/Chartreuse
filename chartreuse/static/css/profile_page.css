@@ -97,6 +97,10 @@ html body {
 
 img {
     border: none;
+
+    /* for making sure images are contained within the post container */
+    max-width: 100%;
+    height: auto;
 }
 
 .nav-link{

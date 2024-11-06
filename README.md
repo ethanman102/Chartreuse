@@ -36,9 +36,25 @@ The authors claiming copyright, if they wish to be known, can list their names h
 * Addresses:  3.216.88.24, 3.219.96.23, 23.22.52.7, 23.22.144.165
 
 ## Tests
-To run the tests, run the following command in the root directory of the project:
+You can choose the following options to run the tests:
+
+1. Run all tests:
+
+```sh
+python3 manage.py test
 ```
-python manage.py test chartreuse
+
+2. Run a specific test file:
+
+```sh
+python3 manage.py test --pattern=[filename]
+```
+
+Optionally, you can add `--verbosity` flag with a value from 0 (least verbose) to 3 (most verbose). Below is an example of running the tests with all flags:
+
+```sh
+# run only tests in test_comments.py with minimal output (verbosity 0)
+python3 manage.py test --pattern="test_comments.py" --verbosity=0
 ```
 
 ## API Documentation

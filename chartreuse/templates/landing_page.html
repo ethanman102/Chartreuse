@@ -1,20 +1,23 @@
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
+{% block title %}Chartreuse{% endblock %}
+
+{% block extra_head %}
 <head>
-    <meta charset="UTF-8">
     <meta name="date" content="2024-10-12">
     <meta name="tags" content="welcome">
     <meta name="summary" content="Welcome page with signup and login buttons.">
-    <title>Chartreuse</title>
+   
 
     <link rel="stylesheet" href="../static/css/landing_page.css">
-    <link rel="shortcut icon"   type="image/png"    href="{% static 'favico.png' %}">
 </head>
+{% endblock %}
+
+{% block content %}
 <body>
     <div class="container">
-        <h4 class="mb-4">Welcome to Chartreuse!</h4>
+        <h4 class="mb-4" id="header">Welcome_to_Chartreuse!</h4>
         <p class="lead mb-4">Join us today and connect with your friends, share posts, and much more!</p>
 
         <div class="buttons">
@@ -22,5 +25,8 @@
             <a href="login" class="btn custom-button">Login</a>
         </div>
     </div>
+
+    <script src="{% static 'javascript/page_header.js' %}"></script>
 </body>
-</html>
+{% endblock %}
+

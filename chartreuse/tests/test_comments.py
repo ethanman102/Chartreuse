@@ -56,6 +56,10 @@ class CommentTestCases(TestCase):
             "content": "Hello World!"
         })
         cls.post_id = quote(cls.post_response.json()['id'], safe="")
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
     
     def setUp(self):
         '''

@@ -18,7 +18,7 @@ class FollowersTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/k7XVwpB.jpeg',
             'username': 'greg',
             'password': 'ABC123!!!',
-            'host': 'http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
+            'host': 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
             'firstName': 'Greg',
             'lastName': 'Johnson',
         }
@@ -29,7 +29,7 @@ class FollowersTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/1234.jpeg',
             'username': 'john',
             'password': '87@398dh817b!',
-            'host': 'http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
+            'host': 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
             'firstName': 'John',
             'lastName': 'Smith',
         }
@@ -43,8 +43,8 @@ class FollowersTestCases(TestCase):
             'username': 'greg',
             'password': 'ABC123!!!'
         })
-        cls.user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1", safe='')
-        cls.follower_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/2", safe='')
+        cls.user_id = quote(f"{cls.test_user_1_data['host']}authors/1", safe='')
+        cls.follower_id = quote(f"{cls.test_user_2_data['host']}authors/2", safe='')
 
         # add user 2 as a follower of user 1 (user 1 accepted the request)
         cls.response = cls.client.post(reverse('chartreuse:add_follower', args=[cls.user_id, cls.follower_id]))

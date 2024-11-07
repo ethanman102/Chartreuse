@@ -87,7 +87,6 @@ class FollowersTestCases(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.json()['followers'], list)
         self.assertEqual(len(response.json()['followers']), 1)  # Greg is followed by John
-
     
     def test_is_follower(self):
         '''

@@ -10,6 +10,11 @@ nav div.container {
     flex-direction: column;	
 }	
 
+.bg-body-tertiary {
+    --bs-bg-opacity: 0;
+    background-color: transparent;
+}
+
 nav {
     height: 70%;
 

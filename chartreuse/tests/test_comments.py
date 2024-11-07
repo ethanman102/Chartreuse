@@ -1,15 +1,11 @@
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.urls import reverse
-from .. import models
 from rest_framework.test import APIClient
 from urllib.parse import quote
 
 class CommentTestCases(TestCase):
     @classmethod
     def setUpClass(cls):
-        '''
-        This method creates all information for testing, only once.
-        '''
         super().setUpClass()
 
         cls.client = APIClient()
@@ -56,10 +52,6 @@ class CommentTestCases(TestCase):
             "content": "Hello World!"
         })
         cls.post_id = quote(cls.post_response.json()['id'], safe="")
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
     
     def setUp(self):
         '''

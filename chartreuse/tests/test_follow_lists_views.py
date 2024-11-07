@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User as AuthUser
-from ..models import Follow,FollowRequest,User
+from ..models import User
 from  urllib.parse import quote
 
 
@@ -34,10 +34,6 @@ class TestProfileViews(TestCase):
         cls.user_1_id = quote(cls.user_1.url_id,safe = '')
         cls.user_2_id = quote(cls.user_2.url_id,safe = '')
         cls.user_3_id = quote(cls.user_3.url_id,safe = '')
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
 
     # How to Authenticate User in tests: https://www.geeksforgeeks.org/how-to-authenticate-a-user-in-tests-in-django/ (Geeks for Geeks)
     # Article Last Updated on September 25, 2024

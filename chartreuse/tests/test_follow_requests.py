@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.urls import reverse
 from ..models import User, FollowRequest, Follow
 from django.shortcuts import get_object_or_404
-from urllib.parse import quote
 from rest_framework.test import APIClient
 
 class FollowRequestsTestCases(TestCase):

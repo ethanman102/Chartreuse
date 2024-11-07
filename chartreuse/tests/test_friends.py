@@ -1,8 +1,7 @@
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.urls import reverse
 from urllib.parse import quote
 from rest_framework.test import APIClient
-from .. import models
 
 class FriendsTestCases(TestCase):
     @classmethod

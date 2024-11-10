@@ -1,6 +1,5 @@
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.urls import reverse
-from .. import models
 from rest_framework.test import APIClient
 from urllib.parse import quote
 

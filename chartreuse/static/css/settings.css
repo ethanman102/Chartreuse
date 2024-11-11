@@ -109,6 +109,6 @@ body,html{
 }
 
 button.update{
-    /* align-self: center; */
+    /* centers the button */
     margin-left: 50%;
 }

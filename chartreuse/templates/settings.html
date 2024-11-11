@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}chartreuse.profile{% endblock %}
+{% block title %}chartreuse.settings{% endblock %}
 
 
 {% block extra_head %}
@@ -71,7 +71,7 @@
                         </div>
                         <div class="row">
                             <div class="col-3 offset-3">
-                                <button type="button" class="btn btn-primary w-100" id="dn-submit-button">Update</button>
+                                <button type="button" class="btn btn-primary w-100 update" id="dn-submit-button">Update</button>
                             </div>
                             <div class="col-3" id="dn-loading">
                                 <div class="spinner-border text-primary" role="status" id="dnSpinner" style="visibility: hidden;"></div>
@@ -115,7 +115,7 @@
             
                         <div class="row">
                             <div class="col-3 offset-3">
-                                <button type="button" class="btn btn-primary w-100" id="password-submit-button">Update</button>
+                                <button type="button" class="btn btn-primary w-100 update" id="password-submit-button">Update</button>
                             </div>
                             <div class="col-3" id="password-loading">
                                 <div class="spinner-border text-primary" role="status" id="passwordSpinner" style="visibility: hidden;"></div>
@@ -179,7 +179,7 @@
                         </div>
                         <div class="row">
                             <div class="col-3 offset-3">
-                                <button type="button" class="btn btn-primary w-100" id="image-submit-button">Upload</button>
+                                <button type="button" class="btn btn-primary w-100 update" id="image-submit-button">Upload</button>
                             </div>
                         </div>
                     </div>

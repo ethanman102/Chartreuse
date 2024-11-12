@@ -9,6 +9,8 @@ from chartreuse.views import Host
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
+from rest_framework import serializers
 
 def get_post_likes(post_id):
     """
@@ -157,6 +159,73 @@ def update_post(request, post_id):
         return redirect('/chartreuse/homepage/post/' + post_id + '/')
     return redirect('/chartreuse/error/')
 
+@extend_schema(
+    summary="Repost an existing post",
+    description=(
+        "Allows an authenticated user to create a repost of an existing post by providing necessary details. "
+        "The `content_type` must be explicitly set to `repost` to identify the action as a repost.\n\n"
+        "**When to use:** Use this endpoint when a user wants to share or repost an existing post with their own "
+        "optional title and description.\n\n"
+        "**How to use:** Send a POST request with a JSON body containing the following keys:\n"
+        "- `title`: Optional title for the repost.\n"
+        "- `content_type`: Must be `repost`.\n"
+        "- `content`: The URL or text being reposted.\n"
+        "- `description`: Optional description for the repost.\n\n"
+        "**Why to use:** This endpoint creates a new post entry for the user, representing their repost of the original content.\n\n"
+        "**Why not to use:** Avoid using if the `content_type` is not `repost` or the provided data does not align with reposting requirements."
+    ),
+    request=inline_serializer(
+        name="RepostRequest",
+        fields={
+            "title": serializers.CharField(
+                required=False,
+                help_text="An optional title for the repost.",
+                allow_blank=True
+            ),
+            "content_type": serializers.ChoiceField(
+                choices=["repost"],
+                help_text="The content type of the post, must be set to `repost`."
+            ),
+            "content": serializers.CharField(
+                help_text="The content being reposted, such as a URL or text."
+            ),
+            "description": serializers.CharField(
+                required=False,
+                help_text="An optional description for the repost.",
+                allow_blank=True
+            )
+        }
+    ),
+    responses={
+        200: OpenApiResponse(
+            description="Repost created successfully.",
+            response=inline_serializer(
+                name="RepostSuccessResponse",
+                fields={
+                    "success": serializers.CharField(default="You have successfully reposted this post!")
+                }
+            )
+        ),
+        400: OpenApiResponse(
+            description="Invalid repost request. `content_type` must be `repost`.",
+            response=inline_serializer(
+                name="InvalidRepostResponse",
+                fields={
+                    "error": serializers.CharField(default="Can not process a non-repost.")
+                }
+            )
+        ),
+        405: OpenApiResponse(
+            description="Method not allowed. Only POST requests are supported.",
+            response=inline_serializer(
+                name="MethodNotAllowedResponse",
+                fields={
+                    "error": serializers.CharField(default="Invalid request method.")
+                }
+            )
+        ),
+    }
+)
 def repost(request):
     '''
     Purpose: API endpoint to repost a POST!

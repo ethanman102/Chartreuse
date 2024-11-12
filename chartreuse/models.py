@@ -90,3 +90,11 @@ class FollowRequest(models.Model):
 
 class GithubPolling(models.Model):
     last_polled = models.DateTimeField(auto_now_add=True)
+
+class Node(models.Model):
+    host = models.URLField(primary_key=True)
+    username = models.CharField(max_length=100)
+    password = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"host={self.host}, username={self.username}, password={self.password}"

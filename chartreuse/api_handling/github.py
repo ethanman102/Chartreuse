@@ -2,9 +2,10 @@ import requests
 from django.shortcuts import get_object_or_404
 from ..models import User
 from django.http import JsonResponse
-from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample, inline_serializer
 from rest_framework.decorators import action, api_view
 from urllib.parse import unquote
+from rest_framework import serializers
 
 @extend_schema(
     summary="Gets the public events for a user from github",
@@ -19,8 +20,24 @@ from urllib.parse import unquote
     responses={
         200: OpenApiResponse(
             description="Successfully retrieved the public events.",
+            response=inline_serializer(
+                name="GitHubPublicEventsResponse",
+                fields={
+                    "events": serializers.ListField(
+                        child=serializers.JSONField(),
+                        required=True,
+                        help_text="List of public events fetched from GitHub."
+                    )
+                }
+            )
         ),
-        405: OpenApiResponse(description="Method not allowed."),
+        405: OpenApiResponse(
+            description="Method not allowed.",
+            response=inline_serializer(
+                name="MethodNotAllowedResponse",
+                fields={"error": serializers.CharField(default="Method not allowed.")}
+            )
+        ),
     }
 )
 @action(detail=True, methods=("GET",))
@@ -61,19 +78,41 @@ def get_events(request, user_id):
         "\n\n**Why not to use:** Do not use this endpoint for repositories a user owns or forks. Use the appropriate GitHub API for those."
     ),
     responses={
+        # 200: OpenApiResponse(
+        #     description="Successfully retrieved the public events.",
+        #     examples=[
+        #         {
+        #             "id": "54321",
+        #             "name": "awesome-repo",
+        #             "html_url": "https://github.com/octocat/awesome-repo",
+        #             "description": "A very useful repository.",
+        #             "stargazers_count": 100
+        #         }
+        #     ]
+        # ),
         200: OpenApiResponse(
-            description="Successfully retrieved the public events.",
-            examples=[
-                {
-                    "id": "54321",
-                    "name": "awesome-repo",
-                    "html_url": "https://github.com/octocat/awesome-repo",
-                    "description": "A very useful repository.",
-                    "stargazers_count": 100
+            description="Successfully retrieved the starred repositories.",
+            response=inline_serializer(
+                name="GitHubStarredReposResponse",
+                fields={
+                    "repositories": serializers.ListField(
+                        child=serializers.DictField(
+                            child=serializers.CharField(),
+                            help_text="A dictionary containing details of a starred repository.",
+                        ),
+                        required=True,
+                        help_text="List of repositories starred by the user."
+                    )
                 }
-            ]
+            )
         ),
-        405: OpenApiResponse(description="Method not allowed."),
+        405: OpenApiResponse(
+            description="Method not allowed.",
+            response=inline_serializer(
+                name="MethodNotAllowedResponse",
+                fields={"error": serializers.CharField(default="Method not allowed.")}
+            )
+        ),
     }
 )
 @action(detail=True, methods=("GET",))
@@ -114,19 +153,41 @@ def get_starred(request, user_id):
         "\n\n**Why not to use:** Avoid using this endpoint to retrieve information about repositories a user has starred or owns. Use the appropriate GitHub APIs for those cases."
     ),
     responses={
+        # 200: OpenApiResponse(
+        #     description="Successfully retrieved the public events.",
+        #     examples=[
+        #         {
+        #             "id": "98765",
+        #             "name": "interesting-repo",
+        #             "html_url": "https://github.com/octocat/interesting-repo",
+        #             "description": "A very interesting repository.",
+        #             "watchers_count": 50
+        #         }
+        #     ]
+        # ),
         200: OpenApiResponse(
-            description="Successfully retrieved the public events.",
-            examples=[
-                {
-                    "id": "98765",
-                    "name": "interesting-repo",
-                    "html_url": "https://github.com/octocat/interesting-repo",
-                    "description": "A very interesting repository.",
-                    "watchers_count": 50
+            description="Successfully retrieved the watched repositories.",
+            response=inline_serializer(
+                name="GitHubWatchedReposResponse",
+                fields={
+                    "repositories": serializers.ListField(
+                        child=serializers.DictField(
+                            child=serializers.CharField(),
+                            help_text="A dictionary containing details of a watched repository.",
+                        ),
+                        required=True,
+                        help_text="List of repositories watched by the user."
+                    )
                 }
-            ]
+            )
         ),
-        405: OpenApiResponse(description="Method not allowed."),
+        405: OpenApiResponse(
+            description="Method not allowed.",
+            response=inline_serializer(
+                name="MethodNotAllowedResponse",
+                fields={"error": serializers.CharField(default="Method not allowed.")}
+            )
+        ),
     }
 )
 @action(detail=True, methods=("GET",))

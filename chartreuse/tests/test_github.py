@@ -1,7 +1,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from urllib.parse import quote
-from .. import models
 
 class GithubTestCases(TestCase):
     @classmethod

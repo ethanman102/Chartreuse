@@ -12,38 +12,40 @@ Resource: Help in understanding how to test Django views was utilized through th
 
 '''
 class TestProfileViews(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
 
-    def setUp(self):
-        self.client = Client()
+        cls.client = Client()
         # Setting up authentication Users
-        self.auth_user_1 = AuthUser.objects.create(username='ethankeys',password='ethankisGOAT')
-        self.auth_user_2 = AuthUser.objects.create(username='JuliaD',password='JuliaDisGOAT')
-        self.auth_user_3 = AuthUser.objects.create(username='AllenNestorismybestfriend',password='hestrulyawesome')
+        cls.auth_user_1 = AuthUser.objects.create(username='ethankeys',password='ethankisGOAT')
+        cls.auth_user_2 = AuthUser.objects.create(username='JuliaD',password='JuliaDisGOAT')
+        cls.auth_user_3 = AuthUser.objects.create(username='AllenNestorismybestfriend',password='hestrulyawesome')
 
         # setting up user's model
-        self.user_1 = User.objects.create(user=self.auth_user_1,
+        cls.user_1 = User.objects.create(user=cls.auth_user_1,
                            displayName="goatmanethan",
                            github='https://github.com/',
                            url_id = "http://nodeaaaa/api/authors/111"
                            )
-        self.user_2 = User.objects.create(user=self.auth_user_2,
+        cls.user_2 = User.objects.create(user=cls.auth_user_2,
                            displayName="juliaDtheGOAT",
                            github='https://github.com/',
                            url_id = "http://nodeaaaa/api/authors/222"
                            )
-        self.user_3 = User.objects.create(user=self.auth_user_3,
+        cls.user_3 = User.objects.create(user=cls.auth_user_3,
                            displayName="allenisagoat",
                            github='https://github.com/',
                            url_id = "http://nodeaaaa/api/authors/333"
                            )
         # setting up each user's id
-        self.user_1_id = quote(self.user_1.url_id,safe = '')
-        self.user_2_id = quote(self.user_2.url_id,safe = '')
-        self.user_3_id = quote(self.user_3.url_id,safe = '')
+        cls.user_1_id = quote(cls.user_1.url_id,safe = '')
+        cls.user_2_id = quote(cls.user_2.url_id,safe = '')
+        cls.user_3_id = quote(cls.user_3.url_id,safe = '')
 
         # Setting up follow request
-        self.follow_request_1 = FollowRequest.objects.create(requestee=self.user_1,requester=self.user_2)
-        self.follow_1 = Follow.objects.create(followed=self.user_3,follower=self.user_1)
+        cls.follow_request_1 = FollowRequest.objects.create(requestee=cls.user_1,requester=cls.user_2)
+        cls.follow_1 = Follow.objects.create(followed=cls.user_3,follower=cls.user_1)
 
     def test_follow_accept_method_not_allowed(self):
         response = self.client.get(reverse('chartreuse:profile_follow_accept', args=[self.user_1_id,self.user_2_id]))

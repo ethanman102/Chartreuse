@@ -1,7 +1,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User as AuthUser
-from django.contrib.auth.hashers import check_password
 from ..models import User, Post
 from django.core.files.uploadedfile import SimpleUploadedFile
 import base64
@@ -10,20 +9,21 @@ from urllib.request import urlopen
 
 
 class TestSettingsViews(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
 
-    def setUp(self):
-        self.client = Client()
-        self.auth_user_1 = AuthUser.objects.create_user(username='ethankeys',password='@#goatMan102ERK')
-        self.auth_user_2 = AuthUser.objects.create_user(username="ethanman102",password="chartreusyEthanMan10&$!")
+        cls.client = Client()
+        cls.auth_user_1 = AuthUser.objects.create_user(username='ethankeys',password='@#goatMan102ERK')
+        cls.auth_user_2 = AuthUser.objects.create_user(username="ethanman102",password="chartreusyEthanMan10&$!")
 
-        self.user_1 = User.objects.create(user=self.auth_user_1,
+        cls.user_1 = User.objects.create(user=cls.auth_user_1,
             displayName="goatmanethan",
             github='https://github.com/',
             url_id = "http://nodeaaaa/api/authors/111"
         )
 
-        self.user_2 = User.objects.create(user=self.auth_user_2,displayName='ethankeysboy',github=None,url_id="http://nodeaaaa/api/authors/222")
-        
+        cls.user_2 = User.objects.create(user=cls.auth_user_2,displayName='ethankeysboy',github=None,url_id="http://nodeaaaa/api/authors/222")
 
     def test_incorrect_old_password(self):
         self.client.force_login(self.auth_user_1)
@@ -255,31 +255,3 @@ class TestSettingsViews(TestCase):
 
         updated = User.objects.get(user=self.auth_user_2)
         self.assertEqual(updated.profileImage,new_image.url_id + '/image')
-    
-
-
-
-
-
-
-        
-
-
-
-
-
-
-
-
-
-        
-
-        
-        
-    
-    
-
-        
-
-
-

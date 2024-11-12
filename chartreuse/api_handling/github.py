@@ -78,18 +78,6 @@ def get_events(request, user_id):
         "\n\n**Why not to use:** Do not use this endpoint for repositories a user owns or forks. Use the appropriate GitHub API for those."
     ),
     responses={
-        # 200: OpenApiResponse(
-        #     description="Successfully retrieved the public events.",
-        #     examples=[
-        #         {
-        #             "id": "54321",
-        #             "name": "awesome-repo",
-        #             "html_url": "https://github.com/octocat/awesome-repo",
-        #             "description": "A very useful repository.",
-        #             "stargazers_count": 100
-        #         }
-        #     ]
-        # ),
         200: OpenApiResponse(
             description="Successfully retrieved the starred repositories.",
             response=inline_serializer(

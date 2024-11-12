@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema, inline_serializer
 from rest_framework import serializers
 from rest_framework import viewsets
 
@@ -59,10 +59,34 @@ class PostViewSet(viewsets.ViewSet):
         ],
         responses = {
             201: OpenApiResponse(description="Post created successfully.", response=PostSerializer),
-            400: OpenApiResponse(description="Request syntax invalid."),
-            401: OpenApiResponse(description="User is not authenticated."),
-            404: OpenApiResponse(description="User is not found."),
-            405: OpenApiResponse(description="Method not allowed."),
+            400: OpenApiResponse(
+                description="Request syntax invalid.",
+                response=inline_serializer(
+                    name="InvalidRequestResponse",
+                    fields={"error": serializers.CharField(default="Request syntax invalid.")}
+                )
+            ),
+            401: OpenApiResponse(
+                description="User is not authenticated.",
+                response=inline_serializer(
+                    name="UnauthenticatedResponse",
+                    fields={"error": serializers.CharField(default="User is not authenticated.")}
+                )
+            ),
+            404: OpenApiResponse(
+                description="User not found.",
+                response=inline_serializer(
+                    name="UserNotFoundResponse",
+                    fields={"error": serializers.CharField(default="User not found.")}
+                )
+            ),
+             405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed.")}
+                )
+            ),
         }
     )
     def create_post(self, request, user_id):
@@ -155,11 +179,41 @@ class PostViewSet(viewsets.ViewSet):
             OpenApiParameter(name="post", description="the post url.", required=True, type=str),
         ],
         responses={
-            200: OpenApiResponse(description="Post deleted successfully.", response=PostSerializer),
-            400: OpenApiResponse(description="Post does not exist."),
-            401: OpenApiResponse(description="User not authenticated."),
-            404: OpenApiResponse(description="User not found."),
-            405: OpenApiResponse(description="Method not allowed."),
+            200: OpenApiResponse(
+                description="Post deleted successfully.",
+                response=inline_serializer(
+                    name="PostDeletedResponse",
+                    fields={"message": serializers.CharField(default="Post deleted successfully.")}
+                )
+            ),
+            400: OpenApiResponse(
+                description="Post does not exist.",
+                response=inline_serializer(
+                    name="PostDoesNotExistResponse",
+                    fields={"error": serializers.CharField(default="Post does not exist.")}
+                )
+            ),
+            401: OpenApiResponse(
+                description="User not authenticated.",
+                response=inline_serializer(
+                    name="UnauthenticatedResponse",
+                    fields={"error": serializers.CharField(default="User not authenticated.")}
+                )
+            ),
+            404: OpenApiResponse(
+                description="User not found.",
+                response=inline_serializer(
+                    name="UserNotFoundResponse",
+                    fields={"error": serializers.CharField(default="User not found.")}
+                )
+            ),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed.")}
+                )
+            ),
         }
     )
     def remove_post(self, request, user_id, post_id):
@@ -265,10 +319,34 @@ class PostViewSet(viewsets.ViewSet):
             ],
             responses={
                 200: OpenApiResponse(description="Successfully retrieved post.", response=PostSerializer),
-                400: OpenApiResponse(description="This is a FRIENDS only post and user and author are not friends"),
-                401: OpenApiResponse(description="The user is not authenticated."),
-                404: OpenApiResponse(description="User or post not found."),
-                405: OpenApiResponse(description="Method not allowed."),
+                400: OpenApiResponse(
+                    description="This is a FRIENDS only post and user and author are not friends.",
+                    response=inline_serializer(
+                        name="FriendsOnlyPostResponse",
+                        fields={"error": serializers.CharField(default="This is a FRIENDS only post and user and author are not friends.")}
+                    )
+                ),
+                401: OpenApiResponse(
+                    description="User is not authenticated.",
+                    response=inline_serializer(
+                        name="UnauthenticatedResponse",
+                        fields={"error": serializers.CharField(default="User is not authenticated.")}
+                    )
+                ),
+                404: OpenApiResponse(
+                    description="Post does not exist.",
+                    response=inline_serializer(
+                        name="NotFoundResponse",
+                        fields={"error": serializers.CharField(default="Post does not exist.")}
+                    )
+                ),
+                405: OpenApiResponse(
+                    description="Method not allowed.",
+                    response=inline_serializer(
+                        name="MethodNotAllowedResponse",
+                        fields={"error": serializers.CharField(default="Method not allowed.")}
+                    )
+                ),
             }
     )
     def get_post(self, request, user_id, post_id):
@@ -404,9 +482,34 @@ class PostViewSet(viewsets.ViewSet):
         ],
         responses={
             200: OpenApiResponse(description="Post updated succesfully.", response=PostSerializer),
-            400: OpenApiResponse(description="User was not found."),
-            404: OpenApiResponse(description="Post was not found."),
-            405: OpenApiResponse(description="Method not allowed."),
+            400: OpenApiResponse(
+                description="post visibility invalid",
+                response=inline_serializer(
+                    name="UserNotFoundResponse",
+                    fields={"error": serializers.CharField(default="post visibility invalid")}
+                )
+            ),
+            401: OpenApiResponse(
+                description="User is not authenticated",
+                response=inline_serializer(
+                    name="UserNotAuthenticatedResponse",
+                    fields={"error": serializers.CharField(default="User is not authenticated")}
+                )
+            ),
+            404: OpenApiResponse(
+                description="Post not found.",
+                response=inline_serializer(
+                    name="PostNotFoundResponse",
+                    fields={"error": serializers.CharField(default="Post not found.")}
+                )
+            ),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed.")}
+                )
+            ),
         }
     ) 
     def update(self, request, user_id, post_id):
@@ -537,7 +640,13 @@ class PostViewSet(viewsets.ViewSet):
         ],
         responses={
             200: OpenApiResponse(description="Successfully retrieved all posts.", response=PostsSerializer),
-            405: OpenApiResponse(description="Method not allowed."),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed.")}
+                )
+            ),
         }
     )
     def get_posts(self, request, user_id):

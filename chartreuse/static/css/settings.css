@@ -1,11 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap');
-
 body,html{
-    font-family: "Sometype Mono", monospace;
     margin-left: 10%;
+    margin-right: 2%;
 }
-
-
 
 .full-container{
     background-color:  #dddddd; 
@@ -104,11 +100,15 @@ body,html{
 #current-image-header{
     text-decoration: underline;
     font-weight: bold;
+    font-size: medium;
+    
 }
 
 .card{
     box-shadow: 6px 6px 0px #000000;
 }
 
-
-
+button.update{
+    /* centers the button */
+    margin-left: 50%;
+}

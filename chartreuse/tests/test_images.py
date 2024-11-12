@@ -3,10 +3,12 @@ from django.urls import reverse
 from ..api_handling import images
 
 class ImageTestCases(TestCase):
-    def setUp(self):
-        self.client = Client()
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.client = Client()
 
-        self.test_user_1_data = {
+        cls.test_user_1_data = {
             'displayName': 'Greg Johnson',
             'github': 'http://github.com/gjohnson',
             'profileImage': 'https://kirby.nintendo.com/assets/img/about/char-kirby.png',
@@ -17,7 +19,8 @@ class ImageTestCases(TestCase):
             'lastName': 'Johnson',
         }
 
-        self.client.post(reverse('chartreuse:user-list'), self.test_user_1_data, format='json')
+        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json')
+        cls.imagePath = 'chartreuse/static/images/buba.jpg'
     
     def test_encode_image_from_url(self):
         '''
@@ -34,10 +37,8 @@ class ImageTestCases(TestCase):
     def test_encode_image_from_file(self):
         '''
         Test encoding an image from a file path.
-        '''
-        imagePath = 'chartreuse/static/images/buba.jpg'
-        
-        encoded_string = images.encode_image(imagePath)
+        '''        
+        encoded_string = images.encode_image(self.imagePath)
         
         # Ensure the string is base64 encoded
         self.assertTrue(isinstance(encoded_string, str))
@@ -46,10 +47,8 @@ class ImageTestCases(TestCase):
     def test_decode_image(self):
         '''
         Test decoding an image from a base64 string.
-        '''
-        imagePath = 'chartreuse/static/images/buba.jpg'
-        
-        encoded_string = images.encode_image(imagePath)
+        '''        
+        encoded_string = images.encode_image(self.imagePath)
         
         response = images.decode_image(encoded_string)
 

@@ -44,6 +44,9 @@ def save_signup(request):
         if (profileImage == ""):
             profileImage = 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/static/images/default_pfp_1.png'
 
+        # Get the host from the request
+        Host(request.get_host)
+
         # Create the custom User model instance
         id = Host.host + "authors/" + str(authUser.id)
         user = User.objects.create(

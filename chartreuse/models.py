@@ -6,7 +6,7 @@ VISIBILITY_CHOICES = {"PUBLIC": "PUBLIC", "FRIENDS": "FRIENDS", "UNLISTED": "UNL
 CONTENT_TYPE_CHOICES = {"text/commonmark": "text/commonmark", "text/plain": "text/plain", "application/base64": "application/base64", "image/png;base64": "image/png;base64", "image/jpeg;base64": "image/jpeg;base64"}
 
 class User(models.Model):
-    user = models.OneToOneField(AuthUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, null=True, blank=True)
     url_id = models.URLField(primary_key=True)
     displayName = models.CharField(max_length=100)
     host = models.URLField()
@@ -90,3 +90,11 @@ class FollowRequest(models.Model):
 
 class GithubPolling(models.Model):
     last_polled = models.DateTimeField(auto_now_add=True)
+
+class Node(models.Model):
+    host = models.URLField(primary_key=True)
+    username = models.CharField(max_length=100)
+    password = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"host={self.host}, username={self.username}, password={self.password}"

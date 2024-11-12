@@ -52,7 +52,7 @@
                         </div>
                     {% endif %}
                     {% if not owner and viewer_id %}
-                        <div class="offset col-6">
+                        <div class="col-6 ms-auto">
                             {% if is_following == False and sent_request == False %}
                             {% url 'chartreuse:profile_follow_request' owner_id viewer_id as follow_request_url %}
                             <form action="{{follow_request_url}}" method="POST" class="follow_request_form">
@@ -73,7 +73,7 @@
 
 
                     {% if owner %}
-                        <div class="offset col-6">
+                        <div class="col-6 ms-auto">
                             <form class="follow-forms" method="GET" action="{% url 'chartreuse:user_friends_list' owner_id %}">
                                 <button type="submit" class="btn btn-primary w-100 follow">
                                     View Friends!
@@ -192,7 +192,7 @@
     </div>
 
     <script src="{% static 'javascript/home_page.js' %}"></script>
-    <script src="{% static 'javascript/cm_render.js' %}"></script> <!-- Load bundled JS for commonmark -->
+    <script src="{% static 'javascript/cm_render.js' %}"></script> <!-- JS for commonmark -->
 
 </body>
 {% endblock %}

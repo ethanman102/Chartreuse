@@ -96,7 +96,9 @@ class Node(models.Model):
     host = models.URLField(primary_key=True)
     username = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
-    follow_status = models.CharField(max_length=100,choices=FOLLOW_STATUS_CHOICES)
+    # outgoing means we are connecting to that node
+    # incoming means that node is connecting to us
+    follow_status = models.CharField(max_length=100, choices=FOLLOW_STATUS_CHOICES)
 
     def __str__(self):
-        return f"host={self.host}, username={self.username}, password={self.password}"
+        return f"host={self.host}, username={self.username}, password={self.password}, outgoing={self.follow_status}"

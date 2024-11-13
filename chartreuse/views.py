@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from models import Node
+from .models import Node
 from django.shortcuts import render
 import base64
 
@@ -18,7 +18,9 @@ class Host:
             if self.host is None:
                 self.host = host
             elif self.host != host:
+                print(self.host,'this',host)
                 raise ValueError(f"Host is already set to {self.host}, and cannot be changed.")
+            
 
 def checkIfRequestAuthenticated(request):
     '''

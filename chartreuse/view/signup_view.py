@@ -45,16 +45,18 @@ def save_signup(request):
             profileImage = 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/static/images/default_pfp_1.png'
 
         # Get the host from the request
-        Host(request.get_host)
+       
+        current_host = Host(request.get_host())
+        
 
         # Create the custom User model instance
-        id = Host.host + "authors/" + str(authUser.id)
+        id = "https://" + current_host.host + "/authors/" + str(authUser.id)
         user = User.objects.create(
             url_id=id,
             displayName=displayName,
             github=github,
             profileImage=profileImage,
-            host=Host.host,
+            host=current_host.host,
             user=authUser
         )
 

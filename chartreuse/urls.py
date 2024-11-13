@@ -5,7 +5,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from chartreuse.views import  error, test
 from django.contrib.auth.decorators import login_required
-from .view import home_page_view, profile_utils, signup_view, login_view, landing_page_view, profile_view, follow_list_view, post_view, settings_view, post_utils, comment_utils, follow_utils, inbox
+from .view import home_page_view, profile_utils, signup_view, login_view, landing_page_view, profile_view, follow_list_view, post_view, settings_view, post_utils, comment_utils, follow_utils,discover_view, inbox
 app_name = "chartreuse"
 urlpatterns = [
     re_path(r"homepage/post/(?P<post_id>.+)/image$", images.retrieve_from_homepage, name='get_image_post'),
@@ -87,6 +87,11 @@ urlpatterns = [
     path('settings/uploadProfileImage/',settings_view.upload_profile_picture,name='upload_profile_picture'),
     path('settings/uploadImageUrl/',settings_view.upload_url_picture,name='upload_url_picture'),
     path('settings/',login_required(settings_view.SettingsDetailView.as_view(),login_url='chartreuse:login'),name="settings"),
+
+    # discover views urls:
+    re_path(r'discover/(?P<host>.+)/',login_required(discover_view.DiscoverAuthorListView.as_view(),login_url='chartreuse:login'),name='discover_authors'),
+    path('discover/',login_required(discover_view.DiscoverNodeListView.as_view(),login_url='chartreuse:login'),name="discover_nodes"),
+
 
     # UI Related URLs
     path('', landing_page_view.landing_page, name='home'),

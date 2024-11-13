@@ -102,28 +102,28 @@ def delete_post(request, post_id):
                     url = 'http://' + url
                 url += 'authors/'
 
-                host = post.user.host.rstrip('/')  # Remove trailing slash if any
                 if not host.startswith('http://') and not host.startswith('https://'):
                     host = 'http://' + host  # Default to HTTP
 
                 base_url = f"{host}/chartreuse/api/authors/"
                 post_json_url = f"{base_url}{quote(post.user.url_id, safe='')}/posts/{quote(post.url_id, safe='')}/"
-                print(post_json_url)
 
                 post_json = requests.get(post_json_url).json()
+                print(post_json)
 
                 followers = Follow.objects.filter(followed = post.user)
                 for follower in followers:
-                    author_url_id = follower.follower.url_id
+                    if follower.follower.host == host:
+                        author_url_id = follower.follower.url_id
 
-                    url += f'{quote(author_url_id, safe = "")}/inbox/'
+                        url += f'{quote(author_url_id, safe = "")}/inbox/'
 
-                    headers = {
-                        'Authorization' : f'Basic {username}:{password}'
-                    }
+                        headers = {
+                            'Authorization' : f'Basic {username}:{password}'
+                        }
 
-                    # send to inbox
-                    requests.post(url, headers=headers, json=post_json)
+                        # send to inbox
+                        requests.post(url, headers=headers, json=post_json, contentType='application/json')
         
     return redirect('/chartreuse/homepage/')
 

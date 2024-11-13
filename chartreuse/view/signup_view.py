@@ -49,7 +49,7 @@ def save_signup(request):
         current_host = Host(request.get_host())
 
         # Create the custom User model instance
-        id = "https://" + current_host.host + "/authors/" + str(authUser.id)
+        id = "http://" + current_host.host + "/authors/" + str(authUser.id)
         user = User.objects.create(
             url_id=id,
             displayName=displayName,

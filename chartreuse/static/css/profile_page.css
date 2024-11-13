@@ -58,10 +58,16 @@ html body {
 /* github css */
 #profile-github{
     transition: font-size 0.3s ease;
+    color: chartreuse !important;
+    background-color: #00356B;
+    font-size: 1.5ch;
+    padding-inline: 2ch;
+
 }
 
 #profile-github:hover{
-    font-size: 125%;
+    font-size: 105%;
+    box-shadow: 6px 6px 0px #000000;
 }
 
 .container{

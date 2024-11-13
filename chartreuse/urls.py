@@ -89,8 +89,9 @@ urlpatterns = [
     path('settings/',login_required(settings_view.SettingsDetailView.as_view(),login_url='chartreuse:login'),name="settings"),
 
     # discover views urls:
+    re_path(r'discover/(?P<host>.+)/',login_required(discover_view.DiscoverAuthorListView.as_view(),login_url='chartreuse:login'),name='discover_authors'),
     path('discover/',login_required(discover_view.DiscoverNodeListView.as_view(),login_url='chartreuse:login'),name="discover_nodes"),
-    path('discover/<str:host>/',login_required(discover_view.DiscoverAuthorListView.as_view(),login_url='chartreuse:login'),name='discover_authors'),
+
 
     # UI Related URLs
     path('', landing_page_view.landing_page, name='home'),

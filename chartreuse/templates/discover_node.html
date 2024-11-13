@@ -41,5 +41,20 @@
     </div>
 
     <script src="{% static 'javascript/page_header.js' %}"></script>
+    <script>
+        window.addEventListener('load',main);
+        function main(){
+            document.querySelectorAll('.node-button').forEach((button)=>{
+                console.log('hi');
+                button.addEventListener('click',function(event){
+                    // https://stackoverflow.com/questions/5997450/append-to-url-and-refresh-page
+                    let percentEncodedHost = this.getAttribute('node-host');
+                    let url = window.location.href;
+                    url += percentEncodedHost + '/';
+                    window.location.href = url;
+                });
+            });
+        }
+    </script>
 </body>
 {% endblock %}

@@ -16,21 +16,21 @@
         {% include 'navbar.html' %}
     {% endblock %}
 
-    <div class="container">
+    <div class="container" id="title-container">
         <div class="row">
             <div class="col-12">
-                <h4>chartreuse.node-connections</h4>
+                <h4 id="header">chartreuse.node-connections</h4>
             </div>
         </div>
     </div>
-    <div class="container">
+    <div class="container node-container">
         {% if hostnames %}
             <div class="card">
                 {% for host in hostnames %}
                     <!-- Create clickable cards to be navigation tools to the other nodes authors... -->
                     <div class="row">
                         <div class="col-10 offset-1">
-                            <button class="btn btn-primary btn-lg w-100 node-button" node-host="{{host}}">Discover {{host}} authors</button>
+                            <button class="node-button" node-host="{{host}}">Discover {{host}} authors</button>
                         </div>
                     </div>
                 {% endfor %}
@@ -40,6 +40,6 @@
         {% endif %}
     </div>
 
-
+    <script src="{% static 'javascript/page_header.js' %}"></script>
 </body>
 {% endblock %}

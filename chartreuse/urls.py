@@ -5,7 +5,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from chartreuse.views import  error, test
 from django.contrib.auth.decorators import login_required
-from .view import home_page_view, profile_utils, signup_view, login_view, landing_page_view, profile_view, follow_list_view, post_view, settings_view, post_utils, comment_utils, follow_utils,discover_view
+from .view import home_page_view, profile_utils, signup_view, login_view, landing_page_view, profile_view, follow_list_view, post_view, settings_view, post_utils, comment_utils, follow_utils,discover_view, inbox
 app_name = "chartreuse"
 urlpatterns = [
     re_path(r"homepage/post/(?P<post_id>.+)/image$", images.retrieve_from_homepage, name='get_image_post'),
@@ -16,12 +16,13 @@ urlpatterns = [
     re_path(r"comment/(?P<comment_id>.+)/delete/$",comment_utils.delete_comment,name="delete_comment"),
     re_path(r"comment/like/$",comment_utils.like_comment,name="like_comment"),
 
+    # Inbox URL
+    re_path(r"api/authors/(?P<user_id>.+\d)/inbox/$", inbox.inbox, name="inbox"),
+
     # Like URLs
-    re_path(r"api/authors/(?P<user_id>.+\d)/inbox/$", likes.LikeViewSet.as_view({'post': 'add_like', 'delete': 'remove_like'}), name="like"),
+    re_path(r"api/authors/(?P<user_id>.+\d)/like/$", likes.LikeViewSet.as_view({'post': 'add_like', 'delete': 'remove_like'}), name="like"),
     re_path(r"api/authors/(?P<user_id>.+\d)/posts/(?P<post_id>.+\d)/comments/(?P<comment_id>.+\d)/likes/$", likes.LikeViewSet.as_view({'get': 'get_comment_likes'}), name="comment_likes"),
     re_path(r"api/authors/(?P<user_id>.+\d)/posts/(?P<post_id>.+\d)/likes/$", likes.LikeViewSet.get_post_likes, name="post_likes"),
-    
-
     re_path(r"api/authors/(?P<user_id>.+\d)/liked/(?P<like_id>.+\d)/$", likes.LikeViewSet.get_like, name="get_like_object"),
     re_path(r"api/authors/(?P<user_id>.+\d)/liked/$", likes.LikeViewSet.user_likes, name="get_liked"),
 

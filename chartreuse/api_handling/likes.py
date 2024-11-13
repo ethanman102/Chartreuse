@@ -7,7 +7,6 @@ from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_sche
 from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.decorators import action, api_view
-from rest_framework.permissions import IsAuthenticated
 
 from ..models import Like, User, Post, Comment
 from .users import UserSerializer, UserViewSet
@@ -36,7 +35,6 @@ class LikesSerializer(serializers.Serializer):
         fields = ['type', 'page', 'id', 'page_number', 'size', 'count', 'src']
 
 class LikeViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
     serializer_class = LikeSerializer
 
     @extend_schema(
@@ -68,10 +66,7 @@ class LikeViewSet(viewsets.ViewSet):
 
         Returns:
             JsonResponse containing the like object or error messages.
-        '''
-        if not request.user.is_authenticated:
-            return JsonResponse({"error": "User is not authenticated."}, status=401)
-    
+        '''    
         decoded_user_id = unquote(user_id)
 
         # Get the post URL from the request body

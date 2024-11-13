@@ -1,10 +1,11 @@
 from django.shortcuts import redirect, get_object_or_404
-from chartreuse.models import User,Like,Comment,Post,Follow,FollowRequest
+from chartreuse.models import User,Node
 from django.views.generic.list import ListView
 from django.http import HttpResponseNotAllowed
 from urllib.parse import unquote, quote
-from . import post_utils
 import requests
+import base64
+import json
 
 PAGE_SIZE = 10
 
@@ -21,6 +22,42 @@ class DiscoverAuthorListView(ListView):
         '''
         Uses the pagination API to get the authors for the current discover menu for nodes we connect with
         '''
+        pass
+
+
+    def get_queryset(self):
+        page = self.request.GET.get('page',1)
+        host = self.kwargs.get('host')
+
+        host = unquote('host') # un percent encode the host name!
+
+        node = Node.objects.filter(host=host,connection='OUTGOING')
+        if not node.exists():
+            return []
+        
+        username = base64.b64encode(node.get('username','')).decode('utf-8')
+        password = base64.b64decode(node.get('password','')).decode('utf-8')
+
+        url = f'https://{host}/api/authors/'
+
+        headers = {
+            'Authorization' : 'Basic {username}:{password}'
+        }
+
+        params = {
+            'page':page,
+            'size':self.paginate_by
+        }
+
+        response = requests.get(url,headers=headers,params=params)
+        
+        if response.status_code != 200:
+            return []
+        else:
+            response_data = json.loads(response.body)
+            author_data = response_data.get('authors',[])
+
+        return author_data
 
     
 
@@ -38,9 +75,12 @@ class DiscoverAuthorListView(ListView):
         author_list = []
 
         for author in authors:
+
             url_id = author.get('id')
+
             if url_id != None:
                 node_author_queryset = User.objects.filter(url_id=url_id)
+
                 if node_author_queryset.exists():
                     author_list.append(node_author_queryset[0])
                 else:
@@ -52,7 +92,9 @@ class DiscoverAuthorListView(ListView):
                         github = author.get('github',''),
                         profileImage = author.get('profileImage',''),
                     )
+
                     author_list.append(remote_author)
+
         return author_list
                 
 

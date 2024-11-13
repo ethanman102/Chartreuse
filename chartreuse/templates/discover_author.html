@@ -31,6 +31,7 @@
         </div>
         {% if authors %}
             <div class="card">
+                <p>Displaying {{ item_amount }} remote authors:</p>
                 {% for author in authors %}
                     <!-- Create clickable cards to be navigation tools to the other nodes authors... -->
                     <div class="author">
@@ -45,6 +46,22 @@
                 <h3>You've reached the end... </h3>
             </div>
         {% endif %}
+
+        <div class="row">
+            {% if has_first %}
+                <div class="col-2">
+                    <button id="first-button">First</button>
+                </div>
+                <div class="col-3 offset-2">
+                    <button id="previous-button">Previous</button>
+                </div>
+            {% endif %}
+            {% if has_next %}
+                <div class="col-3 offset-8">
+                    <button id="next-button">Next</button>
+                </div>
+            {% endif %}
+        </div>
     </div>
     <script src="{% static 'javascript/page_header.js' %}"></script>
 
@@ -60,8 +77,6 @@
             });
 
         }
-
-        
     </script>
 
 

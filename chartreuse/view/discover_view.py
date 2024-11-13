@@ -8,7 +8,7 @@ import base64
 import json
 
 
-PAGE_SIZE = 10
+PAGE_SIZE = 5
 
 # ListView class based view discovered via youtube video: https://www.youtube.com/watch?v=dHvcioGHg08
 
@@ -30,6 +30,28 @@ class DiscoverAuthorListView(ListView):
     
         context['host'] = self.kwargs.get('host','')
         context['authors'] = authors
+
+
+        if len(context['authors']) == self.paginate_by:
+            context['has_next'] = True
+        else:
+            context['has_next'] = False
+        
+        page_num =  int(self.request.GET.get('page'))
+
+        if page_num > 1:
+            context['has_first'] = True
+            context['has_previous'] = True
+        else:
+            context['has_first'] = False
+            context['has_previous'] = False
+        
+
+        context['page_number'] = page_num
+        context['item_amount'] = len(authors)
+        context['page_size'] = self.paginate_by
+
+
         return context
 
 

@@ -4,7 +4,7 @@ import re
 from urllib.parse import unquote,quote
 from urllib.request import urlopen
 
-from chartreuse.models import Like, Post, User
+from chartreuse.models import Like, Post, User, Node, Follow
 from chartreuse.views import Host
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
 from rest_framework import serializers
 from rest_framework.decorators import action, api_view
+import requests
 
 def get_post_likes(post_id):
     """
@@ -80,9 +81,50 @@ def delete_post(request, post_id):
         
         # Check if the current user is the author of the post
         if current_user_model == post.user:
-            post.visibility = 'DELETED'
-            post.save()
-    
+            # post.visibility = 'DELETED'
+            # post.save()
+
+            # send this to the inbox of other nodes
+            nodes = Node.objects.filter(follow_status='OUTGOING')
+
+            if not nodes.exists():
+                return []
+            
+            for node in nodes:
+                host = node.host
+                username = node.username
+                password = node.password
+
+                url = host
+                if not host.endswith('api/'):
+                    url += 'api/'
+                if not url.startswith('http://'):
+                    url = 'http://' + url
+                url += 'authors/'
+
+                host = post.user.host.rstrip('/')  # Remove trailing slash if any
+                if not host.startswith('http://') and not host.startswith('https://'):
+                    host = 'http://' + host  # Default to HTTP
+
+                base_url = f"{host}/chartreuse/api/authors/"
+                post_json_url = f"{base_url}{quote(post.user.url_id, safe='')}/posts/{quote(post.url_id, safe='')}/"
+                print(post_json_url)
+
+                post_json = requests.get(post_json_url).json()
+
+                followers = Follow.objects.filter(followed = post.user)
+                for follower in followers:
+                    author_url_id = follower.follower.url_id
+
+                    url += f'{quote(author_url_id, safe = "")}/inbox/'
+
+                    headers = {
+                        'Authorization' : f'Basic {username}:{password}'
+                    }
+
+                    # send to inbox
+                    requests.post(url, headers=headers, json=post_json)
+        
     return redirect('/chartreuse/homepage/')
 
 @csrf_exempt

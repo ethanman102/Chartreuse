@@ -41,7 +41,7 @@ class DiscoverAuthorListView(ListView):
         url = f'https://{host}/api/authors/'
 
         headers = {
-            'Authorization' : 'Basic {username}:{password}'
+            'Authorization' : f'Basic {username}:{password}'
         }
 
         params = {

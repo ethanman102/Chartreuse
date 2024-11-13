@@ -8,7 +8,7 @@ import base64
 import json
 
 
-PAGE_SIZE = 5
+PAGE_SIZE = 1
 
 # ListView class based view discovered via youtube video: https://www.youtube.com/watch?v=dHvcioGHg08
 
@@ -16,7 +16,6 @@ class DiscoverAuthorListView(ListView):
     model = User
     template_name = "discover_author.html"
     context_object_name= "authors"
-    paginate_by = PAGE_SIZE
 
 
     def get_context_data(self,**kwargs):
@@ -32,7 +31,7 @@ class DiscoverAuthorListView(ListView):
         context['authors'] = authors
 
 
-        if len(context['authors']) == self.paginate_by:
+        if len(context['authors']) == PAGE_SIZE:
             context['has_next'] = True
         else:
             context['has_next'] = False
@@ -49,7 +48,7 @@ class DiscoverAuthorListView(ListView):
 
         context['page_number'] = page_num
         context['item_amount'] = len(authors)
-        context['page_size'] = self.paginate_by
+        context['page_size'] = PAGE_SIZE
 
 
         return context
@@ -57,7 +56,7 @@ class DiscoverAuthorListView(ListView):
 
 
     def get_queryset(self):
-        page = self.request.GET.get('page',1)
+        page = int(self.request.GET.get('page',1))
         host = self.kwargs['host']
 
         host = unquote(host) # un percent encode the host name!
@@ -86,7 +85,7 @@ class DiscoverAuthorListView(ListView):
 
         params = {
             'page':page,
-            'size':self.paginate_by
+            'size':PAGE_SIZE
         }
 
         response = requests.get(url,headers=headers,params=params)
@@ -97,6 +96,8 @@ class DiscoverAuthorListView(ListView):
         else:
             response_data = json.loads(response.content)
             author_data = response_data.get('authors',[])
+
+        print(author_data)
 
         return author_data
 

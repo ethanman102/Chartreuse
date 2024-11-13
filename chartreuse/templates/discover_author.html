@@ -53,12 +53,12 @@
                     <button id="first-button">First</button>
                 </div>
                 <div class="col-3 offset-2">
-                    <button id="previous-button">Previous</button>
+                    <button id="previous-button" current="{{ page_number }}">Previous</button>
                 </div>
             {% endif %}
             {% if has_next %}
                 <div class="col-3 offset-8">
-                    <button id="next-button">Next</button>
+                    <button id="next-button" current="{{ page_number }}">Next</button>
                 </div>
             {% endif %}
         </div>
@@ -76,8 +76,26 @@
                 });
             });
 
+            let searchParams = new URLSearchParams(window.location.search);
+            
+            // https://stackoverflow.com/questions/5999118/how-can-i-add-or-update-a-query-string-parameter
+            let next = document.getElementById('next-button');
+
+            if (next !== null){
+                next.addEventListener('click',function(event){
+                    let currentPage = next.getAttribute('current');
+                    let page = Number(currentPage) + 1;
+                    searchParams.set('page',page);
+                    console.log(searchParams.toString());
+                    
+                });
+            }
+
+
         }
     </script>
+
+
 
 
 </body>

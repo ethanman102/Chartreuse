@@ -13,7 +13,7 @@ PAGE_SIZE = 10
 
 class DiscoverAuthorListView(ListView):
     model = User
-    template_name = "discover.html"
+    template_name = "discover_author.html"
     context_object_name= "authors"
     paginate_by = PAGE_SIZE
 
@@ -31,14 +31,19 @@ class DiscoverAuthorListView(ListView):
 
         host = unquote('host') # un percent encode the host name!
 
-        node = Node.objects.filter(host=host,connection='OUTGOING')
+        node = Node.objects.filter(host=host,follow_status='OUTGOING')
         if not node.exists():
             return []
         
         username = base64.b64encode(node.get('username','')).decode('utf-8')
         password = base64.b64decode(node.get('password','')).decode('utf-8')
 
-        url = f'https://{host}/api/authors/'
+        url = host
+        if not host.endswith('api/'):
+            url += 'api/'
+        if not url.startswith('https://'):
+            url = 'https://' + url
+        url += 'authors/'
 
         headers = {
             'Authorization' : f'Basic {username}:{password}'
@@ -96,6 +101,23 @@ class DiscoverAuthorListView(ListView):
                     author_list.append(remote_author)
 
         return author_list
+    
+class DiscoverNodeListView(ListView):
+    template_name = 'discover_node.html'
+    model = Node
+    context_object_name = 'nodes'
+    queryset = Node.objects.filter(follow_status='OUTGOING')
+
+    def get_context_data(self, **kwargs):
+        '''
+        Purpose: use the outgoing Node connections to grab their hostnames for population
+        '''
+
+        context =  super().get_context_data(**kwargs)
+        hostnames = [quote(node.host,safe='') for node in context['nodes']]
+        context['hostnames'] = hostnames
+        return context
+
                 
 
 

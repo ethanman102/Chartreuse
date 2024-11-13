@@ -33,7 +33,13 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-button"   href="{% url 'chartreuse:logout' %}">
+                    <a class="nav-button"   href="{% url 'chartreuse:discover_authors' %}">
+                        <img src="{% static 'css/icons/discover.svg' %}"    alt="discover">
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-button" href="{% url 'chartreuse:logout' %}">
                         <img src="{% static 'css/icons/logout.svg' %}"    alt="log out">
                     </a>
                 </li>

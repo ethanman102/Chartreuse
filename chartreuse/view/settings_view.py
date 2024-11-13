@@ -75,7 +75,8 @@ PROFILE_PICTURE_TITLES = [
         ),
     }
 )
-@action(detail=True, methods=("POST"))
+@action(detail=True, methods=("POST",))
+@api_view(["POST"])
 @login_required
 def update_password(request):
     """
@@ -168,7 +169,8 @@ def update_password(request):
         ),
     }
 )
-@action(detail=True, methods=("POST"))
+@action(detail=True, methods=("POST",))
+@api_view(["POST"])
 @login_required
 def update_display_name(request):
     """
@@ -255,7 +257,8 @@ def update_display_name(request):
         ),
     }
 )
-@action(detail=True, methods=("DELETE"))
+@action(detail=True, methods=("DELETE",))
+@api_view(["DELETE"])
 @login_required
 def remove_github(request):
     """
@@ -345,7 +348,8 @@ def remove_github(request):
         ),
     }
 )
-@action(detail=True, methods=("PUT"))
+@action(detail=True, methods=("PUT",))
+@api_view(["PUT"])
 @login_required
 def add_github(request):
     """
@@ -446,7 +450,8 @@ def add_github(request):
         ),
     }
 )
-@action(detail=True, methods=("POST"))
+@action(detail=True, methods=("POST",))
+@api_view(["POST"])
 @login_required
 def upload_profile_picture(request):
     """
@@ -582,7 +587,8 @@ def upload_profile_picture(request):
         ),
     }
 )
-@action(detail=True, methods=("POST"))
+@action(detail=True, methods=("POST",))
+@api_view(["POST"])
 @login_required
 def upload_url_picture(request):
     """

@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
 from rest_framework import serializers
+from rest_framework.decorators import action, api_view
 
 def get_post_likes(post_id):
     """
@@ -226,6 +227,8 @@ def update_post(request, post_id):
         ),
     }
 )
+@action(detail=True, methods=("POST",))
+@api_view(["POST"])
 def repost(request):
     '''
     Purpose: API endpoint to repost a POST!

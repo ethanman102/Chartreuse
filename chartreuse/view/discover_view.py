@@ -29,6 +29,7 @@ class DiscoverAuthorListView(ListView):
         authors = self.discover(authors)
     
         context['host'] = self.kwargs.get('host','')
+        context['authors'] = authors
         return context
 
 
@@ -66,7 +67,7 @@ class DiscoverAuthorListView(ListView):
             'size':self.paginate_by
         }
 
-        response = requests.get(url,params=params)
+        response = requests.get(url,headers=headers,params=params)
         
         
         if response.status_code != 200:
@@ -100,7 +101,9 @@ class DiscoverAuthorListView(ListView):
                 node_author_queryset = User.objects.filter(url_id=url_id)
 
                 if node_author_queryset.exists():
-                    author_list.append(node_author_queryset[0])
+                    remote_author = node_author_queryset[0]
+                    remote_author.url_id = quote(remote_author.url_id,safe='')
+                    author_list.append(remote_author)
                 else:
                     # author has not be discovered by our node yet, so must be appended to user database.
                     remote_author = User.objects.create(
@@ -110,6 +113,8 @@ class DiscoverAuthorListView(ListView):
                         github = author.get('github',''),
                         profileImage = author.get('profileImage',''),
                     )
+
+                    remote_author.url_id = quote(remote_author.url_id,safe='')
 
                     author_list.append(remote_author)
 

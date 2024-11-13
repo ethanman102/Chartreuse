@@ -36,7 +36,7 @@
                     <div class="author">
                         <img src="{{author.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
                         <h5 style="display:inline">{{author.displayName}}</h5>
-                        <button class="view-profile-button btn btn-primary view-profile-button" url-id="">View Profile</button>   
+                        <button class="view-profile-button btn btn-primary view-profile-button" url-id="{% url 'chartreuse:profile' url_id=author.url_id %}">View Profile</button>   
                     </div>
                 {% endfor %}
             </div>
@@ -47,5 +47,23 @@
         {% endif %}
     </div>
     <script src="{% static 'javascript/page_header.js' %}"></script>
+
+    <script>
+        window.addEventListener('load', main); 
+
+        function main() {
+            document.querySelectorAll(".view-profile-button").forEach((button)=>{
+                button.addEventListener('click',function(event){
+                    let location = this.getAttribute("url-id");
+                    window.location.href = location;
+                });
+            });
+
+        }
+
+        
+    </script>
+
+
 </body>
 {% endblock %}

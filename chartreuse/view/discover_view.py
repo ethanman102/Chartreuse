@@ -7,6 +7,7 @@ import requests
 import base64
 import json
 
+
 PAGE_SIZE = 10
 
 # ListView class based view discovered via youtube video: https://www.youtube.com/watch?v=dHvcioGHg08
@@ -22,31 +23,42 @@ class DiscoverAuthorListView(ListView):
         '''
         Uses the pagination API to get the authors for the current discover menu for nodes we connect with
         '''
-        pass
+        context =  super().get_context_data(**kwargs)
+        authors = context.get('authors',[])
+
+        authors = self.discover(authors)
+    
+        context['host'] = self.kwargs.get('host','')
+        return context
+
 
 
     def get_queryset(self):
         page = self.request.GET.get('page',1)
-        host = self.kwargs.get('host')
+        host = self.kwargs['host']
 
-        host = unquote('host') # un percent encode the host name!
-
+        host = unquote(host) # un percent encode the host name!
+    
         node = Node.objects.filter(host=host,follow_status='OUTGOING')
+
         if not node.exists():
             return []
         
-        username = base64.b64encode(node.get('username','')).decode('utf-8')
-        password = base64.b64decode(node.get('password','')).decode('utf-8')
+        node = node[0]
+        
+        username = base64.b64encode(bytes(node.username,encoding='utf-8')).decode('utf-8')
+        password = base64.b64encode(bytes(node.password,encoding='utf-8')).decode('utf-8')
 
         url = host
         if not host.endswith('api/'):
-            url += 'api/'
-        if not url.startswith('https://'):
-            url = 'https://' + url
+            url += 'chartreuse/api/'
         url += 'authors/'
 
+        print(url)
+
         headers = {
-            'Authorization' : f'Basic {username}:{password}'
+            'Authorization' : f'Basic {username}:{password}',
+
         }
 
         params = {
@@ -54,12 +66,13 @@ class DiscoverAuthorListView(ListView):
             'size':self.paginate_by
         }
 
-        response = requests.get(url,headers=headers,params=params)
+        response = requests.get(url,params=params)
+        
         
         if response.status_code != 200:
             return []
         else:
-            response_data = json.loads(response.body)
+            response_data = json.loads(response.content)
             author_data = response_data.get('authors',[])
 
         return author_data

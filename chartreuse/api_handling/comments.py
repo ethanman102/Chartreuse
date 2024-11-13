@@ -3,7 +3,7 @@ import json
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema, inline_serializer
 from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.decorators import action, api_view
@@ -56,10 +56,34 @@ class CommentViewSet(viewsets.ViewSet):
         ],
         responses={
             201: OpenApiResponse(description="Comment added successfully.", response=CommentSerializer),
-            400: OpenApiResponse(description="Incorrect request body"),
-            401: OpenApiResponse(description="User is not authenticated."),
-            404: OpenApiResponse(description="User not found."),
-            405: OpenApiResponse(description="Method not allowed."),
+            400: OpenApiResponse(
+                description="Incorrect request body.",
+                response=inline_serializer(
+                    name="BadRequestResponse",
+                    fields={"error": serializers.CharField(default="Incorrect request body")}
+                )
+            ),
+            401: OpenApiResponse(
+                description="User is not authenticated.",
+                response=inline_serializer(
+                    name="UnauthorizedResponse",
+                    fields={"error": serializers.CharField(default="User is not authenticated.")}
+                )
+            ),
+            404: OpenApiResponse(
+                description="User not found.",
+                response=inline_serializer(
+                    name="NotFoundResponse",
+                    fields={"error": serializers.CharField(default="User not found.")}
+                )
+            ),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed.")}
+                )
+            ),
         },
     )
     @action(detail=False, methods=["POST"])
@@ -96,7 +120,7 @@ class CommentViewSet(viewsets.ViewSet):
         post_visibility = post.visibility
 
         # check post visibillity permission
-        if post_visibility != "PUBLIC" and post_visibility != "UNLISTED" or (post_visibility == "FREINDS" and FriendsViewSet().check_friendship(request, user_id, request.user.user.id).status_code != 200):
+        if post_visibility != "PUBLIC" and post_visibility != "UNLISTED" or (post_visibility == "FRIENDS" and FriendsViewSet().check_friendship(request, user_id, request.user.user.id).status_code != 200):
             return JsonResponse({"error": "User does not have permission to comment on this post"}, status=401)
 
         comment_text = request.POST.get('comment', '')
@@ -155,9 +179,27 @@ class CommentViewSet(viewsets.ViewSet):
             ),
             responses={
                 200: OpenApiResponse(description="Comment removed successfully.", response=CommentSerializer),
-                401: OpenApiResponse(description="User is not authenticated."),
-                404: OpenApiResponse(description="Comment not found."),
-                405: OpenApiResponse(description="Method not allowed."),
+                401: OpenApiResponse(
+                    description="User is not authenticated.",
+                    response=inline_serializer(
+                        name="UnauthorizedResponse",
+                        fields={"error": serializers.CharField(default="User is not authenticated.")}
+                    )
+                ),
+                404: OpenApiResponse(
+                    description="Comment not found.",
+                    response=inline_serializer(
+                        name="NotFoundResponse",
+                        fields={"error": serializers.CharField(default="Comment not found.")}
+                    )
+                ),
+                405: OpenApiResponse(
+                    description="Method not allowed.",
+                    response=inline_serializer(
+                        name="MethodNotAllowedResponse",
+                        fields={"error": serializers.CharField(default="Method not allowed.")}
+                    )
+                ),
             },
     )
     @action(detail=False, methods=["DELETE"])
@@ -243,8 +285,20 @@ class CommentViewSet(viewsets.ViewSet):
         ],
         responses={
             200: OpenApiResponse(description="List of comments retrieved successfully.", response=CommentsSerializer),
-            404: OpenApiResponse(description="Post or User not found."),
-            405: OpenApiResponse(description="Method not allowed."),
+            404: OpenApiResponse(
+                description="Post or User not found.",
+                response=inline_serializer(
+                    name="NotFoundResponse",
+                    fields={"error": serializers.CharField(default="Post or User not found.")}
+                )
+            ),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed.")}
+                )
+            ),
         }
     )
     @action(detail=False, methods=["GET"])
@@ -349,8 +403,20 @@ class CommentViewSet(viewsets.ViewSet):
         ),
         responses={
             200: OpenApiResponse(description="Successfully retrieved comment.", response=CommentSerializer),
-            404: OpenApiResponse(description="User, comment, or post not found."),
-            405: OpenApiResponse(description="Method not allowed."),
+            404: OpenApiResponse(
+                description="User, comment, or post not found.",
+                response=inline_serializer(
+                    name="NotFoundResponse",
+                    fields={"error": serializers.CharField(default="User, comment, or post not found.")}
+                )
+            ),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed.")}
+                )
+            ),
         }
     )
     @api_view(["GET"]) 
@@ -436,8 +502,20 @@ class CommentViewSet(viewsets.ViewSet):
         ],
         responses={
             200: OpenApiResponse(description="Successfully retrieved comments.", response=CommentsSerializer),
-            404: OpenApiResponse(description="User, or comment not found"),
-            405: OpenApiResponse(description="Method not allowed."),
+            404: OpenApiResponse(
+                description="User, or comment not found.",
+                response=inline_serializer(
+                    name="NotFoundResponse",
+                    fields={"error": serializers.CharField(default="User, or comment not found.")}
+                )
+            ),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed.")}
+                )
+            ),
         }
     )
     @action(detail=False, methods=["GET"])

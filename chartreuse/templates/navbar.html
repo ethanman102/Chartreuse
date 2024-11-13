@@ -32,14 +32,15 @@
                     </a>
                 </li>
 
+                <!-- icon for discovering other authors on other nodes -->
                 <li class="nav-item">
-                    <a class="nav-button"   href="{% url 'chartreuse:discover' %}">
+                    <a class="nav-button" href="{% url 'chartreuse:discover' %}">
                         <img src="{% static 'css/icons/discover.svg' %}"    alt="discover">
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-button" href="{% url 'chartreuse:logout' %}">
+                    <a class="nav-button" id="logout_svg" href="{% url 'chartreuse:logout' %}">
                         <img src="{% static 'css/icons/logout.svg' %}"    alt="log out">
                     </a>
                 </li>

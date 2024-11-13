@@ -77,17 +77,35 @@
             });
 
             let searchParams = new URLSearchParams(window.location.search);
+
+
             
             // https://stackoverflow.com/questions/5999118/how-can-i-add-or-update-a-query-string-parameter
             let next = document.getElementById('next-button');
+            let previous = document.getElementById('previous-button');
+            let first = document.getElementById('first-button');
 
             if (next !== null){
                 next.addEventListener('click',function(event){
                     let currentPage = next.getAttribute('current');
                     let page = Number(currentPage) + 1;
                     searchParams.set('page',page);
-                    console.log(searchParams.toString());
-                    
+                    window.location.search = searchParams.toString();
+                });
+            }
+
+            // if previous is not null then we know first is not null too.
+            if (previous !== null){
+                previous.addEventListener('click',function(event){
+                    let currentPage = previous.getAttribute('current');
+                    let page = Number(currentPage) - 1;
+                    searchParams.set('page',page);
+                    window.location.search = searchParams.toString();
+                });
+
+                first.addEventListener('click', function(event){
+                    searchParams.set('page',1);
+                    window.location.search = searchParams.toString();
                 });
             }
 

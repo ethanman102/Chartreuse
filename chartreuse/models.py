@@ -4,6 +4,7 @@ from django.db.models import UniqueConstraint
 
 VISIBILITY_CHOICES = {"PUBLIC": "PUBLIC", "FRIENDS": "FRIENDS", "UNLISTED": "UNLISTED", "DELETED": "DELETED"}
 CONTENT_TYPE_CHOICES = {"text/commonmark": "text/commonmark", "text/plain": "text/plain", "application/base64": "application/base64", "image/png;base64": "image/png;base64", "image/jpeg;base64": "image/jpeg;base64"}
+FOLLOW_STATUS_CHOICES = {'OUTGOING':'OUTGOING','INCOMING':'INCOMING'}
 
 class User(models.Model):
     user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, null=True, blank=True)
@@ -95,6 +96,7 @@ class Node(models.Model):
     host = models.URLField(primary_key=True)
     username = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
+    follow_status = models.CharField(max_length=100,choices=FOLLOW_STATUS_CHOICES)
 
     def __str__(self):
         return f"host={self.host}, username={self.username}, password={self.password}"

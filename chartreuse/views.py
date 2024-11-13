@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from models import Node
+from .models import Node
 from django.shortcuts import render
 import base64
 

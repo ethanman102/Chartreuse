@@ -29,3 +29,5 @@ admin.site.register(models.Post)
 admin.site.register(models.Follow)
 admin.site.register(models.FollowRequest)
 admin.site.register(models.GithubPolling)
+
+admin.site.register(models.Node)

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}chartreuse.node-remote-authors{% endblock %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/discover_node.css' %}">
+    
+</head>
+<body class="bg-light">
+    
+    {% block sidenav %}
+        {% include 'navbar.html' %}
+    {% endblock %}
+
+    <div class="container" id="title-container">
+        <div class="row">
+            <div class="col-12">
+                <h4 id="header">chartreuse.remote-authors</h4>
+            </div>
+        </div>
+    </div>
+    <div class="container node-container">
+        <div class="row">
+            <div class="col-12">
+                <h3><b>Look carefully,</b> you're exploring the wilderness of the authors of {{host}}</h3>
+            </div>
+        </div>
+        {% if authors %}
+            <div class="card">
+                {% for author in authors %}
+                    <!-- Create clickable cards to be navigation tools to the other nodes authors... -->
+                    <div class="author">
+                        <img src="{{author.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
+                        <h5 style="display:inline">{{author.displayName}}</h5>
+                        <button class="view-profile-button btn btn-primary view-profile-button" url-id="{% url 'chartreuse:profile' author.url_id %}">View Profile</button>   
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card">
+                <h3>You've reached the end... </h3>
+            </div>
+        {% endif %}
+    </div>
+    <script src="{% static 'javascript/page_header.js' %}"></script>
+</body>
+{% endblock %}

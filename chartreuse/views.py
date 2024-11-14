@@ -17,9 +17,7 @@ class Host:
         if host is not None:
             if self.host is None:
                 self.host = host
-            elif self.host != host:
-                print(self.host,'this',host)
-                raise ValueError(f"Host is already set to {self.host}, and cannot be changed.")
+
             
 
 def checkIfRequestAuthenticated(request):

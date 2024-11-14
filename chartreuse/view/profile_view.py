@@ -94,6 +94,7 @@ def profile_follow_request(request,requestee,requester):
             if remote_node.count() != 1:
                 return redirect("chartreuse:profile",url_id=quote(requestee,safe=''))
             
+            remote_node = remote_node[0]
             username = base64.b64encode(bytes(remote_node.username,encoding='utf-8')).decode('utf-8')
             password = base64.b64encode(bytes(remote_node.password,encoding='utf-8')).decode('utf-8')
 

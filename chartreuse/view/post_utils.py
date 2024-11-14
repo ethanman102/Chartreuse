@@ -102,10 +102,7 @@ def send_post_to_inbox(post_url_id):
         password = node.password
 
         url = host
-        if not host.endswith('api/'):
-            url += '/chartreuse/api/'
-        if not url.startswith('https://'):
-            url = 'https://' + url
+        
         url += 'authors/'
 
         base_url = f"{post.user.host}/chartreuse/api/authors/"
@@ -271,7 +268,7 @@ def update_post(request, post_id):
         ),
     }
 )
-@api_view(["POST"])
+@action(detail=True, methods=("POST",))
 def repost(request):
     '''
     Purpose: API endpoint to repost a POST!
@@ -280,7 +277,7 @@ def repost(request):
         request: Request object
     '''
     if request.method == "POST":
-        data = request.data
+        data = json.loads(request.body)
 
         title = data.get('title')
 
@@ -438,13 +435,10 @@ def send_like_to_inbox(like_url_id):
         password = node.password
 
         url = host
-        if not host.endswith('api/'):
-            url += '/chartreuse/api/'
-        if not url.startswith('https://'):
-            url = 'https://' + url
+        
         url += 'authors/'
 
-        base_url = f"{like.post.user.host}/chartreuse/api/authors/"
+        base_url = f"{like.post.user.host}authors/"
         likes_json_url = f"{base_url}{quote(like.user.url_id, safe='')}/liked/{quote(like.url_id, safe='')}/"
 
         likes_response = requests.get(likes_json_url)

@@ -128,9 +128,10 @@ def profile_follow_request(request,requestee,requester):
             url = f'{requestee_user.host}authors/{requestee_user.url_id}/inbox'
 
             headers = {
-                'Authorization' : f'Basic {username}:{password}'
+                'Authorization' : f'Basic {username}:{password}',
+                'Content-Type': 'application/json; charset=utf-8'
             }
-            response = requests.post(url,headers=headers)
+            response = requests.post(url, headers=headers, json=data)
             
         else:
             FollowRequest.objects.create(requestee=requestee_user,requester=requester_user)

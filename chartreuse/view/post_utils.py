@@ -105,7 +105,7 @@ def send_post_to_inbox(post_url_id):
         
         url += 'authors/'
 
-        base_url = f"{post.user.host}/chartreuse/api/authors/"
+        base_url = f"{post.user.host}authors/"
         post_json_url = f"{base_url}{quote(post.user.url_id, safe='')}/posts/{quote(post.url_id, safe='')}/"
         print(post_json_url)
         post_response = requests.get(post_json_url)

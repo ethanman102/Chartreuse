@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema, inline_serializer
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny
@@ -146,8 +146,12 @@ class UserViewSet(viewsets.ViewSet):
                 description="User details.",
             ),
             404: OpenApiResponse(
-                description="User not found."
-            )
+                description="User not found.",
+                response=inline_serializer(
+                    name="UserNotFoundResponse",
+                    fields={"message": serializers.CharField(default="User not found.")}
+                )
+            ),
         }
     )
     def retrieve(self, request, pk=None):
@@ -202,9 +206,27 @@ class UserViewSet(viewsets.ViewSet):
                 response=UserSerializer,
                 description="Updated user details.",
             ),
-            404: OpenApiResponse(description="User not found."),
-            401: OpenApiResponse(description="Permission denied."),
-            400: OpenApiResponse(description="Invalid data."),
+            404: OpenApiResponse(
+                description="User not found.",
+                response=inline_serializer(
+                    name="UserNotFoundResponse",
+                    fields={"message": serializers.CharField(default="User not found.")}
+                )
+            ),
+            401: OpenApiResponse(
+                description="Permission denied.",
+                response=inline_serializer(
+                    name="PermissionDeniedResponse",
+                    fields={"error": serializers.CharField(default="Permission denied.")}
+                )
+            ),
+            400: OpenApiResponse(
+                description="Invalid data.",
+                response=inline_serializer(
+                    name="InvalidDataResponse",
+                    fields={"error": serializers.CharField(default="Invalid data.")}
+                )
+            ),
         }
     )
     def update(self, request, pk=None):
@@ -261,9 +283,27 @@ class UserViewSet(viewsets.ViewSet):
         ),
         request=UserSerializer,
         responses={
-            204: OpenApiResponse(description="User deleted successfully."),
-            404: OpenApiResponse(description="User not found."),
-            401: OpenApiResponse(description="You do not have permission to delete this user."),
+            200: OpenApiResponse(
+                description="User deleted successfully.",
+                response=inline_serializer(
+                    name="UserDeletedResponse",
+                    fields={"message": serializers.CharField(default="User deleted successfully.")}
+                )
+            ),
+            404: OpenApiResponse(
+                description="User not found.",
+                response=inline_serializer(
+                    name="UserNotFoundResponse",
+                    fields={"message": serializers.CharField(default="User not found.")}
+                )
+            ),
+            401: OpenApiResponse(
+                description="You do not have permission to delete this user.",
+                response=inline_serializer(
+                    name="PermissionDeniedResponse",
+                    fields={"error": serializers.CharField(default="You do not have permission to delete this user.")}
+                )
+            ),
         }
     )
     def destroy(self, request, pk=None):
@@ -302,7 +342,13 @@ class UserViewSet(viewsets.ViewSet):
         request=UserSerializer,
         responses={
             200: OpenApiResponse(response=UserSerializer, description="Newly created user details."),
-            400: OpenApiResponse(description="Username already exists."),
+            400: OpenApiResponse(
+                description="Username already exists.",
+                response=inline_serializer(
+                    name="UsernameAlreadyExistsResponse",
+                    fields={"error": serializers.CharField(default="Username already exists.")}
+                )
+            ),
         }
     )
     def create(self, request):
@@ -382,9 +428,27 @@ class UserViewSet(viewsets.ViewSet):
         ),
         request=UserSerializer,
         responses={
-            200: OpenApiResponse(description="User logged in successfully."),
-            400: OpenApiResponse(description="Invalid credentials."),
-            400: OpenApiResponse(description="Username and password are required."),
+            200: OpenApiResponse(
+                description="User logged in successfully.",
+                response=inline_serializer(
+                    name="LoginSuccessResponse",
+                    fields={"message": serializers.CharField(default="User logged in successfully.")}
+                )
+            ),
+            400: OpenApiResponse(
+                description="Invalid credentials.",
+                response=inline_serializer(
+                    name="InvalidCredentialsResponse",
+                    fields={"error": serializers.CharField(default="Invalid credentials.")}
+                )
+            ),
+            400: OpenApiResponse(
+                description="Username and password are required.",
+                response=inline_serializer(
+                    name="MissingCredentialsResponse",
+                    fields={"error": serializers.CharField(default="Username and password are required.")}
+                )
+            ),
         }
     )
     @api_view(["POST"])

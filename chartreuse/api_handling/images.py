@@ -5,7 +5,53 @@ from .. import models
 from urllib.parse import unquote
 from django.shortcuts import redirect
 from pathlib import Path
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample, inline_serializer
+from rest_framework.decorators import action, api_view
+from rest_framework import serializers
 
+@extend_schema(
+    summary="Retrieve and serve an image from a post on the homepage",
+    description=(
+        "Fetches the image data associated with a specific post ID, decodes it, saves it locally, and serves the image via a static URL."
+        "\n\n**When to use:** Use this endpoint to retrieve an image attached to a specific post. The post must contain a valid image content type (`image/jpeg` or `image/png`) and base64-encoded image data."
+        "\n\n**How to use:** Send a GET request with the `post_id` in the URL path. The server will process the image data and redirect to a static URL serving the image."
+        "\n\n**Why to use:** This endpoint provides a way to decode, store, and serve images associated with posts."
+        "\n\n**Why not to use:** Avoid using if the post does not contain an image or the content type is unsupported."
+    ),
+    parameters=[
+        {
+            "name": "post_id",
+            "in": "path",
+            "description": "The ID of the post whose image is to be retrieved.",
+            "required": True,
+            "schema": {
+                "type": "string"
+            }
+        }
+    ],
+    responses={
+        302: OpenApiResponse(
+            description="Image successfully retrieved and served.",
+            response=inline_serializer(
+                name="RedirectResponse",
+                fields={
+                    "redirect": serializers.CharField(default="/static/images/<post_id>.png")
+                }
+            )
+        ),
+        404: OpenApiResponse(
+            description="Post not found or does not contain a valid image.",
+            response=inline_serializer(
+                name="ImageNotFoundResponse",
+                fields={
+                    "error": serializers.CharField(default="Not an image.")
+                }
+            )
+        )
+    }
+)
+@action(detail=True, methods=("GET",))
+@api_view(["GET"])
 def retrieve_from_homepage(request, post_id):
     '''
     Get the image data of a post.
@@ -38,6 +84,58 @@ def retrieve_from_homepage(request, post_id):
     else:
         return JsonResponse({'error': 'Not an image'}, status=404)
 
+@extend_schema(
+    summary="Retrieve and serve an image from a post on an author's profile",
+    description=(
+        "Fetches the image data associated with a specific post ID for a given author, decodes it, saves it locally, and serves the image via a static URL."
+        "\n\n**When to use:** Use this endpoint to retrieve an image attached to a specific post from a particular author's profile. The post must contain a valid image content type (`image/jpeg` or `image/png`) and base64-encoded image data."
+        "\n\n**How to use:** Send a GET request with the `author_id` and `post_id` in the URL path. The server will process the image data and redirect to a static URL serving the image."
+        "\n\n**Why to use:** This endpoint provides a way to decode, store, and serve images associated with posts from an author's profile."
+        "\n\n**Why not to use:** Avoid using if the post does not contain an image or the content type is unsupported."
+    ),
+    parameters=[
+        {
+            "name": "author_id",
+            "in": "path",
+            "description": "The ID of the author whose post's image is to be retrieved.",
+            "required": True,
+            "schema": {
+                "type": "string"
+            }
+        },
+        {
+            "name": "post_id",
+            "in": "path",
+            "description": "The ID of the post whose image is to be retrieved.",
+            "required": True,
+            "schema": {
+                "type": "string"
+            }
+        }
+    ],
+    responses={
+        302: OpenApiResponse(
+            description="Image successfully retrieved and served.",
+            response=inline_serializer(
+                name="RedirectResponse",
+                fields={
+                    "redirect": serializers.CharField(default="/static/images/<post_id>.png")
+                }
+            )
+        ),
+        404: OpenApiResponse(
+            description="Post not found or does not contain a valid image.",
+            response=inline_serializer(
+                name="ImageNotFoundResponse",
+                fields={
+                    "error": serializers.CharField(default="Not an image.")
+                }
+            )
+        )
+    }
+)
+@action(detail=True, methods=("GET",))
+@api_view(["GET"])
 def retrieve_from_profile(request, author_id, post_id):
     '''
     Get the image data of a post.

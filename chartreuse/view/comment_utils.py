@@ -144,34 +144,26 @@ def send_comment_to_inbox(comment_url_id):
     comments_response = requests.get(comments_json_url)
     comments_json = comments_response.json()
 
-    followers = Follow.objects.filter(followed = comment.post.user)
-    print("FOLLOWERS", followers)
-    for follower in followers:
-        print("FOLLOWER", follower.follower)
-        print("FOLLOWED", follower.followed)
-        if follower.follower.host != comment.user.host:
-            print("FOLLOWER (true)", follower.follower.host)
-            author_url_id = follower.follower.url_id
-            node = Node.objects.get(host=follower.follower.host)
-            print("NODE", node.host)
-            host = node.host
-            username = node.username
-            password = node.password
+    for node in nodes:
+        author_url_id = comment.user.url_id
+        host = node.host
+        username = node.username
+        password = node.password
 
-            url = host
-            
-            url += 'authors/'
+        url = host
+        
+        url += 'authors/'
 
-            url += f'{quote(author_url_id, safe = "")}/inbox/'
+        url += f'{quote(author_url_id, safe = "")}/inbox/'
 
-            headers = {
-                'Authorization' : f'Basic {username}:{password}',
-                "Content-Type": "application/json; charset=utf-8"
-            }
-            print("SENT COMMENT", comments_json)
-            print("URL", url)
+        headers = {
+            'Authorization' : f'Basic {username}:{password}',
+            "Content-Type": "application/json; charset=utf-8"
+        }
+        print("SENT COMMENT", comments_json)
+        print("URL", url)
 
-            # send to inbox
-            requests.post(url, headers=headers, json=comments_json)
+        # send to inbox
+        requests.post(url, headers=headers, json=comments_json)
     
     return JsonResponse({'status': 'Comment sent to inbox successfully.'})

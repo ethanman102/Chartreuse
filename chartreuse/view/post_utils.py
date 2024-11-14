@@ -437,37 +437,32 @@ def send_like_to_inbox(like_url_id):
     likes_response = requests.get(likes_json_url)
     likes_json = likes_response.json()
 
-    followers = Follow.objects.filter(followed = like.post.user)
-    for follower in followers:
-        print("FOLLOWER -", follower.follower)
-        print("FOLLOWED -", follower.followed)
-        for node in nodes:
-            if follower.follower.host == node.host:
-                print("FOLLOWER", follower.follower.url_id)
-                author_url_id = follower.follower.url_id
+    for node in nodes:
+        author_url_id = like.user.url_id
+        host = node.host
+        username = node.username
+        password = node.password
 
-                host = node.host
-                username = node.username
-                password = node.password
+        url = host
+        
+        url += 'authors/'
 
-                url = host
-                
-                url += 'authors/'
+        url += f'{quote(author_url_id, safe = "")}/inbox/'
+        print(url)  
+        print(likes_json)
 
-                url += f'{quote(author_url_id, safe = "")}/inbox/'
-                print(url)  
-                print(likes_json)
+        headers = {
+            'Authorization' : f'Basic {username}:{password}',
+            "Content-Type": "application/json; charset=utf-8"
+        }
 
-                headers = {
-                    'Authorization' : f'Basic {username}:{password}',
-                    "Content-Type": "application/json; charset=utf-8"
-                }
+        print("SENT LIKE", likes_json)
+        print("URL", url)
 
-                print("SENT LIKE", likes_json)
-                print("URL", url)
-
-                # send to inbox
-                requests.post(url, headers=headers, json=likes_json)
+        # send to inbox
+        requests.post(url, headers=headers, json=likes_json)
+        
+    return JsonResponse({"status": "Like added successfully"})
 
 def get_all_public_posts():
     '''

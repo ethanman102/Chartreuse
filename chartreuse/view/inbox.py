@@ -129,7 +129,7 @@ def inbox(request, user_id):
             like_author = User.objects.get(pk=like_author_id)
 
             # check whether like already exists
-            like = Like.objects.filter(user=like_author, published=published, comment=new_comment).first()
+            like = Like.objects.filter(user=like_author, comment=new_comment).first()
 
             if like is None:
                 new_like = Like.objects.create(user=like_author, published=published, comment=new_comment)

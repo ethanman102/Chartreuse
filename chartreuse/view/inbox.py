@@ -139,8 +139,11 @@ def inbox(request, user_id):
             print(like)
             if like is None:
                 print("adding like")
-                new_like = Like.objects.create(user=like_author, url_id=like_id, comment=comment, published=published)
+                new_like = Like.objects.create(user=like_author, url_id=like_id, comment=comment)
                 new_like.save()
+            else:
+                like.delete()
+                
         return JsonResponse({"status": "Comment added successfully"})
         
     elif (data["type"] == "like"):

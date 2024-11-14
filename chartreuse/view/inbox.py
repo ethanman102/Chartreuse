@@ -34,7 +34,7 @@ def inbox(request, user_id):
 
         if post is None:
             # create a new post
-            new_post = Post.objects.create(title=title, description=description, contentType=contentType, content=content, user=author, published=published, visibility=visibility)
+            new_post = Post.objects.create(title=title, url_id=post_id, description=description, contentType=contentType, content=content, user=author, published=published, visibility=visibility)
             new_post.save()
 
             # add comment objects
@@ -51,7 +51,7 @@ def inbox(request, user_id):
                 comment_author_id = unquote(comment_author["id"])
                 comment_author = User.objects.get(pk=comment_author_id)
 
-                new_comment = Comment.objects.create(user=comment_author, comment=comment, contentType=contentType, post=new_post, dateCreated=published)
+                new_comment = Comment.objects.create(user=comment_author, url_id=comment_id, comment=comment, contentType=contentType, post=new_post, dateCreated=published)
                 new_comment.save()
 
                 # add comment likes
@@ -65,7 +65,7 @@ def inbox(request, user_id):
                     like_author_id = unquote(like_author["id"])
                     like_author = User.objects.get(pk=like_author_id)
 
-                    new_like = Like.objects.create(user=like_author, published=published, comment=new_comment)
+                    new_like = Like.objects.create(user=like_author, url_id=like_id, published=published, comment=new_comment)
                     new_like.save()
 
             # add like objects
@@ -76,7 +76,7 @@ def inbox(request, user_id):
                 like_id = post_like["id"]
                 post = post_like["object"]
 
-                new_like = Like.objects.create(author=author, published=published, post=new_post)
+                new_like = Like.objects.create(author=author, url_id=like_id, published=published, post=new_post)
                 new_like.save()
 
         else:

@@ -445,7 +445,7 @@ class LikeViewSet(viewsets.ViewSet):
         post = get_object_or_404(Post, url_id=decoded_post_id)
         comment = get_object_or_404(Comment, url_id=decoded_comment_id)
 
-        likes = Like.objects.filter(user=user, post=post, comment=comment)
+        likes = Like.objects.filter(user=user, comment=comment)
 
         request.method = 'GET'
         user_viewset = UserViewSet()

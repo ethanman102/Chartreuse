@@ -108,8 +108,14 @@ def inbox(request, user_id):
         comment_author_id = unquote(comment_author["id"])
         comment_author = User.objects.get(pk=comment_author_id)
 
-        new_comment = Comment.objects.create(user=comment_author, comment=comment, contentType=contentType, post=new_post, dateCreated=published)
-        new_comment.save()
+        new_post = Post.objects.get(url_id=post)
+
+        # check whether comment already exists
+        comment = Comment.objects.filter(user=comment_author, comment=comment, contentType=contentType, post=new_post).first()
+
+        if comment is None:
+            new_comment = Comment.objects.create(user=comment_author, comment=comment, contentType=contentType, post=new_post, dateCreated=published)
+            new_comment.save()
 
         # add comment likes
         comment_likes = likes["src"]
@@ -122,8 +128,13 @@ def inbox(request, user_id):
             like_author_id = unquote(like_author["id"])
             like_author = User.objects.get(pk=like_author_id)
 
-            new_like = Like.objects.create(user=like_author, published=published, comment=new_comment)
-            new_like.save()
+            # check whether like already exists
+            like = Like.objects.filter(user=like_author, published=published, comment=new_comment).first()
+
+            if like is None:
+                new_like = Like.objects.create(user=like_author, published=published, comment=new_comment)
+                new_like.save()
+        return JsonResponse({"status": "Comment added successfully"})
         
     elif (data["type"] == "like"):
         author = data["author"]
@@ -141,6 +152,8 @@ def inbox(request, user_id):
         new_like = Like.objects.create(user=author, published=published, post=post) 
         new_like.save()
 
+        return JsonResponse({"status": "Like added successfully"})
+
     elif (data["type"] == "follow"):
         actor = data["actor"]
         object_to_follow = data["object"]
@@ -151,3 +164,5 @@ def inbox(request, user_id):
         # add the follow request if it does not exist, if it exists, delete the follow request
         new_follow_request = FollowRequest.objects.create(follower=follower, followed=followed)
         new_follow_request.save()
+    
+    return JsonResponse({"status": "Follow request sent successfully"})

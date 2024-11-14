@@ -478,6 +478,6 @@ def get_host_from_id(user_id):
     Returns:
         The host of the user.
     '''
-    pattern = r'(https:\/\/[^\/]+\/)'
+    pattern = r'(https?:\/\/[^\/]+\/)'
     match = re.match(pattern, user_id)
     return match.group(1)

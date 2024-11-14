@@ -1,9 +1,10 @@
 import json
 from urllib.parse import quote, unquote
 
-from chartreuse.models import Comment, Like, Post, User
+from chartreuse.models import Comment, Like, Post, User, Node, Follow
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
+import requests
 
 def add_comment(request):
     try:
@@ -24,6 +25,8 @@ def add_comment(request):
             if (comment_text != ""):
                 comment = Comment(user=user, post=post, comment=comment_text, contentType=content_type)
                 comment.save()
+
+                send_comment_to_inbox(comment.url_id)
 
             return JsonResponse({'success': 'Comment added successfully.'})
         else:
@@ -79,6 +82,9 @@ def like_comment(request):
         data = {
             "likes_count": get_comment_likes(unquote(comment_id)).count()
         }
+
+        send_comment_to_inbox(comment.url_id)
+
         return JsonResponse(data)
     else:
         pass
@@ -123,3 +129,44 @@ def delete_comment(request, comment_id):
         post_id = quote(post.url_id, safe='')
     
     return redirect('/chartreuse/homepage/post/' + post_id + '/')
+
+def send_comment_to_inbox(comment_url_id):
+    comment = Comment.objects.get(url_id=comment_url_id)
+    # send this to the inbox of other nodes
+    nodes = Node.objects.filter(follow_status='OUTGOING')
+
+    if not nodes.exists():
+        return []
+    
+    for node in nodes:
+        host = node.host
+        username = node.username
+        password = node.password
+
+        url = host
+        if not host.endswith('api/'):
+            url += '/chartreuse/api/'
+        if not url.startswith('http://'):
+            url = 'http://' + url
+        url += 'authors/'
+
+        base_url = f"{comment.post.user.host}/chartreuse/api/authors/"
+        comments_json_url = f"{base_url}{quote(comment.post.user.url_id, safe='')}/posts/{quote(comment.post.url_id, safe='')}/comment/{quote(comment.url_id, safe='')}/"
+
+        comments_response = requests.get(comments_json_url)
+        comments_json = comments_response.json()
+
+        followers = Follow.objects.filter(followed = comment.post.user)
+        for follower in followers:
+            if follower.follower.host == host:
+                author_url_id = follower.follower.url_id
+
+                url += f'{quote(author_url_id, safe = "")}/inbox/'
+
+                headers = {
+                    'Authorization' : f'Basic {username}:{password}',
+                    "Content-Type": "application/json; charset=utf-8"
+                }
+
+                # send to inbox
+                requests.post(url, headers=headers, json=comments_json)

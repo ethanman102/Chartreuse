@@ -118,7 +118,7 @@ class UserViewSet(viewsets.ViewSet):
         # Since we have some additional fields, we only want to return the required ones
         filtered_user_attributes = []
         for user in page_users:
-            page = user.host + "authors/" + user.user.username
+            page = user.host + "authors/" + user.url_id
 
             filtered_user_attributes.append({
                 "type": "author",
@@ -175,7 +175,7 @@ class UserViewSet(viewsets.ViewSet):
         
         # case where the user is on the current host
         user = User.objects.filter(url_id=decoded_user_id).first()
-        page = user.host + "/authors/" + user.user.username
+        page = user.host + "/authors/" + user.url_id
 
         # We only want to return the required fields
         return JsonResponse({
@@ -245,7 +245,7 @@ class UserViewSet(viewsets.ViewSet):
             else:
                 # case where the user is on the current host
                 user = get_object_or_404(User, pk=decoded_user_id)
-                page = user.host + "/authors/" + user.user.username
+                page = user.host + "/authors/" + user.url_id
 
                 serializer = UserSerializer(instance=user, data=data, partial=True)
 
@@ -402,7 +402,7 @@ class UserViewSet(viewsets.ViewSet):
         user.save()
 
         id = str(user.url_id)
-        page = user.host + "/authors/" + user.user.username
+        page = user.host + "/authors/" + user.url_id
 
         return JsonResponse({
             "type": "author",

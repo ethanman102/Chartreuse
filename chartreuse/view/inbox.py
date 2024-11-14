@@ -1,8 +1,11 @@
 from urllib.parse import unquote
-from ..models import Like, User, Post, Comment, Follow, FollowRequest
+from ..models import Like, User, Post, Comment, FollowRequest
 from ..views import Host
 import json
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 
+@csrf_exempt
 def inbox(request, user_id):
     decoded_user_id = unquote(user_id)
 
@@ -23,13 +26,13 @@ def inbox(request, user_id):
         visibility = data["visibility"]
 
         # check whether we need to add this post or update it or delete it
-        post = Post.objects.filter(url_id=post_id)
+        post = Post.objects.filter(url_id=post_id).first()
 
-        if len(post) == 0:
-            # get author object
-            author_id = unquote(author["id"])
-            author = User.objects.get(pk=author_id)
+        # get author object
+        author_id = unquote(author["id"])
+        author = User.objects.get(pk=author_id)
 
+        if post is None:
             # create a new post
             new_post = Post.objects.create(title=title, description=description, contentType=contentType, content=content, user=author, published=published, visibility=visibility)
             new_post.save()
@@ -76,6 +79,22 @@ def inbox(request, user_id):
                 new_like = Like.objects.create(author=author, published=published, post=new_post)
                 new_like.save()
 
+        else:
+            # update visibility
+            if visibility == "DELETED":
+                post.visibility = visibility
+                post.save()
+            
+            # update post content
+            else:
+                post.title = title
+                post.description = description
+                post.contentType = contentType
+                post.content = content
+                post.save()
+                    
+        return JsonResponse({"status": "Post added successfully"})
+
     elif (data["type"] == "comment"):
         comment_author = data["author"]
         comment = data["comment"]
@@ -89,8 +108,14 @@ def inbox(request, user_id):
         comment_author_id = unquote(comment_author["id"])
         comment_author = User.objects.get(pk=comment_author_id)
 
-        new_comment = Comment.objects.create(user=comment_author, comment=comment, contentType=contentType, post=new_post, dateCreated=published)
-        new_comment.save()
+        new_post = Post.objects.get(url_id=post)
+
+        # check whether comment already exists
+        comment = Comment.objects.filter(user=comment_author, comment=comment, contentType=contentType, post=new_post).first()
+
+        if comment is None:
+            new_comment = Comment.objects.create(user=comment_author, comment=comment, contentType=contentType, post=new_post, dateCreated=published)
+            new_comment.save()
 
         # add comment likes
         comment_likes = likes["src"]
@@ -103,8 +128,13 @@ def inbox(request, user_id):
             like_author_id = unquote(like_author["id"])
             like_author = User.objects.get(pk=like_author_id)
 
-            new_like = Like.objects.create(user=like_author, published=published, comment=new_comment)
-            new_like.save()
+            # check whether like already exists
+            like = Like.objects.filter(user=like_author, comment=new_comment).first()
+
+            if like is None:
+                new_like = Like.objects.create(user=like_author, published=published, comment=new_comment)
+                new_like.save()
+        return JsonResponse({"status": "Comment added successfully"})
         
     elif (data["type"] == "like"):
         author = data["author"]
@@ -116,11 +146,20 @@ def inbox(request, user_id):
         author_id = unquote(author["id"])
         author = User.objects.get(pk=author_id)
 
-        post_id = unquote(post["id"])
-        post = Post.objects.get(url_id=post_id)
+        post = Post.objects.get(url_id=post)
 
-        new_like = Like.objects.create(user=author, published=published, post=post) 
-        new_like.save()
+        # check whether like already exists
+        like = Like.objects.filter(user=author, post=post).first()
+
+        if like is None:
+            new_like = Like.objects.create(user=author, published=published, post=post) 
+            new_like.save()
+
+            return JsonResponse({"status": "Like added successfully"})
+        else:
+            like.delete()
+
+            return JsonResponse({"status": "Like removed successfully"})
 
     elif (data["type"] == "follow"):
         actor = data["actor"]
@@ -132,3 +171,5 @@ def inbox(request, user_id):
         # add the follow request if it does not exist, if it exists, delete the follow request
         new_follow_request = FollowRequest.objects.create(follower=follower, followed=followed)
         new_follow_request.save()
+    
+    return JsonResponse({"status": "Follow request sent successfully"})

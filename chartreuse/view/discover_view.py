@@ -7,7 +7,8 @@ import requests
 import base64
 import json
 
-PAGE_SIZE = 10
+
+PAGE_SIZE = 5
 
 # ListView class based view discovered via youtube video: https://www.youtube.com/watch?v=dHvcioGHg08
 
@@ -15,51 +16,83 @@ class DiscoverAuthorListView(ListView):
     model = User
     template_name = "discover_author.html"
     context_object_name= "authors"
-    paginate_by = PAGE_SIZE
 
 
     def get_context_data(self,**kwargs):
         '''
         Uses the pagination API to get the authors for the current discover menu for nodes we connect with
         '''
-        pass
+        context =  super().get_context_data(**kwargs)
+        authors = context.get('authors',[])
+
+        authors = self.discover(authors)
+    
+        context['host'] = self.kwargs.get('host','')
+        context['authors'] = authors
+
+
+        if len(context['authors']) == PAGE_SIZE:
+            context['has_next'] = True
+        else:
+            context['has_next'] = False
+        
+        page_num =  int(self.request.GET.get('page'))
+
+        if page_num > 1:
+            context['has_first'] = True
+            context['has_previous'] = True
+        else:
+            context['has_first'] = False
+            context['has_previous'] = False
+        
+
+        context['page_number'] = page_num
+        context['item_amount'] = len(authors)
+        context['page_size'] = PAGE_SIZE
+
+
+        return context
+
 
 
     def get_queryset(self):
-        page = self.request.GET.get('page',1)
-        host = self.kwargs.get('host')
+        page = int(self.request.GET.get('page',1))
+        host = self.kwargs['host']
 
-        host = unquote('host') # un percent encode the host name!
-
+        host = unquote(host) # un percent encode the host name!
+    
         node = Node.objects.filter(host=host,follow_status='OUTGOING')
+
         if not node.exists():
             return []
         
-        username = base64.b64encode(node.get('username','')).decode('utf-8')
-        password = base64.b64decode(node.get('password','')).decode('utf-8')
+        node = node[0]
+        
+        username = base64.b64encode(bytes(node.username,encoding='utf-8')).decode('utf-8')
+        password = base64.b64encode(bytes(node.password,encoding='utf-8')).decode('utf-8')
 
         url = host
         if not host.endswith('api/'):
             url += 'api/'
-        if not url.startswith('https://'):
-            url = 'https://' + url
         url += 'authors/'
 
         headers = {
-            'Authorization' : f'Basic {username}:{password}'
+            'Authorization' : f'Basic {username}:{password}',
+
         }
 
         params = {
             'page':page,
-            'size':self.paginate_by
+            'size':PAGE_SIZE
         }
 
         response = requests.get(url,headers=headers,params=params)
         
+        
         if response.status_code != 200:
             return []
         else:
-            response_data = json.loads(response.body)
+            response_data = json.loads(response.content)
             author_data = response_data.get('authors',[])
 
         return author_data
@@ -87,7 +120,9 @@ class DiscoverAuthorListView(ListView):
                 node_author_queryset = User.objects.filter(url_id=url_id)
 
                 if node_author_queryset.exists():
-                    author_list.append(node_author_queryset[0])
+                    remote_author = node_author_queryset[0]
+                    remote_author.url_id = quote(remote_author.url_id,safe='')
+                    author_list.append(remote_author)
                 else:
                     # author has not be discovered by our node yet, so must be appended to user database.
                     remote_author = User.objects.create(
@@ -97,6 +132,8 @@ class DiscoverAuthorListView(ListView):
                         github = author.get('github',''),
                         profileImage = author.get('profileImage',''),
                     )
+
+                    remote_author.url_id = quote(remote_author.url_id,safe='')
 
                     author_list.append(remote_author)
 

@@ -80,12 +80,24 @@ def profile_follow_request(request,requestee,requester):
     requester: the id of the user who is sending the follow request
     '''
 
+
+
     if request.method == "POST":
         requestee = unquote(requestee)
         requester = unquote(requester)
+        remote_check = request.POST.get('remote-follow')
         requester_user = get_object_or_404(User,url_id=requester)
         requestee_user = get_object_or_404(User,url_id=requestee)
-        FollowRequest.objects.create(requestee=requestee_user,requester=requester_user)
+        if remote_check != None:
+            # Can assume that the user is already following the remote author now..
+            follow = Follow(follower=requester_user,followed=requestee_user) # create the new follow!
+            follow.save()
+            ##########################################
+            # CODE SPOT FOR INBOX SENDING FOLLOW REQ #
+            ##########################################
+
+        else:
+            FollowRequest.objects.create(requestee=requestee_user,requester=requester_user)
         return redirect("chartreuse:profile",url_id=quote(requestee,safe=''))
     return HttpResponseNotAllowed(["POST"])
 

@@ -126,7 +126,7 @@ def profile_follow_request(request,requestee,requester):
                 }
             }
 
-            url = f'{requestee_user.host}authors/{quote(requestee_user.url_id,safe='')}/inbox/'
+            url = f"{requestee_user.host}authors/{quote(requestee_user.url_id,safe='')}/inbox/"
 
             headers = {
                 'Authorization' : f'Basic {username}:{password}',

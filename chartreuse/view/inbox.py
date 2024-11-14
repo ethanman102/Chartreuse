@@ -172,7 +172,7 @@ def inbox(request, user_id):
 
         author_queryset = User.objects.filter(url_id=unquote(actor['id'])).first()
 
-        if not author_queryset.exists():
+        if not author_queryset:
             # discovered a new author to add to database...
             remote_author = User.objects.create(
                 user = None,
@@ -187,7 +187,6 @@ def inbox(request, user_id):
 
         follower = User.objects.get(pk=unquote(actor["id"]))
         followed = User.objects.get(pk=unquote(object_to_follow["id"]))
-
 
         # add the follow request if it does not exist, if it exists, delete the follow request
         new_follow_request = FollowRequest.objects.create(requester=remote_author, requestee=followed)

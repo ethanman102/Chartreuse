@@ -172,6 +172,7 @@ def inbox(request, user_id):
         if not author_queryset.exists():
             # discovered a new author to add to database...
             remote_author = User.objects.create(
+                user = None,
                 url_id = unquote(actor['id']),
                 displayName = actor.get('displayName',''),
                 host = actor.get('host'),

@@ -406,13 +406,16 @@ def like_post(request):
         post = Post.objects.get(url_id=unquote(post_id))
 
         # first check if the user has already liked the post
-        like = Like.objects.filter(user=user, post=post)
+        like = Like.objects.filter(user=user, post=post).first()
 
         if like:
+            send_like_to_inbox(like.url_id)
             like.delete()
         else:
             newLike = Like.objects.create(user=user, post=post)
             newLike.save()
+
+            send_like_to_inbox(newLike.url_id)
 
         data = {
             "likes_count": get_post_likes(unquote(post_id)).count()
@@ -442,7 +445,7 @@ def send_like_to_inbox(like_url_id):
         url += 'authors/'
 
         base_url = f"{like.post.user.host}/chartreuse/api/authors/"
-        likes_json_url = f"{base_url}{quote(like.post.user.url_id, safe='')}/posts/{quote(like.post.url_id, safe='')}/like/{quote(like.url_id, safe='')}/"
+        likes_json_url = f"{base_url}{quote(like.user.url_id, safe='')}/liked/{quote(like.url_id, safe='')}/"
 
         likes_response = requests.get(likes_json_url)
         likes_json = likes_response.json()

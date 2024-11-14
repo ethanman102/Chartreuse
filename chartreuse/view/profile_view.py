@@ -214,6 +214,7 @@ class ProfileDetailView(DetailView):
        
         user_id = unquote(self.kwargs['url_id'])
         user = get_object_or_404(User,url_id=user_id)
+        print(user)
 
         return user
     

@@ -113,7 +113,7 @@ def profile_follow_request(request,requestee,requester):
                     'displayName': requester_user.displayName,
                     'page': f'{requester_user.host}/authors/{requester_user.url_id}/',
                     'github':requester_user.github,
-                    'profileImage': requester_user.github
+                    'profileImage': requester_user.profileImage
                 },
                 'object':{
                     'type':'author',
@@ -122,7 +122,7 @@ def profile_follow_request(request,requestee,requester):
                     'displayName': requester_user.displayName,
                     'page': f'{requestee_user.host}/authors/{requestee_user.url_id}/',
                     'github':requestee_user.github,
-                    'profileImage': requestee_user.github
+                    'profileImage': requestee_user.profileImage
                 }
             }
 

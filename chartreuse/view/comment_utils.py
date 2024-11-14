@@ -147,7 +147,8 @@ def send_comment_to_inbox(comment_url_id):
     followers = Follow.objects.filter(followed = comment.post.user)
     print("FOLLOWERS", followers)
     for follower in followers:
-        print("FOLLOWER", follower.follower.host)
+        print("FOLLOWER", follower.follower)
+        print("FOLLOWED", follower.followed)
         if follower.follower.host != comment.user.host:
             print("FOLLOWER (true)", follower.follower.host)
             author_url_id = follower.follower.url_id
@@ -172,3 +173,5 @@ def send_comment_to_inbox(comment_url_id):
 
             # send to inbox
             requests.post(url, headers=headers, json=comments_json)
+    
+    return JsonResponse({'status': 'Comment sent to inbox successfully.'})

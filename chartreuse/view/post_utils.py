@@ -431,27 +431,28 @@ def send_like_to_inbox(like_url_id):
     if not nodes.exists():
         return []
     
-    for node in nodes:
-        host = node.host
-        username = node.username
-        password = node.password
+    base_url = f"{like.user.host}authors/"
+    likes_json_url = f"{base_url}{quote(like.user.url_id, safe='')}/liked/{quote(like.url_id, safe='')}/"
 
-        url = host
-        
-        url += 'authors/'
+    likes_response = requests.get(likes_json_url)
+    likes_json = likes_response.json()
 
-        base_url = f"{like.user.host}authors/"
-        likes_json_url = f"{base_url}{quote(like.user.url_id, safe='')}/liked/{quote(like.url_id, safe='')}/"
-
-        likes_response = requests.get(likes_json_url)
-        likes_json = likes_response.json()
-
-        followers = Follow.objects.filter(followed = like.post.user)
-        for follower in followers:
-            print("FOLLOWER -", follower.follower.host)
-            if follower.follower.host == host:
+    followers = Follow.objects.filter(followed = like.post.user)
+    for follower in followers:
+        print("FOLLOWER -", follower.follower)
+        print("FOLLOWED -", follower.followed)
+        for node in nodes:
+            if follower.follower.host == node.host:
                 print("FOLLOWER", follower.follower.url_id)
                 author_url_id = follower.follower.url_id
+
+                host = node.host
+                username = node.username
+                password = node.password
+
+                url = host
+                
+                url += 'authors/'
 
                 url += f'{quote(author_url_id, safe = "")}/inbox/'
                 print(url)  

@@ -104,8 +104,8 @@ def send_post_to_inbox(post_url_id):
         url = host
         if not host.endswith('api/'):
             url += '/chartreuse/api/'
-        if not url.startswith('http://'):
-            url = 'http://' + url
+        if not url.startswith('https://'):
+            url = 'https://' + url
         url += 'authors/'
 
         base_url = f"{post.user.host}/chartreuse/api/authors/"
@@ -440,8 +440,8 @@ def send_like_to_inbox(like_url_id):
         url = host
         if not host.endswith('api/'):
             url += '/chartreuse/api/'
-        if not url.startswith('http://'):
-            url = 'http://' + url
+        if not url.startswith('https://'):
+            url = 'https://' + url
         url += 'authors/'
 
         base_url = f"{like.post.user.host}/chartreuse/api/authors/"

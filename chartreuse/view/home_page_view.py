@@ -112,8 +112,6 @@ class FeedDetailView(DetailView):
             current_user_model = get_object_or_404(User, user=current_user)
 
             current_user_model.url_id = quote(current_user_model.url_id, safe='')
-            print(current_user_model.url_id)
-
             return current_user_model
         else:
             return None

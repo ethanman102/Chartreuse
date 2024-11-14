@@ -26,14 +26,13 @@ def inbox(request, user_id):
         visibility = data["visibility"]
 
         # check whether we need to add this post or update it or delete it
-        post = Post.objects.filter(url_id=post_id)
-        print(data)
+        post = Post.objects.filter(url_id=post_id).first()
 
-        if len(post) == 0:
-            # get author object
-            author_id = unquote(author["id"])
-            author = User.objects.get(pk=author_id)
+        # get author object
+        author_id = unquote(author["id"])
+        author = User.objects.get(pk=author_id)
 
+        if post is None:
             # create a new post
             new_post = Post.objects.create(title=title, description=description, contentType=contentType, content=content, user=author, published=published, visibility=visibility)
             new_post.save()
@@ -79,7 +78,21 @@ def inbox(request, user_id):
 
                 new_like = Like.objects.create(author=author, published=published, post=new_post)
                 new_like.save()
-                
+
+        else:
+            # update visibility
+            if visibility == "DELETED":
+                post.visibility = visibility
+                post.save()
+            
+            # update post content
+            else:
+                post.title = title
+                post.description = description
+                post.contentType = contentType
+                post.content = content
+                post.save()
+                    
         return JsonResponse({"status": "Post added successfully"})
 
     elif (data["type"] == "comment"):

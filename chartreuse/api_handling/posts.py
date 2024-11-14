@@ -360,9 +360,6 @@ class PostViewSet(viewsets.ViewSet):
         decoded_user_id = unquote(user_id)
         decoded_post_id = unquote(post_id)
 
-        print(decoded_user_id)
-        print(decoded_post_id)
-
         author = User.objects.get(url_id=decoded_user_id)
 
         post = Post.objects.filter(user=author, url_id=decoded_post_id).first()
@@ -379,7 +376,7 @@ class PostViewSet(viewsets.ViewSet):
         response = likes_viewset.get_post_likes(request, user_id=post.user.url_id, post_id=post.url_id)
         likes_data = json.loads(response.content)
     
-        if post.visibility in ["PUBLIC", "UNLISTED"]:
+        if post.visibility in ["PUBLIC", "UNLISTED", "DELETED"]:
             postObject = {
                 "type": "post",
                 "title": post.title,

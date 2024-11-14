@@ -465,12 +465,10 @@ class LikeViewSet(viewsets.ViewSet):
         likes_paginator = Paginator(likes, size)
 
         page_likes = likes_paginator.page(page)
-        print("MY LIKES", likes)
 
         # Since we have some additional fields, we only want to return the required ones
         filtered_likes_attributes = []
         for like in likes:
-            print("LIKE", like)
 
             likeObject = {
                 "type": "like",

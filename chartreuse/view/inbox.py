@@ -103,7 +103,6 @@ def inbox(request, user_id):
         post = data["post"]
         published = data["published"]
         likes = data["likes"]
-        print("comment data", data)
         # add this new comment if it does not exist, if it exists, then delete it
 
         comment_author_id = unquote(comment_author["id"])
@@ -119,16 +118,12 @@ def inbox(request, user_id):
             comment.save()
 
         # add comment likes
-        print("likes", likes)
         comment_likes = likes["src"]
-        print(comment_likes)
         for comment_like in comment_likes:
             like_author = comment_like["author"]
             published = comment_like["published"]
             like_id = comment_like["id"]
             post = comment_like["object"]
-            print(like_author)
-            print(like_id)
 
             like_author_id = unquote(like_author["id"])
             like_author = User.objects.get(pk=like_author_id)
@@ -136,14 +131,10 @@ def inbox(request, user_id):
             # check whether like already exists
             like = Like.objects.filter(user=like_author, comment=comment).first()
 
-            print(like)
             if like is None:
-                print("adding like")
                 new_like = Like.objects.create(user=like_author, url_id=like_id, comment=comment)
                 new_like.save()
-            else:
-                like.delete()
-                
+
         return JsonResponse({"status": "Comment added successfully"})
         
     elif (data["type"] == "like"):

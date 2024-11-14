@@ -8,7 +8,7 @@ import base64
 import json
 
 
-PAGE_SIZE = 1
+PAGE_SIZE = 5
 
 # ListView class based view discovered via youtube video: https://www.youtube.com/watch?v=dHvcioGHg08
 
@@ -73,10 +73,8 @@ class DiscoverAuthorListView(ListView):
 
         url = host
         if not host.endswith('api/'):
-            url += 'chartreuse/api/'
+            url += 'api/'
         url += 'authors/'
-
-        print(url)
 
         headers = {
             'Authorization' : f'Basic {username}:{password}',
@@ -96,8 +94,6 @@ class DiscoverAuthorListView(ListView):
         else:
             response_data = json.loads(response.content)
             author_data = response_data.get('authors',[])
-
-        print(author_data)
 
         return author_data
 

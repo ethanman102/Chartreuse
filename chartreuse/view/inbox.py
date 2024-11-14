@@ -114,7 +114,7 @@ def inbox(request, user_id):
         comment = Comment.objects.filter(user=comment_author, comment=comment, contentType=contentType, post=new_post).first()
 
         if comment is None:
-            new_comment = Comment.objects.create(user=comment_author, comment=comment, contentType=contentType, post=new_post, dateCreated=published)
+            new_comment = Comment.objects.create(user=comment_author, comment=comment, url_id=comment_id, contentType=contentType, post=new_post, dateCreated=published)
             new_comment.save()
 
         # add comment likes
@@ -132,7 +132,7 @@ def inbox(request, user_id):
             like = Like.objects.filter(user=like_author, comment=new_comment).first()
 
             if like is None:
-                new_like = Like.objects.create(user=like_author, published=published, comment=new_comment)
+                new_like = Like.objects.create(user=like_author, url_id=like_id, published=published, comment=new_comment)
                 new_like.save()
         return JsonResponse({"status": "Comment added successfully"})
         
@@ -152,7 +152,7 @@ def inbox(request, user_id):
         like = Like.objects.filter(user=author, post=post).first()
 
         if like is None:
-            new_like = Like.objects.create(user=author, published=published, post=post) 
+            new_like = Like.objects.create(user=author, url_id=like_id, published=published, post=post) 
             new_like.save()
 
             return JsonResponse({"status": "Like added successfully"})

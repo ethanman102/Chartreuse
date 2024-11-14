@@ -138,34 +138,37 @@ def send_comment_to_inbox(comment_url_id):
     if not nodes.exists():
         return []
     
-    for node in nodes:
-        host = node.host
-        username = node.username
-        password = node.password
+    base_url = f"{comment.user.host}authors/"
+    comments_json_url = f"{base_url}{quote(comment.post.user.url_id, safe='')}/posts/{quote(comment.post.url_id, safe='')}/comment/{quote(comment.url_id, safe='')}/"
 
-        url = host
-        
-        url += 'authors/'
+    comments_response = requests.get(comments_json_url)
+    comments_json = comments_response.json()
 
-        base_url = f"{comment.user.host}authors/"
-        comments_json_url = f"{base_url}{quote(comment.post.user.url_id, safe='')}/posts/{quote(comment.post.url_id, safe='')}/comment/{quote(comment.url_id, safe='')}/"
+    followers = Follow.objects.filter(followed = comment.post.user)
+    print("FOLLOWERS", followers)
+    for follower in followers:
+        print("FOLLOWER", follower.follower.host)
+        if follower.follower.host != comment.user.host:
+            print("FOLLOWER (true)", follower.follower.host)
+            author_url_id = follower.follower.url_id
+            node = Node.objects.get(host=follower.follower.host)
+            print("NODE", node.host)
+            host = node.host
+            username = node.username
+            password = node.password
 
-        comments_response = requests.get(comments_json_url)
-        comments_json = comments_response.json()
+            url = host
+            
+            url += 'authors/'
 
-        followers = Follow.objects.filter(followed = comment.post.user)
-        for follower in followers:
-            if follower.follower.host == host:
-                author_url_id = follower.follower.url_id
+            url += f'{quote(author_url_id, safe = "")}/inbox/'
 
-                url += f'{quote(author_url_id, safe = "")}/inbox/'
+            headers = {
+                'Authorization' : f'Basic {username}:{password}',
+                "Content-Type": "application/json; charset=utf-8"
+            }
+            print("SENT COMMENT", comments_json)
+            print("URL", url)
 
-                headers = {
-                    'Authorization' : f'Basic {username}:{password}',
-                    "Content-Type": "application/json; charset=utf-8"
-                }
-                print("SENT COMMENT", comments_json)
-                print("URL", url)
-
-                # send to inbox
-                requests.post(url, headers=headers, json=comments_json)
+            # send to inbox
+            requests.post(url, headers=headers, json=comments_json)

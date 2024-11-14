@@ -40,6 +40,12 @@ ul li img{
     width: 6ch; 
 }	
 
+.nav-button.active {
+    border: 0.7ch;
+    border-color: chartreuse;
+
+}
+
 /* resizing the navbar for smaller screens */
 @media screen and (max-width: 600px) {
     ul li img{	

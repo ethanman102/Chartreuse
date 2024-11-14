@@ -97,7 +97,7 @@ def inbox(request, user_id):
 
     elif (data["type"] == "comment"):
         comment_author = data["author"]
-        comment = data["comment"]
+        comment_text = data["comment"]
         contentType = data["contentType"]
         comment_id = data["id"]
         post = data["post"]
@@ -120,10 +120,10 @@ def inbox(request, user_id):
         new_post = Post.objects.get(url_id=post)
 
         # check whether comment already exists
-        comment = Comment.objects.filter(user=comment_author, comment=comment, url_id=comment_id, contentType=contentType, post=new_post).first()
+        comment = Comment.objects.filter(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post).first()
 
         if comment is None:
-            new_comment = Comment.objects.create(user=comment_author, comment=comment, url_id=comment_id, contentType=contentType, post=new_post)
+            new_comment = Comment.objects.create(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post)
             new_comment.save()
 
         # add comment likes

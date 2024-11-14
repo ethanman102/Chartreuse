@@ -1,10 +1,11 @@
 from django.shortcuts import redirect, get_object_or_404
-from chartreuse.models import User,Like,Comment,Post,Follow,FollowRequest
+from chartreuse.models import User,Like,Comment,Post,Follow,FollowRequest, Node
 from django.views.generic.detail import DetailView
 from django.http import HttpResponseNotAllowed
 from urllib.parse import unquote, quote
 from . import post_utils
 from ..views import Host
+import requests
 
 def follow_accept(request,followed,follower):
 
@@ -79,9 +80,6 @@ def profile_follow_request(request,requestee,requester):
     requestee: the id of the user who is being asked to get followed
     requester: the id of the user who is sending the follow request
     '''
-
-
-
     if request.method == "POST":
         requestee = unquote(requestee)
         requester = unquote(requester)
@@ -95,11 +93,53 @@ def profile_follow_request(request,requestee,requester):
             ##########################################
             # CODE SPOT FOR INBOX SENDING FOLLOW REQ #
             ##########################################
-
+            send_follow_request_to_inbox(requester.url_id, requestee.url_id)
         else:
             FollowRequest.objects.create(requestee=requestee_user,requester=requester_user)
         return redirect("chartreuse:profile",url_id=quote(requestee,safe=''))
     return HttpResponseNotAllowed(["POST"])
+
+def send_follow_request_to_inbox(requester_url_id, requestee_url_id):
+    requester_user = get_object_or_404(User,url_id=requester_url_id)
+    requestee_user = get_object_or_404(User,url_id=requestee_url_id)
+    # send this to the inbox of other nodes
+    nodes = Node.objects.filter(follow_status='OUTGOING')
+
+    if not nodes.exists():
+        return []
+    
+    for node in nodes:
+        host = node.host
+        username = node.username
+        password = node.password
+
+        url = host
+        if not host.endswith('api/'):
+            url += '/chartreuse/api/'
+        if not url.startswith('https://'):
+            url = 'https://' + url
+        url += 'authors/'
+
+        base_url = f"{like.post.user.host}/chartreuse/api/authors/"
+        likes_json_url = f"{base_url}{quote(like.user.url_id, safe='')}/liked/{quote(like.url_id, safe='')}/"
+
+        likes_response = requests.get(likes_json_url)
+        likes_json = likes_response.json()
+
+        followers = Follow.objects.filter(followed = like.post.user)
+        for follower in followers:
+            if follower.follower.host == host:
+                author_url_id = follower.follower.url_id
+
+                url += f'{quote(author_url_id, safe = "")}/inbox/'
+
+                headers = {
+                    'Authorization' : f'Basic {username}:{password}',
+                    "Content-Type": "application/json; charset=utf-8"
+                }
+
+                # send to inbox
+                requests.post(url, headers=headers, json=likes_json)
 
 
 class ProfileDetailView(DetailView):

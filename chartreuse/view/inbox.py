@@ -165,6 +165,8 @@ def inbox(request, user_id):
         actor = data["actor"]
         object_to_follow = data["object"]
 
+        print('HERES THE ACTOR',actor)
+
         author_queryset = User.objects.filter(url_id=unquote(actor['id']))
 
         if not author_queryset.exists():

@@ -189,7 +189,7 @@ class ProfileDetailView(DetailView):
 
 
 
-        if ('https://' + host_obj.host + 'chartreuse/api/') != user.host:
+        if ('https://' + host_obj.host + '/chartreuse/api/') != user.host:
             context['remote'] = 'REMOTE author'
         
 

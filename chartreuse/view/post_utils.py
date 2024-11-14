@@ -452,11 +452,16 @@ def send_like_to_inbox(like_url_id):
                 author_url_id = follower.follower.url_id
 
                 url += f'{quote(author_url_id, safe = "")}/inbox/'
+                print(url)  
+                print(likes_json)
 
                 headers = {
                     'Authorization' : f'Basic {username}:{password}',
                     "Content-Type": "application/json; charset=utf-8"
                 }
+
+                print("SENT LIKE", likes_json)
+                print("URL", url)
 
                 # send to inbox
                 requests.post(url, headers=headers, json=likes_json)

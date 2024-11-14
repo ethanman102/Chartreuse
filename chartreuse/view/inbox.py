@@ -1,6 +1,6 @@
 from urllib.parse import unquote
 from ..models import Like, User, Post, Comment, FollowRequest
-from ..views import Host
+from ..views import Host, checkIfRequestAuthenticated
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
@@ -12,6 +12,15 @@ def inbox(request, user_id):
     user = User.objects.get(pk=decoded_user_id)
 
     data = json.loads(request.body.decode('utf-8'))
+
+    # check request headers
+    authorization = request.headers.get('Authorization')
+    if authorization is None:
+        return JsonResponse({"error": "Unauthorized"}, status=401)
+    
+    authorization_response = checkIfRequestAuthenticated(request)
+    if authorization_response.status_code != 200:
+        return authorization_response
 
     if (data["type"] == "post"):
         title = data["title"]

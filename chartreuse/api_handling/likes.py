@@ -485,7 +485,7 @@ class LikeViewSet(viewsets.ViewSet):
                 },
                 "published": like.dateCreated,
                 "id": like.url_id,
-                "object": like.post.url_id
+                "object": like.comment.url_id
             }
 
             filtered_likes_attributes.append(likeObject)

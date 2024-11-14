@@ -119,19 +119,23 @@ def inbox(request, user_id):
 
         # add comment likes
         comment_likes = likes["src"]
+        print(comment_likes)
         for comment_like in comment_likes:
             like_author = comment_like["author"]
             published = comment_like["published"]
             like_id = comment_like["id"]
             post = comment_like["object"]
+            print(like_author)
+            print(like_id)
 
             like_author_id = unquote(like_author["id"])
             like_author = User.objects.get(pk=like_author_id)
 
             # check whether like already exists
             like = Like.objects.filter(user=like_author, comment=new_comment).first()
-
+            print(like)
             if like is None:
+                print("adding like")
                 new_like = Like.objects.create(user=like_author, url_id=like_id, comment=new_comment)
                 new_like.save()
         return JsonResponse({"status": "Comment added successfully"})

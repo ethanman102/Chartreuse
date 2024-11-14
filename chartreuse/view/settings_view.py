@@ -96,7 +96,7 @@ def update_password(request):
     """
     if request.method == "POST":
 
-        data = json.loads(request.body)
+        data = request.data
         original_password = data.get("old_pass")
         new_password = data.get("new_pass")
 
@@ -188,7 +188,7 @@ def update_display_name(request):
     """
     if request.method == "POST":
 
-        data = json.loads(request.body)
+        data = request.data
         new_display_name = data.get("display_name")
 
         current_auth_user = request.user
@@ -276,7 +276,7 @@ def remove_github(request):
             - 500: Error message if the provided GitHub username does not match the user's associated GitHub.
     """
     if request.method == "DELETE":
-        data = json.loads(request.body)
+        data = request.data
 
         current_github = data.get("current_github")
         current_auth_user = request.user
@@ -367,7 +367,7 @@ def add_github(request):
             - 405: Error message if the request method is not PUT.
     """
     if request.method == "PUT":
-        data = json.loads(request.body)
+        data = request.data
 
         github = data.get('github')
 
@@ -606,7 +606,7 @@ def upload_url_picture(request):
             - 405: Error message if the request method is not POST.
     """
     if request.method == "POST":
-        data = json.loads(request.body)
+        data = request.data
 
         image_url = data.get('url')
 

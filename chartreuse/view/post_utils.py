@@ -4,7 +4,7 @@ import re
 from urllib.parse import unquote,quote
 from urllib.request import urlopen
 
-from chartreuse.models import Like, Post, User
+from chartreuse.models import Like, Post, User, Node, Follow
 from chartreuse.views import Host
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
 from rest_framework import serializers
 from rest_framework.decorators import action, api_view
+import requests
 
 def get_post_likes(post_id):
     """
@@ -82,8 +83,51 @@ def delete_post(request, post_id):
         if current_user_model == post.user:
             post.visibility = 'DELETED'
             post.save()
-    
+
+            send_post_to_inbox(post_id)
+        
     return redirect('/chartreuse/homepage/')
+
+def send_post_to_inbox(post_url_id):
+    post = Post.objects.get(url_id=post_url_id)
+    # send this to the inbox of other nodes
+    nodes = Node.objects.filter(follow_status='OUTGOING')
+
+    if not nodes.exists():
+        return []
+    
+    for node in nodes:
+        host = node.host
+        username = node.username
+        password = node.password
+
+        url = host
+        if not host.endswith('api/'):
+            url += '/chartreuse/api/'
+        if not url.startswith('http://'):
+            url = 'http://' + url
+        url += 'authors/'
+
+        base_url = f"{post.user.host}/chartreuse/api/authors/"
+        post_json_url = f"{base_url}{quote(post.user.url_id, safe='')}/posts/{quote(post.url_id, safe='')}/"
+
+        post_response = requests.get(post_json_url)
+        post_json = post_response.json()
+
+        followers = Follow.objects.filter(followed = post.user)
+        for follower in followers:
+            if follower.follower.host == host:
+                author_url_id = follower.follower.url_id
+
+                url += f'{quote(author_url_id, safe = "")}/inbox/'
+
+                headers = {
+                    'Authorization' : f'Basic {username}:{password}',
+                    "Content-Type": "application/json; charset=utf-8"
+                }
+
+                # send to inbox
+                requests.post(url, headers=headers, json=post_json)
 
 @csrf_exempt
 def update_post(request, post_id):
@@ -109,8 +153,6 @@ def update_post(request, post_id):
         # Ensure that either content, image, or image URL is provided
         if not content_type and not image and not image_url:
             return JsonResponse({'error': 'Post content is required.'}, status=400)
-    
-        print(content_type)
 
         # Determine content type and set appropriate content
         # add option for commonmark here
@@ -156,6 +198,8 @@ def update_post(request, post_id):
         post.visibility = visibility
 
         post.save()
+
+        send_post_to_inbox(post.url_id)
 
         return redirect('/chartreuse/homepage/post/' + post_id + '/')
     return redirect('/chartreuse/error/')
@@ -227,7 +271,6 @@ def update_post(request, post_id):
         ),
     }
 )
-
 @api_view(["POST"])
 def repost(request):
     '''
@@ -337,6 +380,8 @@ def save_post(request):
 
         post.save()
 
+        send_post_to_inbox(post.url_id)
+
         return redirect('/chartreuse/homepage/')
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
@@ -375,6 +420,47 @@ def like_post(request):
         return JsonResponse(data)
     else:
         pass
+
+def send_like_to_inbox(like_url_id):
+    like = Like.objects.get(url_id=like_url_id)
+    # send this to the inbox of other nodes
+    nodes = Node.objects.filter(follow_status='OUTGOING')
+
+    if not nodes.exists():
+        return []
+    
+    for node in nodes:
+        host = node.host
+        username = node.username
+        password = node.password
+
+        url = host
+        if not host.endswith('api/'):
+            url += '/chartreuse/api/'
+        if not url.startswith('http://'):
+            url = 'http://' + url
+        url += 'authors/'
+
+        base_url = f"{like.post.user.host}/chartreuse/api/authors/"
+        likes_json_url = f"{base_url}{quote(like.post.user.url_id, safe='')}/posts/{quote(like.post.url_id, safe='')}/like/{quote(like.url_id, safe='')}/"
+
+        likes_response = requests.get(likes_json_url)
+        likes_json = likes_response.json()
+
+        followers = Follow.objects.filter(followed = like.post.user)
+        for follower in followers:
+            if follower.follower.host == host:
+                author_url_id = follower.follower.url_id
+
+                url += f'{quote(author_url_id, safe = "")}/inbox/'
+
+                headers = {
+                    'Authorization' : f'Basic {username}:{password}',
+                    "Content-Type": "application/json; charset=utf-8"
+                }
+
+                # send to inbox
+                requests.post(url, headers=headers, json=likes_json)
 
 def get_all_public_posts():
     '''

@@ -4,9 +4,10 @@ from django.db.models import UniqueConstraint
 
 VISIBILITY_CHOICES = {"PUBLIC": "PUBLIC", "FRIENDS": "FRIENDS", "UNLISTED": "UNLISTED", "DELETED": "DELETED"}
 CONTENT_TYPE_CHOICES = {"text/commonmark": "text/commonmark", "text/plain": "text/plain", "application/base64": "application/base64", "image/png;base64": "image/png;base64", "image/jpeg;base64": "image/jpeg;base64"}
+FOLLOW_STATUS_CHOICES = {'OUTGOING':'OUTGOING','INCOMING':'INCOMING'}
 
 class User(models.Model):
-    user = models.OneToOneField(AuthUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, null=True, blank=True)
     url_id = models.URLField(primary_key=True)
     displayName = models.CharField(max_length=100)
     host = models.URLField()
@@ -90,3 +91,14 @@ class FollowRequest(models.Model):
 
 class GithubPolling(models.Model):
     last_polled = models.DateTimeField(auto_now_add=True)
+
+class Node(models.Model):
+    host = models.URLField(primary_key=True)
+    username = models.CharField(max_length=100)
+    password = models.CharField(max_length=100)
+    # outgoing means we are connecting to that node
+    # incoming means that node is connecting to us
+    follow_status = models.CharField(max_length=100, choices=FOLLOW_STATUS_CHOICES)
+
+    def __str__(self):
+        return f"host={self.host}, username={self.username}, password={self.password}, outgoing={self.follow_status}"

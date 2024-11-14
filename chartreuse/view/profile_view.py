@@ -127,6 +127,7 @@ def profile_follow_request(request,requestee,requester):
             }
 
             url = f'{requestee_user.host}authors/{requestee_user.url_id}/inbox/'
+            print('URL MANN',url)
 
             headers = {
                 'Authorization' : f'Basic {username}:{password}',
@@ -188,7 +189,7 @@ class ProfileDetailView(DetailView):
 
 
 
-        if ('https://' + host_obj.host) != user.host:
+        if ('https://' + host_obj.host + 'chartreuse/api/') != user.host:
             context['remote'] = 'REMOTE author'
         
 
@@ -258,7 +259,6 @@ class ProfileDetailView(DetailView):
        
         user_id = unquote(self.kwargs['url_id'])
         user = get_object_or_404(User,url_id=user_id)
-        print(user)
 
         return user
     

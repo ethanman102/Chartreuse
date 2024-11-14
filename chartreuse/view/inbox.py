@@ -103,6 +103,7 @@ def inbox(request, user_id):
         post = data["post"]
         published = data["published"]
         likes = data["likes"]
+        print("comment data", data)
         # add this new comment if it does not exist, if it exists, then delete it
 
         comment_author_id = unquote(comment_author["id"])
@@ -118,6 +119,7 @@ def inbox(request, user_id):
             new_comment.save()
 
         # add comment likes
+        print("likes", likes)
         comment_likes = likes["src"]
         print(comment_likes)
         for comment_like in comment_likes:

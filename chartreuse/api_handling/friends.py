@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from ..models import Follow, User
 from urllib.parse import unquote
 from rest_framework import serializers, viewsets
-from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter, inline_serializer
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 from django.core.paginator import Paginator
@@ -43,8 +43,20 @@ class FriendsViewSet(viewsets.ViewSet):
         request=FriendSerializer,
         responses={
             200: OpenApiResponse(description="Successfully retrieved the list of friends.", response=FriendsSerializer),
-            404: OpenApiResponse(description="Author not found."),
-            405: OpenApiResponse(description="Method not allowed."),
+            404: OpenApiResponse(
+                description="Author not found.",
+                response=inline_serializer(
+                    name="AuthorNotFoundResponse",
+                    fields={"message": serializers.CharField(default="Author not found.")}
+                ),
+            ),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed")}
+                ),
+            ),
         }
     )
     @action(detail=False, methods=["GET"])
@@ -103,9 +115,27 @@ class FriendsViewSet(viewsets.ViewSet):
             "\n\n**Why not to use:** Don't use this to check a one-way relationship."
         ),
         responses={
-            200: OpenApiResponse(description="Authors are friends"),
-            404: OpenApiResponse(description="Authors are not friends"),
-            405: OpenApiResponse(description="Method not allowed."),
+            200: OpenApiResponse(
+                description="Authors are friends",
+                response=inline_serializer(
+                    name="FriendStatusResponse",
+                    fields={"message": serializers.CharField(default="Authors are friends.")}
+                ),
+            ),
+            404: OpenApiResponse(
+                description="Authors are not friends",
+                response=inline_serializer(
+                    name="NoFriendshipResponse",
+                    fields={"message": serializers.CharField(default="Authors are not friends.")}
+                ),
+            ),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed")}
+                ),
+            ),
         }
     )
     @action(detail=False, methods=["GET"])

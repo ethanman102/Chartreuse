@@ -18,8 +18,6 @@ class Host:
             if self.host is None:
                 self.host = host
 
-            
-
 def checkIfRequestAuthenticated(request):
     '''
     Purpose: Check if the request is authenticated

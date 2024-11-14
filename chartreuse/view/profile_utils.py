@@ -38,7 +38,6 @@ def setNewProfileImage(request):
 
         user.profileImage = post.url_id + "/image"
         user.save()
-        print(user.profileImage)
 
     return JsonResponse({'success': 'Updated profile picture'}, status=200)
         

@@ -421,6 +421,47 @@ def like_post(request):
     else:
         pass
 
+def send_like_to_inbox(like_url_id):
+    like = Like.objects.get(url_id=like_url_id)
+    # send this to the inbox of other nodes
+    nodes = Node.objects.filter(follow_status='OUTGOING')
+
+    if not nodes.exists():
+        return []
+    
+    for node in nodes:
+        host = node.host
+        username = node.username
+        password = node.password
+
+        url = host
+        if not host.endswith('api/'):
+            url += '/chartreuse/api/'
+        if not url.startswith('http://'):
+            url = 'http://' + url
+        url += 'authors/'
+
+        base_url = f"{like.post.user.host}/chartreuse/api/authors/"
+        likes_json_url = f"{base_url}{quote(like.post.user.url_id, safe='')}/posts/{quote(like.post.url_id, safe='')}/like/{quote(like.url_id, safe='')}/"
+
+        likes_response = requests.get(likes_json_url)
+        likes_json = likes_response.json()
+
+        followers = Follow.objects.filter(followed = like.post.user)
+        for follower in followers:
+            if follower.follower.host == host:
+                author_url_id = follower.follower.url_id
+
+                url += f'{quote(author_url_id, safe = "")}/inbox/'
+
+                headers = {
+                    'Authorization' : f'Basic {username}:{password}',
+                    "Content-Type": "application/json; charset=utf-8"
+                }
+
+                # send to inbox
+                requests.post(url, headers=headers, json=likes_json)
+
 def get_all_public_posts():
     '''
     Retrieves all public posts.

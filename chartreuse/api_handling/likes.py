@@ -280,7 +280,7 @@ class LikeViewSet(viewsets.ViewSet):
         }
     )
     @action(detail=False, methods=["GET"])
-    def get_like(self, request, user_id, like_id):
+    def get_like(request, user_id, like_id):
         '''
         Gets a specific like object from a user.
 

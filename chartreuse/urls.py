@@ -23,7 +23,7 @@ urlpatterns = [
     re_path(r"api/authors/(?P<user_id>.+\d)/like/$", likes.LikeViewSet.as_view({'post': 'add_like', 'delete': 'remove_like'}), name="like"),
     re_path(r"api/authors/(?P<user_id>.+\d)/posts/(?P<post_id>.+\d)/comments/(?P<comment_id>.+\d)/likes/$", likes.LikeViewSet.as_view({'get': 'get_comment_likes'}), name="comment_likes"),
     re_path(r"api/authors/(?P<user_id>.+\d)/posts/(?P<post_id>.+\d)/likes/$", likes.LikeViewSet.get_post_likes, name="post_likes"),
-    re_path(r"api/authors/(?P<user_id>.+\d)/liked/(?P<like_id>.+\d)/$", likes.LikeViewSet.get_like, name="get_like_object"),
+    re_path(r"api/authors/(?P<user_id>https?.+\d)/liked/(?P<like_id>https?.+\d)/$", likes.LikeViewSet.get_like, name="get_like_object"),
     re_path(r"api/authors/(?P<user_id>.+\d)/liked/$", likes.LikeViewSet.user_likes, name="get_liked"),
 
     # Comment URLs 

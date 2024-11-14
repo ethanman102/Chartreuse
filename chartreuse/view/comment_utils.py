@@ -146,8 +146,8 @@ def send_comment_to_inbox(comment_url_id):
         url = host
         if not host.endswith('api/'):
             url += '/chartreuse/api/'
-        if not url.startswith('http://'):
-            url = 'http://' + url
+        if not url.startswith('https://'):
+            url = 'https://' + url
         url += 'authors/'
 
         base_url = f"{comment.post.user.host}/chartreuse/api/authors/"

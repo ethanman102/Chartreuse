@@ -146,13 +146,20 @@ def inbox(request, user_id):
         author_id = unquote(author["id"])
         author = User.objects.get(pk=author_id)
 
-        post_id = unquote(post["id"])
-        post = Post.objects.get(url_id=post_id)
+        post = Post.objects.get(url_id=post)
 
-        new_like = Like.objects.create(user=author, published=published, post=post) 
-        new_like.save()
+        # check whether like already exists
+        like = Like.objects.filter(user=author, post=post).first()
 
-        return JsonResponse({"status": "Like added successfully"})
+        if like is None:
+            new_like = Like.objects.create(user=author, published=published, post=post) 
+            new_like.save()
+
+            return JsonResponse({"status": "Like added successfully"})
+        else:
+            like.delete()
+
+            return JsonResponse({"status": "Like removed successfully"})
 
     elif (data["type"] == "follow"):
         actor = data["actor"]

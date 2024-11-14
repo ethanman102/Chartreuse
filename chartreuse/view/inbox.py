@@ -112,11 +112,11 @@ def inbox(request, user_id):
         new_post = Post.objects.get(url_id=post)
 
         # check whether comment already exists
-        comment = Comment.objects.filter(user=comment_author, comment=comment_text, contentType=contentType, post=new_post).first()
+        comment = Comment.objects.filter(url_id=comment_id).first()
 
         if comment is None:
-            new_comment = Comment.objects.create(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post)
-            new_comment.save()
+            comment = Comment.objects.create(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post, dateCreated=published)
+            comment.save()
 
         # add comment likes
         print("likes", likes)
@@ -134,15 +134,12 @@ def inbox(request, user_id):
             like_author = User.objects.get(pk=like_author_id)
 
             # check whether like already exists
-            if comment is None:
-                like = Like.objects.filter(user=like_author, comment=new_comment).first()
-            else:
-                like = Like.objects.filter(user=like_author, comment=comment).first()
+            like = Like.objects.filter(user=like_author, comment=comment).first()
 
             print(like)
             if like is None:
                 print("adding like")
-                new_like = Like.objects.create(user=like_author, url_id=like_id, comment=new_comment)
+                new_like = Like.objects.create(user=like_author, url_id=like_id, comment=comment, published=published)
                 new_like.save()
         return JsonResponse({"status": "Comment added successfully"})
         

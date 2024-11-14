@@ -144,13 +144,10 @@ def send_comment_to_inbox(comment_url_id):
         password = node.password
 
         url = host
-        if not host.endswith('api/'):
-            url += '/chartreuse/api/'
-        if not url.startswith('https://'):
-            url = 'https://' + url
+        
         url += 'authors/'
 
-        base_url = f"{comment.post.user.host}/chartreuse/api/authors/"
+        base_url = f"{comment.post.user.host}authors/"
         comments_json_url = f"{base_url}{quote(comment.post.user.url_id, safe='')}/posts/{quote(comment.post.url_id, safe='')}/comment/{quote(comment.url_id, safe='')}/"
 
         comments_response = requests.get(comments_json_url)

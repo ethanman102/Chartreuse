@@ -108,11 +108,9 @@ def send_post_to_inbox(post_url_id):
             url = 'http://' + url
         url += 'authors/'
 
-        if not post.user.host.startswith('http://') and not post.user.host.startswith('https://'):
-            post.user.host = 'http://' + host  # Default to HTTP
-
         base_url = f"{post.user.host}/chartreuse/api/authors/"
         post_json_url = f"{base_url}{quote(post.user.url_id, safe='')}/posts/{quote(post.url_id, safe='')}/"
+        print(post_json_url)
 
         post_response = requests.get(post_json_url)
         post_json = post_response.json()

@@ -360,6 +360,9 @@ class PostViewSet(viewsets.ViewSet):
         decoded_user_id = unquote(user_id)
         decoded_post_id = unquote(post_id)
 
+        print(decoded_user_id)
+        print(decoded_post_id)
+
         author = User.objects.get(url_id=decoded_user_id)
 
         post = Post.objects.filter(user=author, url_id=decoded_post_id).first()

@@ -8,8 +8,8 @@ from django.contrib.auth.decorators import login_required
 from .view import home_page_view, profile_utils, signup_view, login_view, landing_page_view, profile_view, follow_list_view, post_view, settings_view, post_utils, comment_utils, follow_utils,discover_view, inbox
 app_name = "chartreuse"
 urlpatterns = [
-    re_path(r"homepage/post/(?P<post_id>.+)/image$", images.retrieve_from_homepage, name='get_image_post'),
-    re_path(r"authors/(?P<author_id>.+)/post/(?P<post_id>.+)/image$", images.retrieve_from_profile, name='get_image_post_profile'),
+    re_path(r"homepage/post/(?P<post_id>https?.+\d)/image$", images.retrieve_from_homepage, name='get_image_post'),
+    re_path(r"authors/(?P<author_id>.+)/post/(?P<post_id>https?.+\d)/image$", images.retrieve_from_profile, name='get_image_post_profile'),
 
     # Post Comment URLs
     re_path(r"comment/$",comment_utils.add_comment,name="add_comment"),
@@ -27,18 +27,18 @@ urlpatterns = [
     re_path(r"api/authors/(?P<user_id>.+\d)/liked/$", likes.LikeViewSet.user_likes, name="get_liked"),
 
     # Comment URLs 
-    re_path(r"api/authors/(?P<user_id>.+)/posts/(?P<post_id>.+)/comments/add/$", comments.CommentViewSet.as_view({'post': 'create_comment'}), name="create_comment"),
-    re_path(r"api/authors/(?P<user_id>.+)/posts/(?P<post_id>.+)/comment/(?P<comment_id>.+)/$", comments.CommentViewSet.get_comment, name="get_comment"),
+    re_path(r"api/authors/(?P<user_id>https?.+\d)/posts/(?P<post_id>https?.+\d)/comments/add/$", comments.CommentViewSet.as_view({'post': 'create_comment'}), name="create_comment"),
+    re_path(r"api/authors/(?P<user_id>https?.+\d)/posts/(?P<post_id>https?.+\d)/comment/(?P<comment_id>.+)/$", comments.CommentViewSet.get_comment, name="get_comment"),
     re_path(r"api/comment/(?P<comment_id>.+)/remove/$", comments.CommentViewSet.as_view({"delete":"delete_comment"}), name="delete_comment"), 
     re_path(r"api/comment/(?P<comment_id>.+)/$", comments.CommentViewSet.get_comment, name="get_comment_by_cid"), 
-    re_path(r"api/authors/(?P<user_id>.+)/posts/(?P<post_id>.+)/comments/$", comments.CommentViewSet.as_view({'get': 'get_comments'}), name="get_comments"),
-    re_path(r"api/posts/(?P<post_id>.+)/comments/$", comments.CommentViewSet.as_view({'get': 'get_comments'}), name="get_comments_by_pid"),
-    re_path(r"api/authors/(?P<user_id>.+)/commented/$", comments.CommentViewSet.as_view({'get': "get_authors_comments", 'post': "create_comment"}), name="get_authors_comments"),
-    re_path(r"api/authors/(?P<user_id>.+)/commented/(?P<comment_id>.+)/$", comments.CommentViewSet.get_comment, name="get_commented"),
+    re_path(r"api/authors/(?P<user_id>https?.+\d)/posts/(?P<post_id>https?.+\d)/comments/$", comments.CommentViewSet.as_view({'get': 'get_comments'}), name="get_comments"),
+    re_path(r"api/posts/(?P<post_id>https?.+\d)/comments/$", comments.CommentViewSet.as_view({'get': 'get_comments'}), name="get_comments_by_pid"),
+    re_path(r"api/authors/(?P<user_id>https?.+\d)/commented/$", comments.CommentViewSet.as_view({'get': "get_authors_comments", 'post': "create_comment"}), name="get_authors_comments"),
+    re_path(r"api/authors/(?P<user_id>https?.+\d)/commented/(?P<comment_id>.+)/$", comments.CommentViewSet.get_comment, name="get_commented"),
     re_path(r"api/commented/(?P<comment_id>.+)/$", comments.CommentViewSet.get_comment, name="get_commented_by_cid"), 
 
     # Post URLs
-    re_path(r"api/authors/(?P<user_id>.+\d)/posts/(?P<post_id>.+\d)/$", posts.PostViewSet.as_view({"get": "get_post", "delete": "remove_post", "put": "update"}), name="post"),
+    re_path(r"api/authors/(?P<user_id>https?.+\d)/posts/(?P<post_id>https?.+\d)/$", posts.PostViewSet.as_view({"get": "get_post", "delete": "remove_post", "put": "update"}), name="post"),
     re_path(r"api/authors/(?P<user_id>.+\d)/posts/$", posts.PostViewSet.as_view({"get": "get_posts", "post": "create_post"}), name="posts"),
     re_path(r"api/post-exists/$", post_utils.check_duplicate_post, name="check_duplicate_post"),
     
@@ -68,9 +68,9 @@ urlpatterns = [
     path('set-profile-image/', profile_utils.setNewProfileImage, name='set_profile_image'),
 
     # Github URLs
-    re_path(r"github/(?P<user_id>.+)/events/", github.get_events, name="get_events"),
-    re_path(r"github/(?P<user_id>.+)/starred/", github.get_starred, name="get_starred"),
-    re_path(r"github/(?P<user_id>.+)/subscriptions/", github.get_subscriptions, name="get_subscriptions"),
+    re_path(r"github/(?P<user_id>https?.+\d)/events/", github.get_events, name="get_events"),
+    re_path(r"github/(?P<user_id>https?.+\d)/starred/", github.get_starred, name="get_starred"),
+    re_path(r"github/(?P<user_id>https?.+\d)/subscriptions/", github.get_subscriptions, name="get_subscriptions"),
     re_path(r"github/polling/$", profile_utils.checkGithubPolling, name="github_polling"),
     
     # error page url
@@ -110,20 +110,20 @@ urlpatterns = [
     re_path(r'.+/send-follow-request/', follow_utils.send_follow_request, name='send-follow-request'),
     re_path(r'.+/repost/', post_utils.repost,name='repost'),
 
-    re_path(r'homepage/post/(?P<post_id>.+)/edit/', post_utils.edit_post, name='edit-post'),
-    re_path(r'homepage/post/(?P<post_id>.+)/delete/', post_utils.delete_post, name='delete-post'),
-    re_path(r'homepage/post/(?P<post_id>.+)/update/', post_utils.update_post, name='update-post'),
-    re_path(r'homepage/post/(?P<post_id>.+)/', post_view.PostDetailView.as_view(), name='view-post'),
+    re_path(r'homepage/post/(?P<post_id>https?.+\d)/edit/', post_utils.edit_post, name='edit-post'),
+    re_path(r'homepage/post/(?P<post_id>https?.+\d)/delete/', post_utils.delete_post, name='delete-post'),
+    re_path(r'homepage/post/(?P<post_id>https?.+\d)/update/', post_utils.update_post, name='update-post'),
+    re_path(r'homepage/post/(?P<post_id>https?.+\d)/', post_view.PostDetailView.as_view(), name='view-post'),
 
     # Follow Request URLs
-    re_path(r"authors/(?P<url_id>.+)/post/(?P<post_id>.+)/$",post_view.PostDetailView.as_view(),name="profile_view_post"),
+    re_path(r"authors/(?P<url_id>.+)/post/(?P<post_id>https?.+\d)/$",post_view.PostDetailView.as_view(),name="profile_view_post"),
     re_path(r"authors/accept/(?P<followed>.+)/(?P<follower>.+)/", profile_view.follow_accept,name="profile_follow_accept"),
     re_path(r"authors/reject/(?P<followed>.+)/(?P<follower>.+)/", profile_view.follow_reject,name="profile_follow_reject"),
     re_path(r"authors/unfollow/(?P<followed>.+)/(?P<follower>.+)/",profile_view.profile_unfollow,name="profile_unfollow"),
     re_path(r"authors/followrequest/(?P<requestee>.+)/(?P<requester>.+)/",profile_view.profile_follow_request,name="profile_follow_request"),
-    re_path(r"authors/following/(?P<user_id>.+)/",follow_list_view.FollowListDetailView.as_view(),name="user_following_list"),
-    re_path(r"authors/followers/(?P<user_id>.+)/",follow_list_view.FollowListDetailView.as_view(),name="user_followers_list"),
-    re_path(r"authors/friends/(?P<user_id>.+)/",follow_list_view.FollowListDetailView.as_view(),name="user_friends_list"),
+    re_path(r"authors/following/(?P<user_id>https?.+\d)/",follow_list_view.FollowListDetailView.as_view(),name="user_following_list"),
+    re_path(r"authors/followers/(?P<user_id>https?.+\d)/",follow_list_view.FollowListDetailView.as_view(),name="user_followers_list"),
+    re_path(r"authors/friends/(?P<user_id>https?.+\d)/",follow_list_view.FollowListDetailView.as_view(),name="user_friends_list"),
     re_path(r"authors/(?P<url_id>.+)/", profile_view.ProfileDetailView.as_view(),name="profile"),
     re_path(r"authors/", profile_utils.view_profile ,name="redirect_profile"),
 ] 

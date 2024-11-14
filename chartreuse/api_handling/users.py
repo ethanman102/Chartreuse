@@ -18,6 +18,8 @@ import regex as re
 
 from .. import views
 from ..models import User
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 class UserSerializer(serializers.ModelSerializer):
     type = serializers.CharField(default="author")
@@ -57,7 +59,9 @@ class UsersSerializer(serializers.Serializer):
 
 class UserViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
-    authentication_permissions = []
+    authentication_classes = []
+
+
 
     @extend_schema(
         summary="Get a list of users",
@@ -82,6 +86,7 @@ class UserViewSet(viewsets.ViewSet):
             ),
         }
     )
+    
     def list(self, request):
         '''
         Gets a paginated list of users based on the provided query parameters. 

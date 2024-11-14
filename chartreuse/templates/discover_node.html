@@ -45,12 +45,12 @@
         window.addEventListener('load',main);
         function main(){
             document.querySelectorAll('.node-button').forEach((button)=>{
-                console.log('hi');
                 button.addEventListener('click',function(event){
                     // https://stackoverflow.com/questions/5997450/append-to-url-and-refresh-page
+                    // Append to URL and refresh page ()
                     let percentEncodedHost = this.getAttribute('node-host');
                     let url = window.location.href;
-                    url += percentEncodedHost + '/' + '?page=1&size=10';
+                    url += percentEncodedHost + '/' + '?page=1&size=5';
                     window.location.href = url;
                 });
             });

@@ -31,3 +31,4 @@ admin.site.register(models.FollowRequest)
 admin.site.register(models.GithubPolling)
 
 admin.site.register(models.Node)
+admin.site.register(models.Settings)

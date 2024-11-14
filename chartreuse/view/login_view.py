@@ -23,7 +23,7 @@ def save_login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        current_host = Host(request.get_host())
+        # current_host = Host(request.get_host())
 
         if not username or not password:
             return JsonResponse({"error": "Username and password are required."}, status=400)

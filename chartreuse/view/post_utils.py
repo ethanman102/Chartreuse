@@ -280,7 +280,7 @@ def repost(request):
         request: Request object
     '''
     if request.method == "POST":
-        data = json.loads(request.body)
+        data = request.data
 
         title = data.get('title')
 

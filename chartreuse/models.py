@@ -102,3 +102,25 @@ class Node(models.Model):
 
     def __str__(self):
         return f"host={self.host}, username={self.username}, password={self.password}, outgoing={self.follow_status}"
+    
+class Settings(models.Model):
+    '''
+    This is a custom singleton model to control all the admins settings in the database.
+    '''
+    approval_required = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        '''
+        Prevents creating a new instance of Settings if one already exists
+        '''
+        if not self.pk and Settings.objects.exists():
+            raise ValueError("Cannot create a new Settings instance if one already exists.")
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get_instance(cls):
+        '''
+        Returns the singleton instance of Settings if it exists, otherwise creates one.
+        '''
+        instance, _ = cls.objects.get_or_create(pk=1)
+        return instance

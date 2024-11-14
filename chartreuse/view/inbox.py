@@ -1,8 +1,11 @@
 from urllib.parse import unquote
-from ..models import Like, User, Post, Comment, Follow, FollowRequest
+from ..models import Like, User, Post, Comment, FollowRequest
 from ..views import Host
 import json
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 
+@csrf_exempt
 def inbox(request, user_id):
     decoded_user_id = unquote(user_id)
 
@@ -24,6 +27,7 @@ def inbox(request, user_id):
 
         # check whether we need to add this post or update it or delete it
         post = Post.objects.filter(url_id=post_id)
+        print(data)
 
         if len(post) == 0:
             # get author object
@@ -75,6 +79,8 @@ def inbox(request, user_id):
 
                 new_like = Like.objects.create(author=author, published=published, post=new_post)
                 new_like.save()
+                
+        return JsonResponse({"status": "Post added successfully"})
 
     elif (data["type"] == "comment"):
         comment_author = data["author"]

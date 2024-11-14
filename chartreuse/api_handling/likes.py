@@ -302,7 +302,7 @@ class LikeViewSet(viewsets.ViewSet):
         response = user_viewset.retrieve(request, pk=decoded_user_id)
 
         data = json.loads(response.content)
-        like = Like.objects.filter(user=user, url_id=decoded_like_id)[0]
+        like = Like.objects.filter(url_id=decoded_like_id).first()
 
         likeObject = {
             "type": "like",
@@ -445,7 +445,7 @@ class LikeViewSet(viewsets.ViewSet):
         post = get_object_or_404(Post, url_id=decoded_post_id)
         comment = get_object_or_404(Comment, url_id=decoded_comment_id)
 
-        likes = Like.objects.filter(user=user, post=post, comment=comment)
+        likes = Like.objects.filter(user=user, comment=comment)
 
         request.method = 'GET'
         user_viewset = UserViewSet()
@@ -468,10 +468,10 @@ class LikeViewSet(viewsets.ViewSet):
 
         # Since we have some additional fields, we only want to return the required ones
         filtered_likes_attributes = []
-        for like in page_likes:
+        for like in likes:
 
             likeObject = {
-                "type": "likes",
+                "type": "like",
                 "author": {
                     "type": "author",
                     "id": data["id"],
@@ -483,7 +483,7 @@ class LikeViewSet(viewsets.ViewSet):
                 },
                 "published": like.dateCreated,
                 "id": like.url_id,
-                "object": like.post.url_id
+                "object": like.comment.url_id
             }
 
             filtered_likes_attributes.append(likeObject)

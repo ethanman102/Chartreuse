@@ -16,7 +16,7 @@ class User(models.Model):
     dateCreated  = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"User(pk={self.pk}, username={self.user.username}, displayName={self.displayName}, host={self.host}, github={self.github}, profileImage={self.profileImage})"
+        return f"User(pk={self.pk}, displayName={self.displayName}, host={self.host}, github={self.github}, profileImage={self.profileImage})"
 
 class Post(models.Model):
     title = models.CharField(max_length=200)

@@ -102,15 +102,11 @@ def send_post_to_inbox(post_url_id):
         password = node.password
 
         url = host
-        if not host.endswith('api/'):
-            url += '/chartreuse/api/'
-        if not url.startswith('https://'):
-            url = 'https://' + url
+        
         url += 'authors/'
 
-        base_url = f"{post.user.host}/chartreuse/api/authors/"
+        base_url = f"{post.user.host}authors/"
         post_json_url = f"{base_url}{quote(post.user.url_id, safe='')}/posts/{quote(post.url_id, safe='')}/"
-
         post_response = requests.get(post_json_url)
         post_json = post_response.json()
 
@@ -271,7 +267,7 @@ def update_post(request, post_id):
         ),
     }
 )
-@api_view(["POST"])
+@action(detail=True, methods=("POST",))
 def repost(request):
     '''
     Purpose: API endpoint to repost a POST!
@@ -280,7 +276,7 @@ def repost(request):
         request: Request object
     '''
     if request.method == "POST":
-        data = request.data
+        data = json.loads(request.body)
 
         title = data.get('title')
 
@@ -432,38 +428,32 @@ def send_like_to_inbox(like_url_id):
     if not nodes.exists():
         return []
     
+    base_url = f"{like.user.host}authors/"
+    likes_json_url = f"{base_url}{quote(like.user.url_id, safe='')}/liked/{quote(like.url_id, safe='')}/"
+
+    likes_response = requests.get(likes_json_url)
+    likes_json = likes_response.json()
+
     for node in nodes:
+        author_url_id = like.user.url_id
         host = node.host
         username = node.username
         password = node.password
 
         url = host
-        if not host.endswith('api/'):
-            url += '/chartreuse/api/'
-        if not url.startswith('https://'):
-            url = 'https://' + url
+        
         url += 'authors/'
 
-        base_url = f"{like.post.user.host}/chartreuse/api/authors/"
-        likes_json_url = f"{base_url}{quote(like.user.url_id, safe='')}/liked/{quote(like.url_id, safe='')}/"
+        url += f'{quote(author_url_id, safe = "")}/inbox/'
 
-        likes_response = requests.get(likes_json_url)
-        likes_json = likes_response.json()
+        headers = {
+            'Authorization' : f'Basic {username}:{password}',
+            "Content-Type": "application/json; charset=utf-8"
+        }
+        # send to inbox
+        requests.post(url, headers=headers, json=likes_json)
 
-        followers = Follow.objects.filter(followed = like.post.user)
-        for follower in followers:
-            if follower.follower.host == host:
-                author_url_id = follower.follower.url_id
-
-                url += f'{quote(author_url_id, safe = "")}/inbox/'
-
-                headers = {
-                    'Authorization' : f'Basic {username}:{password}',
-                    "Content-Type": "application/json; charset=utf-8"
-                }
-
-                # send to inbox
-                requests.post(url, headers=headers, json=likes_json)
+    return JsonResponse({"status": "Like added successfully"})
 
 def get_all_public_posts():
     '''

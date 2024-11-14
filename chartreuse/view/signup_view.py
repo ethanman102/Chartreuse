@@ -55,7 +55,7 @@ def save_signup(request):
             displayName=displayName,
             github=github,
             profileImage=profileImage,
-            host=current_host.host,
+            host="https://" + current_host.host + '/chartreuse/api/',
             user=authUser
         )
 

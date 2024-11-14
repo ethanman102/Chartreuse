@@ -1,10 +1,12 @@
 from django.shortcuts import redirect, get_object_or_404
-from chartreuse.models import User,Like,Comment,Post,Follow,FollowRequest
+from chartreuse.models import User,Like,Comment,Post,Follow,FollowRequest, Node
 from django.views.generic.detail import DetailView
 from django.http import HttpResponseNotAllowed
 from urllib.parse import unquote, quote
 from . import post_utils
 from ..views import Host
+import requests
+import base64
 
 def follow_accept(request,followed,follower):
 
@@ -79,9 +81,6 @@ def profile_follow_request(request,requestee,requester):
     requestee: the id of the user who is being asked to get followed
     requester: the id of the user who is sending the follow request
     '''
-
-
-
     if request.method == "POST":
         requestee = unquote(requestee)
         requester = unquote(requester)
@@ -90,16 +89,57 @@ def profile_follow_request(request,requestee,requester):
         requestee_user = get_object_or_404(User,url_id=requestee)
         if remote_check != None:
             # Can assume that the user is already following the remote author now..
+
+            remote_node = Node.objects.filter(follow_status='OUTGOING',host=requestee_user.host)
+            if remote_node.count() != 1:
+                return redirect("chartreuse:profile",url_id=quote(requestee,safe=''))
+            
+            remote_node = remote_node[0]
+            username = base64.b64encode(bytes(remote_node.username,encoding='utf-8')).decode('utf-8')
+            password = base64.b64encode(bytes(remote_node.password,encoding='utf-8')).decode('utf-8')
+
+
             follow = Follow(follower=requester_user,followed=requestee_user) # create the new follow!
             follow.save()
-            ##########################################
-            # CODE SPOT FOR INBOX SENDING FOLLOW REQ #
-            ##########################################
 
+            data = {
+                'type': 'follow',
+                'summary':'actor wants to follow object',
+                'actor':
+                {
+                    'type':'author',
+                    'id': requester_user.url_id,
+                    'host': requester_user.host,
+                    'displayName': requester_user.displayName,
+                    'page': f'{requester_user.host}/authors/{requester_user.url_id}/',
+                    'github':requester_user.github,
+                    'profileImage': requester_user.profileImage
+                },
+                'object':{
+                    'type':'author',
+                    'id': requestee_user.url_id,
+                    'host': requestee_user.host,
+                    'displayName': requester_user.displayName,
+                    'page': f'{requestee_user.host}/authors/{requestee_user.url_id}/',
+                    'github':requestee_user.github,
+                    'profileImage': requestee_user.profileImage
+                }
+            }
+
+            url = f'{requestee_user.host}authors/{quote(requestee_user.url_id,safe='')}/inbox/'
+
+            headers = {
+                'Authorization' : f'Basic {username}:{password}',
+                'Content-Type': 'application/json; charset=utf-8'
+            }
+            response = requests.post(url, headers=headers, json=data)
+            
         else:
             FollowRequest.objects.create(requestee=requestee_user,requester=requester_user)
         return redirect("chartreuse:profile",url_id=quote(requestee,safe=''))
     return HttpResponseNotAllowed(["POST"])
+
+
 
 
 class ProfileDetailView(DetailView):
@@ -146,7 +186,7 @@ class ProfileDetailView(DetailView):
 
 
 
-        if ('https://' + host_obj.host) != user.host:
+        if ('https://' + host_obj.host + '/chartreuse/api/') != user.host:
             context['remote'] = 'REMOTE author'
         
 
@@ -159,7 +199,9 @@ class ProfileDetailView(DetailView):
             context['logged_in'] = True
             # if logged in, check if user owns the current page or that's being visited or not...
             current_user = self.request.user
-            current_user_model = get_object_or_404(User,user=current_user)  
+
+            current_user_model = get_object_or_404(User, user=current_user)  
+
             if user.url_id == current_user_model.url_id:
                 # owns the page, should not display follow button etc...
                 context['viewer_id'] = quote(current_user_model.url_id,safe='')

@@ -4,6 +4,7 @@ from django.views.generic.detail import DetailView
 from django.http import HttpResponseNotAllowed
 from urllib.parse import unquote, quote
 from . import post_utils
+from ..views import Host
 
 def follow_accept(request,followed,follower):
 
@@ -127,6 +128,15 @@ class ProfileDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         user = context['profile']
         context['owner_id'] = quote(user.url_id,safe='')
+        
+        hostname = self.request.get_host()
+        host_obj = Host(hostname)
+
+
+
+        if ('https://' + host_obj.host) != user.host:
+            context['remote'] = 'REMOTE author'
+        
 
         context['profile'].profileImage = post_utils.get_image_post(context['profile'].profileImage)
 

@@ -12,6 +12,13 @@
 
 }
 
+.node-container{
+    background-color: rgb(246, 255, 247);
+    padding-top: 0.5ch;
+    padding-bottom: 1ch;
+    border: solid 5px black;
+}
+
 #header{
     color: chartreuse;
     font-weight: bold;

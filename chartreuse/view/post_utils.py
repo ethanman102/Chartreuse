@@ -448,7 +448,9 @@ def send_like_to_inbox(like_url_id):
 
         followers = Follow.objects.filter(followed = like.post.user)
         for follower in followers:
+            print("FOLLOWER -", follower.follower.host)
             if follower.follower.host == host:
+                print("FOLLOWER", follower.follower.url_id)
                 author_url_id = follower.follower.url_id
 
                 url += f'{quote(author_url_id, safe = "")}/inbox/'

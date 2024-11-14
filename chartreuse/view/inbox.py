@@ -104,6 +104,13 @@ def inbox(request, user_id):
         published = data["published"]
         likes = data["likes"]
         # add this new comment if it does not exist, if it exists, then delete it
+        print("author", comment_author)
+        print("comment", comment)
+        print("contentType", contentType)
+        print("comment_id", comment_id)
+        print("post", post)
+        print("published", published)
+        print("likes", likes)
 
         print("GOT COMMENT", data)
 
@@ -116,7 +123,7 @@ def inbox(request, user_id):
         comment = Comment.objects.filter(user=comment_author, comment=comment, url_id=comment_id, contentType=contentType, post=new_post).first()
 
         if comment is None:
-            new_comment = Comment.objects.create(user=comment_author, comment=comment, url_id=comment_id, contentType=contentType, post=new_post, dateCreated=published)
+            new_comment = Comment.objects.create(user=comment_author, comment=comment, url_id=comment_id, contentType=contentType, post=new_post)
             new_comment.save()
 
         # add comment likes
@@ -134,7 +141,7 @@ def inbox(request, user_id):
             like = Like.objects.filter(user=like_author, url_id=like_id, comment=new_comment).first()
 
             if like is None:
-                new_like = Like.objects.create(user=like_author, url_id=like_id, published=published, comment=new_comment)
+                new_like = Like.objects.create(user=like_author, url_id=like_id, comment=new_comment)
                 new_like.save()
         return JsonResponse({"status": "Comment added successfully"})
         
@@ -155,7 +162,7 @@ def inbox(request, user_id):
         like = Like.objects.filter(user=author, url_id=like_id, post=post).first()
 
         if like is None:
-            new_like = Like.objects.create(user=author, url_id=like_id, published=published, post=post) 
+            new_like = Like.objects.create(user=author, url_id=like_id, post=post) 
             new_like.save()
 
             return JsonResponse({"status": "Like added successfully"})

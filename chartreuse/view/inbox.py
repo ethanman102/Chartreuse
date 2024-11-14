@@ -182,12 +182,12 @@ def inbox(request, user_id):
         else:
             remote_author = author_queryset[0]
 
-        # follower = User.objects.get(pk=unquote(actor["id"]))
+        follower = User.objects.get(pk=unquote(actor["id"]))
         followed = User.objects.get(pk=unquote(object_to_follow["id"]))
 
 
         # add the follow request if it does not exist, if it exists, delete the follow request
-        new_follow_request = FollowRequest.objects.create(follower=remote_author, followed=followed)
+        new_follow_request = FollowRequest.objects.create(requester=remote_author, requestee=followed)
         new_follow_request.save()
     
         return JsonResponse({"status": "Follow request sent successfully"},status=200)

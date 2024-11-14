@@ -6,6 +6,7 @@ from urllib.parse import unquote, quote
 from . import post_utils
 from ..views import Host
 import requests
+import base64
 
 def follow_accept(request,followed,follower):
 
@@ -88,58 +89,55 @@ def profile_follow_request(request,requestee,requester):
         requestee_user = get_object_or_404(User,url_id=requestee)
         if remote_check != None:
             # Can assume that the user is already following the remote author now..
+
+            remote_node = Node.objects.filter(follow_status='OUTGOING',host=requestee_user.host)
+            if remote_node.count() != 1:
+                return redirect("chartreuse:profile",url_id=quote(requestee,safe=''))
+            
+            username = base64.b64encode(bytes(remote_node.username,encoding='utf-8')).decode('utf-8')
+            password = base64.b64encode(bytes(remote_node.password,encoding='utf-8')).decode('utf-8')
+
+
             follow = Follow(follower=requester_user,followed=requestee_user) # create the new follow!
             follow.save()
-            ##########################################
-            # CODE SPOT FOR INBOX SENDING FOLLOW REQ #
-            ##########################################
-            send_follow_request_to_inbox(requester.url_id, requestee.url_id)
+
+            data = {
+                'type': 'follow',
+                'summary':'actor wants to follow object',
+                'actor':
+                {
+                    'type':'author',
+                    'id': requester_user.url_id,
+                    'host': requester_user.host,
+                    'displayName': requester_user.displayName,
+                    'page': f'{requester_user.host}/authors/{requester_user.url_id}/',
+                    'github':requester_user.github,
+                    'profileImage': requester_user.github
+                },
+                'object':{
+                    'type':'author',
+                    'id': requestee_user.url_id,
+                    'host': requestee_user.host,
+                    'displayName': requester_user.displayName,
+                    'page': f'{requestee_user.host}/authors/{requestee_user.url_id}/',
+                    'github':requestee_user.github,
+                    'profileImage': requestee_user.github
+                }
+            }
+
+            url = f'{requestee_user.host}authors/{requestee_user.url_id}/inbox'
+
+            headers = {
+                'Authorization' : f'Basic {username}:{password}'
+            }
+            response = requests.post(url,headers=headers)
+            
         else:
             FollowRequest.objects.create(requestee=requestee_user,requester=requester_user)
         return redirect("chartreuse:profile",url_id=quote(requestee,safe=''))
     return HttpResponseNotAllowed(["POST"])
 
-def send_follow_request_to_inbox(requester_url_id, requestee_url_id):
-    requester_user = get_object_or_404(User,url_id=requester_url_id)
-    requestee_user = get_object_or_404(User,url_id=requestee_url_id)
-    # send this to the inbox of other nodes
-    nodes = Node.objects.filter(follow_status='OUTGOING')
 
-    if not nodes.exists():
-        return []
-    
-    for node in nodes:
-        host = node.host
-        username = node.username
-        password = node.password
-
-        url = host
-        if not host.endswith('api/'):
-            url += '/chartreuse/api/'
-        if not url.startswith('https://'):
-            url = 'https://' + url
-        url += 'authors/'
-
-        base_url = f"{like.post.user.host}/chartreuse/api/authors/"
-        likes_json_url = f"{base_url}{quote(like.user.url_id, safe='')}/liked/{quote(like.url_id, safe='')}/"
-
-        likes_response = requests.get(likes_json_url)
-        likes_json = likes_response.json()
-
-        followers = Follow.objects.filter(followed = like.post.user)
-        for follower in followers:
-            if follower.follower.host == host:
-                author_url_id = follower.follower.url_id
-
-                url += f'{quote(author_url_id, safe = "")}/inbox/'
-
-                headers = {
-                    'Authorization' : f'Basic {username}:{password}',
-                    "Content-Type": "application/json; charset=utf-8"
-                }
-
-                # send to inbox
-                requests.post(url, headers=headers, json=likes_json)
 
 
 class ProfileDetailView(DetailView):

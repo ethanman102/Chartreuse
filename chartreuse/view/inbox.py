@@ -165,11 +165,26 @@ def inbox(request, user_id):
         actor = data["actor"]
         object_to_follow = data["object"]
 
-        follower = User.objects.get(pk=unquote(actor["id"]))
+        author_queryset = User.objects.filter(url_id=unquote(actor['id']))
+
+        if not author_queryset.exists():
+            # discovered a new author to add to database...
+            remote_author = User.objects.create(
+                url_id = unquote(actor['id']),
+                displayName = actor.get('displayName',''),
+                host = actor.get('host'),
+                github = actor.get('github',''),
+                profileImage = actor.get('profileImage',''),
+            )
+        else:
+            remote_author = author_queryset[0]
+
+        # follower = User.objects.get(pk=unquote(actor["id"]))
         followed = User.objects.get(pk=unquote(object_to_follow["id"]))
 
+
         # add the follow request if it does not exist, if it exists, delete the follow request
-        new_follow_request = FollowRequest.objects.create(follower=follower, followed=followed)
+        new_follow_request = FollowRequest.objects.create(follower=remote_author, followed=followed)
         new_follow_request.save()
     
     return JsonResponse({"status": "Follow request sent successfully"})

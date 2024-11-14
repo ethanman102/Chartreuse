@@ -111,7 +111,7 @@ def inbox(request, user_id):
         new_post = Post.objects.get(url_id=post)
 
         # check whether comment already exists
-        comment = Comment.objects.filter(user=comment_author, comment=comment, contentType=contentType, post=new_post).first()
+        comment = Comment.objects.filter(user=comment_author, comment=comment, url_id=comment_id, contentType=contentType, post=new_post).first()
 
         if comment is None:
             new_comment = Comment.objects.create(user=comment_author, comment=comment, url_id=comment_id, contentType=contentType, post=new_post, dateCreated=published)
@@ -129,7 +129,7 @@ def inbox(request, user_id):
             like_author = User.objects.get(pk=like_author_id)
 
             # check whether like already exists
-            like = Like.objects.filter(user=like_author, comment=new_comment).first()
+            like = Like.objects.filter(user=like_author, url_id=like_id, comment=new_comment).first()
 
             if like is None:
                 new_like = Like.objects.create(user=like_author, url_id=like_id, published=published, comment=new_comment)
@@ -149,7 +149,7 @@ def inbox(request, user_id):
         post = Post.objects.get(url_id=post)
 
         # check whether like already exists
-        like = Like.objects.filter(user=author, post=post).first()
+        like = Like.objects.filter(user=author, url_id=like_id, post=post).first()
 
         if like is None:
             new_like = Like.objects.create(user=author, url_id=like_id, published=published, post=post) 

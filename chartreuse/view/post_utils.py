@@ -271,7 +271,7 @@ def update_post(request, post_id):
         ),
     }
 )
-@action(detail=True, methods=("POST",))
+@api_view(["POST"])
 def repost(request):
     '''
     Purpose: API endpoint to repost a POST!

@@ -294,6 +294,9 @@ class LikeViewSet(viewsets.ViewSet):
         '''
         decoded_user_id = unquote(user_id)
         decoded_like_id = unquote(like_id)
+
+        print(decoded_user_id)
+        print(decoded_like_id)
     
         user = User.objects.get(pk=decoded_user_id)
 
@@ -302,7 +305,7 @@ class LikeViewSet(viewsets.ViewSet):
         response = user_viewset.retrieve(request, pk=decoded_user_id)
 
         data = json.loads(response.content)
-        like = Like.objects.filter(user=user, url_id=decoded_like_id)[0]
+        like = Like.objects.filter(user=user, url_id=decoded_like_id).first()
 
         likeObject = {
             "type": "like",

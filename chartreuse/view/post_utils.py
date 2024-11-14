@@ -442,6 +442,7 @@ def send_like_to_inbox(like_url_id):
 
         base_url = f"{like.post.user.host}authors/"
         likes_json_url = f"{base_url}{quote(like.user.url_id, safe='')}/liked/{quote(like.url_id, safe='')}/"
+        print(likes_json_url)
 
         likes_response = requests.get(likes_json_url)
         likes_json = likes_response.json()

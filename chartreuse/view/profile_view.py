@@ -92,8 +92,6 @@ def profile_follow_request(request,requestee,requester):
 
             remote_node = Node.objects.filter(follow_status='OUTGOING',host=requestee_user.host)
             if remote_node.count() != 1:
-                print("HIIIIIII")
-                print(requestee_user.host)
                 return redirect("chartreuse:profile",url_id=quote(requestee,safe=''))
             
             username = base64.b64encode(bytes(remote_node.username,encoding='utf-8')).decode('utf-8')

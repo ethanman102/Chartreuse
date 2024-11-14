@@ -167,7 +167,7 @@ def inbox(request, user_id):
 
         print('HERES THE ACTOR',actor)
 
-        author_queryset = User.objects.filter(url_id=unquote(actor['id']))
+        author_queryset = User.objects.filter(url_id=unquote(actor['id'])).first()
 
         if not author_queryset.exists():
             # discovered a new author to add to database...
@@ -180,7 +180,7 @@ def inbox(request, user_id):
                 profileImage = actor.get('profileImage',''),
             )
         else:
-            remote_author = author_queryset[0]
+            remote_author = author_queryset
 
         follower = User.objects.get(pk=unquote(actor["id"]))
         followed = User.objects.get(pk=unquote(object_to_follow["id"]))

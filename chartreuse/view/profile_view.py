@@ -133,6 +133,8 @@ def profile_follow_request(request,requestee,requester):
                 'Content-Type': 'application/json; charset=utf-8'
             }
             response = requests.post(url, headers=headers, json=data)
+            print('WE REACH HERE?')
+            print(response.status_code,'WOAH')
             
         else:
             FollowRequest.objects.create(requestee=requestee_user,requester=requester_user)

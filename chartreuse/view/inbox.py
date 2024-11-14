@@ -187,4 +187,4 @@ def inbox(request, user_id):
         new_follow_request = FollowRequest.objects.create(follower=remote_author, followed=followed)
         new_follow_request.save()
     
-    return JsonResponse({"status": "Follow request sent successfully"})
+        return JsonResponse({"status": "Follow request sent successfully"})

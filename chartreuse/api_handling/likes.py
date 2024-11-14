@@ -279,7 +279,7 @@ class LikeViewSet(viewsets.ViewSet):
             ),
         }
     )
-    @api_view(["GET"])
+    @action(detail=False, methods=["GET"])
     def get_like(request, user_id, like_id):
         '''
         Gets a specific like object from a user.
@@ -341,8 +341,8 @@ class LikeViewSet(viewsets.ViewSet):
             ),
         }
     )
-    @api_view(["GET"])
-    def get_post_likes(request, user_id, post_id):
+    @action(detail=False, methods=["GET"])
+    def get_post_likes(self, request, user_id=None, post_id=None):
         '''
         This function handles getting all likes on a post.
         '''

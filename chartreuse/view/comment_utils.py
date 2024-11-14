@@ -160,8 +160,6 @@ def send_comment_to_inbox(comment_url_id):
             'Authorization' : f'Basic {username}:{password}',
             "Content-Type": "application/json; charset=utf-8"
         }
-        print("SENT COMMENT", comments_json)
-        print("URL", url)
 
         # send to inbox
         requests.post(url, headers=headers, json=comments_json)

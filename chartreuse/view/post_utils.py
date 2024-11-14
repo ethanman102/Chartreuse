@@ -107,10 +107,7 @@ def send_post_to_inbox(post_url_id):
 
         base_url = f"{post.user.host}authors/"
         post_json_url = f"{base_url}{quote(post.user.url_id, safe='')}/posts/{quote(post.url_id, safe='')}/"
-        print(post_json_url)
         post_response = requests.get(post_json_url)
-        print(post_response)
-        print(post_response.json())
         post_json = post_response.json()
 
         followers = Follow.objects.filter(followed = post.user)
@@ -448,20 +445,14 @@ def send_like_to_inbox(like_url_id):
         url += 'authors/'
 
         url += f'{quote(author_url_id, safe = "")}/inbox/'
-        print(url)  
-        print(likes_json)
 
         headers = {
             'Authorization' : f'Basic {username}:{password}',
             "Content-Type": "application/json; charset=utf-8"
         }
-
-        print("SENT LIKE", likes_json)
-        print("URL", url)
-
         # send to inbox
         requests.post(url, headers=headers, json=likes_json)
-        
+
     return JsonResponse({"status": "Like added successfully"})
 
 def get_all_public_posts():

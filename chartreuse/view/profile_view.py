@@ -127,15 +127,12 @@ def profile_follow_request(request,requestee,requester):
             }
 
             url = f'{requestee_user.host}authors/{quote(requestee_user.url_id,safe='')}/inbox/'
-            print('URL MANN',url)
 
             headers = {
                 'Authorization' : f'Basic {username}:{password}',
                 'Content-Type': 'application/json; charset=utf-8'
             }
             response = requests.post(url, headers=headers, json=data)
-            print('WE REACH HERE?')
-            print(response.status_code,'WOAH')
             
         else:
             FollowRequest.objects.create(requestee=requestee_user,requester=requester_user)
@@ -202,9 +199,9 @@ class ProfileDetailView(DetailView):
             context['logged_in'] = True
             # if logged in, check if user owns the current page or that's being visited or not...
             current_user = self.request.user
-            print(current_user)
+
             current_user_model = get_object_or_404(User, user=current_user)  
-            print(current_user_model)
+
             if user.url_id == current_user_model.url_id:
                 # owns the page, should not display follow button etc...
                 context['viewer_id'] = quote(current_user_model.url_id,safe='')

@@ -104,7 +104,6 @@ def inbox(request, user_id):
         published = data["published"]
         likes = data["likes"]
         # add this new comment if it does not exist, if it exists, then delete it
-        print("GOT COMMENT", data)
 
         comment_author_id = unquote(comment_author["id"])
         comment_author = User.objects.get(pk=comment_author_id)
@@ -143,8 +142,6 @@ def inbox(request, user_id):
         like_id = data["id"]
         post = data["object"]
         # add the like if it does not exist, if it exists, delete the like
-        print("GOT LIKE", data)
-
         author_id = unquote(author["id"])
         author = User.objects.get(pk=author_id)
 
@@ -166,8 +163,6 @@ def inbox(request, user_id):
     elif (data["type"] == "follow"):
         actor = data["actor"]
         object_to_follow = data["object"]
-
-        print('HERES THE ACTOR',actor)
 
         author_queryset = User.objects.filter(url_id=unquote(actor['id'])).first()
 

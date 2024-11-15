@@ -3,6 +3,8 @@ from django.test import TestCase
 from django.urls import reverse
 from urllib.parse import quote
 import json
+from ..views import Host
+from ..models import User
 
 class UserTestCases(TestCase):
     @classmethod
@@ -11,6 +13,10 @@ class UserTestCases(TestCase):
 
         cls.client = APIClient()
 
+        # set the hostname
+        cls.hostname = 'http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/'
+        Host.host = cls.hostname
+
         # Test user data
         cls.test_user_1_data = {
             'displayName': 'Greg Johnson',
@@ -18,7 +24,6 @@ class UserTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/k7XVwpB.jpeg',
             'username': 'greg',
             'password': 'ABC123!!!',
-            'host': 'http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
             'firstName': 'Greg',
             'lastName': 'Johnson',
         }
@@ -29,7 +34,6 @@ class UserTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/1234.jpeg',
             'username': 'john',
             'password': '87@398dh817b!',
-            'host': 'http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
             'firstName': 'John',
             'lastName': 'Smith',
         }
@@ -40,7 +44,6 @@ class UserTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/abcd.jpeg',
             'username': 'benjamin',
             'password': 'fwef!&123',
-            'host': 'http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
             'firstName': 'Benjamin',
             'lastName': 'Stanley',
         }
@@ -59,7 +62,6 @@ class UserTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/1234.jpeg',
             'username': 'jane',
             'password': 'ABC123!!!',
-            'host': 'http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
             'firstName': 'Jane',
             'lastName': 'Doe',
         }, format='json')
@@ -70,9 +72,9 @@ class UserTestCases(TestCase):
         self.assertEqual(response.json()['github'], 'http://github.com/jdoe')
         self.assertEqual(response.json()['profileImage'], 'https://i.imgur.com/1234.jpeg')
         self.assertEqual(response.json()['type'], 'author')
-        self.assertEqual(response.json()['page'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/jane")
-        self.assertEqual(response.json()['id'], 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/4')
-        self.assertEqual(response.json()['host'], 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/')
+        self.assertEqual(response.json()['page'], f"{self.hostname}authors/jane")
+        self.assertEqual(response.json()['id'], f'{self.hostname}authors/4')
+        self.assertEqual(response.json()['host'], self.hostname)
     
     def test_get_all_users(self):
         '''

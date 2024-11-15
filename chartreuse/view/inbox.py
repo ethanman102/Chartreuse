@@ -125,7 +125,7 @@ def inbox(request, user_id):
         print(comment_text)
         print(contentType)
         print(new_post)
-        comment = Comment.objects.filter(user=comment_author, comment=comment_text, contentType=contentType, post=new_post).first()
+        comment = Comment.objects.filter(url_id=comment_id).first()
 
         if comment is None:
             comment = Comment.objects.create(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post)

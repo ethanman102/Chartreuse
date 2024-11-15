@@ -173,6 +173,7 @@ def inbox(request, user_id):
                 like.delete()
                 return JsonResponse({"status": "Like removed successfully"})
         else:
+            comment = Comment.objects.filter(url_id=object_id).first()
             like = Like.objects.filter(user=author, comment=comment).first()
             if like is None:
                 new_like = Like.objects.create(user=author, url_id=like_id, comment=comment)

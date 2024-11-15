@@ -143,7 +143,7 @@ class DiscoverNodeListView(ListView):
     template_name = 'discover_node.html'
     model = Node
     context_object_name = 'nodes'
-    queryset = Node.objects.filter(follow_status='OUTGOING')
+    queryset = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
 
     def get_context_data(self, **kwargs):
         '''

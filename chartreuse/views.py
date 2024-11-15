@@ -27,28 +27,22 @@ def checkIfRequestAuthenticated(request):
     request: Request object
     '''
     authentication = request.headers.get('Authorization')
+    if not authentication or not authentication.startswith('Basic'):
+        return JsonResponse({"error": "Missing or invalid Authorization header"}, status=401)
 
-    basic = authentication.split(" ")
-    if basic[0] != "Basic":
-        return JsonResponse({"error": "Unauthorized"}, status=401)
-    
-    # Decode the Base64-encoded credentials
     try:
-        decoded_bytes = base64.b64decode(basic[1])
+        # Decode the Base64-encoded credentials
+        decoded_bytes = base64.b64decode(authentication.split(" ")[1])
         decoded_str = decoded_bytes.decode('utf-8')  # Convert bytes to string
-    except (base64.binascii.Error, UnicodeDecodeError):
+        auth = decoded_str.split(":")
+        username = auth[0]
+        password = auth[1]
+    except (IndexError, base64.binascii.Error, UnicodeDecodeError):
         return JsonResponse({"error": "Invalid authentication format"}, status=401)
 
-    auth = decoded_str.split(":")
-    if len(auth) != 2:
-        return JsonResponse({"error": "Unauthorized"}, status=401)
-    
-    username = auth[0]
-    password = auth[1]
+    host = f"https://{request.get_host()}/chartreuse/api/"
 
-    host = request.get_host
-
-    node = Node.objects.filter(host=host, username=username, password=password)
+    node = Node.objects.filter(host=host, username=username, password=password, follow_status="INCOMING", status="ENABLED")
 
     if len(node) == 0:
         return JsonResponse({"error": "Unauthorized"}, status=401)

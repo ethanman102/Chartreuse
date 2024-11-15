@@ -133,7 +133,7 @@ def delete_comment(request, comment_id):
 def send_comment_to_inbox(comment_url_id):
     comment = Comment.objects.get(url_id=comment_url_id)
     # send this to the inbox of other nodes
-    nodes = Node.objects.filter(follow_status='OUTGOING')
+    nodes = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
 
     if not nodes.exists():
         return []
@@ -157,11 +157,10 @@ def send_comment_to_inbox(comment_url_id):
         url += f'{quote(author_url_id, safe = "")}/inbox/'
 
         headers = {
-            'Authorization' : f'Basic {username}:{password}',
             "Content-Type": "application/json; charset=utf-8"
         }
 
         # send to inbox
-        requests.post(url, headers=headers, json=comments_json)
+        requests.post(url, headers=headers, json=comments_json, auth=(username, password))
     
     return JsonResponse({'status': 'Comment sent to inbox successfully.'})

@@ -13,6 +13,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_seriali
 from rest_framework import serializers
 from rest_framework.decorators import action, api_view
 import requests
+from requests.auth import HTTPBasicAuth
 
 def get_post_likes(post_id):
     """
@@ -91,7 +92,7 @@ def delete_post(request, post_id):
 def send_post_to_inbox(post_url_id):
     post = Post.objects.get(url_id=post_url_id)
     # send this to the inbox of other nodes
-    nodes = Node.objects.filter(follow_status='OUTGOING')
+    nodes = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
 
     if not nodes.exists():
         return []
@@ -118,12 +119,11 @@ def send_post_to_inbox(post_url_id):
                 url += f'{quote(author_url_id, safe = "")}/inbox/'
 
                 headers = {
-                    'Authorization' : f'Basic {username}:{password}',
                     "Content-Type": "application/json; charset=utf-8"
                 }
 
                 # send to inbox
-                requests.post(url, headers=headers, json=post_json)
+                requests.post(url, headers=headers, json=post_json, auth=(username, password))
 
 @csrf_exempt
 def update_post(request, post_id):
@@ -423,7 +423,7 @@ def like_post(request):
 def send_like_to_inbox(like_url_id):
     like = Like.objects.get(url_id=like_url_id)
     # send this to the inbox of other nodes
-    nodes = Node.objects.filter(follow_status='OUTGOING')
+    nodes = Node.objects.filter(follow_status='OUTGOING', status="ENABLED")
 
     if not nodes.exists():
         return []
@@ -447,11 +447,11 @@ def send_like_to_inbox(like_url_id):
         url += f'{quote(author_url_id, safe = "")}/inbox/'
 
         headers = {
-            'Authorization' : f'Basic {username}:{password}',
             "Content-Type": "application/json; charset=utf-8"
         }
+
         # send to inbox
-        requests.post(url, headers=headers, json=likes_json)
+        requests.post(url, headers=headers, json=likes_json, auth=(username, password))
 
     return JsonResponse({"status": "Like added successfully"})
 

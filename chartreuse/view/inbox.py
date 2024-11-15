@@ -1,6 +1,6 @@
 from urllib.parse import unquote
 from ..models import Like, User, Post, Comment, FollowRequest
-from ..views import Host
+from ..views import Host, checkIfRequestAuthenticated
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
@@ -12,6 +12,15 @@ def inbox(request, user_id):
     user = User.objects.get(pk=decoded_user_id)
 
     data = json.loads(request.body.decode('utf-8'))
+
+    # check request headers
+    authorization = request.headers.get('Authorization')
+    if authorization is None:
+        return JsonResponse({"error": "Unauthorized"}, status=401)
+    
+    authorization_response = checkIfRequestAuthenticated(request)
+    if authorization_response.status_code != 200:
+        return authorization_response
 
     if (data["type"] == "post"):
         title = data["title"]
@@ -51,7 +60,7 @@ def inbox(request, user_id):
                 comment_author_id = unquote(comment_author["id"])
                 comment_author = User.objects.get(pk=comment_author_id)
 
-                new_comment = Comment.objects.create(user=comment_author, url_id=comment_id, comment=comment, contentType=contentType, post=new_post, dateCreated=published)
+                new_comment = Comment.objects.create(user=comment_author, url_id=comment_id, comment=comment, contentType=contentType, post=new_post)
                 new_comment.save()
 
                 # add comment likes
@@ -65,7 +74,7 @@ def inbox(request, user_id):
                     like_author_id = unquote(like_author["id"])
                     like_author = User.objects.get(pk=like_author_id)
 
-                    new_like = Like.objects.create(user=like_author, url_id=like_id, published=published, comment=new_comment)
+                    new_like = Like.objects.create(user=like_author, url_id=like_id, comment=new_comment)
                     new_like.save()
 
             # add like objects
@@ -76,7 +85,7 @@ def inbox(request, user_id):
                 like_id = post_like["id"]
                 post = post_like["object"]
 
-                new_like = Like.objects.create(author=author, url_id=like_id, published=published, post=new_post)
+                new_like = Like.objects.create(author=author, url_id=like_id, post=new_post)
                 new_like.save()
 
         else:
@@ -104,32 +113,35 @@ def inbox(request, user_id):
         published = data["published"]
         likes = data["likes"]
         # add this new comment if it does not exist, if it exists, then delete it
+        print("data", data)
 
         comment_author_id = unquote(comment_author["id"])
-        comment_author = User.objects.get(pk=comment_author_id)
+        comment_author = User.objects.get(url_id=comment_author_id)
 
         new_post = Post.objects.get(url_id=post)
 
         # check whether comment already exists
-        comment = Comment.objects.filter(user=comment_author, comment=comment_text, contentType=contentType, post=new_post).first()
+        comment = Comment.objects.filter(url_id=comment_id).first()
 
         if comment is None:
-            comment = Comment.objects.create(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post, dateCreated=published)
+            comment = Comment.objects.create(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post)
             comment.save()
 
         # add comment likes
         comment_likes = likes["src"]
+        print("comment likes:", comment_likes)
         for comment_like in comment_likes:
+            print("adding likes", comment_like)
             like_author = comment_like["author"]
             published = comment_like["published"]
             like_id = comment_like["id"]
             post = comment_like["object"]
 
             like_author_id = unquote(like_author["id"])
-            like_author = User.objects.get(pk=like_author_id)
+            like_author = User.objects.get(url_id=like_author_id)
 
             # check whether like already exists
-            like = Like.objects.filter(user=like_author, comment=comment).first()
+            like = Like.objects.filter(user=like_author, url_id=like_id, comment=comment).first()
 
             if like is None:
                 new_like = Like.objects.create(user=like_author, url_id=like_id, comment=comment)
@@ -144,12 +156,12 @@ def inbox(request, user_id):
         post = data["object"]
         # add the like if it does not exist, if it exists, delete the like
         author_id = unquote(author["id"])
-        author = User.objects.get(pk=author_id)
+        author = User.objects.get(url_id=author_id)
 
         post = Post.objects.get(url_id=post)
 
         # check whether like already exists
-        like = Like.objects.filter(user=author, post=post).first()
+        like = Like.objects.filter(url_id=like_id).first()
 
         if like is None:
             new_like = Like.objects.create(user=author, url_id=like_id, post=post) 

@@ -76,17 +76,12 @@ class DiscoverAuthorListView(ListView):
             url += 'api/'
         url += 'authors/'
 
-        headers = {
-            'Authorization' : f'Basic {username}:{password}',
-
-        }
-
         params = {
             'page':page,
             'size':PAGE_SIZE
         }
 
-        response = requests.get(url,headers=headers,params=params)
+        response = requests.get(url, params=params, auth=(username,password))
         
         
         if response.status_code != 200:
@@ -143,7 +138,7 @@ class DiscoverNodeListView(ListView):
     template_name = 'discover_node.html'
     model = Node
     context_object_name = 'nodes'
-    queryset = Node.objects.filter(follow_status='OUTGOING')
+    queryset = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
 
     def get_context_data(self, **kwargs):
         '''

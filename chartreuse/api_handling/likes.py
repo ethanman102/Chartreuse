@@ -292,7 +292,7 @@ class LikeViewSet(viewsets.ViewSet):
 
         Parameters:
             request: rest_framework object containing the request and query parameters.
-            user_id: The id of the user who is liking the posts.
+            user_id: The id of the user who is liking the post or comment.
             like_id: The id of the like object.
 
         Returns:
@@ -310,6 +310,11 @@ class LikeViewSet(viewsets.ViewSet):
         data = json.loads(response.content)
         like = Like.objects.filter(url_id=decoded_like_id).first()
 
+        if like.post is None:
+            object_id = like.comment.url_id
+        else:
+            object_id = like.post.url_id
+
         likeObject = {
             "type": "like",
             "author": {
@@ -323,7 +328,7 @@ class LikeViewSet(viewsets.ViewSet):
             },
             "published": like.dateCreated,
             "id": like.url_id,
-            "object": like.post.url_id
+            "object": object_id
         }
         return JsonResponse(likeObject, safe=False)
 

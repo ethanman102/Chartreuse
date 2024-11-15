@@ -5,6 +5,7 @@ from chartreuse.models import Comment, Like, Post, User, Node, Follow
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 import requests
+from .post_utils import send_like_to_inbox
 
 def add_comment(request):
     try:
@@ -76,14 +77,14 @@ def like_comment(request):
         if like:
             like.delete()
         else:
-            newLike = Like.objects.create(user=user, comment=comment)
-            newLike.save()
+            like = Like.objects.create(user=user, comment=comment)
+            like.save()
 
         data = {
             "likes_count": get_comment_likes(unquote(comment_id)).count()
         }
 
-        send_comment_to_inbox(comment.url_id)
+        send_like_to_inbox(like.url_id)
 
         return JsonResponse(data)
     else:

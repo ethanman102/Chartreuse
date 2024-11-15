@@ -113,7 +113,6 @@ def inbox(request, user_id):
         published = data["published"]
         likes = data["likes"]
         # add this new comment if it does not exist, if it exists, then delete it
-        print("data", data)
 
         comment_author_id = unquote(comment_author["id"])
         comment_author = User.objects.get(url_id=comment_author_id)
@@ -129,9 +128,7 @@ def inbox(request, user_id):
 
         # add comment likes
         comment_likes = likes["src"]
-        print("comment likes:", comment_likes)
         for comment_like in comment_likes:
-            print("adding likes", comment_like)
             like_author = comment_like["author"]
             published = comment_like["published"]
             like_id = comment_like["id"]
@@ -166,21 +163,24 @@ def inbox(request, user_id):
             object_type = "post"
 
         # check whether like already exists
-        like = Like.objects.filter(url_id=like_id).first()
-
-        if like is None:
-            if object_type == "post":
+        if object_type == "post":
+            like = Like.objects.filter(user=author, post=post).first()
+            if like is None:
                 new_like = Like.objects.create(user=author, url_id=like_id, post=post)
+                new_like.save()
+                return JsonResponse({"status": "Like added successfully"})
             else:
-                comment = Comment.objects.get(url_id=object_id)
-                new_like = Like.objects.create(user=author, url_id=like_id, comment=comment)
-            new_like.save()
-
-            return JsonResponse({"status": "Like added successfully"})
+                like.delete()
+                return JsonResponse({"status": "Like removed successfully"})
         else:
-            like.delete()
-
-            return JsonResponse({"status": "Like removed successfully"})
+            like = Like.objects.filter(user=author, comment=comment).first()
+            if like is None:
+                new_like = Like.objects.create(user=author, url_id=like_id, comment=comment)
+                new_like.save()
+                return JsonResponse({"status": "Like added successfully"})
+            else:
+                like.delete()
+                return JsonResponse({"status": "Like removed successfully"})
 
     elif (data["type"] == "follow"):
         actor = data["actor"]

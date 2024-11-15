@@ -124,7 +124,7 @@ def inbox(request, user_id):
         comment = Comment.objects.filter(user=comment_author, comment=comment_text, contentType=contentType, post=new_post).first()
 
         if comment is None:
-            comment = Comment.objects.create(user=comment_author, comment=comment_text, contentType=contentType, post=new_post)
+            comment = Comment.objects.create(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post)
             comment.save()
 
         # add comment likes

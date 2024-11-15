@@ -31,6 +31,7 @@ def checkIfRequestAuthenticated(request):
 
     basic = authentication.split(" ")
     print(basic)
+    print(len(basic))
     if len(basic) != 2:
         return JsonResponse({"error": "Unauthorized"}, status=401)
     

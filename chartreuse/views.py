@@ -30,19 +30,14 @@ def checkIfRequestAuthenticated(request):
     print("Auth: ", authentication)
 
     basic = authentication.split(" ")
-    print(basic)
-
     auth = basic[1].split(":")
     
     username = auth[0]
     password = auth[1]
 
-    host = request.get_host
-    print("Host: ", host)
-    print(Node.objects.all())
+    host = f"{request.get_host()}/chartreuse/api/"
 
     node = Node.objects.filter(host=host, username=username, password=password)
-    print("MADE IT")
 
     if len(node) == 0:
         return JsonResponse({"error": "Unauthorized"}, status=401)

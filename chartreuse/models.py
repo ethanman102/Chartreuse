@@ -93,7 +93,8 @@ class GithubPolling(models.Model):
     last_polled = models.DateTimeField(auto_now_add=True)
 
 class Node(models.Model):
-    host = models.URLField(primary_key=True)
+    id = models.AutoField(primary_key=True)
+    host = models.URLField()
     username = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
     # outgoing means we are connecting to that node

@@ -13,6 +13,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_seriali
 from rest_framework import serializers
 from rest_framework.decorators import action, api_view
 import requests
+from requests.auth import HTTPBasicAuth
 
 def get_post_likes(post_id):
     """
@@ -446,15 +447,12 @@ def send_like_to_inbox(like_url_id):
 
         url += f'{quote(author_url_id, safe = "")}/inbox/'
 
-        credentials = f"{username}:{password}".encode('utf-8')
-        base64_credentials = base64.b64encode(credentials).decode('utf-8')
-
         headers = {
-            'Authorization' : f'Basic {base64_credentials}',
             "Content-Type": "application/json; charset=utf-8"
         }
+
         # send to inbox
-        requests.post(url, headers=headers, json=likes_json)
+        requests.post(url, headers=headers, json=likes_json, auth=(username, password))
 
     return JsonResponse({"status": "Like added successfully"})
 

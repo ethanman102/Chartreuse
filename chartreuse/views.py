@@ -31,8 +31,7 @@ def checkIfRequestAuthenticated(request):
 
     basic = authentication.split(" ")
     print(basic)
-    print(basic[0])
-    if basic[0] != "Basic":
+    if len(basic) != 2:
         return JsonResponse({"error": "Unauthorized"}, status=401)
     
     # Decode the Base64-encoded credentials

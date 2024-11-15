@@ -153,18 +153,27 @@ def inbox(request, user_id):
         author = data["author"]
         published = data["published"]
         like_id = data["id"]
-        post = data["object"]
+        object_id = data["object"]
         # add the like if it does not exist, if it exists, delete the like
         author_id = unquote(author["id"])
         author = User.objects.get(url_id=author_id)
 
-        post = Post.objects.get(url_id=post)
+        post = Post.objects.get(url_id=object_id)
+
+        if post is None:
+            object_type = "comment"
+        else:
+            object_type = "post"
 
         # check whether like already exists
         like = Like.objects.filter(url_id=like_id).first()
 
         if like is None:
-            new_like = Like.objects.create(user=author, url_id=like_id, post=post) 
+            if object_type == "post":
+                new_like = Like.objects.create(user=author, url_id=like_id, post=post)
+            else:
+                comment = Comment.objects.get(url_id=object_id)
+                new_like = Like.objects.create(user=author, url_id=like_id, comment=comment)
             new_like.save()
 
             return JsonResponse({"status": "Like added successfully"})

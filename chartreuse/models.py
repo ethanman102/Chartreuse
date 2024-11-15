@@ -95,14 +95,19 @@ class GithubPolling(models.Model):
 class Node(models.Model):
     id = models.AutoField(primary_key=True)
     host = models.URLField()
+    ENABLE_DISABLE_CHOICES = [
+        ('enabled', 'Enabled'),
+        ('disabled', 'Disabled'),
+    ]
     username = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
     # outgoing means we are connecting to that node
     # incoming means that node is connecting to us
     follow_status = models.CharField(max_length=100, choices=FOLLOW_STATUS_CHOICES)
+    status = models.CharField(max_length=100, choices=ENABLE_DISABLE_CHOICES)
 
     def __str__(self):
-        return f"host={self.host}, username={self.username}, password={self.password}, outgoing={self.follow_status}"
+        return f"host={self.host}, username={self.username}, password={self.password}, outgoing={self.follow_status}, status={self.status}"
     
 class Settings(models.Model):
     '''

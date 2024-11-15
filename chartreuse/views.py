@@ -27,6 +27,7 @@ def checkIfRequestAuthenticated(request):
     request: Request object
     '''
     authentication = request.headers.get('Authorization')
+    print("Auth: ", authentication)
 
     basic = authentication.split(" ")
     if basic[0] != "Basic":
@@ -47,6 +48,8 @@ def checkIfRequestAuthenticated(request):
     password = auth[1]
 
     host = request.get_host
+    print("Host: ", host)
+    print(Node.objects.all())
 
     node = Node.objects.filter(host=host, username=username, password=password)
 

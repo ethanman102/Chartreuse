@@ -34,27 +34,18 @@ def checkIfRequestAuthenticated(request):
         # Decode the Base64-encoded credentials
         decoded_bytes = base64.b64decode(authentication.split(" ")[1])
         decoded_str = decoded_bytes.decode('utf-8')  # Convert bytes to string
-        print("Decoded String", decoded_str)
         auth = decoded_str.split(":")
         username = auth[0]
         password = auth[1]
     except (IndexError, base64.binascii.Error, UnicodeDecodeError):
         return JsonResponse({"error": "Invalid authentication format"}, status=401)
 
-    print("Username: ", username)
-    print("Password: ", password)
-
     host = f"https://{request.get_host()}/chartreuse/api/"
-    print("Host: ", host)
-
-    print(Node.objects.all())
 
     node = Node.objects.filter(host=host, username=username, password=password, follow_status="INCOMING", status="ENABLED")
 
     if len(node) == 0:
         return JsonResponse({"error": "Unauthorized"}, status=401)
-    
-    print("SUCCESS")
 
     return JsonResponse({"success": "Authorized"}, status=200)
 

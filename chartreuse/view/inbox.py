@@ -115,12 +115,16 @@ def inbox(request, user_id):
         # add this new comment if it does not exist, if it exists, then delete it
 
         comment_author_id = unquote(comment_author["id"])
-        comment_author = User.objects.get(pk=comment_author_id)
+        comment_author = User.objects.get(url_id=comment_author_id)
 
         new_post = Post.objects.get(url_id=post)
 
         # check whether comment already exists
         print(Comment.objects.all())
+        print(comment_author)
+        print(comment_text)
+        print(contentType)
+        print(new_post)
         comment = Comment.objects.filter(user=comment_author, comment=comment_text, contentType=contentType, post=new_post).first()
 
         if comment is None:

@@ -30,6 +30,8 @@ def checkIfRequestAuthenticated(request):
     print("Auth: ", authentication)
 
     basic = authentication.split(" ")
+    print(basic)
+    print(basic[0])
     if basic[0] != "Basic":
         return JsonResponse({"error": "Unauthorized"}, status=401)
     
@@ -41,6 +43,7 @@ def checkIfRequestAuthenticated(request):
         return JsonResponse({"error": "Invalid authentication format"}, status=401)
 
     auth = decoded_str.split(":")
+    print(auth)
     if len(auth) != 2:
         return JsonResponse({"error": "Unauthorized"}, status=401)
     

@@ -27,7 +27,7 @@ def checkIfRequestAuthenticated(request):
     request: Request object
     '''
     authentication = request.headers.get('Authorization')
-    if not authentication or not authentication.startswith('Basic '):
+    if not authentication or not authentication.startswith('Basic'):
         return JsonResponse({"error": "Missing or invalid Authorization header"}, status=401)
 
     try:

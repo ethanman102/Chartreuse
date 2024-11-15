@@ -95,9 +95,8 @@ def profile_follow_request(request,requestee,requester):
                 return redirect("chartreuse:profile",url_id=quote(requestee,safe=''))
             
             remote_node = remote_node[0]
-            username = base64.b64encode(bytes(remote_node.username,encoding='utf-8')).decode('utf-8')
-            password = base64.b64encode(bytes(remote_node.password,encoding='utf-8')).decode('utf-8')
-
+            username = remote_node.username
+            password = remote_node.password
 
             follow = Follow(follower=requester_user,followed=requestee_user) # create the new follow!
             follow.save()
@@ -129,10 +128,10 @@ def profile_follow_request(request,requestee,requester):
             url = f"{requestee_user.host}authors/{quote(requestee_user.url_id,safe='')}/inbox/"
 
             headers = {
-                'Authorization' : f'Basic {username}:{password}',
-                'Content-Type': 'application/json; charset=utf-8'
+                "Content-Type": "application/json; charset=utf-8"
             }
-            response = requests.post(url, headers=headers, json=data)
+
+            requests.post(url, headers=headers, json=data, auth=(username, password))
             
         else:
             FollowRequest.objects.create(requestee=requestee_user,requester=requester_user)

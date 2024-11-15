@@ -11,6 +11,8 @@ from rest_framework.decorators import action, api_view
 from ..models import Like, User, Post, Comment
 from .users import UserSerializer, UserViewSet
 from urllib.parse import unquote
+from ..views import checkIfRequestAuthenticated
+from rest_framework.permissions import AllowAny
 
 class LikeSerializer(serializers.Serializer):
     type = serializers.CharField(default="like")
@@ -36,6 +38,8 @@ class LikesSerializer(serializers.Serializer):
 
 class LikeViewSet(viewsets.ViewSet):
     serializer_class = LikeSerializer
+    permission_classes = [AllowAny]
+    authentication_classes = []
 
     @extend_schema(
         summary="Adds a like to a post",
@@ -97,7 +101,8 @@ class LikeViewSet(viewsets.ViewSet):
 
         Returns:
             JsonResponse containing the like object or error messages.
-        '''    
+        '''   
+        checkIfRequestAuthenticated(request) 
         decoded_user_id = unquote(user_id)
 
         # Get the post URL from the request body
@@ -210,6 +215,7 @@ class LikeViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like object.
         '''
+        checkIfRequestAuthenticated(request)
         decoded_user_id = unquote(user_id)
         # Get the post URL from the request body
         postUrl = request.POST.get('post')
@@ -286,7 +292,7 @@ class LikeViewSet(viewsets.ViewSet):
 
         Parameters:
             request: rest_framework object containing the request and query parameters.
-            user_id: The id of the user who is liking the posts.
+            user_id: The id of the user who is liking the post or comment.
             like_id: The id of the like object.
 
         Returns:
@@ -304,6 +310,11 @@ class LikeViewSet(viewsets.ViewSet):
         data = json.loads(response.content)
         like = Like.objects.filter(url_id=decoded_like_id).first()
 
+        if like.post is None:
+            object_id = like.comment.url_id
+        else:
+            object_id = like.post.url_id
+
         likeObject = {
             "type": "like",
             "author": {
@@ -317,7 +328,7 @@ class LikeViewSet(viewsets.ViewSet):
             },
             "published": like.dateCreated,
             "id": like.url_id,
-            "object": like.post.url_id
+            "object": object_id
         }
         return JsonResponse(likeObject, safe=False)
 

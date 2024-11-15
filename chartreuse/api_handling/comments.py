@@ -14,6 +14,8 @@ from .users import UserSerializer, UserViewSet
 from .likes import LikeSerializer, LikesSerializer, LikeViewSet
 from .friends import FriendsViewSet
 from urllib.parse import unquote
+from ..views import checkIfRequestAuthenticated
+from rest_framework.permissions import AllowAny
 
 class CommentSerializer(serializers.Serializer):
     type = serializers.CharField(default="comment")
@@ -37,8 +39,9 @@ class CommentsSerializer(serializers.Serializer):
     src = CommentSerializer(many=True)
 
 class CommentViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = CommentSerializer
+    authentication_classes = []
 
     @extend_schema(
         summary="Adds a comment on a post",
@@ -99,8 +102,7 @@ class CommentViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing the comment object.  
         """
-        if not request.user.is_authenticated:
-            return JsonResponse({"error": "User is not authenticated."}, status=401)
+        checkIfRequestAuthenticated(request)
             
         decoded_author_id = unquote(user_id)
 
@@ -214,8 +216,7 @@ class CommentViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing the comment object.  
         """
-        if not request.user.is_authenticated:
-            return JsonResponse({"error": "User is not authenticated."}, status=401)
+        checkIfRequestAuthenticated(request)
 
         # Get the comment   
         comment = Comment.objects.filter(url_id = unquote(comment_id)).first()

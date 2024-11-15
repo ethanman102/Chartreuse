@@ -15,10 +15,11 @@ from rest_framework.response import Response
 from urllib.parse import unquote
 import requests
 import regex as re
-from ..views import checkIfRequestAuthenticated
 
 from .. import views
 from ..models import User
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 class UserSerializer(serializers.ModelSerializer):
     type = serializers.CharField(default="author")

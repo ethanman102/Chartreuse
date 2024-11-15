@@ -15,7 +15,6 @@ from .likes import LikeViewSet
 from .likes import LikesSerializer
 from .comments import CommentsSerializer
 from urllib.parse import unquote
-from ..views import checkIfRequestAuthenticated
 
 class PostSerializer(serializers.Serializer):
     type = serializers.CharField(default="post")

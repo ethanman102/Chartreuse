@@ -11,7 +11,6 @@ from rest_framework.decorators import action, api_view
 from ..models import Like, User, Post, Comment
 from .users import UserSerializer, UserViewSet
 from urllib.parse import unquote
-from ..views import checkIfRequestAuthenticated
 
 class LikeSerializer(serializers.Serializer):
     type = serializers.CharField(default="like")

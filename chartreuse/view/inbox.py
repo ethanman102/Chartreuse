@@ -134,7 +134,6 @@ def inbox(request, user_id):
         # add comment likes
         comment_likes = likes["src"]
         for comment_like in comment_likes:
-            print("adding likes", comment_like)
             like_author = comment_like["author"]
             published = comment_like["published"]
             like_id = comment_like["id"]

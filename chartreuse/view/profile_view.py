@@ -90,7 +90,7 @@ def profile_follow_request(request,requestee,requester):
         if remote_check != None:
             # Can assume that the user is already following the remote author now..
 
-            remote_node = Node.objects.filter(follow_status='OUTGOING',host=requestee_user.host)
+            remote_node = Node.objects.filter(follow_status='OUTGOING',host=requestee_user.host, status='ENABLED')
             if remote_node.count() != 1:
                 return redirect("chartreuse:profile",url_id=quote(requestee,safe=''))
             

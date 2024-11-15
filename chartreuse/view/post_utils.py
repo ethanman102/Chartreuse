@@ -91,7 +91,7 @@ def delete_post(request, post_id):
 def send_post_to_inbox(post_url_id):
     post = Post.objects.get(url_id=post_url_id)
     # send this to the inbox of other nodes
-    nodes = Node.objects.filter(follow_status='OUTGOING')
+    nodes = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
 
     if not nodes.exists():
         return []
@@ -423,7 +423,7 @@ def like_post(request):
 def send_like_to_inbox(like_url_id):
     like = Like.objects.get(url_id=like_url_id)
     # send this to the inbox of other nodes
-    nodes = Node.objects.filter(follow_status='OUTGOING')
+    nodes = Node.objects.filter(follow_status='OUTGOING', status="ENABLED")
 
     if not nodes.exists():
         return []

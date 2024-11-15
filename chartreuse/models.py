@@ -5,6 +5,7 @@ from django.db.models import UniqueConstraint
 VISIBILITY_CHOICES = {"PUBLIC": "PUBLIC", "FRIENDS": "FRIENDS", "UNLISTED": "UNLISTED", "DELETED": "DELETED"}
 CONTENT_TYPE_CHOICES = {"text/commonmark": "text/commonmark", "text/plain": "text/plain", "application/base64": "application/base64", "image/png;base64": "image/png;base64", "image/jpeg;base64": "image/jpeg;base64"}
 FOLLOW_STATUS_CHOICES = {'OUTGOING':'OUTGOING','INCOMING':'INCOMING'}
+ENABLE_DISABLE_CHOICES = {'ENABLED':'ENABLED','DISABLED':'DISABLED'}
 
 class User(models.Model):
     user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, null=True, blank=True)
@@ -93,11 +94,7 @@ class GithubPolling(models.Model):
     last_polled = models.DateTimeField(auto_now_add=True)
 
 class Node(models.Model):
-    ENABLE_DISABLE_CHOICES = [
-        ('enabled', 'Enabled'),
-        ('disabled', 'Disabled'),
-    ]
-
+    id = models.AutoField(primary_key=True)
     host = models.URLField(primary_key=True)
     username = models.CharField(max_length=100)
     password = models.CharField(max_length=100)

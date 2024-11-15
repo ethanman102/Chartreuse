@@ -133,7 +133,7 @@ def delete_comment(request, comment_id):
 def send_comment_to_inbox(comment_url_id):
     comment = Comment.objects.get(url_id=comment_url_id)
     # send this to the inbox of other nodes
-    nodes = Node.objects.filter(follow_status='OUTGOING')
+    nodes = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
 
     if not nodes.exists():
         return []

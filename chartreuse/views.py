@@ -37,7 +37,7 @@ def checkIfRequestAuthenticated(request):
 
     host = f"{request.get_host()}/chartreuse/api/"
 
-    node = Node.objects.filter(host=host, username=username, password=password, follow_status="INCOMING")
+    node = Node.objects.filter(host=host, username=username, password=password, follow_status="INCOMING", status="ENABLED")
 
     if len(node) == 0:
         return JsonResponse({"error": "Unauthorized"}, status=401)

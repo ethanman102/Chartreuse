@@ -1,15 +1,13 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from ..models import User, FollowRequest, Follow
-from django.contrib.auth.decorators import login_required
-import json
+from ..models import User, Follow
 from urllib.parse import unquote
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import serializers
 from rest_framework import viewsets
-from rest_framework.decorators import action, api_view
-from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter, OpenApiTypes, inline_serializer
-from django.core.paginator import Paginator
+from rest_framework.decorators import action
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
+from ..views import checkIfRequestAuthenticated
 
 class FollowerSerializer(serializers.Serializer):
     type = serializers.CharField(default="author")

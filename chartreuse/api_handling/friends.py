@@ -3,10 +3,10 @@ from django.shortcuts import get_object_or_404
 from ..models import Follow, User
 from urllib.parse import unquote
 from rest_framework import serializers, viewsets
-from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter, inline_serializer
-from rest_framework.decorators import action, api_view
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
-from django.core.paginator import Paginator
+from ..views import checkIfRequestAuthenticated
 
 class FriendSerializer(serializers.Serializer):
     type = serializers.CharField(default="author")

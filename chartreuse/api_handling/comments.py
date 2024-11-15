@@ -9,11 +9,12 @@ from rest_framework import viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 
-from ..models import User, Like, Post, Follow, Comment
+from ..models import User, Post, Comment
 from .users import UserSerializer, UserViewSet
-from .likes import LikeSerializer, LikesSerializer, LikeViewSet
+from .likes import LikesSerializer, LikeViewSet
 from .friends import FriendsViewSet
 from urllib.parse import unquote
+from ..views import checkIfRequestAuthenticated
 
 class CommentSerializer(serializers.Serializer):
     type = serializers.CharField(default="comment")
@@ -101,6 +102,8 @@ class CommentViewSet(viewsets.ViewSet):
         """
         if not request.user.is_authenticated:
             return JsonResponse({"error": "User is not authenticated."}, status=401)
+        
+        checkIfRequestAuthenticated(request)
             
         decoded_author_id = unquote(user_id)
 

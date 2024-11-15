@@ -158,7 +158,7 @@ def inbox(request, user_id):
         author_id = unquote(author["id"])
         author = User.objects.get(url_id=author_id)
 
-        post = Post.objects.get(url_id=object_id)
+        post = Post.objects.filter(url_id=object_id).first()
 
         if post is None:
             object_type = "comment"

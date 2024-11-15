@@ -75,16 +75,16 @@ def like_comment(request):
         like = Like.objects.filter(user=user, comment=comment)
 
         if like:
+            send_like_to_inbox(like.url_id)
             like.delete()
         else:
             like = Like.objects.create(user=user, comment=comment)
             like.save()
+            send_like_to_inbox(like.url_id)
 
         data = {
             "likes_count": get_comment_likes(unquote(comment_id)).count()
         }
-
-        send_like_to_inbox(like.url_id)
 
         return JsonResponse(data)
     else:

@@ -76,17 +76,12 @@ class DiscoverAuthorListView(ListView):
             url += 'api/'
         url += 'authors/'
 
-        headers = {
-            'Authorization' : f'Basic {username}:{password}',
-
-        }
-
         params = {
             'page':page,
             'size':PAGE_SIZE
         }
 
-        response = requests.get(url,headers=headers,params=params)
+        response = requests.get(url, params=params, auth=(username,password))
         
         
         if response.status_code != 200:

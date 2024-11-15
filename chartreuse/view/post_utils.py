@@ -119,12 +119,11 @@ def send_post_to_inbox(post_url_id):
                 url += f'{quote(author_url_id, safe = "")}/inbox/'
 
                 headers = {
-                    'Authorization' : f'Basic {username}:{password}',
                     "Content-Type": "application/json; charset=utf-8"
                 }
 
                 # send to inbox
-                requests.post(url, headers=headers, json=post_json)
+                requests.post(url, headers=headers, json=post_json, auth=(username, password))
 
 @csrf_exempt
 def update_post(request, post_id):

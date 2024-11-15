@@ -45,6 +45,9 @@ def checkIfRequestAuthenticated(request):
     print("Password: ", password)
 
     host = f"{request.get_host()}/chartreuse/api/"
+    print("Host: ", host)
+
+    print(Node.objects.all())
 
     node = Node.objects.filter(host=host, username=username, password=password, follow_status="INCOMING", status="ENABLED")
 

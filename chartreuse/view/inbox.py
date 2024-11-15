@@ -113,6 +113,7 @@ def inbox(request, user_id):
         published = data["published"]
         likes = data["likes"]
         # add this new comment if it does not exist, if it exists, then delete it
+        print("data", data)
 
         comment_author_id = unquote(comment_author["id"])
         comment_author = User.objects.get(url_id=comment_author_id)
@@ -140,7 +141,7 @@ def inbox(request, user_id):
             like_author = User.objects.get(url_id=like_author_id)
 
             # check whether like already exists
-            like = Like.objects.filter(user=like_author, comment=comment).first()
+            like = Like.objects.filter(user=like_author, url_id=like_id, comment=comment).first()
 
             if like is None:
                 new_like = Like.objects.create(user=like_author, url_id=like_id, comment=comment)

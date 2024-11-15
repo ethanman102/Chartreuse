@@ -72,7 +72,7 @@ def like_comment(request):
         comment = Comment.objects.get(url_id=unquote(comment_id))
 
         # first check if the user has already liked the comment
-        like = Like.objects.filter(user=user, comment=comment)
+        like = Like.objects.filter(user=user, comment=comment).first()
 
         if like:
             send_like_to_inbox(like.url_id)

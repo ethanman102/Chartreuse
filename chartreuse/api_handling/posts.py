@@ -15,6 +15,8 @@ from .likes import LikeViewSet
 from .likes import LikesSerializer
 from .comments import CommentsSerializer
 from urllib.parse import unquote
+from rest_framework.permissions import AllowAny
+from ..views import checkIfRequestAuthenticated
 
 class PostSerializer(serializers.Serializer):
     type = serializers.CharField(default="post")
@@ -41,6 +43,8 @@ class PostsSerializer(serializers.Serializer):
 
 class PostViewSet(viewsets.ViewSet):
     serializer_class = PostSerializer
+    permission_classes = [AllowAny]
+    authentication_classes = []
 
     @extend_schema(
         summary="Adds a post",
@@ -102,8 +106,7 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing the new post    
         """        
-        if (not request.user.is_authenticated):
-            return JsonResponse({"error": "User is not authenticated."}, status=401)
+        checkIfRequestAuthenticated(request)
         
         decoded_user_id = unquote(user_id)
 
@@ -229,6 +232,7 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like object.
         """
+        checkIfRequestAuthenticated(request)
         decoded_user_id = unquote(user_id)
         decoded_post_url = unquote(post_id)
 
@@ -518,6 +522,7 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing updated post 
         """
+        checkIfRequestAuthenticated(request)
         if request.user.is_authenticated:
             decoded_user_id = unquote(user_id)
             decoded_post_id = unquote(post_id)
@@ -645,6 +650,7 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the post objects.
         """
+        checkIfRequestAuthenticated(request)
         decoded_author_id = unquote(user_id)
         page = request.GET.get("page")
         size = request.GET.get("size")

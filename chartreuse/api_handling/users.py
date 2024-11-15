@@ -15,6 +15,7 @@ from rest_framework.response import Response
 from urllib.parse import unquote
 import requests
 import regex as re
+from ..views import checkIfRequestAuthenticated
 
 from .. import views
 from ..models import User
@@ -61,8 +62,6 @@ class UserViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     authentication_classes = []
 
-
-
     @extend_schema(
         summary="Get a list of users",
         description=(
@@ -98,6 +97,7 @@ class UserViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the paginated list of users.
         '''
+        checkIfRequestAuthenticated(request)
         page = request.query_params.get('page', 1)
         size = request.query_params.get('size', 50)
 
@@ -227,47 +227,45 @@ class UserViewSet(viewsets.ViewSet):
         }
     )
     def update(self, request, pk=None):
-        if request.user.is_authenticated:
-            decoded_user_id = unquote(pk)
-            host = get_host_from_id(decoded_user_id)
+        checkIfRequestAuthenticated(request)
+        decoded_user_id = unquote(pk)
+        host = get_host_from_id(decoded_user_id)
 
-            data = json.loads(request.body.decode('utf-8'))
+        data = json.loads(request.body.decode('utf-8'))
 
-            if(host != views.Host.host):
-                # if the user is not on the current host, we need to get the user from the remote host
-                api_url = host + "api/authors/" + pk
-                response = requests.put(api_url, data=json.dumps(data), headers={'Content-Type': 'application/json'})
+        if(host != views.Host.host):
+            # if the user is not on the current host, we need to get the user from the remote host
+            api_url = host + "api/authors/" + pk
+            response = requests.put(api_url, data=json.dumps(data), headers={'Content-Type': 'application/json'})
 
-                response.raise_for_status()
-                response_data = response.json()
+            response.raise_for_status()
+            response_data = response.json()
 
-                return JsonResponse(response_data, safe=False)
-            else:
-                # case where the user is on the current host
-                user = get_object_or_404(User, pk=decoded_user_id)
-                page = user.host + "/authors/" + user.url_id
-
-                serializer = UserSerializer(instance=user, data=data, partial=True)
-
-                # Save the updated user
-                if serializer.is_valid():
-                    # If valid, save the updates
-                    serializer.save()
-                
-                else:
-                    return JsonResponse(serializer.errors, status=400)
-
-                return JsonResponse({
-                    "type": "author",
-                    "id": user.url_id,
-                    "host": user.host,
-                    "displayName": user.displayName,
-                    "github": user.github,
-                    "profileImage": user.profileImage,
-                    "page": page
-                }, safe=False)
+            return JsonResponse(response_data, safe=False)
         else:
-            return Response({"error": "Permission denied."}, status=401)
+            # case where the user is on the current host
+            user = get_object_or_404(User, pk=decoded_user_id)
+            page = user.host + "/authors/" + user.url_id
+
+            serializer = UserSerializer(instance=user, data=data, partial=True)
+
+            # Save the updated user
+            if serializer.is_valid():
+                # If valid, save the updates
+                serializer.save()
+            
+            else:
+                return JsonResponse(serializer.errors, status=400)
+
+            return JsonResponse({
+                "type": "author",
+                "id": user.url_id,
+                "host": user.host,
+                "displayName": user.displayName,
+                "github": user.github,
+                "profileImage": user.profileImage,
+                "page": page
+            }, safe=False)
         
     @extend_schema(
         summary="Delete a user",
@@ -304,6 +302,7 @@ class UserViewSet(viewsets.ViewSet):
         }
     )
     def destroy(self, request, pk=None):
+        checkIfRequestAuthenticated(request)
         decoded_user_id = unquote(pk)
 
         host = get_host_from_id(decoded_user_id)
@@ -358,6 +357,7 @@ class UserViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the newly created user.
         '''
+        checkIfRequestAuthenticated(request)
         firstName = request.data.get('firstName')
         lastName = request.data.get('lastName')
         displayName = request.data.get('displayName')

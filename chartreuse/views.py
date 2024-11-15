@@ -31,21 +31,8 @@ def checkIfRequestAuthenticated(request):
 
     basic = authentication.split(" ")
     print(basic)
-    print(len(basic))
-    if len(basic) != 2:
-        return JsonResponse({"error": "Unauthorized"}, status=401)
-    
-    # Decode the Base64-encoded credentials
-    try:
-        decoded_bytes = base64.b64decode(basic[1])
-        decoded_str = decoded_bytes.decode('utf-8')  # Convert bytes to string
-    except (base64.binascii.Error, UnicodeDecodeError):
-        return JsonResponse({"error": "Invalid authentication format"}, status=401)
 
-    auth = decoded_str.split(":")
-    print(auth)
-    if len(auth) != 2:
-        return JsonResponse({"error": "Unauthorized"}, status=401)
+    auth = basic[1].split(":")
     
     username = auth[0]
     password = auth[1]
@@ -55,6 +42,7 @@ def checkIfRequestAuthenticated(request):
     print(Node.objects.all())
 
     node = Node.objects.filter(host=host, username=username, password=password)
+    print("MADE IT")
 
     if len(node) == 0:
         return JsonResponse({"error": "Unauthorized"}, status=401)

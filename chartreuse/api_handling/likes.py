@@ -11,6 +11,8 @@ from rest_framework.decorators import action, api_view
 from ..models import Like, User, Post, Comment
 from .users import UserSerializer, UserViewSet
 from urllib.parse import unquote
+from ..views import checkIfRequestAuthenticated
+from rest_framework.permissions import AllowAny
 
 class LikeSerializer(serializers.Serializer):
     type = serializers.CharField(default="like")
@@ -36,6 +38,8 @@ class LikesSerializer(serializers.Serializer):
 
 class LikeViewSet(viewsets.ViewSet):
     serializer_class = LikeSerializer
+    permission_classes = [AllowAny]
+    authentication_classes = []
 
     @extend_schema(
         summary="Adds a like to a post",
@@ -97,7 +101,8 @@ class LikeViewSet(viewsets.ViewSet):
 
         Returns:
             JsonResponse containing the like object or error messages.
-        '''    
+        '''   
+        checkIfRequestAuthenticated(request) 
         decoded_user_id = unquote(user_id)
 
         # Get the post URL from the request body
@@ -210,6 +215,7 @@ class LikeViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like object.
         '''
+        checkIfRequestAuthenticated(request)
         decoded_user_id = unquote(user_id)
         # Get the post URL from the request body
         postUrl = request.POST.get('post')

@@ -446,8 +446,11 @@ def send_like_to_inbox(like_url_id):
 
         url += f'{quote(author_url_id, safe = "")}/inbox/'
 
+        credentials = f"{username}:{password}".encode('utf-8')
+        base64_credentials = base64.b64encode(credentials).decode('utf-8')
+
         headers = {
-            'Authorization' : f'Basic {username}:{password}',
+            'Authorization' : f'Basic {base64_credentials}',
             "Content-Type": "application/json; charset=utf-8"
         }
         # send to inbox

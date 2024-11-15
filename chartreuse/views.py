@@ -27,22 +27,19 @@ def checkIfRequestAuthenticated(request):
     request: Request object
     '''
     authentication = request.headers.get('Authorization')
-    print("Auth: ", authentication)
+    if not authentication or not authentication.startswith('Basic '):
+        return JsonResponse({"error": "Missing or invalid Authorization header"}, status=401)
 
-    basic = authentication.split(" ")
-
-    # Decode the Base64-encoded credentials
     try:
-        decoded_bytes = base64.b64decode(basic[1])
+        # Decode the Base64-encoded credentials
+        decoded_bytes = base64.b64decode(authentication.split(" ")[1])
         decoded_str = decoded_bytes.decode('utf-8')  # Convert bytes to string
-    except (base64.binascii.Error, UnicodeDecodeError):
+        print("Decoded String", decoded_str)
+        auth = decoded_str.split(":")
+        username = auth[0]
+        password = auth[1]
+    except (IndexError, base64.binascii.Error, UnicodeDecodeError):
         return JsonResponse({"error": "Invalid authentication format"}, status=401)
-    
-    print("Decoded: ", decoded_str)
-    auth = decoded_str.split(":")
-    
-    username = auth[0]
-    password = auth[1]
 
     print("Username: ", username)
     print("Password: ", password)

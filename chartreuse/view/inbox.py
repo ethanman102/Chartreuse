@@ -120,11 +120,6 @@ def inbox(request, user_id):
         new_post = Post.objects.get(url_id=post)
 
         # check whether comment already exists
-        print(Comment.objects.all())
-        print(comment_author)
-        print(comment_text)
-        print(contentType)
-        print(new_post)
         comment = Comment.objects.filter(url_id=comment_id).first()
 
         if comment is None:
@@ -133,6 +128,7 @@ def inbox(request, user_id):
 
         # add comment likes
         comment_likes = likes["src"]
+        print("comment likes:", comment_likes)
         for comment_like in comment_likes:
             print("adding likes", comment_like)
             like_author = comment_like["author"]

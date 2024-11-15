@@ -44,7 +44,7 @@ def checkIfRequestAuthenticated(request):
     print("Username: ", username)
     print("Password: ", password)
 
-    host = f"{request.get_host()}/chartreuse/api/"
+    host = f"https://{request.get_host()}/chartreuse/api/"
     print("Host: ", host)
 
     print(Node.objects.all())

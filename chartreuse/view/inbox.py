@@ -60,7 +60,7 @@ def inbox(request, user_id):
                 comment_author_id = unquote(comment_author["id"])
                 comment_author = User.objects.get(pk=comment_author_id)
 
-                new_comment = Comment.objects.create(user=comment_author, url_id=comment_id, comment=comment, contentType=contentType, post=new_post, dateCreated=published)
+                new_comment = Comment.objects.create(user=comment_author, url_id=comment_id, comment=comment, contentType=contentType, post=new_post)
                 new_comment.save()
 
                 # add comment likes
@@ -74,7 +74,7 @@ def inbox(request, user_id):
                     like_author_id = unquote(like_author["id"])
                     like_author = User.objects.get(pk=like_author_id)
 
-                    new_like = Like.objects.create(user=like_author, url_id=like_id, published=published, comment=new_comment)
+                    new_like = Like.objects.create(user=like_author, url_id=like_id, comment=new_comment)
                     new_like.save()
 
             # add like objects
@@ -85,7 +85,7 @@ def inbox(request, user_id):
                 like_id = post_like["id"]
                 post = post_like["object"]
 
-                new_like = Like.objects.create(author=author, url_id=like_id, published=published, post=new_post)
+                new_like = Like.objects.create(author=author, url_id=like_id, post=new_post)
                 new_like.save()
 
         else:
@@ -121,9 +121,10 @@ def inbox(request, user_id):
 
         # check whether comment already exists
         comment = Comment.objects.filter(user=comment_author, comment=comment_text, contentType=contentType, post=new_post).first()
+        print(comment) 
 
         if comment is None:
-            comment = Comment.objects.create(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post, dateCreated=published)
+            comment = Comment.objects.create(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post)
             comment.save()
 
         # add comment likes

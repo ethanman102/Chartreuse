@@ -2,11 +2,15 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from urllib.parse import quote
+from .. import views
+from chartreuse.models import User
 
 class FollowersTestCases(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
+        views.Host.host = "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/"
 
         cls.client = APIClient()
 
@@ -36,6 +40,11 @@ class FollowersTestCases(TestCase):
         # Create test users
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json')
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json')
+
+        users = User.objects.all()
+        print("List of users in the database after creation:")
+        for user in users:
+            print(f"DisplayName: {user.displayName}, Host: {user.host}")
 
         # log in as user 1
         cls.client.post(reverse('chartreuse:login_user'), {

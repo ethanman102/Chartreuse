@@ -191,6 +191,9 @@ def inbox(request, user_id):
 
         if not author_queryset:
             # discovered a new author to add to database...
+
+            # November 14, 2024: Asked Agent: CHAT GPT, why we may be getting null constraints failed when we have nullability allowed, chatgpt recommended setting the value explicitly to null or
+            # maybe migrations we not applied.
             remote_author = User.objects.create(
                 user = None,
                 url_id = unquote(actor['id']),

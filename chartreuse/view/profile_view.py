@@ -7,6 +7,7 @@ from . import post_utils
 from ..views import Host
 import requests
 import base64
+import json
 
 def follow_accept(request,followed,follower):
 
@@ -24,13 +25,53 @@ def follow_accept(request,followed,follower):
         follower = unquote(follower)
         followed_user = get_object_or_404(User,url_id=followed)
         following_user = get_object_or_404(User,url_id=follower)
+
+        
+
+
+        # check to see if its a remote follow or not.
+
         follow_request = get_object_or_404(FollowRequest,requester=following_user,requestee=followed_user)
+
+        if followed_user.host != following_user.host:
+
+            node_queryset = Node.objects.filter(host=following_user.host,follow_status="OUTGOING",status="ENABLED")
+            if not node_queryset.exists():
+                return redirect('chartreuse:profile',url_id=quote(followed,safe=''))
+
+            # case of remote follow
+            remote_posts = Post.objects.filter(user=followed_user).exclude(contentType='repost')
+            send_posts_to_remote(remote_posts,followed_user,following_user,node_queryset[0])
+
         follow = Follow(follower=following_user,followed=followed_user) # create the new follow!
         follow.save()
         follow_request.delete()
+
         return redirect('chartreuse:profile',url_id=quote(followed,safe=''))
     
     return HttpResponseNotAllowed(["POST"])
+
+def send_posts_to_remote(posts,local_user,remote_user,node):
+    remote_endpoint = quote(remote_user.url_id,safe='')
+    url = f"{remote_user.host}authors/{remote_endpoint}/inbox/"
+
+    username = node.username
+    password = node.password
+
+    headers = {
+                "Content-Type": "application/json; charset=utf-8"
+            }
+    auth = (username,password)
+
+    for post in posts:
+        # get the full representation of the post
+        response = requests.get(f'{local_user.host}/authors/{quote(local_user.url_id,safe='')}/posts/{quote(post.url_id,safe='')}/')
+        if response.status_code != 200:
+            continue
+        
+        post_obj = json.loads(response.content)
+        response.post(url,headers=headers,json=post_obj,auth=(username,password))
+    
 
 def follow_reject(request,followed,follower):
     '''

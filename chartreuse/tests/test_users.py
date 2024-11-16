@@ -68,13 +68,13 @@ class UserTestCases(TestCase):
 
         # Successfully created user
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['type'], 'author')
+        self.assertEqual(response.json()['id'], f'{self.hostname}authors/4')
+        self.assertEqual(response.json()['host'], self.hostname)
         self.assertEqual(response.json()['displayName'], 'Jane Doe')
         self.assertEqual(response.json()['github'], 'http://github.com/jdoe')
         self.assertEqual(response.json()['profileImage'], 'https://i.imgur.com/1234.jpeg')
-        self.assertEqual(response.json()['type'], 'author')
-        self.assertEqual(response.json()['page'], f"{self.hostname}authors/jane")
-        self.assertEqual(response.json()['id'], f'{self.hostname}authors/4')
-        self.assertEqual(response.json()['host'], self.hostname)
+        self.assertEqual(response.json()['page'], f"{self.hostname}/authors/{response.json()['id']}")
     
     def test_get_all_users(self):
         '''
@@ -101,7 +101,6 @@ class UserTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/1234.jpeg',
             'username': 'jane',
             'password': 'ABC',
-            'host': 'http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
             'firstName': 'Jane',
             'lastName': 'Doe',
         }, format='json')

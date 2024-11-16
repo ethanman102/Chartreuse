@@ -401,12 +401,11 @@ class UserViewSet(viewsets.ViewSet):
         # Save the user
         user.save()
 
-        id = str(user.url_id)
         page = user.host + "/authors/" + user.url_id
 
         return JsonResponse({
             "type": "author",
-            "id": id,
+            "id": user.url_id,
             "host": user.host,
             "displayName": user.displayName,
             "github": user.github,

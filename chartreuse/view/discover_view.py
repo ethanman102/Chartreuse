@@ -30,6 +30,11 @@ class DiscoverAuthorListView(ListView):
         context['host'] = self.kwargs.get('host','')
         context['authors'] = authors
 
+        current_auth_user = self.request.user
+        current_user_model = User.objects.get(user=current_auth_user)
+
+        context['current_user_url_id'] = quote(current_user_model.url_id,safe='')
+
 
         if len(context['authors']) == PAGE_SIZE:
             context['has_next'] = True

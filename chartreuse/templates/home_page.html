@@ -41,9 +41,9 @@
                             </div>
                         </div>
                         <h3 class="card-title mt-2" style="text-align: left;">{{ post.repost_user.displayName }} reposted a post:</h3>
-                        {% if post.visibility == 'DELETED' %}
+                        {% if post.visibility != 'PUBLIC' %}
                         <div class = "card mb-3 p-4">
-                            <h1>Looks like the original post was deleted :(</h1>
+                            <h1>Looks like the original post is no longer public :(</h1>
                         </div>
                         {% else %}
                             {% show_feed_post post post.user.url_id user_details.url_id%}

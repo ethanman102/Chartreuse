@@ -2,11 +2,14 @@ from django.test import TestCase
 from django.urls import reverse
 from urllib.parse import quote
 from rest_framework.test import APIClient
+from .. import views
 
 class FriendsTestCases(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
+        views.Host.host = "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/"
 
         cls.client = APIClient()
 

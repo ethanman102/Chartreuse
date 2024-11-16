@@ -3,11 +3,14 @@ from django.urls import reverse
 from ..models import User, FollowRequest, Follow
 from django.shortcuts import get_object_or_404
 from rest_framework.test import APIClient
+from .. import views
 
 class FollowRequestsTestCases(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
+        views.Host.host = "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/"
 
         cls.client = APIClient()
 

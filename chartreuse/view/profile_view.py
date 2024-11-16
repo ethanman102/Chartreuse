@@ -70,7 +70,7 @@ def send_posts_to_remote(posts,local_user,remote_user,node):
             continue
         
         post_obj = json.loads(response.content)
-        response.post(url,headers=headers,json=post_obj,auth=(username,password))
+        response.post(url,headers=headers,json=post_obj,auth=auth)
     
 
 def follow_reject(request,followed,follower):
@@ -229,6 +229,7 @@ class ProfileDetailView(DetailView):
         if ('https://' + host_obj.host + '/chartreuse/api/') != user.host:
             context['remote'] = 'REMOTE author'
         
+        
 
         context['profile'].profileImage = post_utils.get_image_post(context['profile'].profileImage)
 
@@ -283,7 +284,12 @@ class ProfileDetailView(DetailView):
         context['following'] = Follow.objects.filter(follower=user).count()
 
         # posts that can be viewed by the current user visiting.
-        posts = self.get_posts(post_access,user)
+        # checks to see if the author is a remote author, hence the requirement to check if a follow request has been accepted.
+        if context.get('remote',None) == None:
+            posts = self.get_posts(post_access,user)
+        else:
+            posts = self.filter_remote_posts(user,context['logged_in'])
+
         posts = post_utils.prepare_posts(posts)
         context['posts'] = posts
         
@@ -315,6 +321,75 @@ class ProfileDetailView(DetailView):
         return follow_requests
     
    
+
+    def filter_remote_posts(self,user):
+        if not self.request.user.is_authenticated:
+            # case when it's a logged out user, we simply want to display all posts that are public.
+            posts = Post.objects.filter(visibility="PUBLIC",user=user)
+            posts = [post for post in posts]
+            posts = sorted(posts, key=lambda post: post.published, reverse=True)
+            return posts
+        else:
+            # User is authenticated, we want to check if a follow request has been accepted or not.
+            current_auth_user = self.request.user
+            current_user_model = get_object_or_404(User,user=current_auth_user)
+
+            # check to see if current user IS actually still following on their local node, (nodes can be out of date with following lists)
+            follow = Follow.objects.filter(followed=user,follower=current_user_model)
+            if not follow.exists():
+                posts = Post.objects.filter(visibility="PUBLIC",user=user)
+                posts = [post for post in posts]
+                posts = sorted(posts, key=lambda post: post.published, reverse=True)
+                return posts
+            
+            # user is following on local node, but are they still following on the remote node??
+            # Note: this means that if a node is eventually disabled we will only see their public posts!
+            node = Node.objects.filter(host=user.host,follow_status='OUTGOING',status='ENABLED')
+            if not node.exists():
+                posts = Post.objects.filter(visibility="PUBLIC",user=user)
+                posts = [post for post in posts]
+                posts = sorted(posts, key=lambda post: post.published, reverse=True)
+                return posts
+            
+            remote_node = node[0]
+            
+            username = remote_node.username
+            password = remote_node.password
+
+            auth = (username,password)
+
+            url = f'{user.host}authors/{quote(user.url_id,safe='')}/followers/{quote(current_user_model.url_id,safe='')}/'
+
+            response = requests.get(url,auth=auth)
+
+            if response.status_code == 404:
+                # remote node not following...
+                posts = Post.objects.filter(visibility="PUBLIC",user=user)
+                posts = [post for post in posts]
+                posts = sorted(posts, key=lambda post: post.published, reverse=True)
+                return posts
+            
+            # this is case when remote node and local node both agree they are FOLLOWING this remote node!
+            
+            # check to see if the remote author is following this author, if thats the case then they are friends, otherwise they are not friends!
+            follow = Follow.objects.filter(follower=user,followed=current_user_model)
+
+            if follow.exists(): # friends
+                posts = Post.objects.filter(user=user).exclude(visibility='DELETED')
+            else: # only local node following remote node...
+                posts = Post.objects.filter(visibility='PUBLIC',user=user) | Post.objects.filter(visibility='UNLISTED')
+
+            posts = [post for post in posts]
+            posts = sorted(posts, key=lambda post: post.published, reverse=True)
+            return posts
+
+                
+            
+
+
+
+
+        
 
     def get_posts(self,post_access,user):
 

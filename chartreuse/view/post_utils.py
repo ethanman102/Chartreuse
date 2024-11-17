@@ -381,6 +381,7 @@ def save_post(request):
             content=post_content,
             contentType=content_type,
             visibility=visibility,
+            url_id=''
         )
 
         post.save()

@@ -78,7 +78,9 @@ def inbox(request, user_id):
                    
 
             # add like objects
+            
             post_likes = likes["src"]
+            print("WE GOT HERE MANNNN",post_likes)
             for post_like in post_likes:
                 author_id = post_like["author"]['id']
 

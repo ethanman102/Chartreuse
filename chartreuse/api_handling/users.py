@@ -30,7 +30,6 @@ class UserSerializer(serializers.ModelSerializer):
     github = serializers.URLField()
     profileImage = serializers.URLField()
     page = serializers.URLField()
-    id = serializers.URLField()
 
     class Meta:
         model = User

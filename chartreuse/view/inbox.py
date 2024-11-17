@@ -82,9 +82,9 @@ def inbox(request, user_id):
 
             # add like objects
             
-            post_likes = data['likes']['src']
+            post_likes = data['likes']
             print("WE GOT HERE MANNNN",post_likes)
-            for post_like in post_likes:
+            for post_like in post_likes['src']:
                 author_id = post_like["author"]['id']
 
                 # check to see whether the author has been discovered yet or not!

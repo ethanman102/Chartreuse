@@ -111,6 +111,7 @@ def send_post_to_inbox(post_url_id):
         post_response = requests.get(post_json_url)
         post_json = post_response.json()
 
+
         followers = Follow.objects.filter(followed = post.user)
         for follower in followers:
             if follower.follower.host == host:
@@ -123,7 +124,10 @@ def send_post_to_inbox(post_url_id):
                 }
 
                 # send to inbox
-                requests.post(full_url, headers=headers, json=post_json, auth=(username, password))
+                try:
+                    requests.post(full_url, headers=headers, json=post_json, auth=(username, password))
+                except: # some kind of chunked error that occurs if user is gone...
+                    continue
 
 @csrf_exempt
 def update_post(request, post_id):

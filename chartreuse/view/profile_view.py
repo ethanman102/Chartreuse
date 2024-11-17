@@ -361,7 +361,7 @@ class ProfileDetailView(DetailView):
 
             auth = (username,password)
 
-            url = f'{user.host}authors/{quote(user.url_id,safe='')}/followers/{quote(current_user_model.url_id,safe='')}/'
+            url = f'{user.host}authors/{quote(user.url_id,safe='')}/followers/{quote(current_user_model.url_id,safe='')}'
 
             response = requests.get(url,auth=auth)
 

@@ -14,6 +14,7 @@ from rest_framework import serializers
 from rest_framework.decorators import action, api_view
 import requests
 from requests.auth import HTTPBasicAuth
+from requests.exceptions import ChunkedEncodingError
 
 def get_post_likes(post_id):
     """
@@ -126,7 +127,11 @@ def send_post_to_inbox(post_url_id):
                 # send to inbox
                 try:
                     requests.post(full_url, headers=headers, json=post_json, auth=(username, password))
-                except: # some kind of chunked error that occurs if user is gone...
+                    # Resource: https://stackoverflow.com/questions/16511337/correct-way-to-try-except-using-python-requests-module
+                    # Stack Overflow Post: 'correct way to try/except using Python requests module'
+                    # Purpose: Learned how to import the ChunckedEncodingError as defined...
+                    # Hint for importing requests.exceptions as seen by: Jonathon Reinhart's Answer on May 12, 2013
+                except ChunkedEncodingError: # some kind of chunked error that occurs if user is gone...
                     continue
 
 @csrf_exempt

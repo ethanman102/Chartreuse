@@ -40,7 +40,7 @@ def follow_accept(request,followed,follower):
                 return redirect('chartreuse:profile',url_id=quote(followed,safe=''))
 
             # case of remote follow
-            remote_posts = Post.objects.filter(user=followed_user).exclude(contentType='repost')
+            remote_posts = Post.objects.filter(user=followed_user).exclude(contentType='repost').exclude(visibility='DELETED')
             send_posts_to_remote(remote_posts,followed_user,following_user,node_queryset[0])
 
         follow = Follow(follower=following_user,followed=followed_user) # create the new follow!
@@ -70,7 +70,7 @@ def send_posts_to_remote(posts,local_user,remote_user,node):
             continue
         
         post_obj = json.loads(response.content)
-        response.post(url,headers=headers,json=post_obj,auth=auth)
+        requests.post(url,headers=headers,json=post_obj,auth=auth)
     
 
 def follow_reject(request,followed,follower):

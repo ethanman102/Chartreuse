@@ -32,7 +32,7 @@ class Post(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if self.url_id == None:
+        if self.url_id == None or self.url_id == '':
             self.url_id = f"{self.user.url_id}/posts/{self.pk}"
         super().save(*args, **kwargs)
 

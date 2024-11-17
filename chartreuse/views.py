@@ -27,7 +27,6 @@ def checkIfRequestAuthenticated(request):
     request: Request object
     '''
     authentication = request.headers.get('Authorization')
-    authentication.strip()
     if not authentication or not authentication.startswith('Basic'):
         print('AUTH WOW:',authentication)
         return JsonResponse({"error": "Missing or invalid Authorization header"}, status=401)
@@ -46,7 +45,9 @@ def checkIfRequestAuthenticated(request):
     host = f"https://{request.get_host()}/chartreuse/api/"
 
     node1 = Node.objects.get(host=host)
-    print(node1)
+    print(node1,'THIS BE MY NODE')
+    print('username =>',username)
+    print('password =>',password)
 
     node = Node.objects.filter(host=host, username=username, password=password, follow_status="INCOMING", status="ENABLED")
 

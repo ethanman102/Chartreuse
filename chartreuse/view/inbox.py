@@ -90,19 +90,12 @@ def inbox(request, user_id):
                 new_like.save()
 
         else:
-            # update visibility
-            if visibility == "DELETED":
-                post.visibility = visibility
-                post.save()
-            
-            # update post content
-            else:
-                post.visibility = visibility
-                post.title = title
-                post.description = description
-                post.contentType = contentType
-                post.content = content
-                post.save()
+            post.visibility = visibility
+            post.title = title
+            post.description = description
+            post.contentType = contentType
+            post.content = content
+            post.save()
                     
         return JsonResponse({"status": "Post added successfully"})
 

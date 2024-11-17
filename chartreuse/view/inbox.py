@@ -59,14 +59,14 @@ def inbox(request, user_id):
                 likes = post_comment["likes"]
 
                 comment_author_id = unquote(comment_author["id"])
-                comment_author = User.objects.get(pk=comment_author_id)
+                comment_author = discover_author(comment_author_id,post_comment)
 
                 new_comment = Comment.objects.create(user=comment_author, url_id=comment_id, comment=comment, contentType=contentType, post=new_post)
 
                 
-                '''
+                
                 # add comment likes
-                comment_likes = likes["src"]
+                comment_likes = post_comment["src"]
                 for comment_like in comment_likes:
                     like_author = comment_like["author"]
                     published = comment_like["published"]
@@ -74,10 +74,10 @@ def inbox(request, user_id):
                     post = comment_like["object"]
 
                     like_author_id = unquote(like_author["id"])
-                    like_author = User.objects.get(pk=like_author_id)
+                    like_author = discover_author(like_author_id,comment_like)
 
                     new_like = Like.objects.create(user=like_author, url_id=like_id, comment=new_comment)
-                '''
+                
                    
 
             # add like objects
@@ -88,18 +88,7 @@ def inbox(request, user_id):
                 author_id = post_like["author"]['id']
 
                 # check to see whether the author has been discovered yet or not!
-                author_queryset = User.objects.filter(url_id=author_id)
-                if not author_queryset.exists():
-                    # new author need to add...
-                    current_author = User.objects.create(
-                        url_id = author_id,
-                        displayName = post_like['author']['displayName'],
-                        host = post_like['author']['host'],
-                        github = post_like['author']['github'],
-                        profileImage = post_like['author']['profileImage']
-                    )
-                else:
-                    current_author = author_queryset[0]
+                current_author = discover_author(author_id,post_like)
 
                 published = post_like["published"]
                 like_id = post_like["id"]
@@ -227,3 +216,19 @@ def inbox(request, user_id):
         new_follow_request.save()
     
         return JsonResponse({"status": "Follow request sent successfully"},status=200)
+    
+def discover_author(url_id,json_obj):
+
+    author_queryset = User.objects.filter(url_id=url_id)
+    if not author_queryset.exists():
+        current_author = User.objects.create(
+            url_id = url_id,
+            displayName = json_obj['author']['displayName'],
+            host = json_obj['author']['host'],
+            github = json_obj['author']['github'],
+            profileImage = json_obj['author']['profileImage']
+        )
+    else:
+        current_author = author_queryset[0]
+    return current_author
+

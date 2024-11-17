@@ -301,7 +301,7 @@ def repost(request):
 
 
 
-        repost = Post(
+        repost = Post.objects.create(
             user = reposter_user_model,
             contentType = content_type,
             description = description,

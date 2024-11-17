@@ -493,7 +493,7 @@ def upload_profile_picture(request):
         current_auth_user = request.user
         current_user_model = User.objects.get(user = current_auth_user)
 
-        new_picture = Post(
+        new_picture = Post.objects.create(
             title= random.choice(PROFILE_PICTURE_TITLES),
             contentType = mime_type,
             content = encoded_image,

@@ -37,6 +37,7 @@ def follow_accept(request,followed,follower):
 
             node_queryset = Node.objects.filter(host=following_user.host,follow_status="OUTGOING",status="ENABLED")
             if not node_queryset.exists():
+                print("WELL HERE IT IS???")
                 return redirect('chartreuse:profile',url_id=quote(followed,safe=''))
 
             # case of remote follow

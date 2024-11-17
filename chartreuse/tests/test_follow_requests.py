@@ -3,15 +3,19 @@ from django.urls import reverse
 from ..models import User, FollowRequest, Follow
 from django.shortcuts import get_object_or_404
 from rest_framework.test import APIClient
-from .. import views
+from chartreuse.views import Host
 from urllib.parse import quote
+
+import json
 
 class FollowRequestsTestCases(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        views.Host.host = "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/"
+        Host.host = "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/"
+
+        cls.host = Host.host
 
         cls.client = APIClient()
 
@@ -22,7 +26,7 @@ class FollowRequestsTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/k7XVwpB.jpeg',
             'username': 'greg',
             'password': 'ABC123!!!',
-            'host': 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
+            'host': cls.host,
             'firstName': 'Greg',
             'lastName': 'Johnson',
         }
@@ -33,7 +37,7 @@ class FollowRequestsTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/1234.jpeg',
             'username': 'john',
             'password': '87@398dh817b!',
-            'host': 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
+            'host': cls.host,
             'firstName': 'John',
             'lastName': 'Smith',
         }
@@ -43,19 +47,38 @@ class FollowRequestsTestCases(TestCase):
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json')
 
         # log in as user 1
-        cls.client.post(reverse('chartreuse:login_user'), {
+        foo = cls.client.post(reverse('chartreuse:login_user'), {
             'username': 'greg',
             'password': 'ABC123!!!'
         })
 
-        # sends a follow request to user 2
-        cls.response = cls.client.post(reverse('chartreuse:send_follow_request', args=[quote(f"{cls.test_user_2_data['host']}authors/2", safe='')]))
+        data = foo.json()
+        print(json.dumps(data, indent=4))
+        # for sure logged in
 
+        # sends a follow request to user 2
+        # something about the anonymous user here
+        # cls.response = cls.client.post(reverse('chartreuse:send_follow_request', args=[quote(f"{cls.test_user_2_data['host']}authors/2", safe='')]))
+        cls.response = cls.client.post(reverse('chartreuse:send_follow_request', args=[quote(f"{cls.host}authors/2", safe='')]))
+            # I think the issue here is that the URL isn't formmatted in the way that the API can get the id from it???
+
+
+        print('hello')
         # user 1 logout
         cls.client.logout()
 
         cls.greg = get_object_or_404(User, url_id=f"{cls.test_user_1_data['host']}authors/1")
         cls.john = get_object_or_404(User, url_id=f"{cls.test_user_2_data['host']}authors/2")
+
+    def setUp(self):
+        '''
+        Log in as user 1 because setUpClass does not keep log in information
+        '''
+        # log in as user 1
+        self.client.post(reverse('chartreuse:login_user'), {
+            'username': 'greg',
+            'password': 'ABC123!!!'
+        })
     
     def test_send_follow_request(self):
         '''

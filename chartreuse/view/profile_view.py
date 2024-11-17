@@ -37,7 +37,6 @@ def follow_accept(request,followed,follower):
 
             node_queryset = Node.objects.filter(host=following_user.host,follow_status="OUTGOING",status="ENABLED")
             if not node_queryset.exists():
-                print("WELL HERE IT IS???")
                 return redirect('chartreuse:profile',url_id=quote(followed,safe=''))
 
             # case of remote follow
@@ -72,7 +71,6 @@ def send_posts_to_remote(posts,local_user,remote_user,node):
 
         
         post_obj = response.json()
-        print('HERES THE POST OBJ',post_obj)
         requests.post(url,headers=headers,json=post_obj,auth=auth)
     
 

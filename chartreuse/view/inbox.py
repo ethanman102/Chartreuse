@@ -48,7 +48,6 @@ def inbox(request, user_id):
 
             # add comment objects
             post_comments = comments["src"]
-            print(post_comments,'COM HEREEE')
             for post_comment in post_comments:
                 comment_author = post_comment["author"]
                 comment = post_comment["comment"]
@@ -83,7 +82,6 @@ def inbox(request, user_id):
             # add like objects
             
             post_likes = data['likes']
-            print("WE GOT HERE MANNNN",post_likes)
             for post_like in post_likes['src']:
                 author_id = post_like["author"]['id']
 

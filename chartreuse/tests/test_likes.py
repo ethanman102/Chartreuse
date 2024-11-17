@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from urllib.parse import quote
+from chartreuse.views import Host
 
 class LikeTestCases(TestCase):
     @classmethod
@@ -10,7 +11,9 @@ class LikeTestCases(TestCase):
 
         cls.client = APIClient()
 
-        cls.host = 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/'
+        Host.host = 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/'
+
+        cls.host = Host.host
 
         # Test user data
         cls.test_user_1_data = {
@@ -181,6 +184,8 @@ class LikeTestCases(TestCase):
         user_id = like.json()['author']['id']
         user_id = quote(user_id, safe='')
         like_id = quote(like_id, safe='')
+
+        # Missing 1 required argument: 'request'
         response = self.client.get(reverse('chartreuse:post_likes', args=[user_id, self.post_id]))
 
         # Assertions to verify the response
@@ -211,11 +216,13 @@ class LikeTestCases(TestCase):
         like_id = quote(like_id, safe='')
 
         # get the comment likes
-        response = self.client.get(reverse('chartreuse:comment_likes', args=[user_id, self.post_id, comment_id]))
+        response = self.client.get(reverse('chartreuse:comment_likes', args=[user_id, self.post_id, comment_id]))  
 
         # Assertions to verify the response
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['type'], 'likes')
         self.assertEqual(response.json()["src"][0]['author']['displayName'], 'Greg Johnson')
         self.assertEqual(response.json()["src"][0]['id'], f"{self.host}authors/1/liked/1")
-        self.assertEqual(response.json()["src"][0]['object'], f"{self.host}authors/2/posts/1")
+        self.assertEqual(response.json()["src"][0]['object'], f"{self.host}authors/1/commented/1")
+
+        

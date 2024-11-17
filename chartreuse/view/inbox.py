@@ -66,8 +66,8 @@ def inbox(request, user_id):
                 
                 
                 # add comment likes
-                comment_likes = post_comment["src"]
-                for comment_like in comment_likes:
+                comment_likes = post_comment["likes"]
+                for comment_like in comment_likes['src']:
                     like_author = comment_like["author"]
                     published = comment_like["published"]
                     like_id = comment_like["id"]

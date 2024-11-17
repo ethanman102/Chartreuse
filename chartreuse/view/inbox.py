@@ -44,7 +44,7 @@ def inbox(request, user_id):
         if post is None:
             # create a new post
             new_post = Post.objects.create(title=title, url_id=post_id, description=description, contentType=contentType, content=content, user=author, published=published, visibility=visibility)
-            new_post.save()
+            
 
             # add comment objects
             post_comments = comments["src"]

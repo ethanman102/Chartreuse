@@ -61,7 +61,7 @@ def inbox(request, user_id):
                 comment_author = User.objects.get(pk=comment_author_id)
 
                 new_comment = Comment.objects.create(user=comment_author, url_id=comment_id, comment=comment, contentType=contentType, post=new_post)
-                new_comment.save()
+                
 
                 # add comment likes
                 comment_likes = likes["src"]
@@ -75,7 +75,7 @@ def inbox(request, user_id):
                     like_author = User.objects.get(pk=like_author_id)
 
                     new_like = Like.objects.create(user=like_author, url_id=like_id, comment=new_comment)
-                    new_like.save()
+                   
 
             # add like objects
             post_likes = likes["src"]
@@ -101,7 +101,7 @@ def inbox(request, user_id):
                 post = post_like["object"]
 
                 new_like = Like.objects.create(user=current_author, url_id=like_id, post=new_post)
-                new_like.save()
+                
 
         else:
             post.visibility = visibility

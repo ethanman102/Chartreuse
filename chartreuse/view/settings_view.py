@@ -17,6 +17,7 @@ import random
 from rest_framework import serializers
 from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
 from rest_framework.decorators import action, api_view
+import post_utils
 
 PROFILE_PICTURE_TITLES = [
     "Look out! I'm ready to 'serve' with this new image file as my new profile picture!",
@@ -509,6 +510,7 @@ def upload_profile_picture(request):
 
         current_user_model.profileImage = profile_pic_url
         current_user_model.save()
+        post_utils.send_post_to_inbox(new_picture.url_id)
         return JsonResponse({'success':'Profile picture updated','image':encoded_image},status=200)
 
     return HttpResponseNotAllowed(['POST'])

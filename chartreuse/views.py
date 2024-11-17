@@ -43,6 +43,7 @@ def checkIfRequestAuthenticated(request):
         return JsonResponse({"error": "Invalid authentication format"}, status=401)
 
     host = f"https://{request.get_host()}/chartreuse/api/"
+    print('HOST =>',host)
 
     node1 = Node.objects.get(host=host)
     print(node1,'THIS BE MY NODE')

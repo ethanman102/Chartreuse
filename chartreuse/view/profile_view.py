@@ -69,7 +69,7 @@ def send_posts_to_remote(posts,local_user,remote_user,node):
         if response.status_code != 200:
             continue
         
-        post_obj = json.loads(response.content)
+        post_obj = response.json()
         requests.post(url,headers=headers,json=post_obj,auth=auth)
     
 

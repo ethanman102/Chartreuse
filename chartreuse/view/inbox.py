@@ -58,7 +58,7 @@ def inbox(request, user_id):
                 likes = post_comment["likes"]
 
                 comment_author_id = unquote(comment_author["id"])
-                comment_author = discover_author(comment_author_id,post_comment)
+                comment_author = discover_author(comment_author_id,post_comment['author'])
 
                 new_comment = Comment.objects.create(user=comment_author, url_id=comment_id, comment=comment, contentType=contentType, post=new_post)
 
@@ -73,7 +73,7 @@ def inbox(request, user_id):
                     post = comment_like["object"]
 
                     like_author_id = unquote(like_author["id"])
-                    like_author = discover_author(like_author_id,comment_like)
+                    like_author = discover_author(like_author_id,comment_like['author'])
 
                     new_like = Like.objects.create(user=like_author, url_id=like_id, comment=new_comment)
                 
@@ -86,7 +86,7 @@ def inbox(request, user_id):
                 author_id = post_like["author"]['id']
 
                 # check to see whether the author has been discovered yet or not!
-                current_author = discover_author(author_id,post_like)
+                current_author = discover_author(author_id,post_like['author'])
 
                 published = post_like["published"]
                 like_id = post_like["id"]
@@ -116,8 +116,7 @@ def inbox(request, user_id):
         # add this new comment if it does not exist, if it exists, then delete it
 
         comment_author_id = unquote(comment_author["id"])
-        comment_author = User.objects.get(url_id=comment_author_id)
-
+        comment_author = discover_author(comment_author_id,comment_author)
         new_post = Post.objects.get(url_id=post)
 
         # check whether comment already exists
@@ -136,7 +135,8 @@ def inbox(request, user_id):
             post = comment_like["object"]
 
             like_author_id = unquote(like_author["id"])
-            like_author = User.objects.get(url_id=like_author_id)
+            like_author = discover_author(like_author_id,like_author)
+            
 
             # check whether like already exists
             like = Like.objects.filter(user=like_author, url_id=like_id, comment=comment).first()
@@ -154,7 +154,8 @@ def inbox(request, user_id):
         object_id = data["object"]
         # add the like if it does not exist, if it exists, delete the like
         author_id = unquote(author["id"])
-        author = User.objects.get(url_id=author_id)
+        author = discover_author(author_id,author)
+        
 
         post = Post.objects.filter(url_id=object_id).first()
 
@@ -221,10 +222,10 @@ def discover_author(url_id,json_obj):
     if not author_queryset.exists():
         current_author = User.objects.create(
             url_id = url_id,
-            displayName = json_obj['author']['displayName'],
-            host = json_obj['author']['host'],
-            github = json_obj['author']['github'],
-            profileImage = json_obj['author']['profileImage']
+            displayName = json_obj['displayName'],
+            host = json_obj['host'],
+            github = json_obj['github'],
+            profileImage = json_obj['profileImage']
         )
     else:
         current_author = author_queryset[0]

@@ -32,7 +32,8 @@ class Post(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        self.url_id = f"{self.user.url_id}/posts/{self.pk}"
+        if self.url_id == None:
+            self.url_id = f"{self.user.url_id}/posts/{self.pk}"
         super().save(*args, **kwargs)
 
     def __str__(self):

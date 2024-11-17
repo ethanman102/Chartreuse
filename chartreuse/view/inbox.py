@@ -16,7 +16,6 @@ def inbox(request, user_id):
     # check request headers
     authorization = request.headers.get('Authorization')
     if authorization is None:
-        print('WE ARE UNAUTH CUS NO AUTH HEADER')
         return JsonResponse({"error": "Unauthorized"}, status=401)
     
     authorization_response = checkIfRequestAuthenticated(request)

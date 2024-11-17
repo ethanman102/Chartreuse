@@ -80,12 +80,27 @@ def inbox(request, user_id):
             # add like objects
             post_likes = likes["src"]
             for post_like in post_likes:
-                author = post_like["author"]
+                author_id = post_like["author"]['id']
+
+                # check to see whether the author has been discovered yet or not!
+                author_queryset = User.objects.filter(url_id=author_id)
+                if not author_queryset.exists():
+                    # new author need to add...
+                    current_author = User.objects.create(
+                        url_id = author_id,
+                        displayName = post_like['author']['displayName'],
+                        host = post_like['author']['host'],
+                        github = post_like['author']['github'],
+                        profileImage = post_like['author']['profileImage']
+                    )
+                else:
+                    current_author = author_queryset[0]
+
                 published = post_like["published"]
                 like_id = post_like["id"]
                 post = post_like["object"]
 
-                new_like = Like.objects.create(author=author, url_id=like_id, post=new_post)
+                new_like = Like.objects.create(user=current_author, url_id=like_id, post=new_post)
                 new_like.save()
 
         else:

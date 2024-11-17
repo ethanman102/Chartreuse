@@ -374,17 +374,16 @@ def save_post(request):
         else:
             return JsonResponse({'error': 'Invalid post data.'}, status=400)
         
-        post = Post(
+        post = Post.objects.create(
             user=current_user_model,
             title=title,
             description=description,
             content=post_content,
             contentType=content_type,
             visibility=visibility,
-            url_id=''
         )
 
-        post.save()
+        
 
         send_post_to_inbox(post.url_id)
 

@@ -11,6 +11,8 @@ import json
 PAGE_SIZE = 5
 
 # ListView class based view discovered via youtube video: https://www.youtube.com/watch?v=dHvcioGHg08
+# Title of Youtube Video: Learn Django Class Based Views - ListView Theory and Examples
+# Creator: Very Academy, on August 29, 2020
 
 class DiscoverAuthorListView(ListView):
     model = User

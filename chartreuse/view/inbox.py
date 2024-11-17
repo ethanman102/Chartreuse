@@ -44,6 +44,8 @@ def inbox(request, user_id):
         if post is None:
             # create a new post
             new_post = Post.objects.create(title=title, url_id=post_id, description=description, contentType=contentType, content=content, user=author, published=published, visibility=visibility)
+            new_post.published = published
+            new_post.save()
             
 
             # add comment objects
@@ -61,6 +63,8 @@ def inbox(request, user_id):
                 comment_author = discover_author(comment_author_id,post_comment['author'])
 
                 new_comment = Comment.objects.create(user=comment_author, url_id=comment_id, comment=comment, contentType=contentType, post=new_post)
+                new_comment.dateCreated = published
+                new_comment.save()
 
                 
                 
@@ -76,6 +80,8 @@ def inbox(request, user_id):
                     like_author = discover_author(like_author_id,comment_like['author'])
 
                     new_like = Like.objects.create(user=like_author, url_id=like_id, comment=new_comment)
+                    new_like.dateCreated = published
+                    new_like.save()
                 
                    
 
@@ -93,6 +99,8 @@ def inbox(request, user_id):
                 post = post_like["object"]
 
                 new_like = Like.objects.create(user=current_author, url_id=like_id, post=new_post)
+                new_like.dateCreated = published
+                new_like.save()
                 
 
         else:
@@ -124,6 +132,7 @@ def inbox(request, user_id):
 
         if comment is None:
             comment = Comment.objects.create(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post)
+            comment.dateCreated = published
             comment.save()
 
         # add comment likes
@@ -143,6 +152,7 @@ def inbox(request, user_id):
 
             if like is None:
                 new_like = Like.objects.create(user=like_author, url_id=like_id, comment=comment)
+                new_like.dateCreated = published
                 new_like.save()
 
         return JsonResponse({"status": "Comment added successfully"})
@@ -169,6 +179,7 @@ def inbox(request, user_id):
             like = Like.objects.filter(user=author, post=post).first()
             if like is None:
                 new_like = Like.objects.create(user=author, url_id=like_id, post=post)
+                new_like.dateCreated = published
                 new_like.save()
                 return JsonResponse({"status": "Like added successfully"})
             else:
@@ -179,6 +190,7 @@ def inbox(request, user_id):
             like = Like.objects.filter(user=author, comment=comment).first()
             if like is None:
                 new_like = Like.objects.create(user=author, url_id=like_id, comment=comment)
+                new_like.dateCreated = published
                 new_like.save()
                 return JsonResponse({"status": "Like added successfully"})
             else:

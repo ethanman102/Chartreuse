@@ -447,7 +447,7 @@ class PostViewSet(viewsets.ViewSet):
                 "likes": {
                     "types": "likes",
                     "page": likes_data["page"],
-                    "id": likes_data["id"],
+                    # "id": likes_data["id"],
                     "page_number": likes_data["page_number"],
                     "size": likes_data["size"],
                     "count": likes_data["count"],

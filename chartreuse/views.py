@@ -40,9 +40,7 @@ def checkIfRequestAuthenticated(request):
     except (IndexError, base64.binascii.Error, UnicodeDecodeError):
         return JsonResponse({"error": "Invalid authentication format"}, status=401)
 
-    host = f"https://{request.get_host()}/chartreuse/api/"
-
-    node = Node.objects.filter(host=host, username=username, password=password, follow_status="INCOMING", status="ENABLED")
+    node = Node.objects.filter(username=username, password=password, follow_status="INCOMING", status="ENABLED")
 
     if len(node) == 0:
         return JsonResponse({"error": "Unauthorized"}, status=401)

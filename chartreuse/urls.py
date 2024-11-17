@@ -42,17 +42,18 @@ urlpatterns = [
     re_path(r"api/authors/(?P<user_id>https?.+\d)/posts/(?P<post_id>https?.+\d)/$", posts.PostViewSet.as_view({"get": "get_post", "delete": "remove_post", "put": "update"}), name="post"),
     re_path(r"api/authors/(?P<user_id>.+\d)/posts/$", posts.PostViewSet.as_view({"get": "get_posts", "post": "create_post"}), name="posts"),
     re_path(r"api/post-exists/$", post_utils.check_duplicate_post, name="check_duplicate_post"),
-    
-    # Author URLs
-    path("api/author/login/", users.UserViewSet.login_user, name="login_user"),
-    re_path(r"api/authors/(?P<pk>.+\d)/$", users.UserViewSet.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'}), name="user-detail"),
-    path("api/authors/", users.UserViewSet.as_view({'post': 'create', 'get': 'list'}), name="user-list"),
 
     # Follower API URLs
     re_path(r"api/authors/(?P<author_id>.+\d)/followers/(?P<foreign_author_id>.+\d)/is_follower", followers.FollowViewSet.as_view({'get': 'is_follower'}), name="is_follower"),
     re_path(r"api/authors/(?P<author_id>.+\d)/followers/(?P<foreign_author_id>.+\d)/remove", followers.FollowViewSet.as_view({'delete': 'remove_follower'}), name="remove_follower"),
     re_path(r"api/authors/(?P<author_id>.+\d)/followers/(?P<foreign_author_id>.+\d)", followers.FollowViewSet.as_view({'post': 'add_follower', 'put': 'add_follower'}), name="add_follower"),
     re_path(r"api/authors/(?P<author_id>.+\d)/followers", followers.FollowViewSet.as_view({'get': 'get_followers'}), name="get_followers"),
+    
+    # Author URLs
+    path("api/author/login/", users.UserViewSet.login_user, name="login_user"),
+    re_path(r"api/authors/(?P<pk>.+\d)/$", users.UserViewSet.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'}), name="user-detail"),
+    path("api/authors/", users.UserViewSet.as_view({'post': 'create', 'get': 'list'}), name="user-list"),
+
     
     # Follow Request API URLs
     re_path(r"api/authors/(?P<author_id>.+\d)/follow-requests/send", follow_requests.FollowRequestViewSet.as_view({'post': 'send_follow_request'}), name="send_follow_request"),

@@ -42,9 +42,9 @@
                         </div>
                     </div>
                     <h4 class="card-title mt-2" style="text-align: left;">{{ post.repost_user.displayName }} reposted a post:</h4>
-                    {% if post.visibility == 'DELETED' %}
+                    {% if post.visibility != 'PUBLIC' %}
                     <div class = "card mb-3 p-4">
-                        <h2>Looks like the original post was deleted :(</h2>
+                        <h2>Looks like the original post is no longer public :(</h2>
                     </div>
                     {% else %}
                         {% show_singular_post %}

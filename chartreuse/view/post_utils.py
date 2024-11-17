@@ -374,7 +374,7 @@ def save_post(request):
             visibility=visibility,
         )
 
-        post = post.save()
+        post.save()
 
         send_post_to_inbox(post.url_id)
 

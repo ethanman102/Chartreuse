@@ -62,7 +62,7 @@ def inbox(request, user_id):
 
                 new_comment = Comment.objects.create(user=comment_author, url_id=comment_id, comment=comment, contentType=contentType, post=new_post)
                 
-
+                '''
                 # add comment likes
                 comment_likes = likes["src"]
                 for comment_like in comment_likes:
@@ -75,6 +75,7 @@ def inbox(request, user_id):
                     like_author = User.objects.get(pk=like_author_id)
 
                     new_like = Like.objects.create(user=like_author, url_id=like_id, comment=new_comment)
+                '''
                    
 
             # add like objects

@@ -4,6 +4,7 @@ from ..models import User, FollowRequest, Follow
 from django.shortcuts import get_object_or_404
 from rest_framework.test import APIClient
 from .. import views
+from urllib.parse import quote
 
 class FollowRequestsTestCases(TestCase):
     @classmethod
@@ -48,7 +49,7 @@ class FollowRequestsTestCases(TestCase):
         })
 
         # sends a follow request to user 2
-        cls.response = cls.client.post(reverse('chartreuse:send_follow_request', args=[f"{cls.test_user_2_data['host']}authors/2"]))
+        cls.response = cls.client.post(reverse('chartreuse:send_follow_request', args=[quote(f"{cls.test_user_2_data['host']}authors/2", safe='')]))
 
         # user 1 logout
         cls.client.logout()

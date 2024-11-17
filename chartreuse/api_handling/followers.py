@@ -86,8 +86,9 @@ class FollowViewSet(viewsets.ViewSet):
             JsonResponse with the success message
         '''
         checkIfRequestAuthenticated(request)
-        if not request.user.is_authenticated:
-            return JsonResponse({"error": "User is not authenticated."}, status=401)
+
+        # if not request.user.is_authenticated:
+        #     return JsonResponse({"error": "User is not authenticated."}, status=401)
 
         if request.method == 'POST' or request.method == 'PUT':
 

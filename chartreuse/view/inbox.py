@@ -45,7 +45,6 @@ def inbox(request, user_id):
             # create a new post
             new_post = Post.objects.create(title=title, url_id=post_id, description=description, contentType=contentType, content=content, user=author, published=published, visibility=visibility)
             new_post.save()
-            new_post = Post.objects.get(url_id=post_id)
 
             # add comment objects
             post_comments = comments["src"]

@@ -24,7 +24,7 @@ def add_comment(request):
 
             # Create and save the comment
             if (comment_text != ""):
-                comment = Comment(user=user, post=post, comment=comment_text, contentType=content_type)
+                comment = Comment.objects.create(user=user, post=post, comment=comment_text, contentType=content_type)
                 comment.save()
 
                 send_comment_to_inbox(comment.url_id)

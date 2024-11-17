@@ -288,7 +288,7 @@ class ProfileDetailView(DetailView):
         if context.get('remote',None) == None:
             posts = self.get_posts(post_access,user)
         else:
-            posts = self.filter_remote_posts(user,context['logged_in'])
+            posts = self.filter_remote_posts(user)
 
         posts = post_utils.prepare_posts(posts)
         context['posts'] = posts

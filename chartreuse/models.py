@@ -50,8 +50,9 @@ class Comment(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        self.url_id = f"{self.user.url_id}/commented/{self.id}"
-        super().save(*args, **kwargs)
+        if self.url_id == None or self.url_id == '':
+            self.url_id = f"{self.user.url_id}/commented/{self.id}"
+        
 
     def __str__(self):
         return f"Comment(id={self.id}, url_id={self.url_id}, contentType={self.contentType}, content={self.comment}, user={self.user}, published={self.dateCreated})"
@@ -71,7 +72,8 @@ class Like(models.Model):
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        self.url_id = f"{self.user.url_id}/liked/{self.pk}"
+        if self.url_id == None or self.url_id == '':
+            self.url_id = f"{self.user.url_id}/liked/{self.pk}"
     
     def __str__(self):
         return f"Like(id={self.id}, url_id={self.url_id}, user={self.user}, post={self.post}, dateCreated={self.dateCreated})"

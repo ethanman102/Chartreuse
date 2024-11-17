@@ -47,7 +47,9 @@
             document.querySelectorAll('.node-button').forEach((button)=>{
                 button.addEventListener('click',function(event){
                     // https://stackoverflow.com/questions/5997450/append-to-url-and-refresh-page
-                    // Append to URL and refresh page ()
+                    // Append to URL and refresh page Stack Overflow Post.
+                    // Purpose: Learn how to add a query string paramter to query the page!
+                    // Answered and inspired byShlomi Komemi answered on May 13, 2011
                     let percentEncodedHost = this.getAttribute('node-host');
                     let url = window.location.href;
                     url += percentEncodedHost + '/' + '?page=1&size=5';

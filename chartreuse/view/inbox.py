@@ -196,6 +196,7 @@ def inbox(request, user_id):
             else:
                 like.delete()
                 return JsonResponse({"status": "Like removed successfully"})
+            
 
     elif (data["type"] == "follow"):
         actor = data["actor"]

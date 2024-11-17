@@ -115,15 +115,15 @@ def send_post_to_inbox(post_url_id):
         for follower in followers:
             if follower.follower.host == host:
                 author_url_id = follower.follower.url_id
-
-                url += f'{quote(author_url_id, safe = "")}/inbox/'
+                full_url = url + f'{quote(author_url_id, safe = "")}/inbox/'
+                
 
                 headers = {
                     "Content-Type": "application/json; charset=utf-8"
                 }
 
                 # send to inbox
-                requests.post(url, headers=headers, json=post_json, auth=(username, password))
+                requests.post(full_url, headers=headers, json=post_json, auth=(username, password))
 
 @csrf_exempt
 def update_post(request, post_id):

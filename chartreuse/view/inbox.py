@@ -97,6 +97,7 @@ def inbox(request, user_id):
             
             # update post content
             else:
+                post.visibility = visibility
                 post.title = title
                 post.description = description
                 post.contentType = contentType

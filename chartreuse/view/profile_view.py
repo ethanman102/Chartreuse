@@ -68,8 +68,10 @@ def send_posts_to_remote(posts,local_user,remote_user,node):
         response = requests.get(f'{local_user.host}/authors/{quote(local_user.url_id,safe='')}/posts/{quote(post.url_id,safe='')}/')
         if response.status_code != 200:
             continue
+
         
         post_obj = response.json()
+        print('HERES THE POST OBJ',post_obj)
         requests.post(url,headers=headers,json=post_obj,auth=auth)
     
 

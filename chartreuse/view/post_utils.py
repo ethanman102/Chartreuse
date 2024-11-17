@@ -383,6 +383,8 @@ def save_post(request):
             visibility=visibility,
         )
 
+        post.save()
+
         
 
         send_post_to_inbox(post.url_id)

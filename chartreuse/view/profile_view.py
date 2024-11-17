@@ -66,7 +66,7 @@ def send_posts_to_remote(posts,local_user,remote_user,node):
 
     for post in posts:
         # get the full representation of the post
-        response = requests.get(f'{local_user.host}/authors/{quote(local_user.url_id,safe='')}/posts/{quote(post.url_id,safe='')}/')
+        response = requests.get(f'{local_user.host}authors/{quote(local_user.url_id,safe='')}/posts/{quote(post.url_id,safe='')}/')
         if response.status_code != 200:
             continue
 

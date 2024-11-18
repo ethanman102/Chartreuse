@@ -4,6 +4,7 @@ from rest_framework.test import APIClient
 from urllib.parse import quote
 from ..models import User
 from django.contrib.auth.models import User as AuthUser
+from chartreuse.views import Host
 
 class CommentTestCases(TestCase):
     @classmethod
@@ -12,6 +13,10 @@ class CommentTestCases(TestCase):
 
         print("In CommentTestCases", User.objects.all())
         print("In CommentTestCases", AuthUser.objects.all())
+
+        Host.host = "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/"
+
+        cls.host = Host.host
 
         cls.client = APIClient()
 
@@ -38,6 +43,7 @@ class CommentTestCases(TestCase):
             'lastName': 'Smith',
         }
 
+        # Create test users
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json')
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json')
 
@@ -78,6 +84,7 @@ class CommentTestCases(TestCase):
         """
         Tests creating a comment on a post.
         """
+
         # Create a comment
         comment_response = self.client.post(reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]), {
             'comment': 'Nice post!',

@@ -112,7 +112,7 @@ class UserTestCases(TestCase):
         '''
         This tests getting a specific user.
         '''
-        user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1", safe='')
+        user_id = quote(f"{self.hostname}authors/1", safe='')
         response = self.client.get(reverse('chartreuse:user-detail', args=[user_id]))
 
         # Successfully got user
@@ -121,15 +121,15 @@ class UserTestCases(TestCase):
         self.assertEqual(response.json()['github'], 'http://github.com/gjohnson')
         self.assertEqual(response.json()['profileImage'], 'https://i.imgur.com/k7XVwpB.jpeg')
         self.assertEqual(response.json()['type'], 'author')
-        self.assertEqual(response.json()['page'], "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/greg")
-        self.assertEqual(response.json()['id'], 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1')
-        self.assertEqual(response.json()['host'], 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/')
+        self.assertEqual(response.json()['page'], f"{self.hostname}authors/greg")
+        self.assertEqual(response.json()['id'], f'{self.hostname}authors/1')
+        self.assertEqual(response.json()['host'], self.hostname)
         
     def test_get_user_invalid_id(self):
         '''
         This tests getting a user with an invalid id.
         '''
-        user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/100", safe='')
+        user_id = quote(f"{self.hostname}authors/100", safe='')
         response = self.client.get(reverse('chartreuse:user-detail', args=[user_id]))
 
         # User does not exist
@@ -145,7 +145,7 @@ class UserTestCases(TestCase):
             'password': 'ABC123!!!'
         })
 
-        user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1", safe='')
+        user_id = quote(f"{self.hostname}authors/1", safe='')
         response = self.client.delete(reverse('chartreuse:user-detail', args=[user_id]))
 
         # Successfully deleted user

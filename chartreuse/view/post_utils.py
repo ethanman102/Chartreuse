@@ -434,7 +434,7 @@ def like_post(request):
 def send_like_to_inbox(like_url_id):
     like = Like.objects.get(url_id=like_url_id)
     # send this to the inbox of other nodes
-    nodes = Node.objects.filter(follow_status='OUTGOING', status="ENABLED")
+    nodes = Node.objects.filter(follow_status='OUTGOING', status="ENABLED", host=like.user.host)
 
     if not nodes.exists():
         return []
@@ -462,7 +462,10 @@ def send_like_to_inbox(like_url_id):
         }
 
         # send to inbox
-        requests.post(url, headers=headers, json=likes_json, auth=(username, password))
+        try:
+            requests.post(url, headers=headers, json=likes_json, auth=(username, password))
+        except:
+            return JsonResponse({'error': 'Failed to send comment to inbox.'})
 
     return JsonResponse({"status": "Like added successfully"})
 

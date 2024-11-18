@@ -434,7 +434,10 @@ def like_post(request):
 def send_like_to_inbox(like_url_id):
     like = Like.objects.get(url_id=like_url_id)
     # send this to the inbox of other nodes
-    nodes = Node.objects.filter(follow_status='OUTGOING', status="ENABLED", host=like.user.host)
+    if like.comment is None or like.comment == '':
+        nodes = Node.objects.filter(follow_status='OUTGOING', status="ENABLED", host=like.post.user.host)
+    else:
+        nodes = Node.objects.filter(follow_status='OUTGOING', status="ENABLED", host=like.comment.user.host)
 
     if not nodes.exists():
         return []

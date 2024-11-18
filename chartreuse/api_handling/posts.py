@@ -293,7 +293,6 @@ class PostViewSet(viewsets.ViewSet):
             "likes": {
                 "types": "likes",
                 "page": likes_data["page"],
-                "id": likes_data["id"],
                 "page_number": likes_data["page_number"],
                 "size": likes_data["size"],
                 "count": likes_data["count"],
@@ -526,94 +525,90 @@ class PostViewSet(viewsets.ViewSet):
             JsonResponce containing updated post 
         """
         checkIfRequestAuthenticated(request)
-        if request.user.is_authenticated:
-            decoded_user_id = unquote(user_id)
-            decoded_post_id = unquote(post_id)
-            
-            author = User.objects.get(url_id=decoded_user_id)
-            post = Post.objects.filter(user=author, url_id=decoded_post_id)[0]
+        
+        decoded_user_id = unquote(user_id)
+        decoded_post_id = unquote(post_id)
+        
+        author = User.objects.get(url_id=decoded_user_id)
+        post = Post.objects.filter(user=author, url_id=decoded_post_id)[0]
 
-            # Get the request contents
-            post_type = request.POST.get("visibility")
-            if not post_type:
-                post_type = post.type
-            
-            post_title = request.POST.get("title")
-            if not post_title:
-                post_title = post.title
+        # Get the request contents
+        post_type = request.POST.get("visibility")
+        if not post_type:
+            post_type = post.type
+        
+        post_title = request.POST.get("title")
+        if not post_title:
+            post_title = post.title
 
-            post_description = request.POST.get("description")
-            if not post_description:
-                post_description = post.decription
+        post_description = request.POST.get("description")
+        if not post_description:
+            post_description = post.decription
 
-            post_contentType = request.POST.get("contentType")
-            if not post_contentType:
-                post_contentType = post.contentType
+        post_contentType = request.POST.get("contentType")
+        if not post_contentType:
+            post_contentType = post.contentType
 
-            post_content = request.POST.get("content")
-            if not post_content:
-                post_content = post.content
+        post_content = request.POST.get("content")
+        if not post_content:
+            post_content = post.content
 
-            request.method = "GET"
-            user_viewset = UserViewSet()
-            response = user_viewset.retrieve(request, pk=user_id)
-            author_data = json.loads(response.content)
+        request.method = "GET"
+        user_viewset = UserViewSet()
+        response = user_viewset.retrieve(request, pk=user_id)
+        author_data = json.loads(response.content)
 
-            comments_viewset = CommentViewSet()
-            response = comments_viewset.get_comments(request, post_id=post.url_id, user_id=user_id)
-            comments_data = json.loads(response.content)
+        comments_viewset = CommentViewSet()
+        response = comments_viewset.get_comments(request, post_id=post.url_id, user_id=user_id)
+        comments_data = json.loads(response.content)
 
-            likes_viewset = LikeViewSet()
-            response = likes_viewset.get_post_likes(request, user_id=post.user.url_id, post_id=post.url_id)
-            likes_data = json.loads(response.content)
+        likes_viewset = LikeViewSet()
+        response = likes_viewset.get_post_likes(request, user_id=post.user.url_id, post_id=post.url_id)
+        likes_data = json.loads(response.content)
 
-            # Construct the post object to return in the responce
-            if post_type in ["PUBLIC", "FRIENDS", "UNLISTED", "DELETED"]:
-                postObject = {
-                    "type": "post",
-                    "title": post_title,
-                    "id": post.url_id,
-                    "description": post_description,
-                    "contentType": post_contentType,
-                    "content": post_content,
-                    "author": {
-                        "type": "author",
-                        "id": author_data["id"],
-                        "page": author_data["page"],
-                        "host": author_data["host"],
-                        "displayName": author_data["displayName"],
-                        "github": author_data["github"],
-                        "profileImage": author_data["profileImage"]
-                    },
-                    "comments":{
-                        "type": "comments",
-                        "page": comments_data["page"],
-                        "id": comments_data["id"],
-                        "page_number": comments_data["page_number"],
-                        "size": comments_data["size"],
-                        "count": comments_data["count"],
-                        "src": comments_data["src"]
-                    },
-                    "likes": {
-                        "types": "likes",
-                        "page": likes_data["page"],
-                        "id": likes_data["id"],
-                        "page_number": likes_data["page_number"],
-                        "size": likes_data["size"],
-                        "count": likes_data["count"],
-                        "src": likes_data["src"]
-                    },
-                    "published": post.published,
-                    "visibility": post_type,
-                }
+        # Construct the post object to return in the responce
+        if post_type in ["PUBLIC", "FRIENDS", "UNLISTED", "DELETED"]:
+            postObject = {
+                "type": "post",
+                "title": post_title,
+                "id": post.url_id,
+                "description": post_description,
+                "contentType": post_contentType,
+                "content": post_content,
+                "author": {
+                    "type": "author",
+                    "id": author_data["id"],
+                    "page": author_data["page"],
+                    "host": author_data["host"],
+                    "displayName": author_data["displayName"],
+                    "github": author_data["github"],
+                    "profileImage": author_data["profileImage"]
+                },
+                "comments":{
+                    "type": "comments",
+                    "page": comments_data["page"],
+                    "id": comments_data["id"],
+                    "page_number": comments_data["page_number"],
+                    "size": comments_data["size"],
+                    "count": comments_data["count"],
+                    "src": comments_data["src"]
+                },
+                "likes": {
+                    "types": "likes",
+                    "page": likes_data["page"],
+                    "page_number": likes_data["page_number"],
+                    "size": likes_data["size"],
+                    "count": likes_data["count"],
+                    "src": likes_data["src"]
+                },
+                "published": post.published,
+                "visibility": post_type,
+            }
 
-                return JsonResponse(postObject, status=200)
-
-            else:
-                return JsonResponse({"error": "post visibility invalid"}, status=400)
+            return JsonResponse(postObject, status=200)
 
         else:
-            return JsonResponse({"error":"User is not authenticated"}, status=401)
+            return JsonResponse({"error": "post visibility invalid"}, status=400)
 
 
     @extend_schema(
@@ -729,7 +724,6 @@ class PostViewSet(viewsets.ViewSet):
                 "likes": {
                     "types": "likes",
                     "page": likes_data["page"],
-                    "id": likes_data["id"],
                     "page_number": likes_data["page_number"],
                     "size": likes_data["size"],
                     "count": likes_data["count"],

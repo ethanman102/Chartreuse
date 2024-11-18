@@ -11,8 +11,6 @@ class TestSettingsViews(TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        print("In TestSettingViews", User.objects.all())
-
         cls.client = Client()
         cls.auth_user_1 = AuthUser.objects.create_user(username='ethankeys',password='@#goatMan102ERK')
         cls.auth_user_2 = AuthUser.objects.create_user(username="ethanman102",password="chartreusyEthanMan10&$!")

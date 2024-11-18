@@ -8,8 +8,6 @@ class ImageTestCases(TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        print("In CommentTestCases", User.objects.all())
-
         cls.client = Client()
 
         cls.test_user_1_data = {

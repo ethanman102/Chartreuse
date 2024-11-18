@@ -10,8 +10,6 @@ class PostTestCases(TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        print("In PostTestCases", User.objects.all())
-
         cls.client = APIClient()
 
         Host.host = "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/"

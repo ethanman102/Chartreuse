@@ -14,9 +14,6 @@ class FollowRequestsTestCases(TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        print("In FollowRequestsTestCases", User.objects.all())
-        print("In FollowRequestsTestCases", AuthUser.objects.all())
-
         Host.host = "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/"
 
         cls.host = Host.host
@@ -48,18 +45,13 @@ class FollowRequestsTestCases(TestCase):
 
         # Create test users
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json')
-        print("In FollowRequestsTestCases", User.objects.all())
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json')
-
-        print("In FollowRequestsTestCases", User.objects.all())
 
         # log in as user 1
         test_response = cls.client.post(reverse('chartreuse:login_user'), {
             'username': 'greg',
             'password': 'ABC123!!!'
         })
-
-        print("test_response", test_response)
 
         # sends a follow request to user 2
         cls.response = cls.client.post(reverse('chartreuse:send_follow_request', args=[quote(f"{cls.test_user_2_data['host']}authors/2", safe='')]))
@@ -82,7 +74,6 @@ class FollowRequestsTestCases(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        print(User.objects.all())
         return super().tearDownClass()
     
     def test_send_follow_request(self):

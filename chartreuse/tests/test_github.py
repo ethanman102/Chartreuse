@@ -8,8 +8,6 @@ class GithubTestCases(TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        print("In GithubTestCases", User.objects.all())
-
         cls.client = Client()
 
         # Test user data

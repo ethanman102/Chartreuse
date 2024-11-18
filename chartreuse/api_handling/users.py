@@ -227,7 +227,6 @@ class UserViewSet(viewsets.ViewSet):
     def update(self, request, pk=None):
         checkIfRequestAuthenticated(request)
         decoded_user_id = unquote(pk)
-        print(decoded_user_id)
         host = get_host_from_id(decoded_user_id)
 
         data = json.loads(request.body.decode('utf-8'))
@@ -244,7 +243,6 @@ class UserViewSet(viewsets.ViewSet):
         else:
             # case where the user is on the current host
             user = get_object_or_404(User, pk=decoded_user_id)
-            print(user)
             page = user.host + "/authors/" + user.url_id
 
             serializer = UserSerializer(instance=user, data=data, partial=True)
@@ -468,7 +466,6 @@ class UserViewSet(viewsets.ViewSet):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-            print(user)
             login(request, user)
             return JsonResponse({"success": "User logged in successfully."}, status=200)
         else:

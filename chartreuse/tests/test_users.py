@@ -11,8 +11,6 @@ class UserTestCases(TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        print("In UserTestCases", User.objects.all())
-
         cls.client = APIClient()
 
         # set the hostname
@@ -178,7 +176,6 @@ class UserTestCases(TestCase):
         '''
         This tests updating a user.
         '''
-        # print(User.objects.all())
         user_id = quote(f"{self.hostname}authors/1", safe='')
         url = reverse('chartreuse:user-detail', args=[user_id])
 

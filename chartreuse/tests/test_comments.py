@@ -11,9 +11,6 @@ class CommentTestCases(TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        print("In CommentTestCases", User.objects.all())
-        print("In CommentTestCases", AuthUser.objects.all())
-
         Host.host = "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/"
 
         cls.host = Host.host
@@ -63,8 +60,6 @@ class CommentTestCases(TestCase):
             "content": "Hello World!"
         })
         cls.post_id = quote(cls.post_response.json()['id'], safe="")
-
-        print("In CommentTestCases", AuthUser.objects.all())
     
     def setUp(self):
         '''

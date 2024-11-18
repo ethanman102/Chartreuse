@@ -1,6 +1,5 @@
 from django.views.generic.detail import DetailView
 from django.contrib.auth.models import User as AuthUser
-from django.contrib.auth.hashers import check_password
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse, HttpResponseNotAllowed
@@ -644,12 +643,11 @@ def upload_url_picture(request):
         profile_pic_url = new_picture.url_id + '/image'
         current_user_model.profileImage = profile_pic_url
 
+        new_picture.save()
         current_user_model.save()
 
         return JsonResponse({'success':'Profile picture updated','image':encoded_image,"mimeType":mime_type},status=200)
     return HttpResponseNotAllowed(['POST'])
-
-            
 
 class SettingsDetailView(DetailView):
     '''

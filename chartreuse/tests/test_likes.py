@@ -10,8 +10,6 @@ class LikeTestCases(TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        print("In LikeTestCases", User.objects.all())
-
         cls.client = APIClient()
 
         Host.host = 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/'

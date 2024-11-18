@@ -474,18 +474,26 @@ def send_like_to_inbox(like_url_id):
             if not nodes.exists():
                 return []
             
-            all_outgoing = set()
-            for node in nodes:
-                all_outgoing.add(node.host)
-                
-            post_owner_follows = Follow.objects.filter(followed=like.comment.post.user)
-            follow_hosts = set()
-            for follow in post_owner_follows:
-                if follow.follower.host in all_outgoing:
-                    follow_hosts.add(follow.follower.host)
-            node_objs = []
-            for hostname in follow_hosts:
-                node_objs.append(Node.objects.get(host=hostname,status='ENABLED',follow_status='OUTGOING'))
+            if like.comment.user.host == like.comment.post.user.host:
+                all_outgoing = set()
+                for node in nodes:
+                    all_outgoing.add(node.host)
+                    
+                post_owner_follows = Follow.objects.filter(followed=like.comment.post.user)
+                follow_hosts = set()
+                for follow in post_owner_follows:
+                    if follow.follower.host in all_outgoing:
+                        follow_hosts.add(follow.follower.host)
+                node_objs = []
+                for hostname in follow_hosts:
+                    node_objs.append(Node.objects.get(host=hostname,status='ENABLED',follow_status='OUTGOING'))
+            else:
+                post_owner_host = like.comment.post.user.host
+                node_objs = []
+                node_queryset = Node.objects.filter(host=post_owner_host,status="ENABLED",follow_status="OUTGOING")
+                if node_queryset.exists():
+                    node_objs.append(node_queryset[0])
+
         else:
             comment_owner_host = like.comment.user.host
             node_objs = []

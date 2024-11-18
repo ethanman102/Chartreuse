@@ -41,7 +41,7 @@ class CommentsSerializer(serializers.Serializer):
 class CommentViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     serializer_class = CommentSerializer
-    authentication_classes = []
+    # authentication_classes = []
 
     @extend_schema(
         summary="Adds a comment on a post",
@@ -435,7 +435,7 @@ class CommentViewSet(viewsets.ViewSet):
             JsonResponce containing the response   
         """
         decoded_comment_id = unquote(comment_id)
-
+        
         if user_id == None or post_id == None:
             comment = get_object_or_404(Comment, url_id=decoded_comment_id)
             post_id = comment.post.url_id

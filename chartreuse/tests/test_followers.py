@@ -2,11 +2,17 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from urllib.parse import quote
+from chartreuse.views import Host
+from chartreuse.models import User
 
 class FollowersTestCases(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
+        Host.host = "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/"
+
+        cls.host = Host.host
 
         cls.client = APIClient()
 
@@ -17,7 +23,7 @@ class FollowersTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/k7XVwpB.jpeg',
             'username': 'greg',
             'password': 'ABC123!!!',
-            'host': 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
+            'host': cls.host,
             'firstName': 'Greg',
             'lastName': 'Johnson',
         }
@@ -28,7 +34,7 @@ class FollowersTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/1234.jpeg',
             'username': 'john',
             'password': '87@398dh817b!',
-            'host': 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',
+            'host': cls.host,
             'firstName': 'John',
             'lastName': 'Smith',
         }

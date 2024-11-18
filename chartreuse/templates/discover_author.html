@@ -26,7 +26,7 @@
     <div class="container node-container">
         <div class="row">
             <div class="col-12">
-                <h3><b>Look carefully,</b> you're exploring the wilderness of the authors of: <span id='host-page-message'><b><u>{{ host }}</u></b></span></h3>
+                <h3><b>Look carefully,</b> you're exploring the wilderness of the discovered authors on: <span id='host-page-message'><b><u>{{ host }}</u></b></span></h3>
             </div>
         </div>
         {% if authors %}
@@ -37,7 +37,11 @@
                     <div class="author">
                         <img src="{{author.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
                         <h5 style="display:inline">{{author.displayName}}</h5>
-                        <button class="view-profile-button btn btn-primary view-profile-button" url-id="{% url 'chartreuse:profile' url_id=author.url_id %}">View Profile</button>   
+                        {% if author.url_id == current_user_url_id %}
+                            <p class="your-profile-remote"> This is you </p>
+                        {% else %}
+                            <button class="view-profile-button btn btn-primary view-profile-button" url-id="{% url 'chartreuse:profile' url_id=author.url_id %}">View Profile</button>   
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
@@ -81,6 +85,9 @@
 
             
             // https://stackoverflow.com/questions/5999118/how-can-i-add-or-update-a-query-string-parameter
+            // Stack Overflow Post: How can I add or update a query string paramater?
+            // Purpose: Used to learn how to update a query string in a url using js
+            // Code inspired by post reponse by: Anthony Manning-Franklin on January 9, 2017
             let next = document.getElementById('next-button');
             let previous = document.getElementById('previous-button');
             let first = document.getElementById('first-button');

@@ -36,7 +36,7 @@ class FollowersSerializer(serializers.Serializer):
 class FollowViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     serializer_class = FollowerSerializer
-    authentication_classes = []
+    # authentication_classes = []
 
     @extend_schema(
         summary="Add a follower",
@@ -86,6 +86,7 @@ class FollowViewSet(viewsets.ViewSet):
             JsonResponse with the success message
         '''
         checkIfRequestAuthenticated(request)
+
         if not request.user.is_authenticated:
             return JsonResponse({"error": "User is not authenticated."}, status=401)
 

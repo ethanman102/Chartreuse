@@ -52,3 +52,13 @@
 .view-profile-button:hover{
     box-shadow: 6px 6px 0px #000000;
 }
+
+.your-profile-remote{
+    float: right;
+    border-color: black solid 2px;
+    border-radius: 5px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 2ch;
+    padding-right: 2ch;
+}

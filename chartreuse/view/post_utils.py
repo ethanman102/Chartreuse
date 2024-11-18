@@ -14,6 +14,7 @@ from rest_framework import serializers
 from rest_framework.decorators import action, api_view
 import requests
 from requests.auth import HTTPBasicAuth
+from requests.exceptions import ChunkedEncodingError
 
 def get_post_likes(post_id):
     """
@@ -111,19 +112,27 @@ def send_post_to_inbox(post_url_id):
         post_response = requests.get(post_json_url)
         post_json = post_response.json()
 
+
         followers = Follow.objects.filter(followed = post.user)
         for follower in followers:
             if follower.follower.host == host:
                 author_url_id = follower.follower.url_id
-
-                url += f'{quote(author_url_id, safe = "")}/inbox/'
+                full_url = url + f'{quote(author_url_id, safe = "")}/inbox/'
+                
 
                 headers = {
                     "Content-Type": "application/json; charset=utf-8"
                 }
 
                 # send to inbox
-                requests.post(url, headers=headers, json=post_json, auth=(username, password))
+                try:
+                    requests.post(full_url, headers=headers, json=post_json, auth=(username, password))
+                    # Resource: https://stackoverflow.com/questions/16511337/correct-way-to-try-except-using-python-requests-module
+                    # Stack Overflow Post: 'correct way to try/except using Python requests module'
+                    # Purpose: Learned how to import the ChunckedEncodingError as defined...
+                    # Hint for importing requests.exceptions as seen by: Jonathon Reinhart's Answer on May 12, 2013
+                except ChunkedEncodingError: # some kind of chunked error that occurs if user is gone...
+                    continue
 
 @csrf_exempt
 def update_post(request, post_id):
@@ -292,7 +301,7 @@ def repost(request):
 
 
 
-        repost = Post(
+        repost = Post.objects.create(
             user = reposter_user_model,
             contentType = content_type,
             description = description,
@@ -365,7 +374,7 @@ def save_post(request):
         else:
             return JsonResponse({'error': 'Invalid post data.'}, status=400)
         
-        post = Post(
+        post = Post.objects.create(
             user=current_user_model,
             title=title,
             description=description,
@@ -375,6 +384,8 @@ def save_post(request):
         )
 
         post.save()
+
+        
 
         send_post_to_inbox(post.url_id)
 

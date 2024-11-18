@@ -1,5 +1,5 @@
 from urllib.parse import unquote
-from ..models import Like, User, Post, Comment, FollowRequest
+from ..models import Like, User, Post, Comment, FollowRequest, Follow
 from ..views import Host, checkIfRequestAuthenticated
 import json
 from django.views.decorators.csrf import csrf_exempt
@@ -44,7 +44,9 @@ def inbox(request, user_id):
         if post is None:
             # create a new post
             new_post = Post.objects.create(title=title, url_id=post_id, description=description, contentType=contentType, content=content, user=author, published=published, visibility=visibility)
+            new_post.published = published
             new_post.save()
+            
 
             # add comment objects
             post_comments = comments["src"]
@@ -58,49 +60,56 @@ def inbox(request, user_id):
                 likes = post_comment["likes"]
 
                 comment_author_id = unquote(comment_author["id"])
-                comment_author = User.objects.get(pk=comment_author_id)
+                comment_author = discover_author(comment_author_id,post_comment['author'])
 
                 new_comment = Comment.objects.create(user=comment_author, url_id=comment_id, comment=comment, contentType=contentType, post=new_post)
+                new_comment.dateCreated = published
                 new_comment.save()
 
+                
+                
                 # add comment likes
-                comment_likes = likes["src"]
-                for comment_like in comment_likes:
+                comment_likes = post_comment["likes"]
+                for comment_like in comment_likes['src']:
                     like_author = comment_like["author"]
                     published = comment_like["published"]
                     like_id = comment_like["id"]
                     post = comment_like["object"]
 
                     like_author_id = unquote(like_author["id"])
-                    like_author = User.objects.get(pk=like_author_id)
+                    like_author = discover_author(like_author_id,comment_like['author'])
 
                     new_like = Like.objects.create(user=like_author, url_id=like_id, comment=new_comment)
+                    new_like.dateCreated = published
                     new_like.save()
+                
+                   
 
             # add like objects
-            post_likes = likes["src"]
-            for post_like in post_likes:
-                author = post_like["author"]
+            
+            post_likes = data['likes']
+            for post_like in post_likes['src']:
+                author_id = post_like["author"]['id']
+
+                # check to see whether the author has been discovered yet or not!
+                current_author = discover_author(author_id,post_like['author'])
+
                 published = post_like["published"]
                 like_id = post_like["id"]
                 post = post_like["object"]
 
-                new_like = Like.objects.create(author=author, url_id=like_id, post=new_post)
+                new_like = Like.objects.create(user=current_author, url_id=like_id, post=new_post)
+                new_like.dateCreated = published
                 new_like.save()
+                
 
         else:
-            # update visibility
-            if visibility == "DELETED":
-                post.visibility = visibility
-                post.save()
-            
-            # update post content
-            else:
-                post.title = title
-                post.description = description
-                post.contentType = contentType
-                post.content = content
-                post.save()
+            post.visibility = visibility
+            post.title = title
+            post.description = description
+            post.contentType = contentType
+            post.content = content
+            post.save()
                     
         return JsonResponse({"status": "Post added successfully"})
 
@@ -115,8 +124,7 @@ def inbox(request, user_id):
         # add this new comment if it does not exist, if it exists, then delete it
 
         comment_author_id = unquote(comment_author["id"])
-        comment_author = User.objects.get(url_id=comment_author_id)
-
+        comment_author = discover_author(comment_author_id,comment_author)
         new_post = Post.objects.get(url_id=post)
 
         # check whether comment already exists
@@ -124,6 +132,7 @@ def inbox(request, user_id):
 
         if comment is None:
             comment = Comment.objects.create(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post)
+            comment.dateCreated = published
             comment.save()
 
         # add comment likes
@@ -135,13 +144,15 @@ def inbox(request, user_id):
             post = comment_like["object"]
 
             like_author_id = unquote(like_author["id"])
-            like_author = User.objects.get(url_id=like_author_id)
+            like_author = discover_author(like_author_id,like_author)
+            
 
             # check whether like already exists
             like = Like.objects.filter(user=like_author, url_id=like_id, comment=comment).first()
 
             if like is None:
                 new_like = Like.objects.create(user=like_author, url_id=like_id, comment=comment)
+                new_like.dateCreated = published
                 new_like.save()
 
         return JsonResponse({"status": "Comment added successfully"})
@@ -153,7 +164,8 @@ def inbox(request, user_id):
         object_id = data["object"]
         # add the like if it does not exist, if it exists, delete the like
         author_id = unquote(author["id"])
-        author = User.objects.get(url_id=author_id)
+        author = discover_author(author_id,author)
+        
 
         post = Post.objects.filter(url_id=object_id).first()
 
@@ -167,6 +179,7 @@ def inbox(request, user_id):
             like = Like.objects.filter(user=author, post=post).first()
             if like is None:
                 new_like = Like.objects.create(user=author, url_id=like_id, post=post)
+                new_like.dateCreated = published
                 new_like.save()
                 return JsonResponse({"status": "Like added successfully"})
             else:
@@ -177,11 +190,13 @@ def inbox(request, user_id):
             like = Like.objects.filter(user=author, comment=comment).first()
             if like is None:
                 new_like = Like.objects.create(user=author, url_id=like_id, comment=comment)
+                new_like.dateCreated = published
                 new_like.save()
                 return JsonResponse({"status": "Like added successfully"})
             else:
                 like.delete()
                 return JsonResponse({"status": "Like removed successfully"})
+            
 
     elif (data["type"] == "follow"):
         actor = data["actor"]
@@ -191,6 +206,9 @@ def inbox(request, user_id):
 
         if not author_queryset:
             # discovered a new author to add to database...
+
+            # November 14, 2024: Asked Agent: CHAT GPT, why we may be getting null constraints failed when we have nullability allowed, chatgpt recommended setting the value explicitly to null or
+            # maybe migrations we not applied.
             remote_author = User.objects.create(
                 user = None,
                 url_id = unquote(actor['id']),
@@ -202,11 +220,35 @@ def inbox(request, user_id):
         else:
             remote_author = author_queryset
 
+        # check if either a follow already exists or a follow request is already sent to them...
+
         follower = User.objects.get(pk=unquote(actor["id"]))
         followed = User.objects.get(pk=unquote(object_to_follow["id"]))
+
+        follow_queryset = Follow.objects.filter(followed=followed,follower=follower)
+        follow_request_queryset = FollowRequest.objects.filter(requester=remote_author,requestee=followed)
+        if follow_queryset.exists() or follow_request_queryset.exists():
+            # no need to send duplicate request.
+            return JsonResponse({"status": "Follow request sent successfully"},status=200)
 
         # add the follow request if it does not exist, if it exists, delete the follow request
         new_follow_request = FollowRequest.objects.create(requester=remote_author, requestee=followed)
         new_follow_request.save()
     
         return JsonResponse({"status": "Follow request sent successfully"},status=200)
+    
+def discover_author(url_id,json_obj):
+
+    author_queryset = User.objects.filter(url_id=url_id)
+    if not author_queryset.exists():
+        current_author = User.objects.create(
+            url_id = url_id,
+            displayName = json_obj['displayName'],
+            host = json_obj['host'],
+            github = json_obj['github'],
+            profileImage = json_obj['profileImage']
+        )
+    else:
+        current_author = author_queryset[0]
+    return current_author
+

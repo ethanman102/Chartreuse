@@ -71,7 +71,11 @@ def send_posts_to_remote(posts,local_user,remote_user,node):
 
         
         post_obj = response.json()
-        requests.post(url,headers=headers,json=post_obj,auth=auth)
+        
+        try:
+            requests.post(url,headers=headers,json=post_obj,auth=auth)
+        except:
+            continue
     
 
 def follow_reject(request,followed,follower):
@@ -173,7 +177,10 @@ def profile_follow_request(request,requestee,requester):
                 "Content-Type": "application/json; charset=utf-8"
             }
 
-            requests.post(url, headers=headers, json=data, auth=(username, password))
+            try:
+                requests.post(url, headers=headers, json=data, auth=(username, password))
+            except: 
+                return redirect("chartreuse:profile",url_id=quote(requestee,safe=''))
             
         else:
             FollowRequest.objects.create(requestee=requestee_user,requester=requester_user)
@@ -361,7 +368,14 @@ class ProfileDetailView(DetailView):
 
             url = f'{user.host}authors/{quote(user.url_id,safe='')}/followers/{quote(current_user_model.url_id,safe='')}/is_follower'
 
-            response = requests.get(url,auth=auth)
+            try:
+                response = requests.get(url,auth=auth)
+            except:
+                posts = Post.objects.filter(visibility="PUBLIC",user=user)
+                posts = [post for post in posts]
+                posts = sorted(posts, key=lambda post: post.published, reverse=True)
+                return posts
+
 
             if response.status_code == 404:
                 # remote node not following...

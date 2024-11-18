@@ -31,10 +31,9 @@ class Post(models.Model):
     visibility = models.CharField(max_length=20, choices=VISIBILITY_CHOICES, default='PUBLIC')
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
         if self.url_id == None or self.url_id == '':
-            self.url_id = f"{self.user.url_id}/posts/{self.pk}"
-        
+            self.url_id = f"{self.user.url_id}/posts/{self.pk}"     
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Post(id={self.id}, url_id={self.url_id}, title={self.title}, description={self.description}, user={self.user}, published={self.published}, visibility={self.visibility})"

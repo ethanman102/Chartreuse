@@ -4,7 +4,6 @@ from django.urls import reverse
 from urllib.parse import quote
 import json
 from ..views import Host
-from ..models import User
 
 class UserTestCases(TestCase):
     @classmethod

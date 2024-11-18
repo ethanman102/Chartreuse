@@ -134,7 +134,8 @@ def delete_comment(request, comment_id):
 def send_comment_to_inbox(comment_url_id):
     comment = Comment.objects.get(url_id=comment_url_id)
     # send this to the inbox of other nodes
-    nodes = Node.objects.filter(follow_status='OUTGOING', status='ENABLED', host=comment.post.user.host)
+    if comment.user.host == comment.post.user.host:
+        nodes = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
 
     if not nodes.exists():
         return []
@@ -145,6 +146,7 @@ def send_comment_to_inbox(comment_url_id):
     comments_response = requests.get(comments_json_url)
     comments_json = comments_response.json()
 
+    followers = Follow.objects.filter(followed=comment.user)
     for node in nodes:
         author_url_id = comment.user.url_id
         host = node.host

@@ -68,6 +68,10 @@ class PostTestCases(TestCase):
             "content": "Hello World! \nThis is a short message from greg!"
         })
 
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
+
     def test_creating_post(self):
         """
         This tests creating a post.

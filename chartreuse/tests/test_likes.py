@@ -92,6 +92,10 @@ class LikeTestCases(TestCase):
             'password': 'ABC123!!!'
         })
 
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
+
     def test_like_post(self):
         '''
         This tests liking a post.

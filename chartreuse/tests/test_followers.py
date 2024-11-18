@@ -63,6 +63,10 @@ class FollowersTestCases(TestCase):
             'password': 'ABC123!!!'
         })
     
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
+    
     def test_follow_user(self):
         '''
         This tests adding a follower.

@@ -23,6 +23,10 @@ class TestSettingsViews(TestCase):
 
         cls.user_2 = User.objects.create(user=cls.auth_user_2,displayName='ethankeysboy',github=None,url_id="http://nodeaaaa/api/authors/222")
 
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
+
     def test_incorrect_old_password(self):
         self.client.force_login(self.auth_user_1)
         # https://stackoverflow.com/questions/31902901/django-test-client-method-override-header
@@ -113,7 +117,6 @@ class TestSettingsViews(TestCase):
         updated = User.objects.get(user=self.auth_user_1)
 
         self.assertEqual(updated.github,'https://github.com/')
-
     
     def test_add_github(self):
         self.client.force_login(self.auth_user_2)
@@ -125,7 +128,6 @@ class TestSettingsViews(TestCase):
         updated = User.objects.get(user=self.auth_user_2)
 
         self.assertEqual(updated.github,'https://github.com/')
-
     
     def test_reject_non_github(self):
         self.client.force_login(self.auth_user_2)
@@ -196,8 +198,7 @@ class TestSettingsViews(TestCase):
             'file':image
         })
 
-        encoded_image = base64.b64encode(b'file_content').decode('utf-8')
-        
+        encoded_image = base64.b64encode(b'file_content').decode('utf-8') 
 
         self.assertEqual(response.status_code,200)
         data = response.json()

@@ -62,6 +62,10 @@ class CommentTestCases(TestCase):
             'username': 'john',
             'password': '87@398dh817b!'
         })
+
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
     
     def test_create_comment(self):
         """

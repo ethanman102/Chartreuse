@@ -71,6 +71,10 @@ class FollowRequestsTestCases(TestCase):
             'username': 'greg',
             'password': 'ABC123!!!'
         })
+
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
     
     def test_send_follow_request(self):
         '''

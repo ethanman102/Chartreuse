@@ -21,6 +21,10 @@ class ImageTestCases(TestCase):
 
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json')
         cls.imagePath = 'chartreuse/static/images/buba.jpg'
+
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
     
     def test_encode_image_from_url(self):
         '''

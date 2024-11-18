@@ -65,6 +65,10 @@ class FriendsTestCases(TestCase):
             'password': 'ABC123!!!'
         })
 
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
+
     def test_get_friends(self):
         '''
         This tests getting friends for a user.

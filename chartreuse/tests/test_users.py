@@ -50,7 +50,11 @@ class UserTestCases(TestCase):
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json')
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json')
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_3_data, format='json')
-    
+
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
+
     def test_create_user(self):
         '''
         This tests creating a user.

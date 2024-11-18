@@ -24,6 +24,9 @@ class GithubTestCases(TestCase):
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json')
         cls.user_id = quote(f"{cls.test_user_1_data['host']}authors/1", safe='')
 
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
     
     def test_get_events(self):
         '''

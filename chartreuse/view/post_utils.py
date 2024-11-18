@@ -494,6 +494,7 @@ def get_posts(user_id, post_type):
 
     posts = Post.objects.filter(user=author, visibility=post_type)
 
+
     return posts
 
 def check_duplicate_post(request):

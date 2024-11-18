@@ -121,7 +121,7 @@ class UserTestCases(TestCase):
         self.assertEqual(response.json()['github'], 'http://github.com/gjohnson')
         self.assertEqual(response.json()['profileImage'], 'https://i.imgur.com/k7XVwpB.jpeg')
         self.assertEqual(response.json()['type'], 'author')
-        self.assertEqual(response.json()['page'], f"{self.hostname}authors/greg")
+        self.assertEqual(response.json()['page'], f"{self.hostname}/authors/{response.json()['id']}")
         self.assertEqual(response.json()['id'], f'{self.hostname}authors/1')
         self.assertEqual(response.json()['host'], self.hostname)
         
@@ -156,7 +156,7 @@ class UserTestCases(TestCase):
         '''
         This tests deleting a user with an invalid id.
         '''
-        user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/100", safe='')
+        user_id = quote(f"{self.hostname}authors/100", safe='')
         response = self.client.delete(reverse('chartreuse:user-detail', args=[user_id]))
 
         # User does not exist
@@ -166,7 +166,7 @@ class UserTestCases(TestCase):
         '''
         This tests updating a user.
         '''
-        user_id = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1", safe='')
+        user_id = quote(f"{self.hostname}authors/1", safe='')
         url = reverse('chartreuse:user-detail', args=[user_id])
 
         data = {

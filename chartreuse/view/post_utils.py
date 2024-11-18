@@ -464,7 +464,9 @@ def send_like_to_inbox(like_url_id):
         # send to inbox
         try:
             requests.post(url, headers=headers, json=likes_json, auth=(username, password))
-        except:
+            print("Like sent to inbox")
+        except Exception as e:
+            print("Failed to send like to inbox", e)
             return JsonResponse({'error': 'Failed to send comment to inbox.'})
 
     return JsonResponse({"status": "Like added successfully"})

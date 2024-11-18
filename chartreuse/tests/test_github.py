@@ -1,11 +1,14 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from urllib.parse import quote
+from ..models import User
 
 class GithubTestCases(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
+        print("In GithubTestCases", User.objects.all())
 
         cls.client = Client()
 

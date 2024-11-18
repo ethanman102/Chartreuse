@@ -1,11 +1,15 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from ..api_handling import images
+from ..models import User
 
 class ImageTestCases(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
+        print("In CommentTestCases", User.objects.all())
+
         cls.client = Client()
 
         cls.test_user_1_data = {

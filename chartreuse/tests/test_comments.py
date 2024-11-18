@@ -2,11 +2,16 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from urllib.parse import quote
+from ..models import User
+from django.contrib.auth.models import User as AuthUser
 
 class CommentTestCases(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
+        print("In CommentTestCases", User.objects.all())
+        print("In CommentTestCases", AuthUser.objects.all())
 
         cls.client = APIClient()
 
@@ -52,6 +57,8 @@ class CommentTestCases(TestCase):
             "content": "Hello World!"
         })
         cls.post_id = quote(cls.post_response.json()['id'], safe="")
+
+        print("In CommentTestCases", AuthUser.objects.all())
     
     def setUp(self):
         '''

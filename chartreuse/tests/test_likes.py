@@ -3,11 +3,14 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from urllib.parse import quote
 from chartreuse.views import Host
+from ..models import User
 
 class LikeTestCases(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
+        print("In LikeTestCases", User.objects.all())
 
         cls.client = APIClient()
 

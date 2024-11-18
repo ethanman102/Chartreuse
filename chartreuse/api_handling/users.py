@@ -468,6 +468,7 @@ class UserViewSet(viewsets.ViewSet):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
+            print(user)
             login(request, user)
             return JsonResponse({"success": "User logged in successfully."}, status=200)
         else:

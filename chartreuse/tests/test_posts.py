@@ -2,11 +2,14 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from urllib.parse import quote
+from ..models import User
 
 class PostTestCases(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
+        print("In PostTestCases", User.objects.all())
 
         cls.client = APIClient()
 

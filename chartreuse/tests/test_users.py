@@ -4,11 +4,14 @@ from django.urls import reverse
 from urllib.parse import quote
 import json
 from ..views import Host
+from ..models import User
 
 class UserTestCases(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
+        print("In UserTestCases", User.objects.all())
 
         cls.client = APIClient()
 
@@ -175,6 +178,7 @@ class UserTestCases(TestCase):
         '''
         This tests updating a user.
         '''
+        # print(User.objects.all())
         user_id = quote(f"{self.hostname}authors/1", safe='')
         url = reverse('chartreuse:user-detail', args=[user_id])
 

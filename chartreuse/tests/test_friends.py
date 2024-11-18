@@ -3,11 +3,14 @@ from django.urls import reverse
 from urllib.parse import quote
 from rest_framework.test import APIClient
 from chartreuse.views import Host
+from ..models import User
 
 class FriendsTestCases(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
+        print("In FriendsTestCases", User.objects.all())
 
         Host.host = "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/"
 

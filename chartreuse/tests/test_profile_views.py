@@ -16,6 +16,8 @@ class TestProfileViews(TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
+        print("In TestProfileViews", User.objects.all())
+
         cls.client = Client()
         # Setting up authentication Users
         cls.auth_user_1 = AuthUser.objects.create(username='ethankeys',password='ethankisGOAT')

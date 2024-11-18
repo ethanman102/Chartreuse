@@ -46,7 +46,6 @@ class PostsSerializer(serializers.Serializer):
 class PostViewSet(viewsets.ViewSet):
     serializer_class = PostSerializer
     permission_classes = [AllowAny]
-    authentication_classes = []
 
     @extend_schema(
         summary="Adds a post",
@@ -525,7 +524,7 @@ class PostViewSet(viewsets.ViewSet):
             JsonResponce containing updated post 
         """
         checkIfRequestAuthenticated(request)
-        
+
         decoded_user_id = unquote(user_id)
         decoded_post_id = unquote(post_id)
         

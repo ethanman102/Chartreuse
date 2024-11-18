@@ -8,8 +8,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.decorators import action, api_view
-from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter, OpenApiTypes, inline_serializer
 from django.core.paginator import Paginator
+from ..views import checkIfRequestAuthenticated
+from rest_framework.permissions import AllowAny
 
 class FollowerSerializer(serializers.Serializer):
     type = serializers.CharField(default="author")
@@ -32,8 +34,9 @@ class FollowersSerializer(serializers.Serializer):
 
 
 class FollowViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = FollowerSerializer
+    # authentication_classes = []
 
     @extend_schema(
         summary="Add a follower",
@@ -45,9 +48,28 @@ class FollowViewSet(viewsets.ViewSet):
             "\n\n**Why not to use:** If either author does not exist, or if the follow request is not properly structured, the request may fail."
         ),
         responses={
-            200: OpenApiResponse(description="Follower added", response=FollowerSerializer),
-            404: OpenApiResponse(description="Author not found."),
-            405: OpenApiResponse(description="Method not allowed."),
+            201: OpenApiResponse(description="Follower added", response=FollowerSerializer),
+            400: OpenApiResponse(
+                description="Already a follower",
+                response=inline_serializer(
+                    name="AlreadyFollowerResponse",
+                    fields={"message": serializers.CharField(default="Already a follower")}
+                ),
+            ),
+            404: OpenApiResponse(
+                description="Author not found.",
+                response=inline_serializer(
+                    name="AuthorNotFoundResponse",
+                    fields={"message": serializers.CharField(default="Author not found")}
+                ),
+            ),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed")}
+                ),
+            ),
         }
     )
     @action(detail=False, methods=["POST"])
@@ -63,6 +85,8 @@ class FollowViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse with the success message
         '''
+        checkIfRequestAuthenticated(request)
+
         if not request.user.is_authenticated:
             return JsonResponse({"error": "User is not authenticated."}, status=401)
 
@@ -96,10 +120,34 @@ class FollowViewSet(viewsets.ViewSet):
         ),
         request=FollowerSerializer,
         responses={
-            200: OpenApiResponse(description="Follower removed."),
-            400: OpenApiResponse(description="Not a follower."),
-            404: OpenApiResponse(description="Author not found."),
-            405: OpenApiResponse(description="Method not allowed."),
+            204: OpenApiResponse(
+                description="Follower removed.",
+                response=inline_serializer(
+                    name="FollowerRemovedResponse",
+                    fields={"message": serializers.CharField(default="Follower removed.")}
+                ),
+            ),
+            400: OpenApiResponse(
+                description="Not a follower.",
+                response=inline_serializer(
+                    name="NotFollowerResponse",
+                    fields={"message": serializers.CharField(default="Not a follower.")}
+                ),
+            ),
+            404: OpenApiResponse(
+                description="Author not found.",
+                response=inline_serializer(
+                    name="AuthorNotFoundResponse",
+                    fields={"message": serializers.CharField(default="Author not found")}
+                ),
+            ),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed")}
+                ),
+            ),
         }
     )
     @action(detail=False, methods=["DELETE"])
@@ -115,6 +163,7 @@ class FollowViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse with success message.
         '''
+        checkIfRequestAuthenticated(request)
         if request.method == 'DELETE':
             decoded_author_id = unquote(author_id)
             decoded_foreign_author_id = unquote(foreign_author_id)
@@ -148,9 +197,27 @@ class FollowViewSet(viewsets.ViewSet):
         request=FollowerSerializer,
         responses={
             200: OpenApiResponse(description="Successfully retrieved the list of followers.", response=FollowersSerializer),
-            400: OpenApiResponse(description="Invalid request or missing parameters."),
-            404: OpenApiResponse(description="Author not found."),
-            405: OpenApiResponse(description="Method not allowed."),
+            400: OpenApiResponse(
+                description="Invalid request or missing parameters.",
+                response=inline_serializer(
+                    name="InvalidRequestResponse",
+                    fields={"message": serializers.CharField(default="Invalid request or missing parameters.")}
+                ),
+            ),
+            404: OpenApiResponse(
+                description="Author not found.",
+                response=inline_serializer(
+                    name="AuthorNotFoundResponse",
+                    fields={"message": serializers.CharField(default="Author not found")}
+                ),
+            ),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed")}
+                ),
+            ),
         }
     )
     @action(detail=False, methods=["GET"])
@@ -209,9 +276,27 @@ class FollowViewSet(viewsets.ViewSet):
             "\n\n**Why not to use:** If the provided IDs are invalid or if no follower relationship exists."
         ),
         responses={
-            200: OpenApiResponse(description="Is a follower"),
-            404: OpenApiResponse(description="Not a follower"),
-            405: OpenApiResponse(description="Method not allowed."),
+            200: OpenApiResponse(
+                description="Is a follower",
+                response=inline_serializer(
+                    name="IsFollowerResponse",
+                    fields={"message": serializers.CharField(default="Is a follower")}
+                ),
+            ),
+            404: OpenApiResponse(
+                description="Not a follower",
+                response=inline_serializer(
+                    name="NotFollowerResponse",
+                    fields={"message": serializers.CharField(default="Not a follower")}
+                ),
+            ),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed")}
+                ),
+            ),
         }
     )
     @action(detail=False, methods=["GET"])

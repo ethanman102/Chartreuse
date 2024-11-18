@@ -1,0 +1,64 @@
+.card{
+    margin: 0.5ch;
+    padding-top: 1ch;
+    padding-bottom: 1ch;
+  
+}
+
+
+#title-container{
+    background-color: #00356b;
+    border: solid 5px black;
+
+}
+
+.node-container{
+    background-color: rgb(246, 255, 247);
+    padding-top: 0.5ch;
+    padding-bottom: 1ch;
+    border: solid 5px black;
+}
+
+#header{
+    color: chartreuse;
+    font-weight: bold;
+}
+
+.author{
+    border: 1px solid black;
+    border-radius: 5px;
+    margin-top: 0.5ch;
+    margin-bottom: 0.5ch;
+    margin-left: 1ch;
+    margin-right: 1ch;
+    padding: 4px;
+    
+}
+
+.view-profile-button{
+    color: white;
+    border: none;
+    background-color: #002549;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 2ch;
+    padding-right: 2ch;
+    margin: 6px;
+    transition: box-shadow 0.3s ease;
+    border-radius: 0;
+    float: right;
+}
+
+.view-profile-button:hover{
+    box-shadow: 6px 6px 0px #000000;
+}
+
+.your-profile-remote{
+    float: right;
+    border-color: black solid 2px;
+    border-radius: 5px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 2ch;
+    padding-right: 2ch;
+}

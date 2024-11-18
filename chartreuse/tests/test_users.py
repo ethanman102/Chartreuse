@@ -5,11 +5,14 @@ from urllib.parse import quote
 import json
 
 class UserTestCases(TestCase):
-    def setUp(self):
-        self.client = APIClient()
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.client = APIClient()
 
         # Test user data
-        self.test_user_1_data = {
+        cls.test_user_1_data = {
             'displayName': 'Greg Johnson',
             'github': 'http://github.com/gjohnson',
             'profileImage': 'https://i.imgur.com/k7XVwpB.jpeg',
@@ -20,7 +23,7 @@ class UserTestCases(TestCase):
             'lastName': 'Johnson',
         }
 
-        self.test_user_2_data = {
+        cls.test_user_2_data = {
             'displayName': 'John Smith',
             'github': 'http://github.com/jiori',
             'profileImage': 'https://i.imgur.com/1234.jpeg',
@@ -31,7 +34,7 @@ class UserTestCases(TestCase):
             'lastName': 'Smith',
         }
 
-        self.test_user_3_data = {
+        cls.test_user_3_data = {
             'displayName': 'Benjamin Stanley',
             'github': 'http://github.com/bstanley',
             'profileImage': 'https://i.imgur.com/abcd.jpeg',
@@ -42,9 +45,9 @@ class UserTestCases(TestCase):
             'lastName': 'Stanley',
         }
 
-        self.client.post(reverse('chartreuse:user-list'), self.test_user_1_data, format='json')
-        self.client.post(reverse('chartreuse:user-list'), self.test_user_2_data, format='json')
-        self.client.post(reverse('chartreuse:user-list'), self.test_user_3_data, format='json')
+        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json')
+        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json')
+        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_3_data, format='json')
     
     def test_create_user(self):
         '''

@@ -3,7 +3,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
-from chartreuse.models import User
+from chartreuse.models import User, Settings
 from chartreuse.views import Host
 from django.views.decorators.csrf import csrf_exempt
 
@@ -19,7 +19,7 @@ def save_signup(request):
         password_2 = request.POST.get('password2')
         displayName = request.POST.get('displayname')
         github = request.POST.get('github', '')  # Default to empty string if not provided
-        profileImage = request.POST.get('profile_image', 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/static/images/default_pfp_1.png')  # Default to empty string if not provided
+        profileImage = request.POST.get('profile_image', '')  # Default to empty string if not provided
 
         # Check if the username already exists
         if AuthUser.objects.filter(username=username).exists():
@@ -38,20 +38,26 @@ def save_signup(request):
         # Create the AuthUser instance
         authUser = AuthUser.objects.create_user(username=username)
         authUser.set_password(password_1)
-        authUser.is_active = False
+        singleton_settings = Settings.get_instance()
+        if singleton_settings.approval_required:    # set active status of newly created account as False is approval is required
+            authUser.is_active = False
         authUser.save()
 
+        # Get the host from the request
+        current_host = Host(request.get_host())
+
         if (profileImage == ""):
-            profileImage = 'https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/static/images/default_pfp_1.png'
+            profileImage = f'https://{current_host.host}/static/images/default_pfp_1.png'
 
         # Create the custom User model instance
-        id = Host.host + "authors/" + str(authUser.id)
+        id = f'https://{current_host.host}/authors/{authUser.id}'
+        # id = "https://" + current_host.host + "/authors/" + str(authUser.id)
         user = User.objects.create(
             url_id=id,
             displayName=displayName,
             github=github,
             profileImage=profileImage,
-            host=Host.host,
+            host="https://" + current_host.host + '/chartreuse/api/',
             user=authUser
         )
 

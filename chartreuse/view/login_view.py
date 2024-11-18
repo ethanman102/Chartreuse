@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User as AuthUser
+from chartreuse.views import Host
 
 def login(request):
     if request.user.is_authenticated:
@@ -21,6 +22,8 @@ def save_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
+
+        # current_host = Host(request.get_host())
 
         if not username or not password:
             return JsonResponse({"error": "Username and password are required."}, status=400)

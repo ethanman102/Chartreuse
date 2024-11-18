@@ -3,15 +3,16 @@ import json
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema, inline_serializer
 from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.decorators import action, api_view
-from rest_framework.permissions import IsAuthenticated
 
 from ..models import Like, User, Post, Comment
 from .users import UserSerializer, UserViewSet
 from urllib.parse import unquote
+from ..views import checkIfRequestAuthenticated
+from rest_framework.permissions import AllowAny
 
 class LikeSerializer(serializers.Serializer):
     type = serializers.CharField(default="like")
@@ -36,8 +37,9 @@ class LikesSerializer(serializers.Serializer):
         fields = ['type', 'page', 'id', 'page_number', 'size', 'count', 'src']
 
 class LikeViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
     serializer_class = LikeSerializer
+    permission_classes = [AllowAny]
+    authentication_classes = []
 
     @extend_schema(
         summary="Adds a like to a post",
@@ -51,10 +53,41 @@ class LikeViewSet(viewsets.ViewSet):
         request=LikeSerializer,
         responses={
             200: OpenApiResponse(description="Like added successfully.", response=LikeSerializer),
-            400: OpenApiResponse(description="Like already exists."),
-            401: OpenApiResponse(description="User is not authenticated."),
-            404: OpenApiResponse(description="User not found."),
-            405: OpenApiResponse(description="Method not allowed."),
+            400: OpenApiResponse(
+                description="Like already exists.",
+                response=inline_serializer(
+                    name="LikeAlreadyExistsResponse",
+                    fields={"error": serializers.CharField(default="Like already exists.")}
+                )
+            ),
+            400: OpenApiResponse(
+                description="Post URL is required.",
+                response=inline_serializer(
+                    name="PostURLRequiredResponse",
+                    fields={"error": serializers.CharField(default="Post URL is required.")}
+                )
+            ),
+            401: OpenApiResponse(
+                description="User is not authenticated.",
+                response=inline_serializer(
+                    name="UserNotAuthenticatedResponse",
+                    fields={"error": serializers.CharField(default="User is not authenticated.")}
+                )
+            ),
+            404: OpenApiResponse(
+                description="User not found.",
+                response=inline_serializer(
+                    name="UserNotFoundResponse",
+                    fields={"error": serializers.CharField(default="User not found.")}
+                )
+            ),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed.")}
+                )
+            ),
         }
     )
     @action(detail=False, methods=["POST"])
@@ -68,10 +101,8 @@ class LikeViewSet(viewsets.ViewSet):
 
         Returns:
             JsonResponse containing the like object or error messages.
-        '''
-        if not request.user.is_authenticated:
-            return JsonResponse({"error": "User is not authenticated."}, status=401)
-    
+        '''   
+        checkIfRequestAuthenticated(request) 
         decoded_user_id = unquote(user_id)
 
         # Get the post URL from the request body
@@ -142,10 +173,34 @@ class LikeViewSet(viewsets.ViewSet):
         ),
         request=LikeSerializer,
         responses={
-            200: OpenApiResponse(description="Like deleted successfully.", response=LikeSerializer),
-            400: OpenApiResponse(description="Like does not exist."),
-            404: OpenApiResponse(description="User not found."),
-            405: OpenApiResponse(description="Method not allowed."),
+            200: OpenApiResponse(
+                description="Like deleted successfully.",
+                response=inline_serializer(
+                    name="LikeDeletedResponse",
+                    fields={"message": serializers.CharField(default="Like deleted successfully.")}
+                )
+            ),
+            400: OpenApiResponse(
+                description="Like does not exist.",
+                response=inline_serializer(
+                    name="LikeDoesNotExistResponse",
+                    fields={"error": serializers.CharField(default="Like does not exist.")}
+                )
+            ),
+            404: OpenApiResponse(
+                description="User not found.",
+                response=inline_serializer(
+                    name="UserNotFoundResponse",
+                    fields={"error": serializers.CharField(default="User not found.")}
+                )
+            ),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed.")}
+                )
+            ),
         }
     )
     @action(detail=False, methods=["DELETE"])
@@ -160,6 +215,7 @@ class LikeViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like object.
         '''
+        checkIfRequestAuthenticated(request)
         decoded_user_id = unquote(user_id)
         # Get the post URL from the request body
         postUrl = request.POST.get('post')
@@ -213,18 +269,30 @@ class LikeViewSet(viewsets.ViewSet):
         ),
         responses={
             200: OpenApiResponse(description="Successfully retrieved like.", response=LikeSerializer),
-            404: OpenApiResponse(description="User or like not found."),
-            405: OpenApiResponse(description="Method not allowed."),
+            404: OpenApiResponse(
+                description="User or like not found.",
+                response=inline_serializer(
+                    name="UserOrLikeNotFoundResponse",
+                    fields={"error": serializers.CharField(default="User or like not found.")}
+                )
+            ),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed.")}
+                )
+            ),
         }
     )
-    @api_view(["GET"])
+    @action(detail=False, methods=["GET"])
     def get_like(request, user_id, like_id):
         '''
         Gets a specific like object from a user.
 
         Parameters:
             request: rest_framework object containing the request and query parameters.
-            user_id: The id of the user who is liking the posts.
+            user_id: The id of the user who is liking the post or comment.
             like_id: The id of the like object.
 
         Returns:
@@ -240,7 +308,12 @@ class LikeViewSet(viewsets.ViewSet):
         response = user_viewset.retrieve(request, pk=decoded_user_id)
 
         data = json.loads(response.content)
-        like = Like.objects.filter(user=user, url_id=decoded_like_id)[0]
+        like = Like.objects.filter(url_id=decoded_like_id).first()
+
+        if like.post is None:
+            object_id = like.comment.url_id
+        else:
+            object_id = like.post.url_id
 
         likeObject = {
             "type": "like",
@@ -255,7 +328,7 @@ class LikeViewSet(viewsets.ViewSet):
             },
             "published": like.dateCreated,
             "id": like.url_id,
-            "object": like.post.url_id
+            "object": object_id
         }
         return JsonResponse(likeObject, safe=False)
 
@@ -270,11 +343,17 @@ class LikeViewSet(viewsets.ViewSet):
         ),
         responses={
             200: OpenApiResponse(description="Successfully retrieved all likes.", response=LikesSerializer),
-            405: OpenApiResponse(description="Method not allowed."),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed.")}
+                )
+            ),
         }
     )
-    @api_view(["GET"])
-    def get_post_likes(request, user_id, post_id):
+    @action(detail=False, methods=["GET"])
+    def get_post_likes(self, request, user_id=None, post_id=None):
         '''
         This function handles getting all likes on a post.
         '''
@@ -354,8 +433,14 @@ class LikeViewSet(viewsets.ViewSet):
             "\n\n**Why not to use:** If you're not interested in the comment likes or if the comment doesn't exist."
         ),
         responses={
-            200: OpenApiResponse(description="Successfully retrieved all likes."),
-            405: OpenApiResponse(description="Method not allowed."),
+            200: OpenApiResponse(description="Successfully retrieved all likes.", response=LikesSerializer),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed.")}
+                )
+            ),
         }
     )
     @action(detail=False, methods=["GET"])
@@ -371,7 +456,7 @@ class LikeViewSet(viewsets.ViewSet):
         post = get_object_or_404(Post, url_id=decoded_post_id)
         comment = get_object_or_404(Comment, url_id=decoded_comment_id)
 
-        likes = Like.objects.filter(user=user, post=post, comment=comment)
+        likes = Like.objects.filter(user=user, comment=comment)
 
         request.method = 'GET'
         user_viewset = UserViewSet()
@@ -394,10 +479,10 @@ class LikeViewSet(viewsets.ViewSet):
 
         # Since we have some additional fields, we only want to return the required ones
         filtered_likes_attributes = []
-        for like in page_likes:
+        for like in likes:
 
             likeObject = {
-                "type": "likes",
+                "type": "like",
                 "author": {
                     "type": "author",
                     "id": data["id"],
@@ -409,7 +494,7 @@ class LikeViewSet(viewsets.ViewSet):
                 },
                 "published": like.dateCreated,
                 "id": like.url_id,
-                "object": like.post.url_id
+                "object": like.comment.url_id
             }
 
             filtered_likes_attributes.append(likeObject)
@@ -442,7 +527,13 @@ class LikeViewSet(viewsets.ViewSet):
         ],
         responses={
             200: OpenApiResponse(description="Successfully retrieved all likes.", response=LikesSerializer),
-            405: OpenApiResponse(description="Method not allowed."),
+            405: OpenApiResponse(
+                description="Method not allowed.",
+                response=inline_serializer(
+                    name="MethodNotAllowedResponse",
+                    fields={"error": serializers.CharField(default="Method not allowed.")}
+                )
+            ),
         }
     )
     @api_view(["GET"])

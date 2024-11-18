@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}chartreuse.node-connections{% endblock %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/discover_node.css' %}">
+    
+</head>
+<body class="bg-light">
+    
+    {% block sidenav %}
+        {% include 'navbar.html' %}
+    {% endblock %}
+
+    <div class="container" id="title-container">
+        <div class="row">
+            <div class="col-12">
+                <h4 id="header">chartreuse.node-connections</h4>
+            </div>
+        </div>
+    </div>
+    <div class="container node-container">
+        {% if hostnames %}
+            <div class="card">
+                {% for host in hostnames %}
+                    <!-- Create clickable cards to be navigation tools to the other nodes authors... -->
+                    <div class="row">
+                        <div class="col-10 offset-1">
+                            <button class="node-button" node-host="{{host}}">Discover {{host}} authors</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <h3>This node has no outgoing connections. </h3>
+        {% endif %}
+    </div>
+
+    <script src="{% static 'javascript/page_header.js' %}"></script>
+    <script>
+        window.addEventListener('load',main);
+        function main(){
+            document.querySelectorAll('.node-button').forEach((button)=>{
+                button.addEventListener('click',function(event){
+                    // https://stackoverflow.com/questions/5997450/append-to-url-and-refresh-page
+                    // Append to URL and refresh page Stack Overflow Post.
+                    // Purpose: Learn how to add a query string paramter to query the page!
+                    // Answered and inspired byShlomi Komemi answered on May 13, 2011
+                    let percentEncodedHost = this.getAttribute('node-host');
+                    let url = window.location.href;
+                    url += percentEncodedHost + '/' + '?page=1&size=5';
+                    window.location.href = url;
+                });
+            });
+        }
+    </script>
+</body>
+{% endblock %}

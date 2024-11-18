@@ -1,0 +1,254 @@
+from urllib.parse import unquote
+from ..models import Like, User, Post, Comment, FollowRequest, Follow
+from ..views import Host, checkIfRequestAuthenticated
+import json
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+
+@csrf_exempt
+def inbox(request, user_id):
+    decoded_user_id = unquote(user_id)
+
+    user = User.objects.get(pk=decoded_user_id)
+
+    data = json.loads(request.body.decode('utf-8'))
+
+    # check request headers
+    authorization = request.headers.get('Authorization')
+    if authorization is None:
+        return JsonResponse({"error": "Unauthorized"}, status=401)
+    
+    authorization_response = checkIfRequestAuthenticated(request)
+    if authorization_response.status_code != 200:
+        return authorization_response
+
+    if (data["type"] == "post"):
+        title = data["title"]
+        description = data["description"]
+        post_id = data["id"]
+        contentType = data["contentType"]
+        content = data["content"]
+        author = data["author"]
+        comments = data["comments"]
+        likes = data["likes"]
+        published = data["published"]
+        visibility = data["visibility"]
+
+        # check whether we need to add this post or update it or delete it
+        post = Post.objects.filter(url_id=post_id).first()
+
+        # get author object
+        author_id = unquote(author["id"])
+        author = User.objects.get(pk=author_id)
+
+        if post is None:
+            # create a new post
+            new_post = Post.objects.create(title=title, url_id=post_id, description=description, contentType=contentType, content=content, user=author, published=published, visibility=visibility)
+            new_post.published = published
+            new_post.save()
+            
+
+            # add comment objects
+            post_comments = comments["src"]
+            for post_comment in post_comments:
+                comment_author = post_comment["author"]
+                comment = post_comment["comment"]
+                contentType = post_comment["contentType"]
+                comment_id = post_comment["id"]
+                post = post_comment["post"]
+                published = post_comment["published"]
+                likes = post_comment["likes"]
+
+                comment_author_id = unquote(comment_author["id"])
+                comment_author = discover_author(comment_author_id,post_comment['author'])
+
+                new_comment = Comment.objects.create(user=comment_author, url_id=comment_id, comment=comment, contentType=contentType, post=new_post)
+                new_comment.dateCreated = published
+                new_comment.save()
+
+                
+                
+                # add comment likes
+                comment_likes = post_comment["likes"]
+                for comment_like in comment_likes['src']:
+                    like_author = comment_like["author"]
+                    published = comment_like["published"]
+                    like_id = comment_like["id"]
+                    post = comment_like["object"]
+
+                    like_author_id = unquote(like_author["id"])
+                    like_author = discover_author(like_author_id,comment_like['author'])
+
+                    new_like = Like.objects.create(user=like_author, url_id=like_id, comment=new_comment)
+                    new_like.dateCreated = published
+                    new_like.save()
+                
+                   
+
+            # add like objects
+            
+            post_likes = data['likes']
+            for post_like in post_likes['src']:
+                author_id = post_like["author"]['id']
+
+                # check to see whether the author has been discovered yet or not!
+                current_author = discover_author(author_id,post_like['author'])
+
+                published = post_like["published"]
+                like_id = post_like["id"]
+                post = post_like["object"]
+
+                new_like = Like.objects.create(user=current_author, url_id=like_id, post=new_post)
+                new_like.dateCreated = published
+                new_like.save()
+                
+
+        else:
+            post.visibility = visibility
+            post.title = title
+            post.description = description
+            post.contentType = contentType
+            post.content = content
+            post.save()
+                    
+        return JsonResponse({"status": "Post added successfully"})
+
+    elif (data["type"] == "comment"):
+        comment_author = data["author"]
+        comment_text = data["comment"]
+        contentType = data["contentType"]
+        comment_id = data["id"]
+        post = data["post"]
+        published = data["published"]
+        likes = data["likes"]
+        # add this new comment if it does not exist, if it exists, then delete it
+
+        comment_author_id = unquote(comment_author["id"])
+        comment_author = discover_author(comment_author_id,comment_author)
+        new_post = Post.objects.get(url_id=post)
+
+        # check whether comment already exists
+        comment = Comment.objects.filter(url_id=comment_id).first()
+
+        if comment is None:
+            comment = Comment.objects.create(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post)
+            comment.dateCreated = published
+            comment.save()
+
+        # add comment likes
+        comment_likes = likes["src"]
+        for comment_like in comment_likes:
+            like_author = comment_like["author"]
+            published = comment_like["published"]
+            like_id = comment_like["id"]
+            post = comment_like["object"]
+
+            like_author_id = unquote(like_author["id"])
+            like_author = discover_author(like_author_id,like_author)
+            
+
+            # check whether like already exists
+            like = Like.objects.filter(user=like_author, url_id=like_id, comment=comment).first()
+
+            if like is None:
+                new_like = Like.objects.create(user=like_author, url_id=like_id, comment=comment)
+                new_like.dateCreated = published
+                new_like.save()
+
+        return JsonResponse({"status": "Comment added successfully"})
+        
+    elif (data["type"] == "like"):
+        author = data["author"]
+        published = data["published"]
+        like_id = data["id"]
+        object_id = data["object"]
+        # add the like if it does not exist, if it exists, delete the like
+        author_id = unquote(author["id"])
+        author = discover_author(author_id,author)
+        
+
+        post = Post.objects.filter(url_id=object_id).first()
+
+        if post is None:
+            object_type = "comment"
+        else:
+            object_type = "post"
+
+        # check whether like already exists
+        if object_type == "post":
+            like = Like.objects.filter(user=author, post=post).first()
+            if like is None:
+                new_like = Like.objects.create(user=author, url_id=like_id, post=post)
+                new_like.dateCreated = published
+                new_like.save()
+                return JsonResponse({"status": "Like added successfully"})
+            else:
+                like.delete()
+                return JsonResponse({"status": "Like removed successfully"})
+        else:
+            comment = Comment.objects.filter(url_id=object_id).first()
+            like = Like.objects.filter(user=author, comment=comment).first()
+            if like is None:
+                new_like = Like.objects.create(user=author, url_id=like_id, comment=comment)
+                new_like.dateCreated = published
+                new_like.save()
+                return JsonResponse({"status": "Like added successfully"})
+            else:
+                like.delete()
+                return JsonResponse({"status": "Like removed successfully"})
+            
+
+    elif (data["type"] == "follow"):
+        actor = data["actor"]
+        object_to_follow = data["object"]
+
+        author_queryset = User.objects.filter(url_id=unquote(actor['id'])).first()
+
+        if not author_queryset:
+            # discovered a new author to add to database...
+
+            # November 14, 2024: Asked Agent: CHAT GPT, why we may be getting null constraints failed when we have nullability allowed, chatgpt recommended setting the value explicitly to null or
+            # maybe migrations we not applied.
+            remote_author = User.objects.create(
+                user = None,
+                url_id = unquote(actor['id']),
+                displayName = actor.get('displayName',''),
+                host = actor.get('host'),
+                github = actor.get('github',''),
+                profileImage = actor.get('profileImage',''),
+            )
+        else:
+            remote_author = author_queryset
+
+        # check if either a follow already exists or a follow request is already sent to them...
+
+        follower = User.objects.get(pk=unquote(actor["id"]))
+        followed = User.objects.get(pk=unquote(object_to_follow["id"]))
+
+        follow_queryset = Follow.objects.filter(followed=followed,follower=follower)
+        follow_request_queryset = FollowRequest.objects.filter(requester=remote_author,requestee=followed)
+        if follow_queryset.exists() or follow_request_queryset.exists():
+            # no need to send duplicate request.
+            return JsonResponse({"status": "Follow request sent successfully"},status=200)
+
+        # add the follow request if it does not exist, if it exists, delete the follow request
+        new_follow_request = FollowRequest.objects.create(requester=remote_author, requestee=followed)
+        new_follow_request.save()
+    
+        return JsonResponse({"status": "Follow request sent successfully"},status=200)
+    
+def discover_author(url_id,json_obj):
+
+    author_queryset = User.objects.filter(url_id=url_id)
+    if not author_queryset.exists():
+        current_author = User.objects.create(
+            url_id = url_id,
+            displayName = json_obj['displayName'],
+            host = json_obj['host'],
+            github = json_obj['github'],
+            profileImage = json_obj['profileImage']
+        )
+    else:
+        current_author = author_queryset[0]
+    return current_author
+

@@ -1,28 +1,24 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}chartreuse.profile{% endblock %}
+{% block title %}chartreuse.{{ profile.displayName }}{% endblock %}
+
+{% block extra_head %}
+<head>
+    {% load timeline_post_layouts %}
+    <link rel="stylesheet" href="{% static 'css/profile_page.css' %}">
+</head>
+{% endblock %}
 
 {% block content %}
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="main.css">
-    <title>{{ profile.displayName }}</title>
-    {% load static %}
-    {% load timeline_post_layouts %}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="{% static 'css/profile_page.css' %}">
-
-</head>
 <body>
     {% block sidenav %}
-    {% include 'navbar.html' %}
+        {% include 'navbar.html' %}
     {% endblock %}
     <!-- Creating a mass container to store main details referring to the specific follower -->
     <div class="profile-box" style="margin-top: 30px;">
         <div class="container" id="profile-header">
-            <h4>chartreuse.profile</h4>
+            <h4>chartreuse.profile {{ remote }}</h4>
         </div>
         <div class="container full-container">
             <div class="row" style="margin-top: 20px; margin-bottom: 20px;">
@@ -56,12 +52,15 @@
                         </div>
                     {% endif %}
                     {% if not owner and viewer_id %}
-                        <div class="col-6">
+                        <div class="col-6 ms-auto">
                             {% if is_following == False and sent_request == False %}
                             {% url 'chartreuse:profile_follow_request' owner_id viewer_id as follow_request_url %}
                             <form action="{{follow_request_url}}" method="POST" class="follow_request_form">
                                 {% csrf_token %}
                                 <button class="btn btn-outline-primary btn-lg w-100 follow" type="submit">Follow</button>
+                                {% if remote %}
+                                <input type="hidden" id="remote-follow" name="remote-follow" value="remote">
+                                {% endif %}
                             </form>
                             {% elif sent_request == True %}
                             <button class="btn btn-secondary btn-lg w-100" id="requested" type="button" disabled>Requested</button>
@@ -77,7 +76,7 @@
 
 
                     {% if owner %}
-                        <div class="col-6">
+                        <div class="col-6 ms-auto">
                             <form class="follow-forms" method="GET" action="{% url 'chartreuse:user_friends_list' owner_id %}">
                                 <button type="submit" class="btn btn-primary w-100 follow">
                                     View Friends!
@@ -136,9 +135,9 @@
                                 </div>
                             </div>
                             <h3 class="card-title mt-2" style="text-align: left;">{{ post.repost_user.displayName }} reposted a post:</h3>
-                            {% if post.visibility == 'DELETED' %}
+                            {% if post.visibility != 'PUBLIC' %}
                             <div class = "card mb-3 p-4">
-                                <h1>Looks like the original post was deleted :(</h1>
+                                <h1>Looks like the original post is no longer public :(</h1>
                             </div>
                             {% else %}
                                 {% show_feed_post post owner_id viewer_id%}
@@ -196,7 +195,7 @@
     </div>
 
     <script src="{% static 'javascript/home_page.js' %}"></script>
-    <script src="{% static 'javascript/cm_render.js' %}"></script> <!-- Load bundled JS for commonmark -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="{% static 'javascript/cm_render.js' %}"></script> <!-- JS for commonmark -->
+
 </body>
 {% endblock %}

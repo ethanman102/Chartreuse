@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema, inline_serializer
 from rest_framework import serializers, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny
@@ -15,9 +15,12 @@ from rest_framework.response import Response
 from urllib.parse import unquote
 import requests
 import regex as re
+from ..views import checkIfRequestAuthenticated
 
 from .. import views
 from ..models import User
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 class UserSerializer(serializers.ModelSerializer):
     type = serializers.CharField(default="author")
@@ -27,7 +30,6 @@ class UserSerializer(serializers.ModelSerializer):
     github = serializers.URLField()
     profileImage = serializers.URLField()
     page = serializers.URLField()
-    id = serializers.URLField()
 
     class Meta:
         model = User
@@ -57,6 +59,7 @@ class UsersSerializer(serializers.Serializer):
 
 class UserViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
+    authentication_classes = []
 
     @extend_schema(
         summary="Get a list of users",
@@ -81,6 +84,7 @@ class UserViewSet(viewsets.ViewSet):
             ),
         }
     )
+    
     def list(self, request):
         '''
         Gets a paginated list of users based on the provided query parameters. 
@@ -92,6 +96,7 @@ class UserViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the paginated list of users.
         '''
+        checkIfRequestAuthenticated(request)
         page = request.query_params.get('page', 1)
         size = request.query_params.get('size', 50)
 
@@ -112,7 +117,7 @@ class UserViewSet(viewsets.ViewSet):
         # Since we have some additional fields, we only want to return the required ones
         filtered_user_attributes = []
         for user in page_users:
-            page = user.host + "authors/" + user.user.username
+            page = user.host + "authors/" + user.url_id
 
             filtered_user_attributes.append({
                 "type": "author",
@@ -146,8 +151,12 @@ class UserViewSet(viewsets.ViewSet):
                 description="User details.",
             ),
             404: OpenApiResponse(
-                description="User not found."
-            )
+                description="User not found.",
+                response=inline_serializer(
+                    name="UserNotFoundResponse",
+                    fields={"message": serializers.CharField(default="User not found.")}
+                )
+            ),
         }
     )
     def retrieve(self, request, pk=None):
@@ -162,30 +171,21 @@ class UserViewSet(viewsets.ViewSet):
             JsonResponse containing the user.
         '''
         decoded_user_id = unquote(pk)
-        host = get_host_from_id(decoded_user_id)
+        
+        # case where the user is on the current host
+        user = User.objects.filter(url_id=decoded_user_id).first()
+        page = user.host + "/authors/" + user.url_id
 
-        if(host != views.Host.host):
-            # if the user is not on the current host, we need to get the user from the remote host
-            api_url = host + "api/authors/" + pk
-            response = requests.get(api_url)
-            data = response.json()
-
-            return JsonResponse(data, safe=False)
-        else:
-            # case where the user is on the current host
-            user = get_object_or_404(User, pk=decoded_user_id)
-            page = user.host + "authors/" + user.user.username
-
-            # We only want to return the required fields
-            return JsonResponse({
-                "type": "author",
-                "id": user.url_id,
-                "host": user.host,
-                "displayName": user.displayName,
-                "github": user.github,
-                "profileImage": user.profileImage,
-                "page": page
-            }, safe=False)
+        # We only want to return the required fields
+        return JsonResponse({
+            "type": "author",
+            "id": user.url_id,
+            "host": user.host,
+            "displayName": user.displayName,
+            "github": user.github,
+            "profileImage": user.profileImage,
+            "page": page
+        }, safe=False)
 
     @extend_schema(
         summary="Update a user",
@@ -202,53 +202,69 @@ class UserViewSet(viewsets.ViewSet):
                 response=UserSerializer,
                 description="Updated user details.",
             ),
-            404: OpenApiResponse(description="User not found."),
-            401: OpenApiResponse(description="Permission denied."),
-            400: OpenApiResponse(description="Invalid data."),
+            404: OpenApiResponse(
+                description="User not found.",
+                response=inline_serializer(
+                    name="UserNotFoundResponse",
+                    fields={"message": serializers.CharField(default="User not found.")}
+                )
+            ),
+            401: OpenApiResponse(
+                description="Permission denied.",
+                response=inline_serializer(
+                    name="PermissionDeniedResponse",
+                    fields={"error": serializers.CharField(default="Permission denied.")}
+                )
+            ),
+            400: OpenApiResponse(
+                description="Invalid data.",
+                response=inline_serializer(
+                    name="InvalidDataResponse",
+                    fields={"error": serializers.CharField(default="Invalid data.")}
+                )
+            ),
         }
     )
     def update(self, request, pk=None):
-        if request.user.is_authenticated:
-            decoded_user_id = unquote(pk)
-            host = get_host_from_id(decoded_user_id)
+        checkIfRequestAuthenticated(request)
+        decoded_user_id = unquote(pk)
+        host = get_host_from_id(decoded_user_id)
 
-            data = json.loads(request.body.decode('utf-8'))
+        data = json.loads(request.body.decode('utf-8'))
 
-            if(host != views.Host.host):
-                # if the user is not on the current host, we need to get the user from the remote host
-                api_url = host + "api/authors/" + pk
-                response = requests.put(api_url, data=json.dumps(data), headers={'Content-Type': 'application/json'})
+        if(host != views.Host.host):
+            # if the user is not on the current host, we need to get the user from the remote host
+            api_url = host + "api/authors/" + pk
+            response = requests.put(api_url, data=json.dumps(data), headers={'Content-Type': 'application/json'})
 
-                response.raise_for_status()
-                response_data = response.json()
+            response.raise_for_status()
+            response_data = response.json()
 
-                return JsonResponse(response_data, safe=False)
-            else:
-                # case where the user is on the current host
-                user = get_object_or_404(User, pk=decoded_user_id)
-                page = user.host + "authors/" + user.user.username
-
-                serializer = UserSerializer(instance=user, data=data, partial=True)
-
-                # Save the updated user
-                if serializer.is_valid():
-                    # If valid, save the updates
-                    serializer.save()
-                
-                else:
-                    return JsonResponse(serializer.errors, status=400)
-
-                return JsonResponse({
-                    "type": "author",
-                    "id": user.url_id,
-                    "host": user.host,
-                    "displayName": user.displayName,
-                    "github": user.github,
-                    "profileImage": user.profileImage,
-                    "page": page
-                }, safe=False)
+            return JsonResponse(response_data, safe=False)
         else:
-            return Response({"error": "Permission denied."}, status=401)
+            # case where the user is on the current host
+            user = get_object_or_404(User, pk=decoded_user_id)
+            page = user.host + "/authors/" + user.url_id
+
+            serializer = UserSerializer(instance=user, data=data, partial=True)
+
+            # Save the updated user
+            if serializer.is_valid():
+                # If valid, save the updates
+                serializer.save()
+            
+            else:
+                return JsonResponse(serializer.errors, status=400)
+
+            return JsonResponse({
+                "type": "author",
+                "id": user.url_id,
+                "host": user.host,
+                "displayName": user.displayName,
+                "github": user.github,
+                "profileImage": user.profileImage,
+                "page": page
+            }, safe=False)
         
     @extend_schema(
         summary="Delete a user",
@@ -261,12 +277,31 @@ class UserViewSet(viewsets.ViewSet):
         ),
         request=UserSerializer,
         responses={
-            204: OpenApiResponse(description="User deleted successfully."),
-            404: OpenApiResponse(description="User not found."),
-            401: OpenApiResponse(description="You do not have permission to delete this user."),
+            200: OpenApiResponse(
+                description="User deleted successfully.",
+                response=inline_serializer(
+                    name="UserDeletedResponse",
+                    fields={"message": serializers.CharField(default="User deleted successfully.")}
+                )
+            ),
+            404: OpenApiResponse(
+                description="User not found.",
+                response=inline_serializer(
+                    name="UserNotFoundResponse",
+                    fields={"message": serializers.CharField(default="User not found.")}
+                )
+            ),
+            401: OpenApiResponse(
+                description="You do not have permission to delete this user.",
+                response=inline_serializer(
+                    name="PermissionDeniedResponse",
+                    fields={"error": serializers.CharField(default="You do not have permission to delete this user.")}
+                )
+            ),
         }
     )
     def destroy(self, request, pk=None):
+        checkIfRequestAuthenticated(request)
         decoded_user_id = unquote(pk)
 
         host = get_host_from_id(decoded_user_id)
@@ -302,7 +337,13 @@ class UserViewSet(viewsets.ViewSet):
         request=UserSerializer,
         responses={
             200: OpenApiResponse(response=UserSerializer, description="Newly created user details."),
-            400: OpenApiResponse(description="Username already exists."),
+            400: OpenApiResponse(
+                description="Username already exists.",
+                response=inline_serializer(
+                    name="UsernameAlreadyExistsResponse",
+                    fields={"error": serializers.CharField(default="Username already exists.")}
+                )
+            ),
         }
     )
     def create(self, request):
@@ -315,6 +356,7 @@ class UserViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the newly created user.
         '''
+        checkIfRequestAuthenticated(request)
         firstName = request.data.get('firstName')
         lastName = request.data.get('lastName')
         displayName = request.data.get('displayName')
@@ -359,7 +401,7 @@ class UserViewSet(viewsets.ViewSet):
         user.save()
 
         id = str(user.url_id)
-        page = user.host + "authors/" + user.user.username
+        page = user.host + "/authors/" + user.url_id
 
         return JsonResponse({
             "type": "author",
@@ -382,9 +424,27 @@ class UserViewSet(viewsets.ViewSet):
         ),
         request=UserSerializer,
         responses={
-            200: OpenApiResponse(description="User logged in successfully."),
-            400: OpenApiResponse(description="Invalid credentials."),
-            400: OpenApiResponse(description="Username and password are required."),
+            200: OpenApiResponse(
+                description="User logged in successfully.",
+                response=inline_serializer(
+                    name="LoginSuccessResponse",
+                    fields={"message": serializers.CharField(default="User logged in successfully.")}
+                )
+            ),
+            400: OpenApiResponse(
+                description="Invalid credentials.",
+                response=inline_serializer(
+                    name="InvalidCredentialsResponse",
+                    fields={"error": serializers.CharField(default="Invalid credentials.")}
+                )
+            ),
+            400: OpenApiResponse(
+                description="Username and password are required.",
+                response=inline_serializer(
+                    name="MissingCredentialsResponse",
+                    fields={"error": serializers.CharField(default="Username and password are required.")}
+                )
+            ),
         }
     )
     @api_view(["POST"])
@@ -422,6 +482,6 @@ def get_host_from_id(user_id):
     Returns:
         The host of the user.
     '''
-    pattern = r'(https:\/\/[^\/]+\/)'
+    pattern = r'(https?:\/\/[^\/]+\/)'
     match = re.match(pattern, user_id)
     return match.group(1)

@@ -11,12 +11,13 @@ from ..models import User, Post
 from django.shortcuts import get_object_or_404
 from urllib.parse import urlparse
 import base64
-from .post_utils import get_image_post
+from .post_utils import get_image_post, send_post_to_inbox
 from urllib.request import urlopen
 import random
-
-from drf_spectacular.utils import extend_schema, OpenApiResponse
+from rest_framework import serializers
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
 from rest_framework.decorators import action, api_view
+
 
 PROFILE_PICTURE_TITLES = [
     "Look out! I'm ready to 'serve' with this new image file as my new profile picture!",
@@ -37,25 +38,46 @@ PROFILE_PICTURE_TITLES = [
         "\n\n**Why to use:** This API enhances security by allowing users to update their password, requiring the current password for verification."
         "\n\n**Why not to use:** Avoid using if you are content with your current password."
     ),
-    request={
-        "old_pass": str,
-        "new_pass": str
-    },
+    request=inline_serializer(
+        name="PasswordUpdateRequest",
+        fields={
+            "old_pass": serializers.CharField(help_text="The user's current password."),
+            "new_pass": serializers.CharField(help_text="The user's new desired password.")
+        }
+    ),
     responses={
         200: OpenApiResponse(
-            description="Password successfully changed."
+            description="Password successfully changed.",
+            response=inline_serializer(
+                name="PasswordUpdateSuccessResponse",
+                fields={"success": serializers.CharField(default="Password successfully updated.")}
+            )
         ),
         400: OpenApiResponse(
-            description="New password did not meet validation requirements."
+            description="New password did not meet validation requirements.",
+            response=inline_serializer(
+                name="PasswordValidationErrorResponse",
+                fields={"error": serializers.CharField(default="New password does not meet validation requirements.")}
+            )
         ),
         403: OpenApiResponse(
-            description="Old password invalid."
+            description="Old password invalid",
+            response=inline_serializer(
+                name="InvalidOldPasswordResponse",
+                fields={"error": serializers.CharField(default="Old password invalid")}
+            )
         ),
         405: OpenApiResponse(
-            description="Method not allowed"
+            description="Method not allowed.",
+            response=inline_serializer(
+                name="MethodNotAllowedResponse",
+                fields={"error": serializers.CharField(default="Method not allowed.")}
+            )
         ),
     }
-)    
+)
+@action(detail=True, methods=("POST",))
+@api_view(["POST"])
 @login_required
 def update_password(request):
     """
@@ -75,7 +97,7 @@ def update_password(request):
     """
     if request.method == "POST":
 
-        data = json.loads(request.body)
+        data = request.data
         original_password = data.get("old_pass")
         new_password = data.get("new_pass")
 
@@ -116,21 +138,40 @@ def update_password(request):
         "\n\n**Why to use:** This endpoint provides a way for users to personalize or update their display name, which will be shown on their profile and in interactions across the application."
         "\n\n**Why not to use:** Avoid using if the display name update functionality is not required or if the request method is not allowed."
     ),
-    request={
-        "display_name": str
-    },
+    request=inline_serializer(
+        name="DisplayNameUpdateRequest",
+        fields={
+            "display_name": serializers.CharField(
+                help_text="The new display name for the user."
+            )
+        }
+    ),
     responses={
         200: OpenApiResponse(
-            description="Display name successfully changed."
+            description="Display name successfully changed.",
+            response=inline_serializer(
+                name="DisplayNameUpdateSuccessResponse",
+                fields={"message": serializers.CharField(default="Display name successfully updated.")}
+            )
         ),
         404: OpenApiResponse(
-            description="User not found."
+            description="User not found.",
+            response=inline_serializer(
+                name="UserNotFoundResponse",
+                fields={"error": serializers.CharField(default="The specified user does not exist.")}
+            )
         ),
         405: OpenApiResponse(
-            description="Method not allowed: Only POST requests are supported."
+            description="Method not allowed: Only POST requests are supported.",
+            response=inline_serializer(
+                name="MethodNotAllowedResponse",
+                fields={"error": serializers.CharField(default="Method not allowed.")}
+            )
         ),
     }
 )
+@action(detail=True, methods=("POST",))
+@api_view(["POST"])
 @login_required
 def update_display_name(request):
     """
@@ -148,7 +189,7 @@ def update_display_name(request):
     """
     if request.method == "POST":
 
-        data = json.loads(request.body)
+        data = request.data
         new_display_name = data.get("display_name")
 
         current_auth_user = request.user
@@ -170,24 +211,55 @@ def update_display_name(request):
         "\n\n**Why to use:** This endpoint provides a way for users to remove their GitHub account association for privacy or profile updating purposes."
         "\n\n**Why not to use:** Avoid using if the GitHub account is not associated or if the request method is not DELETE."
     ),
-    request={
-        "current_github": str
-    },
+    request=inline_serializer(
+        name="RemoveGitHubAccountRequest",
+        fields={
+            "current_github": serializers.CharField(
+                help_text="The current GitHub username associated with the user."
+            )
+        }
+    ),
     responses={
         200: OpenApiResponse(
-            description="Associated github removed"
+            description="Associated github removed.",
+            response=inline_serializer(
+                name="GitHubAccountRemovedResponse",
+                fields={
+                    "success": serializers.CharField(default="Associated github removed")
+                }
+            )
         ),
         404: OpenApiResponse(
-            description="User not found."
+            description="User not found.",
+            response=inline_serializer(
+                name="UserNotFoundResponse",
+                fields={
+                    "error": serializers.CharField(default="The specified user does not exist.")
+                }
+            )
         ),
         405: OpenApiResponse(
-            description="Method not allowed"
+            description="Method not allowed.",
+            response=inline_serializer(
+                name="MethodNotAllowedResponse",
+                fields={
+                    "error": serializers.CharField(default="Method not allowed.")
+                }
+            )
         ),
         500: OpenApiResponse(
-            description="Server Side Implementation Error"
+            description="SServer Side Implementation Error",
+            response=inline_serializer(
+                name="ServerErrorResponse",
+                fields={
+                    "error": serializers.CharField(default="Server Side Implementation Error")
+                }
+            )
         ),
     }
 )
+@action(detail=True, methods=("DELETE",))
+@api_view(["DELETE"])
 @login_required
 def remove_github(request):
     """
@@ -205,7 +277,7 @@ def remove_github(request):
             - 500: Error message if the provided GitHub username does not match the user's associated GitHub.
     """
     if request.method == "DELETE":
-        data = json.loads(request.body)
+        data = request.data
 
         current_github = data.get("current_github")
         current_auth_user = request.user
@@ -229,24 +301,56 @@ def remove_github(request):
         "\n\n**Why to use:** This endpoint provides a way for users to add a GitHub account to their profile to showcase their projects and contributions."
         "\n\n**Why not to use:** Avoid using if the URL provided is not a GitHub link or if the request method is not PUT."
     ),
-    request={
-        "github": str
-    },
+    request=inline_serializer(
+        name="AddGitHubAccountRequest",
+        fields={
+            "github": serializers.URLField(
+                help_text="The GitHub URL to associate with the user's profile.",
+                default="https://github.com/<username>"
+            )
+        }
+    ),
     responses={
         200: OpenApiResponse(
-            description="Github Added successfully"
+            description="GitHub added successfully.",
+            response=inline_serializer(
+                name="GitHubAddedResponse",
+                fields={
+                    "success": serializers.CharField(default="Github Added successfully"),
+                }
+            )
         ),
         400: OpenApiResponse(
-            description="Invalid GitHub URL"
+            description="Invalid GitHub URL.",
+            response=inline_serializer(
+                name="InvalidGitHubURLResponse",
+                fields={
+                    "error": serializers.CharField(default="Invalid GitHub URL.")
+                }
+            )
         ),
         404: OpenApiResponse(
-            description="User not found."
+            description="User not found.",
+            response=inline_serializer(
+                name="UserNotFoundResponse",
+                fields={
+                    "error": serializers.CharField(default="User not found.")
+                }
+            )
         ),
         405: OpenApiResponse(
-            description="Method not allowed: Only PUT requests are supported."
+            description="Method not allowed: Only PUT requests are supported.",
+            response=inline_serializer(
+                name="MethodNotAllowedResponse",
+                fields={
+                    "error": serializers.CharField(default="This endpoint only supports PUT requests.")
+                }
+            )
         ),
     }
 )
+@action(detail=True, methods=("PUT",))
+@api_view(["PUT"])
 @login_required
 def add_github(request):
     """
@@ -264,7 +368,7 @@ def add_github(request):
             - 405: Error message if the request method is not PUT.
     """
     if request.method == "PUT":
-        data = json.loads(request.body)
+        data = request.data
 
         github = data.get('github')
 
@@ -296,25 +400,59 @@ def add_github(request):
         "\n\n**Why to use:** This endpoint updates the user's profile picture URL and provides an encoded version of the image."
         "\n\n**Why not to use:** Avoid using if you do not need a profile picture."
     ),
-    request={
-        "image": str
-    },
+    request=inline_serializer(
+        name="UploadProfilePictureRequest",
+        fields={
+            "image": serializers.ImageField(
+                help_text="The image file to upload as the new profile picture."
+            )
+        }
+    ),
     responses={
         200: OpenApiResponse(
-            description="Profile picture updated",
-            examples={"success": "Profile picture updated", "image": "base64-encoded-image-data"}
+            description="Profile picture updated.",
+            response=inline_serializer(
+                name="ProfilePictureUpdatedResponse",
+                fields={
+                    "success": serializers.CharField(default="Profile picture updated."),
+                    "image": serializers.CharField(
+                        help_text="The base64-encoded representation of the uploaded image.",
+                        default="base64-encoded-image-data"
+                    )
+                }
+            )
         ),
         400: OpenApiResponse(
-            description="No file provided."
+            description="No file provided.",
+            response=inline_serializer(
+                name="NoFileProvidedResponse",
+                fields={
+                    "error": serializers.CharField(default="No file was provided in the request.")
+                }
+            )
         ),
         404: OpenApiResponse(
-            description="User not found."
+            description="User not found.",
+            response=inline_serializer(
+                name="UserNotFoundResponse",
+                fields={
+                    "error": serializers.CharField(default="The specified user does not exist.")
+                }
+            )
         ),
         405: OpenApiResponse(
-            description="Method not allowed."
+            description="Method not allowed.",
+            response=inline_serializer(
+                name="MethodNotAllowedResponse",
+                fields={
+                    "error": serializers.CharField(default="This endpoint only supports POST requests.")
+                }
+            )
         ),
     }
 )
+@action(detail=True, methods=("POST",))
+@api_view(["POST"])
 @login_required
 def upload_profile_picture(request):
     """
@@ -356,7 +494,7 @@ def upload_profile_picture(request):
         current_auth_user = request.user
         current_user_model = User.objects.get(user = current_auth_user)
 
-        new_picture = Post(
+        new_picture = Post.objects.create(
             title= random.choice(PROFILE_PICTURE_TITLES),
             contentType = mime_type,
             content = encoded_image,
@@ -372,6 +510,7 @@ def upload_profile_picture(request):
 
         current_user_model.profileImage = profile_pic_url
         current_user_model.save()
+        send_post_to_inbox(new_picture.url_id)
         return JsonResponse({'success':'Profile picture updated','image':encoded_image},status=200)
 
     return HttpResponseNotAllowed(['POST'])
@@ -386,27 +525,72 @@ def upload_profile_picture(request):
         "\n\n**Why to use:** This endpoint retrieves, encodes, and stores the image, updating the user's profile image URL."
         "\n\n**Why not to use:** Avoid using if the image is not in .png, .jpg, or .jpeg format."
     ),
-    request={
-        "application/json": OpenApiResponse(
-            description="JSON body containing an image URL.",
-            examples={"url": "https://example.com/image.jpg"}
-        )
-    },
+    request=inline_serializer(
+        name="UploadProfilePictureFromURLRequest",
+        fields={
+            "url": serializers.URLField(
+                help_text="The direct URL of the image to be uploaded as the new profile picture."
+            )
+        }
+    ),
     responses={
         200: OpenApiResponse(
-            description="Profile picture updated",
-            examples={
-                "success": "Profile picture updated",
-                "image": "base64-encoded-image-data",
-                "mimeType": "image/png;base64"
-            }
+            description="Profile picture updated.",
+            response=inline_serializer(
+                name="ProfilePictureUpdatedFromURLResponse",
+                fields={
+                    "success": serializers.CharField(default="Profile picture updated."),
+                    "image": serializers.CharField(
+                        help_text="The base64-encoded representation of the retrieved image.",
+                        default="base64-encoded-image-data"
+                    ),
+                    "mimeType": serializers.CharField(
+                        help_text="The MIME type of the encoded image.",
+                        default="image/png;base64"
+                    )
+                }
+            )
         ),
-        400: OpenApiResponse(description="Failed to retrieve image."),
-        404: OpenApiResponse(description="User not found."),
-        415: OpenApiResponse(description="Unsupported media type: only .png and .jpeg images are accepted."),
-        405: OpenApiResponse(description="Method not allowed"),
+         400: OpenApiResponse(
+            description="Failed to retrieve image.",
+            response=inline_serializer(
+                name="FailedToRetrieveImageResponse",
+                fields={
+                    "error": serializers.CharField(default="Failed to retrieve image")
+                }
+            )
+        ),
+        404: OpenApiResponse(
+            description="User not found.",
+            response=inline_serializer(
+                name="UserNotFoundResponse",
+                fields={
+                    "error": serializers.CharField(default="The specified user does not exist.")
+                }
+            )
+        ),
+        415: OpenApiResponse(
+            description="Unsupported media type: only .png and .jpeg images are accepted.",
+            response=inline_serializer(
+                name="UnsupportedMediaTypeResponse",
+                fields={
+                    "error": serializers.CharField(default="Invalid media type. (.png and .jpeg accepted)'")
+                }
+            )
+        ),
+        405: OpenApiResponse(
+            description="Method not allowed.",
+            response=inline_serializer(
+                name="MethodNotAllowedResponse",
+                fields={
+                    "error": serializers.CharField(default="This endpoint only supports POST requests.")
+                }
+            )
+        ),
     }
 )
+@action(detail=True, methods=("POST",))
+@api_view(["POST"])
 @login_required
 def upload_url_picture(request):
     """
@@ -424,7 +608,7 @@ def upload_url_picture(request):
             - 405: Error message if the request method is not POST.
     """
     if request.method == "POST":
-        data = json.loads(request.body)
+        data = request.data
 
         image_url = data.get('url')
 

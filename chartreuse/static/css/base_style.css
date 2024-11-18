@@ -4,8 +4,11 @@
 
 html body {
     background-image: url(background.png);
+    background-attachment: fixed;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    margin: 0;
+    height: auto;
 }
 

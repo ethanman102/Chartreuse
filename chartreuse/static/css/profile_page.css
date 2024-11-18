@@ -1,10 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap');
-
-body,html{
-    font-family: "Sometype Mono", monospace;
-}
-
-
 /*Following related buttons */
 .follow{
     border-radius: 0;
@@ -16,6 +9,7 @@ body,html{
 
 html body {
     margin-left: 10%;
+    margin-right: 2%;
 }
 
 .follow:hover{
@@ -64,10 +58,16 @@ html body {
 /* github css */
 #profile-github{
     transition: font-size 0.3s ease;
+    color: chartreuse !important;
+    background-color: #00356B;
+    font-size: 1.5ch;
+    padding-inline: 2ch;
+
 }
 
 #profile-github:hover{
-    font-size: 125%;
+    font-size: 105%;
+    box-shadow: 6px 6px 0px #000000;
 }
 
 .container{
@@ -97,6 +97,10 @@ html body {
 
 img {
     border: none;
+
+    /* for making sure images are contained within the post container */
+    max-width: 100%;
+    height: auto;
 }
 
 .nav-link{

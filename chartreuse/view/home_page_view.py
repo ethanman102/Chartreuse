@@ -1,10 +1,11 @@
 from django.shortcuts import get_object_or_404
-from chartreuse.models import User, Follow, Like, FollowRequest
+from chartreuse.models import User, Follow, Like, FollowRequest, Node
 from django.views.generic.detail import DetailView
 from urllib.parse import quote
 from chartreuse.view.post_utils import get_all_public_posts, get_posts, get_image_post,prepare_posts
 from chartreuse.view.follow_utils import get_followed
 from django.core.paginator import Paginator
+import requests
 
 
 class FeedDetailView(DetailView):
@@ -55,9 +56,39 @@ class FeedDetailView(DetailView):
 
             public_posts = public_posts.difference(unneeded_reposts)
 
-
+            confirmed_follows = set()
+            unconfirmed_follows = set()
             # get all posts from the users that the current user follows
             for follower in following:
+                node_queryset = Node.objects.filter(host=follower.host,follow_status="OUTGOING",status="ENABLED")
+
+                if not node_queryset.exists():
+                    continue # skip showing posts from a non existant node connection!
+
+                if (follower.host != current_user_model.host) and (follower.url_id not in confirmed_follows or follower.url_id not in unconfirmed_follows):
+                    node_queryset = Node.objects.filter(host=follower.host,follow_status="OUTGOING",status="ENABLED")
+                    if not node_queryset.exists():
+                        unconfirmed_follows.add(follower.url_id)
+                        continue # skip showing posts from a non existant node connection!
+
+                    # make a request to see if they are following remotely.
+                    node = node_queryset[0]
+                    auth = (node.username,node.password)
+                    url = f"{follower.host}authors/{quote(follower.url_id,safe='')}/followers/{quote(current_user_model.url_id,safe='')}/is_follower"
+
+                    try:
+                        response = requests.get(url,auth=auth)
+                        if response.status_code == 404:
+                            unconfirmed_follows.add(follower.url_id)
+                            continue
+                        else:
+                            confirmed_follows.add(follower.url_id)
+                    except:
+                        unconfirmed_follows.add(follower.url_id)
+
+                elif follower.url_id in unconfirmed_follows:
+                    continue
+
                 unlisted_posts = get_posts(follower.url_id, 'UNLISTED')
                 posts.extend(unlisted_posts)
 
@@ -112,8 +143,6 @@ class FeedDetailView(DetailView):
             current_user_model = get_object_or_404(User, user=current_user)
 
             current_user_model.url_id = quote(current_user_model.url_id, safe='')
-            print(current_user_model.url_id)
-
             return current_user_model
         else:
             return None

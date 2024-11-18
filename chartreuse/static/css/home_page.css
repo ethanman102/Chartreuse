@@ -1,8 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap');
-
 html body {
     margin-left: 10%;
-    font-family: "Sometype Mono", monospace;
+    margin-right: 2%;
 }
 
 .hidden {
@@ -126,7 +124,7 @@ a {
     border-radius: 5px;
 }
 
-p img {
+img {
     max-width: 100%;
     height: auto;
 }

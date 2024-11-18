@@ -4,11 +4,17 @@ import re
 from urllib.parse import unquote,quote
 from urllib.request import urlopen
 
-from chartreuse.models import Like, Post, User
+from chartreuse.models import Like, Post, User, Node, Follow
 from chartreuse.views import Host
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
+from rest_framework import serializers
+from rest_framework.decorators import action, api_view
+import requests
+from requests.auth import HTTPBasicAuth
+from requests.exceptions import ChunkedEncodingError
 
 def get_post_likes(post_id):
     """
@@ -79,8 +85,54 @@ def delete_post(request, post_id):
         if current_user_model == post.user:
             post.visibility = 'DELETED'
             post.save()
-    
+
+            send_post_to_inbox(post_id)
+        
     return redirect('/chartreuse/homepage/')
+
+def send_post_to_inbox(post_url_id):
+    post = Post.objects.get(url_id=post_url_id)
+    # send this to the inbox of other nodes
+    nodes = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
+
+    if not nodes.exists():
+        return []
+    
+    for node in nodes:
+        host = node.host
+        username = node.username
+        password = node.password
+
+        url = host
+        
+        url += 'authors/'
+
+        base_url = f"{post.user.host}authors/"
+        post_json_url = f"{base_url}{quote(post.user.url_id, safe='')}/posts/{quote(post.url_id, safe='')}/"
+        post_response = requests.get(post_json_url)
+        post_json = post_response.json()
+
+
+        followers = Follow.objects.filter(followed = post.user)
+        for follower in followers:
+            if follower.follower.host == host:
+                author_url_id = follower.follower.url_id
+                full_url = url + f'{quote(author_url_id, safe = "")}/inbox/'
+                
+
+                headers = {
+                    "Content-Type": "application/json; charset=utf-8"
+                }
+
+                # send to inbox
+                try:
+                    requests.post(full_url, headers=headers, json=post_json, auth=(username, password))
+                    # Resource: https://stackoverflow.com/questions/16511337/correct-way-to-try-except-using-python-requests-module
+                    # Stack Overflow Post: 'correct way to try/except using Python requests module'
+                    # Purpose: Learned how to import the ChunckedEncodingError as defined...
+                    # Hint for importing requests.exceptions as seen by: Jonathon Reinhart's Answer on May 12, 2013
+                except ChunkedEncodingError: # some kind of chunked error that occurs if user is gone...
+                    continue
 
 @csrf_exempt
 def update_post(request, post_id):
@@ -106,8 +158,6 @@ def update_post(request, post_id):
         # Ensure that either content, image, or image URL is provided
         if not content_type and not image and not image_url:
             return JsonResponse({'error': 'Post content is required.'}, status=400)
-    
-        print(content_type)
 
         # Determine content type and set appropriate content
         # add option for commonmark here
@@ -154,9 +204,79 @@ def update_post(request, post_id):
 
         post.save()
 
+        send_post_to_inbox(post.url_id)
+
         return redirect('/chartreuse/homepage/post/' + post_id + '/')
     return redirect('/chartreuse/error/')
 
+@extend_schema(
+    summary="Repost an existing post",
+    description=(
+        "Allows an authenticated user to create a repost of an existing post by providing necessary details. "
+        "The `content_type` must be explicitly set to `repost` to identify the action as a repost.\n\n"
+        "**When to use:** Use this endpoint when a user wants to share or repost an existing post with their own "
+        "optional title and description.\n\n"
+        "**How to use:** Send a POST request with a JSON body containing the following keys:\n"
+        "- `title`: Optional title for the repost.\n"
+        "- `content_type`: Must be `repost`.\n"
+        "- `content`: The URL or text being reposted.\n"
+        "- `description`: Optional description for the repost.\n\n"
+        "**Why to use:** This endpoint creates a new post entry for the user, representing their repost of the original content.\n\n"
+        "**Why not to use:** Avoid using if the `content_type` is not `repost` or the provided data does not align with reposting requirements."
+    ),
+    request=inline_serializer(
+        name="RepostRequest",
+        fields={
+            "title": serializers.CharField(
+                required=False,
+                help_text="An optional title for the repost.",
+                allow_blank=True
+            ),
+            "content_type": serializers.ChoiceField(
+                choices=["repost"],
+                help_text="The content type of the post, must be set to `repost`."
+            ),
+            "content": serializers.CharField(
+                help_text="The content being reposted, such as a URL or text."
+            ),
+            "description": serializers.CharField(
+                required=False,
+                help_text="An optional description for the repost.",
+                allow_blank=True
+            )
+        }
+    ),
+    responses={
+        200: OpenApiResponse(
+            description="Repost created successfully.",
+            response=inline_serializer(
+                name="RepostSuccessResponse",
+                fields={
+                    "success": serializers.CharField(default="You have successfully reposted this post!")
+                }
+            )
+        ),
+        400: OpenApiResponse(
+            description="Invalid repost request. `content_type` must be `repost`.",
+            response=inline_serializer(
+                name="InvalidRepostResponse",
+                fields={
+                    "error": serializers.CharField(default="Can not process a non-repost.")
+                }
+            )
+        ),
+        405: OpenApiResponse(
+            description="Method not allowed. Only POST requests are supported.",
+            response=inline_serializer(
+                name="MethodNotAllowedResponse",
+                fields={
+                    "error": serializers.CharField(default="Invalid request method.")
+                }
+            )
+        ),
+    }
+)
+@action(detail=True, methods=("POST",))
 def repost(request):
     '''
     Purpose: API endpoint to repost a POST!
@@ -181,7 +301,7 @@ def repost(request):
 
 
 
-        repost = Post(
+        repost = Post.objects.create(
             user = reposter_user_model,
             contentType = content_type,
             description = description,
@@ -254,7 +374,7 @@ def save_post(request):
         else:
             return JsonResponse({'error': 'Invalid post data.'}, status=400)
         
-        post = Post(
+        post = Post.objects.create(
             user=current_user_model,
             title=title,
             description=description,
@@ -264,6 +384,10 @@ def save_post(request):
         )
 
         post.save()
+
+        
+
+        send_post_to_inbox(post.url_id)
 
         return redirect('/chartreuse/homepage/')
     return JsonResponse({'error': 'Invalid request method'}, status=405)
@@ -289,13 +413,16 @@ def like_post(request):
         post = Post.objects.get(url_id=unquote(post_id))
 
         # first check if the user has already liked the post
-        like = Like.objects.filter(user=user, post=post)
+        like = Like.objects.filter(user=user, post=post).first()
 
         if like:
+            send_like_to_inbox(like.url_id)
             like.delete()
         else:
             newLike = Like.objects.create(user=user, post=post)
             newLike.save()
+
+            send_like_to_inbox(newLike.url_id)
 
         data = {
             "likes_count": get_post_likes(unquote(post_id)).count()
@@ -303,6 +430,119 @@ def like_post(request):
         return JsonResponse(data)
     else:
         pass
+
+def send_like_to_inbox(like_url_id):
+    like = Like.objects.get(url_id=like_url_id)
+    # send this to the inbox of other nodes
+    if like.comment is None or like.comment == '':
+        obj_hostname = like.post.user.host
+        like_type = "POST"
+    else:
+        obj_hostname = like.comment.user.host
+        like_type = "COMMENT"
+
+ 
+    
+    if like_type == "POST":
+        if like.user.host == like.post.user.host:
+            nodes = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
+            if not nodes.exists():
+                return []
+            
+            all_outgoing = set()
+            for node in nodes:
+                all_outgoing.add(node.host)
+                
+            post_owner_follows = Follow.objects.filter(followed=like.post.user)
+            follow_hosts = set()
+            for follow in post_owner_follows:
+                if follow.follower.host in all_outgoing:
+                    follow_hosts.add(follow.follower.host)
+            node_objs = []
+            for hostname in follow_hosts:
+                node_objs.append(Node.objects.get(host=hostname,status='ENABLED',follow_status='OUTGOING'))
+        else:
+            post_owner_host = like.post.user.host
+            node_objs = []
+            node_queryset = Node.objects.filter(host=post_owner_host,status='ENABLED',follow_status="OUTGOING")
+            if node_queryset.exists():
+                node_objs.append(node_queryset[0])
+    else:
+        # this is a comment like.....
+        if like.user.host == like.comment.user.host:
+            nodes = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
+            if not nodes.exists():
+                return []
+            
+            if like.comment.user.host == like.comment.post.user.host:
+                all_outgoing = set()
+                for node in nodes:
+                    all_outgoing.add(node.host)
+                    
+                post_owner_follows = Follow.objects.filter(followed=like.comment.post.user)
+                follow_hosts = set()
+                for follow in post_owner_follows:
+                    if follow.follower.host in all_outgoing:
+                        follow_hosts.add(follow.follower.host)
+                node_objs = []
+                for hostname in follow_hosts:
+                    node_objs.append(Node.objects.get(host=hostname,status='ENABLED',follow_status='OUTGOING'))
+            else:
+                post_owner_host = like.comment.post.user.host
+                node_objs = []
+                node_queryset = Node.objects.filter(host=post_owner_host,status="ENABLED",follow_status="OUTGOING")
+                if node_queryset.exists():
+                    node_objs.append(node_queryset[0])
+
+        else:
+            comment_owner_host = like.comment.user.host
+            node_objs = []
+            node_queryset = Node.objects.filter(host=comment_owner_host,status='ENABLED',follow_status="OUTGOING")
+            if node_queryset.exists():
+                node_objs.append(node_queryset[0])
+
+
+            
+
+                
+                
+
+            
+        
+    
+
+    
+    base_url = f"{like.user.host}authors/"
+    likes_json_url = f"{base_url}{quote(like.user.url_id, safe='')}/liked/{quote(like.url_id, safe='')}/"
+
+    likes_response = requests.get(likes_json_url)
+    likes_json = likes_response.json()
+
+    for node in node_objs:
+        author_url_id = like.user.url_id
+        host = node.host
+        username = node.username
+        password = node.password
+
+        url = host
+        
+        url += 'authors/'
+
+        url += f'{quote(author_url_id, safe = "")}/inbox/'
+
+        headers = {
+            "Content-Type": "application/json; charset=utf-8"
+        }
+
+        # send to inbox
+        try:
+            requests.post(url, headers=headers, json=likes_json, auth=(username, password))
+            print("Like sent to inbox")
+        except Exception as e:
+            print("Failed to send like to inbox", e)
+            return JsonResponse({'error': 'Failed to send comment to inbox.'})
+
+    return JsonResponse({"status": "Like added successfully"})
 
 def get_all_public_posts():
     '''
@@ -331,6 +571,7 @@ def get_posts(user_id, post_type):
     author = User.objects.get(url_id=user_id)
 
     posts = Post.objects.filter(user=author, visibility=post_type)
+
 
     return posts
 

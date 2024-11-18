@@ -66,8 +66,25 @@ class FeedDetailView(DetailView):
                     continue # skip showing posts from a non existant node connection!
 
                 if (follower.host != current_user_model.host) and (follower.url_id not in confirmed_follows or follower.url_id not in unconfirmed_follows):
-                    # make a request to see if they are following i guess???
+                    node_queryset = Node.objects.filter(host=follower.host,follow_status="OUTGOING",status="ENABLED")
+                    if not node_queryset.exits():
+                        unconfirmed_follows.add(follower.url_id)
+                        continue # skip showing posts from a non existant node connection!
+
+                    # make a request to see if they are following remotely.
                     node = node_queryset[0]
+                    auth = (node.username,node.password)
+                    url = f'{follower.host}authors/{quote(follower.url_id,safe='')}/followers/{quote(current_user_model.url_id,safe='')}/is_follower'
+
+                    try:
+                        response = requests.get(url,auth=auth)
+                        if response.status_code == 404:
+                            unconfirmed_follows.add(follower.url_id)
+                            continue
+                        else:
+                            confirmed_follows.add(follower.url_id)
+                    except:
+                        unconfirmed_follows.add(follower.url_id)
 
                 elif follower.url_id in unconfirmed_follows:
                     continue

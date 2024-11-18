@@ -1,5 +1,5 @@
 from urllib.parse import unquote
-from ..models import Like, User, Post, Comment, FollowRequest
+from ..models import Like, User, Post, Comment, FollowRequest, Follow
 from ..views import Host, checkIfRequestAuthenticated
 import json
 from django.views.decorators.csrf import csrf_exempt
@@ -220,8 +220,16 @@ def inbox(request, user_id):
         else:
             remote_author = author_queryset
 
+        # check if either a follow already exists or a follow request is already sent to them...
+
         follower = User.objects.get(pk=unquote(actor["id"]))
         followed = User.objects.get(pk=unquote(object_to_follow["id"]))
+
+        follow_queryset = Follow.objects.filter(followed=followed,follower=follower)
+        follow_request_queryset = FollowRequest.objects.filter(requester=remote_author,requestee=followed)
+        if follow_queryset.exists() or follow_request_queryset.exists():
+            # no need to send duplicate request.
+            return JsonResponse({"status": "Follow request sent successfully"},status=200)
 
         # add the follow request if it does not exist, if it exists, delete the follow request
         new_follow_request = FollowRequest.objects.create(requester=remote_author, requestee=followed)

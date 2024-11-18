@@ -17,6 +17,8 @@ from .comments import CommentsSerializer
 from urllib.parse import unquote
 from rest_framework.permissions import AllowAny
 from ..views import checkIfRequestAuthenticated
+from ..view import post_utils
+
 
 class PostSerializer(serializers.Serializer):
     type = serializers.CharField(default="post")
@@ -131,8 +133,9 @@ class PostViewSet(viewsets.ViewSet):
             return JsonResponse({"error": "Post content is required."}, status=400)
 
         # Create and save the post
-        post = Post(user=author, title=post_title, description=post_description, contentType=contentType_description, content=content_description, visibility=post_type)
+        post = Post.objects.create(user=author, title=post_title, description=post_description, contentType=contentType_description, content=content_description, visibility=post_type)
         post.save()
+        post_utils.send_post_to_inbox(post.url_id)
 
         # get the author data
         request.method = "GET"

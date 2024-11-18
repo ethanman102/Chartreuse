@@ -486,6 +486,13 @@ def send_like_to_inbox(like_url_id):
             node_objs = []
             for hostname in follow_hosts:
                 node_objs.append(Node.objects.get(host=hostname,status='ENABLED',follow_status='OUTGOING'))
+        else:
+            comment_owner_host = like.comment.user.host
+            node_objs = []
+            node_queryset = Node.objects.filter(host=comment_owner_host,status='ENABLED',follow_status="OUTGOING")
+            if node_queryset.exists():
+                node_objs.append(node_queryset[0])
+
 
             
 

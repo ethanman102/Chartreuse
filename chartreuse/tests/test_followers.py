@@ -43,11 +43,6 @@ class FollowersTestCases(TestCase):
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json')
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json')
 
-        users = User.objects.all()
-        print("List of users in the database after creation:")
-        for user in users:
-            print(f"DisplayName: {user.displayName}, Host: {user.host}")
-
         # log in as user 1
         cls.client.post(reverse('chartreuse:login_user'), {
             'username': 'greg',

@@ -32,7 +32,7 @@ class FriendsSerializer(serializers.Serializer):
 class FriendsViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     serializer_class = FriendSerializer
-    authentication_classes = []
+    # authentication_classes = []
 
     @extend_schema(
         summary="Retrieve list of friends for a specific author",

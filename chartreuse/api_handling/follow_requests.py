@@ -55,7 +55,7 @@ class FollowRequestsSerializer(serializers.Serializer):
 class FollowRequestViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     serializer_class = FollowRequestSerializer
-    authentication_classes = []
+    # authentication_classes = []
 
     @extend_schema(
         summary="Send a follow request",

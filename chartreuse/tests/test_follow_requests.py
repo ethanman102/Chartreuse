@@ -47,23 +47,15 @@ class FollowRequestsTestCases(TestCase):
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json')
 
         # log in as user 1
-        foo = cls.client.post(reverse('chartreuse:login_user'), {
+        cls.client.post(reverse('chartreuse:login_user'), {
             'username': 'greg',
             'password': 'ABC123!!!'
         })
-
-        data = foo.json()
-        print(json.dumps(data, indent=4))
         # for sure logged in
 
         # sends a follow request to user 2
-        # something about the anonymous user here
-        # cls.response = cls.client.post(reverse('chartreuse:send_follow_request', args=[quote(f"{cls.test_user_2_data['host']}authors/2", safe='')]))
-        cls.response = cls.client.post(reverse('chartreuse:send_follow_request', args=[quote(f"{cls.host}authors/2", safe='')]))
-            # I think the issue here is that the URL isn't formmatted in the way that the API can get the id from it???
+        cls.response = cls.client.post(reverse('chartreuse:send_follow_request', args=[quote(f"{cls.test_user_2_data['host']}authors/2", safe='')]))
 
-
-        print('hello')
         # user 1 logout
         cls.client.logout()
 

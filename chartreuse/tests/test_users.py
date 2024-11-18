@@ -156,6 +156,12 @@ class UserTestCases(TestCase):
         '''
         This tests deleting a user with an invalid id.
         '''
+        # login as user 1
+        response = self.client.post(reverse('chartreuse:login_user'), {
+            'username': 'greg',
+            'password': 'ABC123!!!'
+        })
+
         user_id = quote(f"{self.hostname}authors/100", safe='')
         response = self.client.delete(reverse('chartreuse:user-detail', args=[user_id]))
 

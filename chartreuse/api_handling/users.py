@@ -172,7 +172,7 @@ class UserViewSet(viewsets.ViewSet):
         decoded_user_id = unquote(pk)
         
         # case where the user is on the current host
-        user = User.objects.filter(url_id=decoded_user_id).first()
+        user = get_object_or_404(User, pk=decoded_user_id)
         page = user.host + "/authors/" + user.url_id
 
         # We only want to return the required fields

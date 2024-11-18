@@ -136,8 +136,28 @@ def send_comment_to_inbox(comment_url_id):
     # send this to the inbox of other nodes
     if comment.user.host == comment.post.user.host:
         nodes = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
+        all_outgoing = set()
+        for node in nodes:
+            all_outgoing.add(node.host)
+        
+        post_owner_follows = Follow.objects.filter(followed=comment.post.user)
+        follow_hosts = set()
+        for follow in post_owner_follows:
+            if follow.follower.host in all_outgoing:
+                follow_hosts.add(follow.follower.host)
+        node_objs = []
+        for hostname in follow_hosts:
+            node_objs.append(Node.objects.get(host=hostname,status='ENABLED',follow_status='OUTGOING'))
+    else:
+        post_owner_host = comment.post.user.host
+        node_objs = []
+        node_queryset = Node.objects.filter(host=post_owner_host,status='ENABLED',follow_status="OUTGOING")
+        if node_queryset.exists():
+            node_objs.append(node_queryset[0])
+        
 
-    if not nodes.exists():
+
+    if len(node_objs) == 0:
         return []
     
     base_url = f"{comment.user.host}authors/"
@@ -147,7 +167,7 @@ def send_comment_to_inbox(comment_url_id):
     comments_json = comments_response.json()
 
     followers = Follow.objects.filter(followed=comment.user)
-    for node in nodes:
+    for node in node_objs:
         author_url_id = comment.user.url_id
         host = node.host
         username = node.username

@@ -111,7 +111,6 @@ def send_follow_request(request):
                 requests.post(url, headers=headers, json=data, auth=auth)
                 follow_request_status = "Sent Follow Request"
                 new_follow = Follow.objects.create(followed=post_author,follower=user)
-
             except: 
                 return JsonResponse({"follow_request_status": 'Error Following...'})
                 

@@ -11,13 +11,13 @@ from ..models import User, Post
 from django.shortcuts import get_object_or_404
 from urllib.parse import urlparse
 import base64
-from .post_utils import get_image_post
+from .post_utils import get_image_post, send_post_to_inbox
 from urllib.request import urlopen
 import random
 from rest_framework import serializers
 from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
 from rest_framework.decorators import action, api_view
-import post_utils
+
 
 PROFILE_PICTURE_TITLES = [
     "Look out! I'm ready to 'serve' with this new image file as my new profile picture!",
@@ -510,7 +510,7 @@ def upload_profile_picture(request):
 
         current_user_model.profileImage = profile_pic_url
         current_user_model.save()
-        post_utils.send_post_to_inbox(new_picture.url_id)
+        send_post_to_inbox(new_picture.url_id)
         return JsonResponse({'success':'Profile picture updated','image':encoded_image},status=200)
 
     return HttpResponseNotAllowed(['POST'])

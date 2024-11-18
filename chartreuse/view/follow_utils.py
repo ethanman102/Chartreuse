@@ -106,13 +106,13 @@ def send_follow_request(request):
                     }
                 }
 
-            url = f"{post_author.host}authors/{quote(post_author.url_id,safe='')}/inbox/"
-            try:
-                requests.post(url, headers=headers, json=data, auth=auth)
-                follow_request_status = "Sent Follow Request"
-                new_follow = Follow.objects.create(followed=post_author,follower=user)
-            except: 
-                return JsonResponse({"follow_request_status": 'Error Following...'})
+                url = f"{post_author.host}authors/{quote(post_author.url_id,safe='')}/inbox/"
+                try:
+                    requests.post(url, headers=headers, json=data, auth=auth)
+                    follow_request_status = "Sent Follow Request"
+                    new_follow = Follow.objects.create(followed=post_author,follower=user)
+                except: 
+                    return JsonResponse({"follow_request_status": 'Error Following...'})
                 
             else:
                 FollowRequest.objects.create(requester=user, requestee=post_author)

@@ -3,6 +3,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from urllib.parse import quote
 from chartreuse.views import Host
+from ..models import User
 
 class LikeTestCases(TestCase):
     @classmethod
@@ -91,6 +92,10 @@ class LikeTestCases(TestCase):
             'username': 'greg',
             'password': 'ABC123!!!'
         })
+
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
 
     def test_like_post(self):
         '''

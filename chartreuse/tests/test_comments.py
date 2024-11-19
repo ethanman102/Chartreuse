@@ -2,6 +2,8 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from urllib.parse import quote
+from ..models import User
+from django.contrib.auth.models import User as AuthUser
 from chartreuse.views import Host
 
 class CommentTestCases(TestCase):
@@ -68,6 +70,10 @@ class CommentTestCases(TestCase):
             'username': 'john',
             'password': '87@398dh817b!'
         })
+
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
     
     def test_create_comment(self):
         """

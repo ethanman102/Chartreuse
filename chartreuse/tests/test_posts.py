@@ -2,12 +2,15 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from urllib.parse import quote
+from ..models import User
 from chartreuse.views import Host
 
 class PostTestCases(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
+        cls.client = APIClient()
 
         Host.host = "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/"
 
@@ -70,6 +73,10 @@ class PostTestCases(TestCase):
             "contentType": "text/plain", 
             "content": "Hello World! \nThis is a short message from greg!"
         })
+
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
 
     def test_creating_post(self):
         """

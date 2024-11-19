@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from urllib.parse import quote
+from ..models import User
 
 class GithubTestCases(TestCase):
     @classmethod
@@ -24,6 +25,9 @@ class GithubTestCases(TestCase):
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json')
         cls.user_id = quote(f"{cls.test_user_1_data['host']}authors/1", safe='')
 
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
     
     def test_get_events(self):
         '''

@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.test import APIClient
 from chartreuse.views import Host
 from urllib.parse import quote
+from django.contrib.auth.models import User as AuthUser
 
 import json
 
@@ -47,11 +48,10 @@ class FollowRequestsTestCases(TestCase):
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json')
 
         # log in as user 1
-        cls.client.post(reverse('chartreuse:login_user'), {
+        test_response = cls.client.post(reverse('chartreuse:login_user'), {
             'username': 'greg',
             'password': 'ABC123!!!'
         })
-        # for sure logged in
 
         # sends a follow request to user 2
         cls.response = cls.client.post(reverse('chartreuse:send_follow_request', args=[quote(f"{cls.test_user_2_data['host']}authors/2", safe='')]))
@@ -71,6 +71,10 @@ class FollowRequestsTestCases(TestCase):
             'username': 'greg',
             'password': 'ABC123!!!'
         })
+
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
     
     def test_send_follow_request(self):
         '''

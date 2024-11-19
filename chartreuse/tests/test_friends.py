@@ -3,6 +3,7 @@ from django.urls import reverse
 from urllib.parse import quote
 from rest_framework.test import APIClient
 from chartreuse.views import Host
+from ..models import User
 
 class FriendsTestCases(TestCase):
     @classmethod
@@ -64,6 +65,10 @@ class FriendsTestCases(TestCase):
             'username': 'greg',
             'password': 'ABC123!!!'
         })
+
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
 
     def test_get_friends(self):
         '''

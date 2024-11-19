@@ -59,7 +59,6 @@ class UsersSerializer(serializers.Serializer):
 
 class UserViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
-    authentication_classes = []
 
     @extend_schema(
         summary="Get a list of users",
@@ -173,7 +172,7 @@ class UserViewSet(viewsets.ViewSet):
         decoded_user_id = unquote(pk)
         
         # case where the user is on the current host
-        user = User.objects.filter(url_id=decoded_user_id).first()
+        user = get_object_or_404(User, pk=decoded_user_id)
         page = user.host + "/authors/" + user.url_id
 
         # We only want to return the required fields
@@ -302,13 +301,14 @@ class UserViewSet(viewsets.ViewSet):
     )
     def destroy(self, request, pk=None):
         checkIfRequestAuthenticated(request)
+        
         decoded_user_id = unquote(pk)
 
         host = get_host_from_id(decoded_user_id)
         
         if(host != views.Host.host):
             # if the user is not on the current host, we need to get the user from the remote host
-            api_url = host + "api/authors/" + pk
+            api_url = host + "api/authors/" + decoded_user_id
             response = requests.delete(api_url)
 
             # Raise an exception if the request failed
@@ -400,12 +400,11 @@ class UserViewSet(viewsets.ViewSet):
         # Save the user
         user.save()
 
-        id = str(user.url_id)
         page = user.host + "/authors/" + user.url_id
 
         return JsonResponse({
             "type": "author",
-            "id": id,
+            "id": user.url_id,
             "host": user.host,
             "displayName": user.displayName,
             "github": user.github,

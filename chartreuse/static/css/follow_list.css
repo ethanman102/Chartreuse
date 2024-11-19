@@ -1,5 +1,5 @@
 #follow-list-header{
-    background-color: #002549;
+    background-color: #00356b;
     margin-top: 30px;
 }
 
@@ -10,7 +10,7 @@
 #container-item-box{
     padding-top: 2ch;
     padding-bottom: 2ch;
-    background-color: #D9D9D9;
+    background-color: #bebfc5;
     overflow-y: scroll;
     max-height: 400px;
     min-height: 400px;

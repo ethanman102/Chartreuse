@@ -65,7 +65,7 @@ We created a couple of pages on our wiki to hold all the resources we referred t
 
 <br>
 
-If you would like to put our wiki on your local machine, you can use code below to clone our wiki
+If you would like to put our wiki on your local machine, you can use the code below.
 ```
 https://github.com/uofa-cmput404/f24-project-chartreuse.wiki.git
 ```

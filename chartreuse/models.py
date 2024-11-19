@@ -52,7 +52,7 @@ class Comment(models.Model):
         super().save(*args, **kwargs)
         if self.url_id == None or self.url_id == '':
             self.url_id = f"{self.user.url_id}/commented/{self.id}"
-        super().save(*args, **kwargs)
+        
         
 
     def __str__(self):

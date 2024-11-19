@@ -333,6 +333,8 @@ def save_post(request):
 
         current_user = request.user
         current_user_model = get_object_or_404(User, user=current_user)
+
+        print(visibility,'HERE IS THE VISIBILITY')
         
 
         # Ensure that either content, image, or image URL is provided

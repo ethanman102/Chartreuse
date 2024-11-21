@@ -27,7 +27,7 @@
                     {% for follow in follows %}
                     
                     <div class="follower-box">
-                        <img src="{{follow.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
+                        <img src="{{follow.profileImage}}" class="img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
                         <h5 style="display:inline">{{follow.displayName}}</h5>
                         <button class="view-profile-button btn btn-primary view-profile-button" url-id="{% url 'chartreuse:profile' follow.url_id %}">View Profile</button>   
                     </div>

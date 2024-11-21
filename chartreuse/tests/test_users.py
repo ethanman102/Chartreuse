@@ -4,7 +4,7 @@ from django.urls import reverse
 from urllib.parse import quote
 import json
 from ..views import Host
-from ..models import User
+from ..models import User,Node
 
 class UserTestCases(TestCase):
     @classmethod
@@ -51,6 +51,8 @@ class UserTestCases(TestCase):
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json')
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json')
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_3_data, format='json')
+
+        cls.node = Node.objects.create(host='http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',username='abc',password='123',follow_status='INCOMING',status='ENABLED')
 
     @classmethod
     def tearDownClass(cls):

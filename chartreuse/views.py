@@ -26,6 +26,7 @@ def checkIfRequestAuthenticated(request):
     Arguments:
     request: Request object
     '''
+    
     authentication = request.headers.get('Authorization')
     if not authentication or not authentication.startswith('Basic'):
         return JsonResponse({"error": "Missing or invalid Authorization header"}, status=401)
@@ -45,7 +46,9 @@ def checkIfRequestAuthenticated(request):
     if len(node) == 0:
         return JsonResponse({"error": "Unauthorized"}, status=401)
 
+    print('WE REACH HERE')
     return JsonResponse({"success": "Authorized"}, status=200)
+
 
 def error(request):
     '''

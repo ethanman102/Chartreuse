@@ -59,6 +59,7 @@ class UsersSerializer(serializers.Serializer):
 
 class UserViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
+    authhentication_classes = []
     
 
     @extend_schema(
@@ -96,7 +97,11 @@ class UserViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the paginated list of users.
         '''
-        checkIfRequestAuthenticated(request)
+        auth_response = checkIfRequestAuthenticated(request)
+       
+        if auth_response.status_code == 401:
+            return auth_response
+
         page = request.query_params.get('page', 1)
         size = request.query_params.get('size', 50)
 
@@ -226,7 +231,11 @@ class UserViewSet(viewsets.ViewSet):
         }
     )
     def update(self, request, pk=None):
-        checkIfRequestAuthenticated(request)
+        auth_response = checkIfRequestAuthenticated(request)
+
+        if auth_response.status_code == 401:
+            return auth_response
+
         decoded_user_id = unquote(pk)
         host = get_host_from_id(decoded_user_id)
 
@@ -301,7 +310,9 @@ class UserViewSet(viewsets.ViewSet):
         }
     )
     def destroy(self, request, pk=None):
-        checkIfRequestAuthenticated(request)
+        auth_response = checkIfRequestAuthenticated(request)
+        if auth_response.status_code == 401:
+            return auth_response
         
         decoded_user_id = unquote(pk)
 
@@ -357,7 +368,10 @@ class UserViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the newly created user.
         '''
-        checkIfRequestAuthenticated(request)
+        auth_response = checkIfRequestAuthenticated(request)
+        if auth_response.status_code == 401:
+            return auth_response
+        
         firstName = request.data.get('firstName')
         lastName = request.data.get('lastName')
         displayName = request.data.get('displayName')

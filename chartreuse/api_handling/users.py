@@ -1,5 +1,5 @@
 import json
-
+from rest_framework.authentication import SessionAuthentication
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.auth.password_validation import validate_password
@@ -59,8 +59,11 @@ class UsersSerializer(serializers.Serializer):
 
 class UserViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
-    authentication_classes = []
-
+    # November 21, 2024. Asked CHATGPT agent why the user isn't staying logged in between tests. Chatgpt recommended checking the forced login to see if it works, and suggested using
+    # sessionauthentication as seen here b/w sessions
+    authentication_classes = [SessionAuthentication]
+    
+    
 
     @extend_schema(
         summary="Get a list of users",

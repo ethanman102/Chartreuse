@@ -163,6 +163,7 @@ class UserTestCases(TestCase):
 
         greg = AuthUser.objects.get(username='greg')
         self.client.force_login(greg)
+        print(self.client.session['_auth_user_id'],'hiii')
    
 
         user_id = quote(f"{self.hostname}authors/1", safe='')

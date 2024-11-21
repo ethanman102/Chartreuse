@@ -56,7 +56,7 @@ class UsersSerializer(serializers.Serializer):
 
     class Meta:
         fields = ['type', 'authors']
-@csrf_exempt
+
 class UserViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     authhentication_classes = []
@@ -97,9 +97,11 @@ class UserViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the paginated list of users.
         '''
+        print('hayyyyy')
         auth_response = checkIfRequestAuthenticated(request)
        
         if auth_response.status_code == 401:
+            print('oh no')
             return auth_response
 
         page = request.query_params.get('page', 1)

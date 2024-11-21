@@ -94,7 +94,7 @@ def send_post_to_inbox(post_url_id):
     post = Post.objects.get(url_id=post_url_id)
     # send this to the inbox of other nodes
     nodes = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
-
+    
     if not nodes.exists():
         return []
     
@@ -444,6 +444,7 @@ def send_like_to_inbox(like_url_id):
     
     if like_type == "POST":
         if like.user.host == like.post.user.host:
+            print('LIKE HEREEEE')
             nodes = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
             if not nodes.exists():
                 return []
@@ -457,15 +458,21 @@ def send_like_to_inbox(like_url_id):
             for follow in post_owner_follows:
                 if follow.follower.host in all_outgoing:
                     follow_hosts.add(follow.follower.host)
-            node_objs = []
+            node_objs = {}
             for hostname in follow_hosts:
-                node_objs.append(Node.objects.get(host=hostname,status='ENABLED',follow_status='OUTGOING'))
+                node_objs[hostname] = list()
+            
+            for follow in post_owner_follows:
+                if follow.follower.host in node_objs:
+                    node_objs[follow.follower.host].append(follow.follower.url_id)
+            print("MADE IT HERE!!")
+                
         else:
             post_owner_host = like.post.user.host
-            node_objs = []
+            node_objs = {}
             node_queryset = Node.objects.filter(host=post_owner_host,status='ENABLED',follow_status="OUTGOING")
             if node_queryset.exists():
-                node_objs.append(node_queryset[0])
+                node_objs[node_queryset[0].host] = [like.post.user.url_id]
     else:
         # this is a comment like.....
         if like.user.host == like.comment.user.host:
@@ -474,6 +481,7 @@ def send_like_to_inbox(like_url_id):
                 return []
             
             if like.comment.user.host == like.comment.post.user.host:
+                # send the comment like to all the post owners followers!
                 all_outgoing = set()
                 for node in nodes:
                     all_outgoing.add(node.host)
@@ -483,33 +491,29 @@ def send_like_to_inbox(like_url_id):
                 for follow in post_owner_follows:
                     if follow.follower.host in all_outgoing:
                         follow_hosts.add(follow.follower.host)
-                node_objs = []
+                node_objs = {}
                 for hostname in follow_hosts:
-                    node_objs.append(Node.objects.get(host=hostname,status='ENABLED',follow_status='OUTGOING'))
+                    node_objs[hostname] = list()
+                
+                for follow in post_owner_follows:
+                    if follow.follower.host in node_objs:
+                        node_objs[follow.follower.host].append(follow.follower.url_id)
+                
+            
             else:
                 post_owner_host = like.comment.post.user.host
-                node_objs = []
+                node_objs = {}
                 node_queryset = Node.objects.filter(host=post_owner_host,status="ENABLED",follow_status="OUTGOING")
                 if node_queryset.exists():
-                    node_objs.append(node_queryset[0])
+                    node_objs[node_queryset[0].host] = [like.comment.post.user.url_id]
 
         else:
+            # case when local user likes the comment of another node's user!
             comment_owner_host = like.comment.user.host
-            node_objs = []
+            node_objs = {}
             node_queryset = Node.objects.filter(host=comment_owner_host,status='ENABLED',follow_status="OUTGOING")
             if node_queryset.exists():
-                node_objs.append(node_queryset[0])
-
-
-            
-
-                
-                
-
-            
-        
-    
-
+                node_objs[node_queryset[0].host] = [like.comment.user.url_id]
     
     base_url = f"{like.user.host}authors/"
     likes_json_url = f"{base_url}{quote(like.user.url_id, safe='')}/liked/{quote(like.url_id, safe='')}/"
@@ -518,21 +522,24 @@ def send_like_to_inbox(like_url_id):
     likes_json = likes_response.json()
 
     for node in node_objs:
-        author_url_id = like.user.url_id
-        host = node.host
-        username = node.username
-        password = node.password
-
-        url = host
+        # author_url_id = like.user.url_id
         
-        url += 'authors/'
+        node_copy = Node.objects.get(host=node,follow_status='OUTGOING')
+        for to_send_id in node_objs[node]:
+        
+            username = node_copy.username
+            password = node_copy.password
 
-        url += f'{quote(author_url_id, safe = "")}/inbox/'
+            url = node
+            
+            url += 'authors/'
 
-        headers = {
-            "Content-Type": "application/json; charset=utf-8"
-        }
+            url += f'{quote(to_send_id, safe = "")}/inbox/'
 
+            headers = {
+                "Content-Type": "application/json; charset=utf-8"
+            }
+            
         # send to inbox
         try:
             requests.post(url, headers=headers, json=likes_json, auth=(username, password))

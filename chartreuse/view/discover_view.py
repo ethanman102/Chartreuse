@@ -74,6 +74,10 @@ class DiscoverAuthorListView(ListView):
             return []
         
         node = node[0]
+
+        print(f'Node: {node.host}')
+        print(f'Username: {node.username}')
+        print(f'Password: {node.password}')
         
         username = base64.b64encode(bytes(node.username,encoding='utf-8')).decode('utf-8')
         password = base64.b64encode(bytes(node.password,encoding='utf-8')).decode('utf-8')
@@ -88,6 +92,7 @@ class DiscoverAuthorListView(ListView):
             'size':PAGE_SIZE
         }
 
+        print(f'URL: {url}')
         response = requests.get(url, params=params, auth=(username,password))
         
         

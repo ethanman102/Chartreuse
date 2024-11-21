@@ -186,9 +186,7 @@ def inbox(request, user_id):
                 new_like.dateCreated = published
                 new_like.save()
                 return JsonResponse({"status": "Like added successfully"})
-            else:
-                like.delete()
-                return JsonResponse({"status": "Like removed successfully"})
+
         else:
             comment = Comment.objects.filter(url_id=object_id).first()
             like = Like.objects.filter(user=author, comment=comment).first()
@@ -197,9 +195,7 @@ def inbox(request, user_id):
                 new_like.dateCreated = published
                 new_like.save()
                 return JsonResponse({"status": "Like added successfully"})
-            else:
-                like.delete()
-                return JsonResponse({"status": "Like removed successfully"})
+       
             
 
     elif (data["type"] == "follow"):

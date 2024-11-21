@@ -61,6 +61,7 @@ class UserViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     # November 21, 2024. Asked CHATGPT agent why the user isn't staying logged in between tests. Chatgpt recommended checking the forced login to see if it works, and suggested using
     # sessionauthentication as seen here b/w sessions
+    
     authentication_classes = [SessionAuthentication]
     
     

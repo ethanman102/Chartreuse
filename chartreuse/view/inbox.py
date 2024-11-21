@@ -21,6 +21,8 @@ def inbox(request, user_id):
     authorization_response = checkIfRequestAuthenticated(request)
     if authorization_response.status_code != 200:
         return authorization_response
+    
+    print('data')
 
     if (data["type"] == "post"):
         title = data["title"]

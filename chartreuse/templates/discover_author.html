@@ -18,10 +18,15 @@
 
     <div class="container" id="title-container">
         <div class="row">
-            <div class="col-12">
+            <div class="col-11">
                 <h4 id="header">chartreuse.remote-authors</h4>
             </div>
-            <button id="back" type="button" url-id="{% url 'chartreuse:discover_nodes' %}" class="custom-button">X</button>
+
+            <div class="col-1">
+                <!-- back button to get to discover node page  -->
+                <button id="back" type="button" class="custom-button">X</button>
+            </div>
+            
         </div>
     </div>
     <div class="container node-container">
@@ -117,6 +122,11 @@
                 });
             }
 
+            document.getElementById('back').addEventListener('click', function() {
+                window.location.href = "{% url 'chartreuse:discover_nodes' %}";
+            });
+
+           
 
         }
     </script>

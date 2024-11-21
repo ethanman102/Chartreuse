@@ -189,12 +189,10 @@ def send_comment_to_inbox(comment_url_id):
                 "Content-Type": "application/json; charset=utf-8"
             }
 
-            # send to inbox
-            try:
-                requests.post(url, headers=headers, json=comments_json, auth=(username, password))
-             
-            except Exception as e:
-              
-                return JsonResponse({'error': 'Failed to send comment to inbox.'})
+        # send to inbox
+        try:
+            requests.post(url, headers=headers, json=comments_json, auth=(username, password))
+        except Exception as e:
+            return JsonResponse({'error': 'Failed to send comment to inbox.'})
     
     return JsonResponse({'status': 'Comment sent to inbox successfully.'})

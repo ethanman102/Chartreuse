@@ -50,7 +50,7 @@ def save_signup(request):
             profileImage = f'https://{current_host.host}/static/images/default_pfp_1.png'
 
         # Create the custom User model instance
-        id = f'https://{current_host.host}/authors/{authUser.id}'
+        id = f'https://{current_host.host}/api/authors/{authUser.id}'
         # id = "https://" + current_host.host + "/authors/" + str(authUser.id)
         user = User.objects.create(
             url_id=id,

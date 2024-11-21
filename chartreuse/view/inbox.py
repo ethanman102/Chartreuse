@@ -21,6 +21,8 @@ def inbox(request, user_id):
     authorization_response = checkIfRequestAuthenticated(request)
     if authorization_response.status_code != 200:
         return authorization_response
+    
+   
 
     if (data["type"] == "post"):
         title = data["title"]
@@ -50,6 +52,7 @@ def inbox(request, user_id):
 
             # add comment objects
             post_comments = comments["src"]
+            
             for post_comment in post_comments:
                 comment_author = post_comment["author"]
                 comment = post_comment["comment"]
@@ -124,6 +127,7 @@ def inbox(request, user_id):
         # add this new comment if it does not exist, if it exists, then delete it
 
         comment_author_id = unquote(comment_author["id"])
+        
         comment_author = discover_author(comment_author_id,comment_author)
         new_post = Post.objects.get(url_id=post)
 
@@ -182,9 +186,7 @@ def inbox(request, user_id):
                 new_like.dateCreated = published
                 new_like.save()
                 return JsonResponse({"status": "Like added successfully"})
-            else:
-                like.delete()
-                return JsonResponse({"status": "Like removed successfully"})
+
         else:
             comment = Comment.objects.filter(url_id=object_id).first()
             like = Like.objects.filter(user=author, comment=comment).first()
@@ -193,9 +195,7 @@ def inbox(request, user_id):
                 new_like.dateCreated = published
                 new_like.save()
                 return JsonResponse({"status": "Like added successfully"})
-            else:
-                like.delete()
-                return JsonResponse({"status": "Like removed successfully"})
+       
             
 
     elif (data["type"] == "follow"):
@@ -243,10 +243,10 @@ def discover_author(url_id,json_obj):
     if not author_queryset.exists():
         current_author = User.objects.create(
             url_id = url_id,
-            displayName = json_obj['displayName'],
-            host = json_obj['host'],
-            github = json_obj['github'],
-            profileImage = json_obj['profileImage']
+            displayName = json_obj.get('displayName'),
+            host = json_obj.get('host'),
+            github = json_obj.get('github'),
+            profileImage = json_obj.get('profileImage')
         )
     else:
         current_author = author_queryset[0]

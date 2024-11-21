@@ -333,10 +333,7 @@ def save_post(request):
 
         current_user = request.user
         current_user_model = get_object_or_404(User, user=current_user)
-
-        print(visibility,'HERE IS THE VISIBILITY')
         
-
         # Ensure that either content, image, or image URL is provided
         if not content_type and not image and not image_url:
             return JsonResponse({'error': 'Post content is required.'}, status=400)
@@ -539,9 +536,7 @@ def send_like_to_inbox(like_url_id):
         # send to inbox
         try:
             requests.post(url, headers=headers, json=likes_json, auth=(username, password))
-            print("Like sent to inbox")
         except Exception as e:
-            print("Failed to send like to inbox", e)
             return JsonResponse({'error': 'Failed to send comment to inbox.'})
 
     return JsonResponse({"status": "Like added successfully"})

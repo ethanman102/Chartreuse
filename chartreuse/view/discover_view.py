@@ -74,10 +74,6 @@ class DiscoverAuthorListView(ListView):
             return []
         
         node = node[0]
-
-        print(f'Node: {node.host}')
-        print(f'Username: {node.username}')
-        print(f'Password: {node.password}')
         
         username = node.username
         password = node.password
@@ -92,7 +88,6 @@ class DiscoverAuthorListView(ListView):
             'size':PAGE_SIZE
         }
 
-        print(f'URL: {url}')
         response = requests.get(url, params=params, auth=(username,password))
         
         

@@ -170,7 +170,7 @@ def profile_follow_request(request,requestee,requester):
                     'profileImage': requestee_user.profileImage
                 }
             }
-
+            print("ID", requestee_user.url_id)
             url = f"{requestee_user.host}authors/{quote(requestee_user.url_id,safe='')}/inbox/"
 
             headers = {

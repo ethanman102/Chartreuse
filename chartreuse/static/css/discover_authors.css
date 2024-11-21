@@ -79,3 +79,17 @@ html body{
     color: chartreuse;
     background-color: #00356b;
 }
+
+.custom-button {
+    color: chartreuse;
+    float: right;
+    transition: box-shadow 0.3s ease;
+    background-color: transparent;
+    padding-inline: 1ch;
+    font-weight: 600;
+}
+
+.custom-button:hover {
+    color: white;
+    background-color: chartreuse;
+}

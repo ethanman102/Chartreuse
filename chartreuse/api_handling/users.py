@@ -56,7 +56,7 @@ class UsersSerializer(serializers.Serializer):
 
     class Meta:
         fields = ['type', 'authors']
-
+@csrf_exempt
 class UserViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     authhentication_classes = []

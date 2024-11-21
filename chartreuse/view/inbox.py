@@ -125,6 +125,7 @@ def inbox(request, user_id):
         # add this new comment if it does not exist, if it exists, then delete it
 
         comment_author_id = unquote(comment_author["id"])
+        print(comment_author)
         comment_author = discover_author(comment_author_id,comment_author)
         new_post = Post.objects.get(url_id=post)
 

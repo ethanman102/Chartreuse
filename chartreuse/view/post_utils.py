@@ -463,12 +463,14 @@ def send_like_to_inbox(like_url_id):
             node_objs = []
             for hostname in follow_hosts:
                 node_objs.append(Node.objects.get(host=hostname,status='ENABLED',follow_status='OUTGOING'))
+            
         else:
             post_owner_host = like.post.user.host
             node_objs = []
             node_queryset = Node.objects.filter(host=post_owner_host,status='ENABLED',follow_status="OUTGOING")
             if node_queryset.exists():
                 node_objs.append(node_queryset[0])
+        author_url_id = like.post.user.url_id
     else:
         # this is a comment like.....
         if like.user.host == like.comment.user.host:
@@ -489,6 +491,7 @@ def send_like_to_inbox(like_url_id):
                 node_objs = []
                 for hostname in follow_hosts:
                     node_objs.append(Node.objects.get(host=hostname,status='ENABLED',follow_status='OUTGOING'))
+            
             else:
                 post_owner_host = like.comment.post.user.host
                 node_objs = []
@@ -521,7 +524,7 @@ def send_like_to_inbox(like_url_id):
     likes_json = likes_response.json()
 
     for node in node_objs:
-        author_url_id = like.user.url_id
+        # author_url_id = like.user.url_id
         host = node.host
         username = node.username
         password = node.password

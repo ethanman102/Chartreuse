@@ -1,7 +1,9 @@
 <!DOCTYPE html>
+
+{% load static %}
+{% load tz %}
 <html> 
     <head>
-        {% load static %}
         <title>{% block title %}{% endblock %}</title>
         <meta charset="utf-8">
 
@@ -25,7 +27,11 @@
         <script src="https://unpkg.com/commonmark@0.29.3/dist/commonmark.js"></script>
         
         <!-- Here is where our actual pages will be imported -->
+
+        {% timezone 'America/Edmonton' %}
         {% block content %}{% endblock %}
+        {% endtimezone %}
+
     </body>
     <script src="{% static 'javascript/github_posts.js' %}"></script>
 </html>

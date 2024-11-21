@@ -44,6 +44,7 @@ def checkIfRequestAuthenticated(request):
     node = Node.objects.filter(username=username, password=password, follow_status="INCOMING", status="ENABLED")
 
     if len(node) == 0:
+        print('incorrect')
         return JsonResponse({"error": "Unauthorized"}, status=401)
 
     print('WE REACH HERE')

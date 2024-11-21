@@ -5,6 +5,7 @@ from urllib.parse import quote
 import json
 from ..views import Host
 from ..models import User,Node
+import base64
 
 class UserTestCases(TestCase):
     @classmethod

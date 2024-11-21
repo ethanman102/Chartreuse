@@ -172,6 +172,7 @@ def profile_follow_request(request,requestee,requester):
             }
             print("ID", requestee_user.url_id)
             url = f"{requestee_user.host}authors/{quote(requestee_user.url_id,safe='')}/inbox/"
+            print(url)
 
             headers = {
                 "Content-Type": "application/json; charset=utf-8"

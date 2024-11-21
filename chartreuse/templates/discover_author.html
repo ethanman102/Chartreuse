@@ -26,7 +26,7 @@
     <div class="container node-container">
         <div class="row">
             <div class="col-12">
-                <h3><b>Look carefully,</b> you're exploring the wilderness of the discovered authors on: <span id='host-page-message'><b><u>{{ host }}</u></b></span></h3>
+                <h3><b>Tread carefully,</b> you're exploring authors in the wilderness of: <span id='host-page-message'><b><u>{{ host }}</u></b></span></h3>
             </div>
         </div>
         {% if authors %}
@@ -47,11 +47,11 @@
             </div>
         {% else %}
             <div class="card">
-                <h3>You've reached the end... </h3>
+                <h3>You've reached uncharted territory... </h3>
             </div>
         {% endif %}
 
-        <div class="row">
+        <div class="row" id="page_buttons">
             {% if has_first %}
                 <div class="col-2">
                     <button id="first-button">First</button>

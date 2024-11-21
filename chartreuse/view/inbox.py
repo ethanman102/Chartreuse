@@ -50,6 +50,7 @@ def inbox(request, user_id):
 
             # add comment objects
             post_comments = comments["src"]
+            print(post_comments,'this is our comment part!!')
             for post_comment in post_comments:
                 comment_author = post_comment["author"]
                 comment = post_comment["comment"]

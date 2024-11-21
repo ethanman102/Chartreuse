@@ -94,7 +94,7 @@ def send_post_to_inbox(post_url_id):
     post = Post.objects.get(url_id=post_url_id)
     # send this to the inbox of other nodes
     nodes = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
-
+    
     if not nodes.exists():
         return []
     
@@ -460,17 +460,20 @@ def send_like_to_inbox(like_url_id):
             for follow in post_owner_follows:
                 if follow.follower.host in all_outgoing:
                     follow_hosts.add(follow.follower.host)
-            node_objs = []
+            node_objs = {}
             for hostname in follow_hosts:
-                node_objs.append(Node.objects.get(host=hostname,status='ENABLED',follow_status='OUTGOING'))
+                node_objs[hostname] = list()
             
+            for follow in post_owner_follows:
+                if follow.follower.host in node_objs:
+                    node_objs[follow.follower.host].append(follow.follower.url_id)
+                
         else:
             post_owner_host = like.post.user.host
-            node_objs = []
+            node_objs = {}
             node_queryset = Node.objects.filter(host=post_owner_host,status='ENABLED',follow_status="OUTGOING")
             if node_queryset.exists():
-                node_objs.append(node_queryset[0])
-        author_url_id = like.post.user.url_id
+                node_objs[node_queryset[0].host] = [like.post.user.url_id]
     else:
         # this is a comment like.....
         if like.user.host == like.comment.user.host:
@@ -479,6 +482,7 @@ def send_like_to_inbox(like_url_id):
                 return []
             
             if like.comment.user.host == like.comment.post.user.host:
+                # send the comment like to all the post owners followers!
                 all_outgoing = set()
                 for node in nodes:
                     all_outgoing.add(node.host)
@@ -488,23 +492,29 @@ def send_like_to_inbox(like_url_id):
                 for follow in post_owner_follows:
                     if follow.follower.host in all_outgoing:
                         follow_hosts.add(follow.follower.host)
-                node_objs = []
+                node_objs = {}
                 for hostname in follow_hosts:
-                    node_objs.append(Node.objects.get(host=hostname,status='ENABLED',follow_status='OUTGOING'))
+                    node_objs[hostname] = list()
+                
+                for follow in post_owner_follows:
+                    if follow.follower.host in node_objs:
+                        node_objs[follow.follower.host].append(follow.follower.url_id)
+                
             
             else:
                 post_owner_host = like.comment.post.user.host
-                node_objs = []
+                node_objs = {}
                 node_queryset = Node.objects.filter(host=post_owner_host,status="ENABLED",follow_status="OUTGOING")
                 if node_queryset.exists():
-                    node_objs.append(node_queryset[0])
+                    node_objs[node_queryset[0].host] = [like.comment.post.user.url_id]
 
         else:
+            # case when local user likes the comment of another node's user!
             comment_owner_host = like.comment.user.host
-            node_objs = []
+            node_objs = {}
             node_queryset = Node.objects.filter(host=comment_owner_host,status='ENABLED',follow_status="OUTGOING")
             if node_queryset.exists():
-                node_objs.append(node_queryset[0])
+                node_objs[node_queryset[0].host] = [like.comment.user.url_id]
 
 
             
@@ -525,27 +535,29 @@ def send_like_to_inbox(like_url_id):
 
     for node in node_objs:
         # author_url_id = like.user.url_id
-        host = node.host
-        username = node.username
-        password = node.password
-
-        url = host
+        node_copy = Node.objects.get(host=node,follow_status='OUTGOING')
+        for to_send_id in node_objs[node]:
         
-        url += 'authors/'
+            username = node_copy.username
+            password = node_copy.password
 
-        url += f'{quote(author_url_id, safe = "")}/inbox/'
+            url = node
+            
+            url += 'authors/'
 
-        headers = {
-            "Content-Type": "application/json; charset=utf-8"
-        }
+            url += f'{quote(to_send_id, safe = "")}/inbox/'
 
-        # send to inbox
-        try:
-            requests.post(url, headers=headers, json=likes_json, auth=(username, password))
-            print("Like sent to inbox")
-        except Exception as e:
-            print("Failed to send like to inbox", e)
-            return JsonResponse({'error': 'Failed to send comment to inbox.'})
+            headers = {
+                "Content-Type": "application/json; charset=utf-8"
+            }
+
+            # send to inbox
+            try:
+                requests.post(url, headers=headers, json=likes_json, auth=(username, password))
+                print("Like sent to inbox")
+            except Exception as e:
+                print("Failed to send like to inbox", e)
+                return JsonResponse({'error': 'Failed to send comment to inbox.'})
 
     return JsonResponse({"status": "Like added successfully"})
 

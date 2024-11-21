@@ -75,8 +75,8 @@ class DiscoverAuthorListView(ListView):
         
         node = node[0]
         
-        username = base64.b64encode(bytes(node.username,encoding='utf-8')).decode('utf-8')
-        password = base64.b64encode(bytes(node.password,encoding='utf-8')).decode('utf-8')
+        username = node.username
+        password = node.password
 
         url = host
         if not host.endswith('api/'):

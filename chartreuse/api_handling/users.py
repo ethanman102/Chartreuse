@@ -59,7 +59,7 @@ class UsersSerializer(serializers.Serializer):
 
 class UserViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
-    authentication_classes = []
+    
 
     @extend_schema(
         summary="Get a list of users",

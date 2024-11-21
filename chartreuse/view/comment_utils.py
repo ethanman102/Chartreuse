@@ -192,9 +192,9 @@ def send_comment_to_inbox(comment_url_id):
             # send to inbox
             try:
                 requests.post(url, headers=headers, json=comments_json, auth=(username, password))
-                print('Comment sent to inbox successfully.')
+             
             except Exception as e:
-                print('Failed to send comment to inbox.', e)
+              
                 return JsonResponse({'error': 'Failed to send comment to inbox.'})
     
     return JsonResponse({'status': 'Comment sent to inbox successfully.'})

@@ -22,7 +22,7 @@ def inbox(request, user_id):
     if authorization_response.status_code != 200:
         return authorization_response
     
-    print(data)
+   
 
     if (data["type"] == "post"):
         title = data["title"]
@@ -52,7 +52,7 @@ def inbox(request, user_id):
 
             # add comment objects
             post_comments = comments["src"]
-            print(post_comments,'this is our comment part!!')
+            
             for post_comment in post_comments:
                 comment_author = post_comment["author"]
                 comment = post_comment["comment"]
@@ -127,7 +127,7 @@ def inbox(request, user_id):
         # add this new comment if it does not exist, if it exists, then delete it
 
         comment_author_id = unquote(comment_author["id"])
-        print(comment_author)
+        
         comment_author = discover_author(comment_author_id,comment_author)
         new_post = Post.objects.get(url_id=post)
 

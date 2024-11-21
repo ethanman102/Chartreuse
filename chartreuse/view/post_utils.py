@@ -526,7 +526,7 @@ def send_like_to_inbox(like_url_id):
 
     for node in node_objs:
         # author_url_id = like.user.url_id
-        print(node)
+        
         node_copy = Node.objects.get(host=node,follow_status='OUTGOING')
         for to_send_id in node_objs[node]:
         
@@ -546,9 +546,9 @@ def send_like_to_inbox(like_url_id):
             # send to inbox
             try:
                 requests.post(url, headers=headers, json=likes_json, auth=(username, password))
-                print("Like sent to inbox")
+            
             except Exception as e:
-                print("Failed to send like to inbox", e)
+               
                 return JsonResponse({'error': 'Failed to send comment to inbox.'})
 
     return JsonResponse({"status": "Like added successfully"})

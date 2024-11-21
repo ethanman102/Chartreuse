@@ -168,7 +168,7 @@ def send_comment_to_inbox(comment_url_id):
 
     followers = Follow.objects.filter(followed=comment.user)
     for node in node_objs:
-        author_url_id = comment.user.url_id
+        author_url_id = comment.post.user.url_id
         host = node.host
         username = node.username
         password = node.password

@@ -4,7 +4,81 @@ from ..views import Host, checkIfRequestAuthenticated
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
+from rest_framework import serializers
+from rest_framework.decorators import action, api_view
 
+
+@extend_schema(
+    summary="Handle incoming posts, comments, likes, and follow requests",
+    description=(
+        "Processes data sent to an author's inbox for different types of content, "
+        "including posts, comments, likes, and follow requests. Depending on the content type, "
+        "the function adds, updates, or removes the relevant objects in the database."
+        "\n\n**When to use:** Use this endpoint when sending new posts, comments, likes, or follow requests "
+        "to a remote author's inbox for further processing."
+        "\n\n**How to use:** Send a POST request with the remote author's `user_id` in the URL path and a valid JSON payload "
+        "specifying the `type` (e.g., 'post', 'comment', 'like', or 'follow') along with the required data."
+        "\n\n**Why to use:** This endpoint provides a centralized mechanism to handle interactions with a remote author's "
+        "inbox, ensuring consistency in the database."
+        "\n\n**Why not to use:** Avoid using this endpoint for retrieving data or if the required data format is unavailable."
+    ),
+    request=inline_serializer(
+        name="InboxRequest",
+        fields={
+            "type": serializers.ChoiceField(
+                choices=["post", "comment", "like", "follow"],
+                help_text="The type of data being sent to the inbox."
+            ),
+            "id": serializers.CharField(help_text="Unique ID of the post/comment/like/follow."),
+            "author": serializers.JSONField(help_text="Author information of the object."),
+            "published": serializers.DateTimeField(help_text="Timestamp when the object was created."),
+            "content": serializers.JSONField(required=False, help_text="Content of the post or comment."),
+            "comments": serializers.JSONField(required=False, help_text="Comments associated with the post."),
+            "likes": serializers.JSONField(required=False, help_text="Likes associated with the post or comment."),
+        }
+    ),
+    responses={
+        200: OpenApiResponse(
+            description="Request processed successfully.",
+            response=inline_serializer(
+                name="SuccessfulResponse",
+                fields={
+                "status": serializers.CharField(default="Post added successfully")
+            }
+            )
+            
+        ),
+        400: OpenApiResponse(
+            description="Invalid request format.",
+            response=inline_serializer(
+                name="BadRequestResponse",
+                fields={
+                    "error": serializers.CharField(default="Invalid input data.")
+                }
+            )
+        ),
+        401: OpenApiResponse(
+            description="Unauthorized request.",
+            response=inline_serializer(
+                name="UnauthorizedResponse",
+                fields={
+                    "error": serializers.CharField(default="Unauthorized.")
+                }
+            )
+        ),
+        404: OpenApiResponse(
+            description="User not found or data references invalid objects.",
+            response=inline_serializer(
+                name="NotFoundResponse",
+                fields={
+                    "error": serializers.CharField(default="Resource not found.")
+                }
+            )
+        ),
+    }
+)
+@api_view(["POST"])
 @csrf_exempt
 def inbox(request, user_id):
     decoded_user_id = unquote(user_id)

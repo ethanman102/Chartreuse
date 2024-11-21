@@ -96,3 +96,7 @@ html body{
     background-color: #00356b;
 }
 
+.author .img-fluid {
+    /* adding border around the icon */
+    border: black solid 2px;
+}

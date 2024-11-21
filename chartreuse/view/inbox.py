@@ -243,10 +243,10 @@ def discover_author(url_id,json_obj):
     if not author_queryset.exists():
         current_author = User.objects.create(
             url_id = url_id,
-            displayName = json_obj['displayName'],
-            host = json_obj['host'],
-            github = json_obj['github'],
-            profileImage = json_obj['profileImage']
+            displayName = json_obj.get('displayName'),
+            host = json_obj.get('host'),
+            github = json_obj.get('github'),
+            profileImage = json_obj.get('profileImage')
         )
     else:
         current_author = author_queryset[0]

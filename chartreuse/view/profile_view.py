@@ -6,8 +6,6 @@ from urllib.parse import unquote, quote
 from . import post_utils
 from ..views import Host
 import requests
-import base64
-import json
 
 def follow_accept(request,followed,follower):
 
@@ -25,9 +23,6 @@ def follow_accept(request,followed,follower):
         follower = unquote(follower)
         followed_user = get_object_or_404(User,url_id=followed)
         following_user = get_object_or_404(User,url_id=follower)
-
-        
-
 
         # check to see if its a remote follow or not.
 

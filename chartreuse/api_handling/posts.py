@@ -16,6 +16,7 @@ from .likes import LikesSerializer
 from .comments import CommentsSerializer
 from urllib.parse import unquote
 from rest_framework.permissions import AllowAny
+from rest_framework.authentication import SessionAuthentication
 from ..views import checkIfRequestAuthenticated
 from ..view import post_utils
 
@@ -46,6 +47,7 @@ class PostsSerializer(serializers.Serializer):
 class PostViewSet(viewsets.ViewSet):
     serializer_class = PostSerializer
     permission_classes = [AllowAny]
+    authentication_classes = [SessionAuthentication]
 
     @extend_schema(
         summary="Adds a post",
@@ -107,7 +109,9 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing the new post    
         """        
-        checkIfRequestAuthenticated(request)
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response
         
         decoded_user_id = unquote(user_id)
 
@@ -234,7 +238,9 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like object.
         """
-        checkIfRequestAuthenticated(request)
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response
         decoded_user_id = unquote(user_id)
         decoded_post_url = unquote(post_id)
 
@@ -523,7 +529,9 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing updated post 
         """
-        checkIfRequestAuthenticated(request)
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response
 
         decoded_user_id = unquote(user_id)
         decoded_post_id = unquote(post_id)
@@ -647,7 +655,9 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the post objects.
         """
-        checkIfRequestAuthenticated(request)
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response
         decoded_author_id = unquote(user_id)
         page = request.GET.get("page")
         size = request.GET.get("size")

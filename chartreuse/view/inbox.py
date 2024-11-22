@@ -213,7 +213,7 @@ def inbox(request, user_id):
             comment.save()
 
         # add comment likes
-        comment_likes = likes["src"]
+        comment_likes = likes.get("src",[])
         for comment_like in comment_likes:
             like_author = comment_like["author"]
             published = comment_like["published"]

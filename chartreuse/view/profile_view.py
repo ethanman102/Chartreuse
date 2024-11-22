@@ -177,6 +177,8 @@ def profile_follow_request(request,requestee,requester):
                 "X-Original-Host": requester_user.host
             }
 
+            print("HEADERS", headers)
+
             try:
                 requests.post(url, headers=headers, json=data, auth=(username, password))
             except:

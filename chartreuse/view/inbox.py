@@ -6,7 +6,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
 from rest_framework import serializers
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.authentication import SessionAuthentication
 
 
 @extend_schema(
@@ -80,11 +82,9 @@ from rest_framework.decorators import action, api_view
 )
 @api_view(["POST"])
 @csrf_exempt
+@permission_classes([AllowAny])
+@authentication_classes([SessionAuthentication])
 def inbox(request, user_id):
-    decoded_user_id = unquote(user_id)
-
-    user = User.objects.get(pk=decoded_user_id)
-
     data = json.loads(request.body.decode('utf-8'))
 
     # check request headers
@@ -95,8 +95,6 @@ def inbox(request, user_id):
     authorization_response = checkIfRequestAuthenticated(request)
     if authorization_response.status_code != 200:
         return authorization_response
-    
-   
 
     if (data["type"] == "post"):
         title = data["title"]
@@ -105,8 +103,8 @@ def inbox(request, user_id):
         contentType = data["contentType"]
         content = data["content"]
         author = data["author"]
-        comments = data["comments"]
-        likes = data["likes"]
+        comments = data.get("comments",[])
+        likes = data.get("likes",[])
         published = data["published"]
         visibility = data["visibility"]
 
@@ -164,7 +162,7 @@ def inbox(request, user_id):
 
             # add like objects
             
-            post_likes = data['likes']
+            post_likes = data.get("likes",[])
             for post_like in post_likes['src']:
                 author_id = post_like["author"]['id']
 
@@ -197,7 +195,7 @@ def inbox(request, user_id):
         comment_id = data["id"]
         post = data["post"]
         published = data["published"]
-        likes = data["likes"]
+        likes = data.get("likes",[])
         # add this new comment if it does not exist, if it exists, then delete it
 
         comment_author_id = unquote(comment_author["id"])

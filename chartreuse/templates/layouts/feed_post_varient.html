@@ -1,24 +1,16 @@
-<div class="card mb-3 p-4">
-    <div class="d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center">
-            <a href="/chartreuse/authors/{{ post.user.url_id }}/" style="text-decoration: none; color:black">
-                <img src="{{ post.user.profileImage }}" class="rounded-circle me-3 post-image" width="50" height="50">
-            </a>
-            <a href="/chartreuse/authors/{{ post.user.url_id }}/" style="text-decoration: none; color:black">
-                <h5 class="card-title mb-0">{{ post.user.displayName }}</h5>
-            </a>
-        </div>        
+<div class="card mb-3 pt-4">
+    <div class="d-flex justify-content-between align-items-center px-4">
+        <a href="/chartreuse/authors/{{ post.user.url_id }}/" class="d-flex align-items-center" style="text-decoration: none; color:black">
+            <img src="{{ post.user.profileImage }}" class="rounded-circle me-3 post-image" width="50" height="50">
+            <h5 class="card-title mb-0">{{ post.user.displayName }}</h5>
+        </a>
         
         <meta name="csrf-token" content="{{ csrf_token }}">
-        <div class="d-flex align-items-center mb-3" style="gap: 2ch;">
-            <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ viewer_id }}">{{ post.likes_count }} likes</button>
-            <button class="btn follow-button" data-post-id="{{ post.url_id }}" data-user-id="{{ viewer_id }}"> {{ post.following_status }}</button>
-        </div>
+        <button class="btn follow-button" data-post-id="{{ post.url_id }}" data-user-id="{{ viewer_id }}"> {{ post.following_status }}</button>
     </div>
-    
-    <a href="{% url 'chartreuse:profile_view_post' owner_id post.url_id %}" class="card-link" style="text-decoration: none;">
-        <div class="post"> 
-            <p class="card-title mt-2" style="text-align: left;">{{ post.title }}</p>
+    <!-- Post content -->
+    <a href="{% url 'chartreuse:profile_view_post' owner_id post.url_id %}" class="card-link px-4" style="text-decoration: none;">
+        <p class="card-title mt-2" style="text-align: left;">{{ post.title }}</p>
             {% if post.contentType == "text/plain" %}
                 <p class="card-text mt-2" style="text-align: left;">{{ post.content }}</p>
             {% elif post.contentType == "text/commonmark" %}
@@ -28,8 +20,24 @@
                     <img src="{{ post.content }}" alt="Post Image" class="img-fluid mt-3" style="border: none; max-width: 20%;">
                 </div>
             {% endif %}
-            <p class="card-text mt-2" style="text-align: left;">{{ post.description }}</p>
-            <p class="text-muted" style="text-align: left;">Published on {{ post.published }}</p>
-        </div>  
+        <p class="card-text mt-2" style="text-align: left;">{{ post.description }}</p>
+        <p class="text-muted" style="text-align: left;">Published on {{ post.published }}</p>
     </a>
+    <!-- Like, Comment, and Share -->
+    <div class="row align-items-center rounded-bottom mx-1 pt-2">
+        <button class="btn col-4 border-0 p-2 like-button" 
+                data-post-id="{{ post.url_id }}" 
+                data-user-id="{{ viewer_id }}">
+            <i class="bi bi-hand-thumbs-up-fill"></i> {{ post.likes_count }} likes
+        </button>
+        <button onclick="window.location.href='{% url 'chartreuse:profile_view_post' owner_id post.url_id %}'" 
+                class="btn col-4 border-0 p-2 feed-comment-button">
+            <i class="bi bi-chat-left-fill"></i> Comment
+        </button>
+        <button id="copy-link" 
+                class="btn col-4 border-0 p-2 copy-button" 
+                data-url="{{ request.build_absolute_uri|default:'' }}{% url 'chartreuse:profile_view_post' owner_id post.url_id %}">
+            <i class="bi bi-link"></i> Copy Post Link
+        </button>
+    </div>
 </div>

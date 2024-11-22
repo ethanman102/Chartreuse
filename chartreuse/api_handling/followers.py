@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from ..models import User, FollowRequest, Follow
 from django.contrib.auth.decorators import login_required
 import json
+from rest_framework.authentication import SessionAuthentication
 from urllib.parse import unquote
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import serializers
@@ -36,7 +37,7 @@ class FollowersSerializer(serializers.Serializer):
 class FollowViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     serializer_class = FollowerSerializer
-    # authentication_classes = []
+    authentication_classes = [SessionAuthentication]
 
     @extend_schema(
         summary="Add a follower",

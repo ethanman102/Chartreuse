@@ -88,12 +88,7 @@ class DiscoverAuthorListView(ListView):
             'size':PAGE_SIZE
         }   
 
-        print("URL",url)
-
-        response = requests.get(url, params=params, auth=(username,password))
-        print(response.status_code)
-        print(response.content)
-        
+        response = requests.get(url, params=params, auth=(username,password))       
         
         if response.status_code != 200:
             return []

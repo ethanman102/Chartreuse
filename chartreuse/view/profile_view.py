@@ -169,15 +169,11 @@ def profile_follow_request(request,requestee,requester):
                 }
             }
             url = f"{requestee_user.host}authors/{quote(requestee_username,safe='')}/inbox"
-            print("URL", url)
-            print("DATA", data)
 
             headers = {
                 "Content-Type": "application/json; charset=utf-8",
                 "X-Original-Host": requester_user.host
             }
-
-            print("HEADERS", headers)
 
             try:
                 requests.post(url, headers=headers, json=data, auth=(username, password))

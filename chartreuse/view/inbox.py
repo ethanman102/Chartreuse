@@ -86,7 +86,6 @@ from rest_framework.authentication import SessionAuthentication
 @authentication_classes([SessionAuthentication])
 def inbox(request, user_id):
     data = json.loads(request.body.decode('utf-8'))
-    print("DATA", data)
 
     # check request headers
     authorization = request.headers.get('Authorization')

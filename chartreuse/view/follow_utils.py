@@ -107,7 +107,7 @@ def send_follow_request(request):
                         'profileImage': post_author.profileImage
                     }
                 }
-                print(url)
+
                 url = f"{post_author.host}authors/{quote(author_username,safe='')}/inbox/"
                 try:
                     requests.post(url, headers=headers, json=data, auth=auth)

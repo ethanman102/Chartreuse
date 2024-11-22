@@ -142,13 +142,16 @@ def profile_follow_request(request,requestee,requester):
             follow = Follow(follower=requester_user,followed=requestee_user) # create the new follow!
             follow.save()
 
+            requestee_username = unquote(requestee_user.url_id).split('/')[-1]
+            our_username = unquote(requester_user.url_id).split('/')[-1]
+
             data = {
                 'type': 'follow',
                 'summary':'actor wants to follow object',
                 'actor':
                 {
                     'type':'author',
-                    'id': requester_user.url_id,
+                    'id': our_username,
                     'host': requester_user.host,
                     'displayName': requester_user.displayName,
                     'page': f'{requester_user.host}/authors/{requester_user.url_id}/',
@@ -157,7 +160,7 @@ def profile_follow_request(request,requestee,requester):
                 },
                 'object':{
                     'type':'author',
-                    'id': requestee_user.url_id,
+                    'id': requestee_username,
                     'host': requestee_user.host,
                     'displayName': requester_user.displayName,
                     'page': f'{requestee_user.host}/authors/{requestee_user.url_id}/',
@@ -165,7 +168,9 @@ def profile_follow_request(request,requestee,requester):
                     'profileImage': requestee_user.profileImage
                 }
             }
-            url = f"{requestee_user.host}authors/{quote(requestee_user.url_id,safe='')}/inbox/"
+            url = f"{requestee_user.host}authors/{quote(requestee_username,safe='')}/inbox/"
+            print("URL", url)
+            print("DATA", data)
 
             headers = {
                 "Content-Type": "application/json; charset=utf-8"

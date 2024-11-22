@@ -6,7 +6,24 @@
         </a>
         
         <meta name="csrf-token" content="{{ csrf_token }}">
-        <button class="btn follow-button" data-post-id="{{ post.url_id }}" data-user-id="{{ viewer_id }}"> {{ post.following_status }}</button>
+        {% if post.following_status == "Follow" %}
+            <button class="btn follow-button" data-post-id="{{ post.url_id }}" data-user-id="{{ viewer_id }}">
+                <i class="bi bi-person-plus-fill"></i> {{ post.following_status }}
+            </button>
+        {% elif post.following_status == "Following" %}
+            <button class="btn follow-button" data-post-id="{{ post.url_id }}" data-user-id="{{ viewer_id }}">
+                <i class="bi bi-check2"></i> {{ post.following_status }}
+            </button>
+        {% elif post.following_status == "Pending" %}
+            <button class="btn follow-button" data-post-id="{{ post.url_id }}" data-user-id="{{ viewer_id }}">
+                <i class="bi bi-hourglass-split"></i> {{ post.following_status }}
+            </button>
+        {% else %}
+        <!-- The only case should be "Sign up to follow!" -->
+            <button class="btn follow-button" data-post-id="{{ post.url_id }}" data-user-id="{{ viewer_id }}">
+                {{ post.following_status }}
+            </button>
+        {% endif %}
     </div>
     <!-- Post content -->
     <a href="{% url 'chartreuse:profile_view_post' owner_id post.url_id %}" class="card-link px-4" style="text-decoration: none;">

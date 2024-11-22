@@ -191,7 +191,8 @@ document.querySelectorAll('.like-comment-button').forEach(button => {
 document.querySelectorAll('.copy-button').forEach(button => {
     button.addEventListener('click', function() {
         const link = this.getAttribute('data-url');
-        navigator.clipboard.writeText(window.location.host + link);
+        const fullUrl = window.location.protocol + '//' + window.location.host + link;
+        navigator.clipboard.writeText(fullUrl);
         alert('Post link copied to clipboard!');
     });
 })

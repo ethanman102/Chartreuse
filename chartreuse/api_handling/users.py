@@ -179,7 +179,7 @@ class UserViewSet(viewsets.ViewSet):
         
         # case where the user is on the current host
         user = get_object_or_404(User, pk=decoded_user_id)
-        page = user.host + "/authors/" + user.url_id
+        page = user.host + "authors/" + user.url_id
 
         username = user.url_id.split('/')[-1]
 

@@ -21,7 +21,7 @@
         <div class="text-center" style="border: solid; border-color: black;">
             <h1 class="mb-4">chartreuse.post</h1>
                 {% if post.repost %}
-                <div class="card mb-3 p-4 mx-4 my-3 p-3" style="border-radius: 10px; background-color: rgb(246, 255, 247);"">
+                <div class="card mb-3 p-4 mx-4 my-3 p-3" style="border-radius: 10px; background-color: rgb(246, 255, 247);">
                     <div class="d-flex mb-4">
                         <a href="/chartreuse/authors/{{ post.repost_user.url_id }}/" style="text-decoration: none; color:black">
                             <img src="{{ post.repost_user.profileImage }}" alt="{{ post.repost_user.displayName }} Avatar" class="rounded-circle me-3" width="50" height="50">

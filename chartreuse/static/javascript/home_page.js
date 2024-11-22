@@ -187,3 +187,11 @@ document.querySelectorAll('.like-comment-button').forEach(button => {
         .catch(error => console.error('Error:', error));
     });
 });
+
+document.querySelectorAll('.copy-button').forEach(button => {
+    button.addEventListener('click', function() {
+        const link = this.getAttribute('data-url');
+        navigator.clipboard.writeText(window.location.host + link);
+        alert('Post link copied to clipboard!');
+    });
+})

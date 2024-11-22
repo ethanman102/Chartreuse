@@ -213,24 +213,24 @@ def inbox(request, user_id):
             comment.save()
 
         # add comment likes
-        # comment_likes = likes["src"]
-        # for comment_like in comment_likes:
-        #     like_author = comment_like["author"]
-        #     published = comment_like["published"]
-        #     like_id = comment_like["id"]
-        #     post = comment_like["object"]
+        comment_likes = likes["src"]
+        for comment_like in comment_likes:
+            like_author = comment_like["author"]
+            published = comment_like["published"]
+            like_id = comment_like["id"]
+            post = comment_like["object"]
 
-        #     like_author_id = unquote(like_author["id"])
-        #     like_author = discover_author(like_author_id,like_author)
+            like_author_id = unquote(like_author["id"])
+            like_author = discover_author(like_author_id,like_author)
             
 
-        #     # check whether like already exists
-        #     like = Like.objects.filter(user=like_author, url_id=like_id, comment=comment).first()
+            # check whether like already exists
+            like = Like.objects.filter(user=like_author, url_id=like_id, comment=comment).first()
 
-        #     if like is None:
-        #         new_like = Like.objects.create(user=like_author, url_id=like_id, comment=comment)
-        #         new_like.dateCreated = published
-        #         new_like.save()
+            if like is None:
+                new_like = Like.objects.create(user=like_author, url_id=like_id, comment=comment)
+                new_like.dateCreated = published
+                new_like.save()
 
         return JsonResponse({"status": "Comment added successfully"})
         

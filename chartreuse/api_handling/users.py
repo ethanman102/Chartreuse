@@ -181,10 +181,12 @@ class UserViewSet(viewsets.ViewSet):
         user = get_object_or_404(User, pk=decoded_user_id)
         page = user.host + "/authors/" + user.url_id
 
+        username = user.url_id.split('/')[-1]
+
         # We only want to return the required fields
         return JsonResponse({
             "type": "author",
-            "id": user.user.id,
+            "id": username,
             "host": user.host,
             "displayName": user.displayName,
             "github": user.github,

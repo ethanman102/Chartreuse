@@ -104,8 +104,8 @@ def inbox(request, user_id):
         contentType = data["contentType"]
         content = data["content"]
         author = data["author"]
-        comments = data["comments"]
-        likes = data["likes"]
+        comments = data.get("comments",[])
+        likes = data.get("likes",[])
         published = data["published"]
         visibility = data["visibility"]
 
@@ -163,7 +163,7 @@ def inbox(request, user_id):
 
             # add like objects
             
-            post_likes = data['likes']
+            post_likes = data.get("likes",[])
             for post_like in post_likes['src']:
                 author_id = post_like["author"]['id']
 

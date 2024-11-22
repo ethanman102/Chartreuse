@@ -185,12 +185,7 @@ def profile_follow_request(request,requestee,requester):
         return redirect("chartreuse:profile",url_id=quote(requestee,safe=''))
     return HttpResponseNotAllowed(["POST"])
 
-
-
-
 class ProfileDetailView(DetailView):
-
-
     '''
     Purpose: Serve associated files related to the user specified in the URL pk
 
@@ -198,8 +193,7 @@ class ProfileDetailView(DetailView):
     By overriding get_context_data, and retreiving the nested user primary key in the url by overriding get_object)
 
     '''
-
-
+    
     model = User
     template_name = "profile.html"
     context_object_name= "profile"

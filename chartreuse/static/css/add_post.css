@@ -1,6 +1,8 @@
 html body {
     margin-left: 10%;
     margin-right: 2%;
+    margin-top: 5%;
+    
 }
 
 .hidden {
@@ -18,13 +20,32 @@ html body {
     
 }
 
-h1 {
-    color: chartreuse;
+#header-box{
     background-color: #00356b;
-    font-size: 4ch;
-
     border-bottom-style: solid;
     border-bottom-color: #1b1b1b;
+}
+
+h4 {
+    color: chartreuse;
+    font-size: 4ch;
+}
+
+#back {
+    margin-top: 1ch;
+    color: chartreuse;
+    float: right;
+    transition: box-shadow 0.3s ease;
+    background-color: transparent;
+    padding-inline: 1ch;
+    font-weight: 600;
+    right: 0;
+
+}
+
+#back:hover {
+    color: white;
+    background-color: chartreuse;
 }
 
 .create-button {

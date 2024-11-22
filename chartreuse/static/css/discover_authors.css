@@ -28,6 +28,22 @@ html body{
     font-weight: bold;
 }
 
+#back {
+    color: chartreuse;
+    float: right;
+    transition: box-shadow 0.3s ease;
+    background-color: transparent;
+    padding-inline: 1ch;
+    font-weight: 600;
+    right: 0;
+
+}
+
+#back:hover {
+    color: white;
+    background-color: chartreuse;
+}
+
 .author{
     border: 1px solid black;
     border-radius: 5px;
@@ -78,4 +94,9 @@ html body{
 #page_buttons button:hover{
     color: chartreuse;
     background-color: #00356b;
+}
+
+.author .img-fluid {
+    /* adding border around the icon */
+    border: black solid 2px;
 }

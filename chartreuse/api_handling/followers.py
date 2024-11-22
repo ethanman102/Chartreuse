@@ -34,9 +34,9 @@ class FollowersSerializer(serializers.Serializer):
 
 
 class FollowViewSet(viewsets.ViewSet):
-    permission_classes = [AllowAny]
     serializer_class = FollowerSerializer
-    # authentication_classes = []
+    permission_classes = [AllowAny]
+    authentication_classes = []
 
     @extend_schema(
         summary="Add a follower",

@@ -117,11 +117,12 @@ def send_post_to_inbox(post_url_id):
         for follower in followers:
             if follower.follower.host == host:
                 author_url_id = follower.follower.url_id
-                full_url = url + f'{quote(author_url_id, safe = "")}/inbox/'
+                full_url = url + f'{unquote(author_url_id).split('/')[-1]}/inbox'
                 
 
                 headers = {
-                    "Content-Type": "application/json; charset=utf-8"
+                    "Content-Type": "application/json; charset=utf-8",
+                    "X-Original-Host": post.user.host
                 }
 
                 # send to inbox
@@ -444,7 +445,6 @@ def send_like_to_inbox(like_url_id):
     
     if like_type == "POST":
         if like.user.host == like.post.user.host:
-            print('LIKE HEREEEE')
             nodes = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
             if not nodes.exists():
                 return []
@@ -465,8 +465,7 @@ def send_like_to_inbox(like_url_id):
             for follow in post_owner_follows:
                 if follow.follower.host in node_objs:
                     node_objs[follow.follower.host].append(follow.follower.url_id)
-            print("MADE IT HERE!!")
-                
+
         else:
             post_owner_host = like.post.user.host
             node_objs = {}
@@ -534,10 +533,11 @@ def send_like_to_inbox(like_url_id):
             
             url += 'authors/'
 
-            url += f'{quote(to_send_id, safe = "")}/inbox/'
+            url += f'{unquote(to_send_id).split('/')[-1]}/inbox'
 
             headers = {
-                "Content-Type": "application/json; charset=utf-8"
+                "Content-Type": "application/json; charset=utf-8",
+                "X-Original-Host": like.user.host
             }
             
         # send to inbox

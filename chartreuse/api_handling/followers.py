@@ -235,10 +235,17 @@ class FollowViewSet(viewsets.ViewSet):
         decoded_author_id = unquote(author_id)
 
         # Fetch the author based on the provided author_id
-        author = get_object_or_404(User, url_id=decoded_author_id)
+        authors = User.objects.all()
+
+        sent_author = None
+
+        for author in authors:
+            if author.user.id == decoded_author_id:
+                sent_author = author
+                break
         
         # Get all followers for the author
-        followers = Follow.objects.filter(followed=author)
+        followers = Follow.objects.filter(followed=sent_author)
 
         followers_list = []
 

@@ -17,7 +17,7 @@ urlpatterns = [
     re_path(r"comment/like/$",comment_utils.like_comment,name="like_comment"),
 
     # Inbox URL
-    re_path(r"api/authors/(?P<user_id>.+\w)/inbox", inbox.inbox, name="inbox"),
+    path("api/authors/<str:user_id>/inbox", inbox.inbox, name="inbox"),
 
     # Like URLs
     re_path(r"api/authors/(?P<user_id>.+\w)/like/$", likes.LikeViewSet.as_view({'post': 'add_like', 'delete': 'remove_like'}), name="like"),

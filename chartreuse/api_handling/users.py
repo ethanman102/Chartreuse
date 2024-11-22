@@ -401,7 +401,7 @@ class UserViewSet(viewsets.ViewSet):
         authUser.set_password(password)
         authUser.save()
 
-        id = host + "authors/" + str(authUser.id)
+        id = host + "api/authors/" + str(authUser.id)
 
         user = User.objects.create(
             url_id = id,

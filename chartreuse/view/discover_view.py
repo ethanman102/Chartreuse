@@ -88,7 +88,16 @@ class DiscoverAuthorListView(ListView):
             'size':PAGE_SIZE
         }   
 
-        response = requests.get(url, params=params, auth=(username,password))       
+        user = self.request.user
+        user_object = User.objects.get(user=user)
+
+        headers = {
+            "X-Original-Host": user_object.host
+        }
+
+        print(f"user: {user}")
+
+        response = requests.get(url, params=params, auth=(username,password), headers=headers)       
         
         if response.status_code != 200:
             return []

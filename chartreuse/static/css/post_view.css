@@ -1,9 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap');
-
 html body {
-    background-image: url("background.png");
     margin-left: 10%;
-    font-family: "Sometype Mono", monospace;
 }
 
 .hidden {
@@ -23,10 +19,6 @@ h1 {
     border-bottom-style: solid;
     border-bottom-color: #1b1b1b;
     padding-left: 3%;
-}
-
-p {
-    font-family: "Sometype Mono", monospace;
 }
  
 .like-button {
@@ -48,11 +40,6 @@ p {
     box-shadow: 6px 6px 0px #000000;
 }
 
-.follow-button {
-    color:#000000;
-    border-color: black;
-}
-
 .repost-button {
     color: chartreuse;
     background-color: #00356b;
@@ -70,11 +57,6 @@ p {
     color: chartreuse;
     background-color: #01254a;
     box-shadow: 6px 6px 0px #000000;
-}
-
-.follow-button:hover {
-    color: #ffffff;
-    background-color: #000000;
 }
 
 .pfp-button {
@@ -133,7 +115,6 @@ a {
 
 img {
     border: none;
-
     /* for making sure images are contained within the post container */
     max-width: 100%;
     height: auto;
@@ -167,3 +148,23 @@ img {
     background-color: #000000;
 }
   
+.follow-button {
+    background-color: #ffffff;
+    border-width: 1px;
+    border-color: #00356b;
+    border-radius: 0%;
+}
+
+.follow-button:hover {
+    color: chartreuse;
+    background-color: #00356b;
+    box-shadow: 6px 6px 0px #000000;
+
+    i {
+        color: chartreuse; 
+    }
+}
+
+i {
+    color:#00356b;
+}

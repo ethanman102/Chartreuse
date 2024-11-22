@@ -96,6 +96,7 @@ class FeedDetailView(DetailView):
                 is_followed = Follow.objects.filter(follower=follower.url_id, followed=current_user_model).exists()
 
                 if (is_following and is_followed):
+                    print("Both following each other!")
                     friends_posts = get_posts(follower.url_id, 'FRIENDS')
                     posts.extend(friends_posts)
 

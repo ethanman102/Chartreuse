@@ -17,8 +17,17 @@
     {% endblock %}
 
     <div class="container min-vh-100 d-flex justify-content-center align-items-center">
+        
         <div class="text-center">
-            <h1 class="mb-4">Create a post</h1>
+
+            <div class="container" id="header-box">
+                <div class="row">
+                    <div class="col-11">
+                        <h4 class="mb-4" style="text-align: left;">chartreuse.add-post</h4>
+                    </div>      
+                </div>
+            </div>
+
             <div class="mx-4 my-3 p-3">
                 <form method="POST" action="save/" enctype="multipart/form-data">
                     {% csrf_token %}
@@ -55,7 +64,7 @@
 
                     <article style="font-weight: 500; font-size: small;">
                         If you're making a commonmark post with an image post url from our site, please make sure the URL ends with "/image". <br>
-                        For more information about commonmark syntax, check out this <a href="https://commonmark.org/help/">link</a>.
+                        For more information about commonmark syntax, check out this <a href="https://commonmark.org/help/">link</a>. <br> 
                     </article>
     
                     <div id="textContent" class="my-3 px-3">

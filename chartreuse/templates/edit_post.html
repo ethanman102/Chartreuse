@@ -11,13 +11,27 @@
 {% endblock %}
 
 {% block content %}
-<body class="bg-light">
+<body>
     {% block sidenav %}
         {% include 'navbar.html' %}
     {% endblock %}
     <div class="container vh-100 d-flex justify-content-center align-items-center">
+        
         <div class="text-center">
-            <h1 class="mb-4">Edit post</h1>
+            <div class="container" id="header-box">
+                <div class="row">
+                    <div class="col-11">
+                        <h4 class="mb-4" style="text-align: left;">chartreuse.edit-post</h4>
+                    </div>
+        
+                    <div class="col-1">
+                        <!-- back button to get to discover node page  -->
+                        <button id="back" type="button" class="custom-button">X</button>
+                    </div>
+                    
+                </div>
+            </div>
+            
             <div class="mx-4 my-3 p-3">
                 <form method="POST" action="/chartreuse/homepage/post/{{ post.url_id }}/update/" enctype="multipart/form-data">
                     {% csrf_token %}
@@ -80,7 +94,7 @@
     
                 <article style="font-weight: 500; font-size: small;">
                     If you're making a commonmark post with an image post url from our site, please make sure the URL ends with "/image". <br> 
-                    For more information about commonmark syntax, check out this <a href="https://commonmark.org/help/">link</a>.
+                    For more information about commonmark syntax, check out this <a href="https://commonmark.org/help/">link</a>. <br> 
                 </article>
 
                 {% if post.contentType == "text/plain" %}
@@ -260,6 +274,12 @@
         document.querySelector('form').addEventListener('submit', function(e) {
             console.log('Form is being submitted');
         });
+
+        // Asked OpenAI, ChatGPT how I can make a button redirect to the last visited page (back button), "how to make a back button with JS", 2024-11-21.
+        document.getElementById('back').addEventListener('click', function() {
+            window.history.back();
+        });
+
 
     </script>    
 </body>

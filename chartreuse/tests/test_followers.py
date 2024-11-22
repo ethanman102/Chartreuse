@@ -5,7 +5,6 @@ from urllib.parse import quote
 from chartreuse.views import Host
 from chartreuse.models import User, Node
 import base64
-from django.contrib.auth.models import User as AuthUser
 
 class FollowersTestCases(TestCase):
     @classmethod

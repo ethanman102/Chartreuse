@@ -117,7 +117,7 @@ def send_post_to_inbox(post_url_id):
         for follower in followers:
             if follower.follower.host == host:
                 author_url_id = follower.follower.url_id
-                full_url = url + f'{quote(author_url_id, safe = "")}/inbox'
+                full_url = url + f'{quote(author_url_id, safe = "").split('/')[-1]}/inbox'
                 
 
                 headers = {
@@ -535,7 +535,7 @@ def send_like_to_inbox(like_url_id):
             
             url += 'authors/'
 
-            url += f'{quote(to_send_id, safe = "")}/inbox'
+            url += f'{quote(to_send_id, safe = "").split('/')[-1]}/inbox'
 
             headers = {
                 "Content-Type": "application/json; charset=utf-8",

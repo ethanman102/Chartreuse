@@ -196,7 +196,7 @@ def inbox(request, user_id):
         comment_id = data["id"]
         post = data["post"]
         published = data["published"]
-        likes = data["likes"]
+        likes = data.get("likes",[])
         # add this new comment if it does not exist, if it exists, then delete it
 
         comment_author_id = unquote(comment_author["id"])

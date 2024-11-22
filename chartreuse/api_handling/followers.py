@@ -86,7 +86,9 @@ class FollowViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse with the success message
         '''
-        checkIfRequestAuthenticated(request)
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response
 
         if not request.user.is_authenticated:
             return JsonResponse({"error": "User is not authenticated."}, status=401)
@@ -164,7 +166,9 @@ class FollowViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse with success message.
         '''
-        checkIfRequestAuthenticated(request)
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response
         if request.method == 'DELETE':
             decoded_author_id = unquote(author_id)
             decoded_foreign_author_id = unquote(foreign_author_id)

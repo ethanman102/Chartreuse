@@ -160,7 +160,7 @@ def profile_follow_request(request,requestee,requester):
                 },
                 'object':{
                     'type':'author',
-                    'id': requestee.url_id,
+                    'id': requestee_user.url_id,
                     'host': requestee_user.host,
                     'displayName': requester_user.displayName,
                     'page': f'{requestee_user.host}/authors/{requestee_user.url_id}/',

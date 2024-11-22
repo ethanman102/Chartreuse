@@ -47,17 +47,17 @@ class FollowersTestCases(TestCase):
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json', headers=cls.creds)
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json', headers=cls.creds)
 
-        # # log in as user 1
-        # cls.client.post(reverse('chartreuse:login_user'), {
-        #     'username': 'greg',
-        #     'password': 'ABC123!!!'
-        # }, headers=cls.creds)
-        cls.user_id = quote(f"{cls.test_user_1_data['host']}authors/1", safe='')
-        cls.follower_id = quote(f"{cls.test_user_2_data['host']}authors/2", safe='')
+        # log in as user 1
+        cls.client.post(reverse('chartreuse:login_user'), {
+            'username': 'greg',
+            'password': 'ABC123!!!'
+        })
+        cls.user_id = quote(f"{cls.test_user_1_data['host']}chartreuse/api/authors/1", safe='')
+        cls.follower_id = quote(f"{cls.test_user_2_data['host']}chartreuse/api/authors/2", safe='')
 
 
-        # # add user 2 as a follower of user 1 (user 1 accepted the request)
-        # cls.response = cls.client.post(reverse('chartreuse:add_follower', args=[cls.user_id, cls.follower_id]), headers=cls.creds)
+        # add user 2 as a follower of user 1 (user 1 accepted the request)
+        cls.response = cls.client.post(reverse('chartreuse:add_follower', args=[cls.user_id, cls.follower_id]), headers=cls.creds)
 
     def setUp(self):
         '''
@@ -67,8 +67,9 @@ class FollowersTestCases(TestCase):
             'username': 'greg',
             'password': 'ABC123!!!'
         })
+
+        # self.response = self.client.post(reverse('chartreuse:add_follower', args=[self.user_id, self.follower_id]), headers=self.creds)
         
-    
     @classmethod
     def tearDownClass(cls):
         return super().tearDownClass()
@@ -77,10 +78,7 @@ class FollowersTestCases(TestCase):
         '''
         This tests adding a follower.
         '''
-        
-
-        # add user 2 as a follower of user 1 (user 1 accepted the request)
-        self.response = self.client.post(reverse('chartreuse:add_follower', args=[self.user_id, self.follower_id]), headers=self.creds)
+        # self.response = self.client.post(reverse('chartreuse:add_follower', args=[self.user_id, self.follower_id]), headers=self.creds)
         # Check if follower added successfully
         
         self.assertEqual(self.response.status_code, 201)

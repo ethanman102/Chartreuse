@@ -183,7 +183,7 @@ def send_comment_to_inbox(comment_url_id):
             
             url += 'authors/'
 
-            url += f'{unquote(to_send_url_id).split('/')[-1]}/inbox'
+            url += f"{unquote(to_send_url_id).split('/')[-1]}/inbox"
 
             headers = {
                 "Content-Type": "application/json; charset=utf-8",

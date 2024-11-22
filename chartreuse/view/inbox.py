@@ -7,7 +7,8 @@ from django.http import JsonResponse
 from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
 from rest_framework import serializers
 from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated, SessionAuthentication
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.authentication import SessionAuthentication
 
 
 @extend_schema(

@@ -95,8 +95,6 @@ class DiscoverAuthorListView(ListView):
             "X-Original-Host": user_object.host
         }
 
-        print(f"user: {user}")
-
         response = requests.get(url, params=params, auth=(username,password), headers=headers)       
         
         if response.status_code != 200:

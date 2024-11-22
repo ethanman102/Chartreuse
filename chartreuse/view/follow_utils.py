@@ -88,7 +88,7 @@ def send_follow_request(request):
                 'actor':
                     {
                         'type':'author',
-                        'id': user.id,
+                        'id': user.user.id,
                         'host': user.host,
                         'displayName': user.displayName,
                         'page': f'{user.host}/authors/{user.url_id}/',
@@ -97,7 +97,7 @@ def send_follow_request(request):
                     },
                     'object':{
                         'type':'author',
-                        'id': post_author.id,
+                        'id': post_author.user.id,
                         'host': post_author.host,
                         'displayName': post_author.displayName,
                         'page': f'{post_author.host}/authors/{post_author.url_id}/',
@@ -106,7 +106,7 @@ def send_follow_request(request):
                     }
                 }
                 print(url)
-                url = f"{post_author.host}authors/{quote(post_author.id,safe='')}/inbox/"
+                url = f"{post_author.host}authors/{quote(post_author.user.id,safe='')}/inbox/"
                 try:
                     requests.post(url, headers=headers, json=data, auth=auth)
                     follow_request_status = "Sent Follow Request"

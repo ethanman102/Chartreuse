@@ -9,7 +9,7 @@ ENABLE_DISABLE_CHOICES = {'ENABLED':'ENABLED','DISABLED':'DISABLED'}
 
 class User(models.Model):
     user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, null=True, blank=True)
-    url_id = models.CharField(primary_key=True)
+    url_id = models.URLField(primary_key=True)
     displayName = models.CharField(max_length=100)
     host = models.URLField()
     github = models.URLField(null=True,blank=True)

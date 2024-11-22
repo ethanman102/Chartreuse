@@ -98,6 +98,7 @@ class FeedDetailView(DetailView):
                 if (is_following and is_followed):
                     print("Both following each other!")
                     friends_posts = get_posts(follower.url_id, 'FRIENDS')
+                    print(friends_posts)
                     posts.extend(friends_posts)
 
             for post in posts:

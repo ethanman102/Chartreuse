@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}chartreuse.likes_list{% endblock %}
+
+{% block extra_head %}
+<head>
+        <link rel="stylesheet" href="{% static 'css/follow_list.css' %}">
+
+</head>
+{% endblock %}
+
+{% block content %}
+    <body>
+
+        {% block sidenav %}
+            {% include 'navbar.html' %}
+        {% endblock %}
+
+        <div class="container">
+            <div class="container full-container" id="follow-list-header">
+                <h4>chartreuse.post-likes</h4>
+                <button id="back" type="button" url-id="{% url 'chartreuse:profile' user.url_id %}" class="custom-button">X</button>
+            </div>
+            <div class="container full-container" id="container-item-box">
+                {% if liked %}
+                    {% for author in liked %}
+                    
+                    <div class="follower-box">
+                        <img src="{{author.profileImage}}" class="img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
+                        <h5 style="display:inline">{{author.displayName}}</h5>
+                        <button class="view-profile-button btn btn-primary view-profile-button" url-id="{% url 'chartreuse:profile' author.url_id %}">View Profile</button>   
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <h1 class="text-center">there's nothing here... :(</h1>
+
+                {% endif %} 
+            </div>
+        </div>
+        
+        <script>
+            window.addEventListener('load', main); 
+    
+            function main() {
+                document.querySelectorAll(".view-profile-button").forEach((button)=>{
+                    button.addEventListener('click',function(event){
+                        let location = this.getAttribute("url-id");
+                        window.location.href = location;
+                    });
+                });
+
+                // Asked OpenAI, ChatGPT how I can make a button redirect to the last visited page (back button), "how to make a back button with JS", 2024-11-21.
+                document.getElementById('back').addEventListener('click', function() {
+                    window.history.back();
+                });
+
+            }
+    
+            
+        </script>
+
+    </body>
+{% endblock %}

@@ -240,9 +240,10 @@ class FollowViewSet(viewsets.ViewSet):
         sent_author = None
 
         for author in authors:
-            if author.user.id == decoded_author_id:
-                sent_author = author
-                break
+            if author.user:
+                if author.user.id == decoded_author_id:
+                    sent_author = author
+                    break
         
         # Get all followers for the author
         followers = Follow.objects.filter(followed=sent_author)

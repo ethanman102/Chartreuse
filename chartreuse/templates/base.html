@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 {% load static %}
-{% load tz %}
+{% load tz %}   
 <html> 
     <head>
         <title>{% block title %}{% endblock %}</title>
@@ -28,6 +28,7 @@
         
         <!-- Here is where our actual pages will be imported -->
 
+        <!-- Using Django's template tags to display the time in MST -->
         {% timezone 'America/Edmonton' %}
         {% block content %}{% endblock %}
         {% endtimezone %}

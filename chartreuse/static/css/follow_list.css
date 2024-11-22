@@ -1,3 +1,8 @@
+html body{
+    margin-left: 10%;
+    margin-right: 2%;
+}
+
 #follow-list-header{
     background-color: #00356b;
     margin-top: 30px;
@@ -31,7 +36,7 @@ h4{
 }
 
 
-img{
+.follower-box img{
     border: black solid 2px;
 }
 

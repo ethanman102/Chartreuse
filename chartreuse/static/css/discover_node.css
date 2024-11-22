@@ -5,6 +5,8 @@ html body{
 
 .card{
     margin: 0.5ch;
+    height: 80%;
+    overflow-y: scroll;
   
 }
 

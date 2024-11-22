@@ -6,7 +6,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
 from rest_framework import serializers
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 
 @extend_schema(
@@ -80,6 +81,7 @@ from rest_framework.decorators import action, api_view
 )
 @api_view(["POST"])
 @csrf_exempt
+@permission_classes([AllowAny])
 def inbox(request, user_id):
     decoded_user_id = unquote(user_id)
 

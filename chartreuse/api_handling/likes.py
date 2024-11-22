@@ -311,9 +311,9 @@ class LikeViewSet(viewsets.ViewSet):
         like = Like.objects.filter(url_id=decoded_like_id).first()
 
         if like.post is None:
-            object_id = like.comment.id
+            object_id = like.comment.url_id
         else:
-            object_id = like.post.id
+            object_id = like.post.url_id
 
         likeObject = {
             "type": "like",
@@ -327,7 +327,7 @@ class LikeViewSet(viewsets.ViewSet):
                 "profileImage": data["profileImage"]
             },
             "published": like.dateCreated,
-            "id": like.id,
+            "id": like.url_id,
             "object": object_id
         }
         return JsonResponse(likeObject, safe=False)

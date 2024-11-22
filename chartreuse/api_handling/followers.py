@@ -241,6 +241,7 @@ class FollowViewSet(viewsets.ViewSet):
 
         for author in authors:
             if author.user:
+                print("AUTHOR", author)
                 if author.user.id == decoded_author_id:
                     sent_author = author
                     break

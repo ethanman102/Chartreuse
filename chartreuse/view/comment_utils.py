@@ -186,7 +186,8 @@ def send_comment_to_inbox(comment_url_id):
             url += f'{quote(to_send_url_id, safe = "")}/inbox/'
 
             headers = {
-                "Content-Type": "application/json; charset=utf-8"
+                "Content-Type": "application/json; charset=utf-8",
+                "X-Original-Host": comment.user.host
             }
 
         # send to inbox

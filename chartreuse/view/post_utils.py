@@ -121,7 +121,8 @@ def send_post_to_inbox(post_url_id):
                 
 
                 headers = {
-                    "Content-Type": "application/json; charset=utf-8"
+                    "Content-Type": "application/json; charset=utf-8",
+                    "X-Original-Host": post.user.host
                 }
 
                 # send to inbox
@@ -537,7 +538,8 @@ def send_like_to_inbox(like_url_id):
             url += f'{quote(to_send_id, safe = "")}/inbox/'
 
             headers = {
-                "Content-Type": "application/json; charset=utf-8"
+                "Content-Type": "application/json; charset=utf-8",
+                "X-Original-Host": like.user.host
             }
             
         # send to inbox

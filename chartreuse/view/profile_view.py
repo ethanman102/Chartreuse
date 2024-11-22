@@ -168,7 +168,7 @@ def profile_follow_request(request,requestee,requester):
                     'profileImage': requestee_user.profileImage
                 }
             }
-            url = f"{requestee_user.host}authors/{quote(requestee_username,safe='')}/inbox/"
+            url = f"{requestee_user.host}authors/{quote(requestee_username,safe='')}/inbox"
             print("URL", url)
             print("DATA", data)
 

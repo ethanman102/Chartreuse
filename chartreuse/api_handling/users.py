@@ -184,7 +184,7 @@ class UserViewSet(viewsets.ViewSet):
         # We only want to return the required fields
         return JsonResponse({
             "type": "author",
-            "id": user.url_id,
+            "id": user.id,
             "host": user.host,
             "displayName": user.displayName,
             "github": user.github,

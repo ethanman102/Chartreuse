@@ -385,7 +385,7 @@ class PostViewSet(viewsets.ViewSet):
             postObject = {
                 "type": "post",
                 "title": post.title,
-                "id": post.url_id,
+                "id": post.id,
                 "description": post.description,
                 "contentType": post.contentType,
                 "content": post.content,

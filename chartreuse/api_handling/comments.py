@@ -472,8 +472,8 @@ class CommentViewSet(viewsets.ViewSet):
             "comment": comment.comment,
             "contentType": comment.contentType,
             "published": comment.dateCreated,
-            "id": comment.url_id,
-            "post": comment.post.url_id,
+            "id": comment.id,
+            "post": comment.post.id,
             "likes": {
                 "type":"likes",
                 "page": like_data["page"],

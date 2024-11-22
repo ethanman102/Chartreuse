@@ -173,12 +173,13 @@ def profile_follow_request(request,requestee,requester):
             print("DATA", data)
 
             headers = {
-                "Content-Type": "application/json; charset=utf-8"
+                "Content-Type": "application/json; charset=utf-8",
+                "X-Original-Host": requester_user.host
             }
 
             try:
                 requests.post(url, headers=headers, json=data, auth=(username, password))
-            except: 
+            except:
                 return redirect("chartreuse:profile",url_id=quote(requestee,safe=''))
             
         else:

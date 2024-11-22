@@ -77,7 +77,7 @@ class FollowersTestCases(TestCase):
         '''
         This tests adding a follower.
         '''
-        print(self.client.session['_auth_user_id'])
+        
 
         # add user 2 as a follower of user 1 (user 1 accepted the request)
         self.response = self.client.post(reverse('chartreuse:add_follower', args=[self.user_id, self.follower_id]), headers=self.creds)

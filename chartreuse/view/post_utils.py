@@ -27,7 +27,7 @@ def get_post_likes(post_id):
     Returns:
         JsonResponse containing the likes for a post.
     """
-    post = Post.object.filter(url_id=post_id).first()
+    post = Post.objects.filter(url_id=post_id).first()
 
     likes = Like.objects.filter(post=post)
 

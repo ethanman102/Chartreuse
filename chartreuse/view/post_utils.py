@@ -630,8 +630,9 @@ def get_image_post(pfp_url):
         author = User.objects.filter(url_id=f"{host}/authors/{author_serial}").first()
         pfp_post = Post.objects.filter(user=author, url_id=f"{host}/authors/{author_serial}/posts/{post_serial}").first()
 
-        if pfp_post and pfp_post.content and pfp_post.contentType in ['image/jpeg', 'image/png', 'image/webp', 'image/jpg']:
-            pfp_url = f"data:{pfp_post.contentType};charset=utf-8;base64, {pfp_post.content}"
+        if pfp_post and pfp_post.content and pfp_post.contentType in ['image/jpeg;base64', 'image/png;bas64', 'image/webp', 'image/jpg;base64']:
+            if not pfp_post.content.startswith('data:'):
+                pfp_url = f"data:{pfp_post.contentType};charset=utf-8;base64, {pfp_post.content}"
         else:
             pfp_url = f"{Host.host}/static/images/default_pfp_1.png"
         return pfp_url

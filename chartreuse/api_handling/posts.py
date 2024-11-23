@@ -145,6 +145,7 @@ class PostViewSet(viewsets.ViewSet):
         # Create and save the post
         post = Post.objects.create(user=author, title=post_title, description=post_description, contentType=contentType_description, content=content_description, visibility=post_type)
         post.save()
+        print(post.url_id,'FRIENDS POST URLID')
         post_utils.send_post_to_inbox(post.url_id)
 
         # get the author data

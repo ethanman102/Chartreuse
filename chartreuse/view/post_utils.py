@@ -364,7 +364,7 @@ def save_post(request):
             image_content = image_url.split('.')[-1]
             if image_content not in ['jpeg', 'png', 'jpg']:
                 image_content = 'png'
-            content_type = 'image/' + image_content
+            content_type = 'image/' + image_content +';base64'
             try:
                 with urlopen(image_url) as url:
                     f = url.read()

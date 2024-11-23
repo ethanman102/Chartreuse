@@ -108,7 +108,8 @@ img {
 }
 
 /*
-.like-button class is kept because we need it for JS
+although they have the same styling, classes for
+comment, like, and copy are separate because we need them for JS
 */
 
 .feed-comment-button, 

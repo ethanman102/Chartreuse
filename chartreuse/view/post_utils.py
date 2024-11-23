@@ -168,7 +168,7 @@ def update_post(request, post_id):
             post_content = content
 
         elif (content_type == 'commonmark') and content:
-            content_type = 'text/commonmark'    
+            content_type = 'text/mark'    
             post_content = content
 
         elif image:
@@ -349,7 +349,7 @@ def save_post(request):
             post_content = content
 
         elif content and (content_type == 'commonmark'):
-            content_type = 'text/commonmark'
+            content_type = 'text/markdown'
             post_content = content 
         
         elif image:
@@ -364,7 +364,7 @@ def save_post(request):
             image_content = image_url.split('.')[-1]
             if image_content not in ['jpeg', 'png', 'jpg']:
                 image_content = 'png'
-            content_type = 'image/' + image_content
+            content_type = 'image/' + image_content +';base64'
             try:
                 with urlopen(image_url) as url:
                     f = url.read()
@@ -668,7 +668,7 @@ def prepare_posts(posts):
             post.likes_count = Like.objects.filter(post=post).count()
                
                 
-        if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
+        if (post.contentType != "text/plain") and (post.contentType != "text/markdown"):
             post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
         post.url_id = quote(post.url_id,safe='')
             

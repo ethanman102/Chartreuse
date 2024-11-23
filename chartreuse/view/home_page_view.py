@@ -128,7 +128,7 @@ class FeedDetailView(DetailView):
                 post.likes_count = Like.objects.filter(post=post).count()
                 post.url_id = quote(post.url_id, safe='')
                 post.following_status = "Sign up to follow!"
-                if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
+                if (post.contentType != "text/plain") and (post.contentType != "text/markdown"):
                     post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
                 post.user.profileImage = get_image_post(post.user.profileImage)
             

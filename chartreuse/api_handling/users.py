@@ -75,10 +75,7 @@ class UserViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     # November 21, 2024. Asked CHATGPT agent why the user isn't staying logged in between tests. Chatgpt recommended checking the forced login to see if it works, and suggested using
     # sessionauthentication as seen here b/w sessions
-    
     authentication_classes = [SessionAuthentication]
-    
-    
 
     @extend_schema(
         summary="Get a list of users",
@@ -114,12 +111,7 @@ class UserViewSet(viewsets.ViewSet):
 
         Returns:
             JsonResponse containing the paginated list of users.
-        '''
-        auth_response = checkIfRequestAuthenticated(request)
-       
-        if auth_response.status_code == 401:
-            return auth_response
-
+        '''  
         page = request.query_params.get('page', 1)
         size = request.query_params.get('size', 50)
 

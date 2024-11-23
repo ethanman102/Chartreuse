@@ -58,7 +58,7 @@ def edit_post(request, post_id):
     # Check if the user is authenticated
     if request.user.is_authenticated:
         current_user = request.user
-        print(current_user)
+        print(current_user,'HELLLLO')
         current_user_model = get_object_or_404(User, user=current_user)
         
         # Check if the current user is the author of the post

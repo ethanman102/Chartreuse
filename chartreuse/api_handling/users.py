@@ -32,7 +32,6 @@ def create_user_url_id(request, id):
         host = request.get_host()
         scheme = request.scheme
         url = f"{scheme}://{host}/chartreuse/api/authors/{id}"
-        print(url)
         return url
     
 

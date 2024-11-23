@@ -8,8 +8,8 @@ from django.contrib.auth.decorators import login_required
 from .view import home_page_view, profile_utils, signup_view, login_view, landing_page_view, profile_view, follow_list_view, post_view, settings_view, post_utils, comment_utils, follow_utils,discover_view, inbox
 app_name = "chartreuse"
 urlpatterns = [
-    re_path(r"homepage/post/(?P<post_id>.+\w)/image$", images.retrieve_from_homepage, name='get_image_post'),
-    re_path(r"authors/(?P<author_id>.+)/post/(?P<post_id>.+\w)/image$", images.retrieve_from_profile, name='get_image_post_profile'),
+    re_path(r"homepage/post/(?P<post_id>https?.+\w)/image$", images.retrieve_from_homepage, name='get_image_post'),
+    re_path(r"authors/(?P<author_id>https?.+)/post/(?P<post_id>https?.+\w)/image$", images.retrieve_from_profile, name='get_image_post_profile'),
 
     # Post Comment URLs
     re_path(r"comment/$",comment_utils.add_comment,name="add_comment"),
@@ -114,18 +114,18 @@ urlpatterns = [
     re_path(r'homepage/post/(?P<post_id>https?.+\w)/edit/', post_utils.edit_post, name='edit-post'),
     re_path(r'homepage/post/(?P<post_id>https?.+\w)/delete/', post_utils.delete_post, name='delete-post'),
     re_path(r'homepage/post/(?P<post_id>https?.+\w)/update/', post_utils.update_post, name='update-post'),
-    re_path(r'homepage/post/(?P<post_id>.+\w)/', post_view.PostDetailView.as_view(), name='view-post'),
+    re_path(r'homepage/post/(?P<post_id>https?.+\w)/', post_view.PostDetailView.as_view(), name='view-post'),
 
     # Follow Request URLs
-    re_path(r"authors/(?P<url_id>.+)/post/(?P<post_id>.+\w)/$",post_view.PostDetailView.as_view(),name="profile_view_post"),
-    re_path(r"authors/accept/(?P<followed>.+)/(?P<follower>.+)/", profile_view.follow_accept,name="profile_follow_accept"),
-    re_path(r"authors/reject/(?P<followed>.+)/(?P<follower>.+)/", profile_view.follow_reject,name="profile_follow_reject"),
-    re_path(r"authors/unfollow/(?P<followed>.+)/(?P<follower>.+)/",profile_view.profile_unfollow,name="profile_unfollow"),
-    re_path(r"authors/followrequest/(?P<requestee>.+)/(?P<requester>.+)/",profile_view.profile_follow_request,name="profile_follow_request"),
-    re_path(r"authors/following/(?P<user_id>.+\w)/",follow_list_view.FollowListDetailView.as_view(),name="user_following_list"),
-    re_path(r"authors/followers/(?P<user_id>.+\w)/",follow_list_view.FollowListDetailView.as_view(),name="user_followers_list"),
-    re_path(r"authors/friends/(?P<user_id>.+\w)/",follow_list_view.FollowListDetailView.as_view(),name="user_friends_list"),
-    re_path(r"authors/(?P<url_id>.+)/", profile_view.ProfileDetailView.as_view(),name="profile"),
+    re_path(r"authors/(?P<url_id>https?.+)/post/(?P<post_id>https?.+\w)/$",post_view.PostDetailView.as_view(),name="profile_view_post"),
+    re_path(r"authors/accept/(?P<followed>https?.+)/(?P<follower>https?.+)/", profile_view.follow_accept,name="profile_follow_accept"),
+    re_path(r"authors/reject/(?P<followed>https?.+)/(?P<follower>https?.+)/", profile_view.follow_reject,name="profile_follow_reject"),
+    re_path(r"authors/unfollow/(?P<followed>https?.+)/(?P<follower>https?.+)/",profile_view.profile_unfollow,name="profile_unfollow"),
+    re_path(r"authors/followrequest/(?P<requestee>https?.+)/(?P<requester>https?.+)/",profile_view.profile_follow_request,name="profile_follow_request"),
+    re_path(r"authors/following/(?P<user_id>https?.+\w)/",follow_list_view.FollowListDetailView.as_view(),name="user_following_list"),
+    re_path(r"authors/followers/(?P<user_id>https?.+\w)/",follow_list_view.FollowListDetailView.as_view(),name="user_followers_list"),
+    re_path(r"authors/friends/(?P<user_id>https?.+\w)/",follow_list_view.FollowListDetailView.as_view(),name="user_friends_list"),
+    re_path(r"authors/(?P<url_id>https?.+)/", profile_view.ProfileDetailView.as_view(),name="profile"),
     re_path(r"authors/", profile_utils.view_profile ,name="redirect_profile"),
 ] 
 

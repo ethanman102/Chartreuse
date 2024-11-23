@@ -66,7 +66,8 @@ class PostDetailView(DetailView):
 
         
         if (post.contentType != "text/plain") and (post.contentType != "text/markdown"):
-            post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+            if not post.content.startswith('data:'):
+                post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
             post.has_image = True
 
         post_owner.profileImage = post_utils.get_image_post(post_owner.profileImage)

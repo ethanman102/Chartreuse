@@ -16,6 +16,7 @@ from .friends import FriendsViewSet
 from urllib.parse import unquote
 from ..views import checkIfRequestAuthenticated
 from rest_framework.permissions import AllowAny
+from id_functions import create_user_url_id
 
 class CommentSerializer(serializers.Serializer):
     type = serializers.CharField(default="comment")
@@ -536,7 +537,7 @@ class CommentViewSet(viewsets.ViewSet):
         size = request.GET.get('size', 10)
 
         # get the author of the comments
-        decoded_author_id = unquote(user_id)
+        decoded_author_id = create_user_url_id(request, user_id)
         comment_author = get_object_or_404(User, url_id=decoded_author_id)
 
         # Get all the comments authored by the given user

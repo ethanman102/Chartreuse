@@ -13,6 +13,7 @@ from .users import UserSerializer, UserViewSet
 from urllib.parse import unquote
 from ..views import checkIfRequestAuthenticated
 from rest_framework.permissions import AllowAny
+from id_functions import create_user_url_id
 
 class LikeSerializer(serializers.Serializer):
     type = serializers.CharField(default="like")
@@ -548,7 +549,7 @@ class LikeViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like objects.
         '''
-        decoded_user_id = unquote(user_id)
+        decoded_user_id = create_user_url_id(request, user_id)
         page = request.GET.get('page')
         size = request.GET.get('size')
 

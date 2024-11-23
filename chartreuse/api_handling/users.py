@@ -21,6 +21,7 @@ from .. import views
 from ..models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from id_functions import create_user_url_id
 
 class UserSerializer(serializers.ModelSerializer):
     type = serializers.CharField(default="author")
@@ -175,7 +176,7 @@ class UserViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the user.
         '''
-        decoded_user_id = unquote(pk)
+        decoded_user_id = create_user_url_id(request, pk)
         
         # case where the user is on the current host
         user = get_object_or_404(User, pk=decoded_user_id)

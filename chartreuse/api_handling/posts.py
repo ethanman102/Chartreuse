@@ -18,6 +18,7 @@ from urllib.parse import unquote
 from rest_framework.permissions import AllowAny
 from ..views import checkIfRequestAuthenticated
 from ..view import post_utils
+from id_functions import create_user_url_id
 
 
 class PostSerializer(serializers.Serializer):
@@ -648,7 +649,7 @@ class PostViewSet(viewsets.ViewSet):
             JsonResponse containing the post objects.
         """
         checkIfRequestAuthenticated(request)
-        decoded_author_id = unquote(user_id)
+        decoded_author_id = create_user_url_id(request, user_id)
         page = request.GET.get("page")
         size = request.GET.get("size")
 

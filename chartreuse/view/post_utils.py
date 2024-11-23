@@ -93,6 +93,7 @@ def delete_post(request, post_id):
 
 def send_post_to_inbox(post_url_id):
     post = Post.objects.get(url_id=post_url_id)
+    print(post.url_id,'HERE IS URLID    Yass')
     # send this to the inbox of other nodes
     nodes = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
     

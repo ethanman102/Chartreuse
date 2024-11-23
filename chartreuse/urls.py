@@ -12,7 +12,7 @@ urlpatterns = [
     re_path(r'homepage/post/(?P<post_id>https?.+\w)/delete/', post_utils.delete_post, name='delete-post'),
     re_path(r'homepage/post/(?P<post_id>https?.+\w)/update/', post_utils.update_post, name='update-post'),
     re_path(r'homepage/post/(?P<post_id>https?.+\w)/', post_view.PostDetailView.as_view(), name='view-post'),
-    re_path(r"homepage/post/(?P<post_id>https?.+\w)/image$", images.retrieve_from_homepage, name='get_image_post'),
+    re_path(r"api/posts/(?P<post_id>https?.+\w)/image$", images.retrieve_from_homepage, name='get_image_post'),
     re_path(r"api/authors/(?P<author_id>https?.+)/post/(?P<post_id>https?.+\w)/image$", images.retrieve_from_profile, name='get_image_post_profile'),
 
     # Post Comment URLs

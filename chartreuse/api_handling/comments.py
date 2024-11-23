@@ -457,7 +457,7 @@ class CommentViewSet(viewsets.ViewSet):
             user = get_object_or_404(User, url_id=decoded_author_id)
 
             decoded_post_id = unquote(post_id)
-            post = get_object_or_404(Post, url_id=decoded_post_id, user=user)
+            post = Post.objects.filter(url_id=decoded_post_id, user=user).first()
 
             comment = get_object_or_404(Comment, url_id=decoded_comment_id, post=post)
 

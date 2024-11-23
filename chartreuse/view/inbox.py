@@ -125,7 +125,7 @@ def inbox(request, user_id):
         visibility = data["visibility"]
 
         # check whether we need to add this post or update it or delete it
-        post = Post.objects.filter(url_id=post_id, description=description, contentType=contentType, content=content, user=author, published=published).first()
+        post = Post.objects.filter(title=title, description=description, content=content).first()
 
         # get author object
         author_id = unquote(author["id"])
@@ -221,7 +221,7 @@ def inbox(request, user_id):
         new_post = Post.objects.get(url_id=post)
 
         # check whether comment already exists
-        comment = Comment.objects.filter(url_id=comment_id).first()
+        comment = Comment.objects.filter(comment=comment_text, user=comment_author, post=new_post).first()
 
         if comment is None:
             comment = Comment.objects.create(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post)

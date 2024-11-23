@@ -159,9 +159,6 @@ def send_comment_to_inbox(comment_url_id):
         if node_queryset.exists():
             node_objs[node_queryset[0].host] = [comment.post.user.url_id]
 
-        
-
-
     if len(node_objs) == 0:
         return []
     

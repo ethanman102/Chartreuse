@@ -83,10 +83,10 @@
         {% endif %}
             <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">{{ post.likes_count }} likes</button>
 
-            <a> 
+            <a href="/chartreuse/authors/{{ user_details.url_id }}/post/{{ post.url_id }}/liked-users/"> 
                 <!-- This button will redirect the user to the page with the list of authors who liked the post -->
                 <!-- added href for the redirect -->
-                <button class="btn likes-list-button" href="/chartreuse/authors/{{ user_details.url_id }}/post/{{ post.url_id }}/liked-users/" data-post-id="{{post.url_id}}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">See Likes</button>
+                <button class="btn likes-list-button" data-post-id="{{post.url_id}}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">See Likes</button>
             </a>
             
         {% if logged_in and not post.repost and post.visibility == "PUBLIC" %}

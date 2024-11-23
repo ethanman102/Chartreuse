@@ -671,7 +671,8 @@ def prepare_posts(posts):
                
                 
         if (post.contentType != "text/plain") and (post.contentType != "text/markdown"):
-            post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+            if not post.content.startswith('data:'):
+                post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
         post.url_id = quote(post.url_id,safe='')
             
         prepared.append(post)

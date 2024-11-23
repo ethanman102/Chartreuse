@@ -8,7 +8,6 @@ from django.contrib.auth.decorators import login_required
 from .view import home_page_view, profile_utils, signup_view, login_view, landing_page_view, profile_view, follow_list_view, post_view, settings_view, post_utils, comment_utils, follow_utils,discover_view, inbox
 app_name = "chartreuse"
 urlpatterns = [
-    re_path(r"api/authors/(?P<pk>.*\w)/$", users.UserViewSet.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'}), name="user-detail"),
     path('add-post/', post_utils.add_post, name='add_post'),
     path('add-post/save/', post_utils.save_post, name='save_post'),
 
@@ -20,6 +19,7 @@ urlpatterns = [
     re_path(r'homepage/post/(?P<post_id>https?.+\w)/$', post_view.PostDetailView.as_view(), name='view-post'),
     re_path(r"homepage/post/(?P<post_id>https?.+\w)/image$", images.retrieve_from_homepage, name='get_image_post'),
     re_path(r"authors/(?P<author_id>https?.+)/post/(?P<post_id>https?.+\w)/image$", images.retrieve_from_profile, name='get_image_post_profile'),
+    re_path(r"api/authors/(?P<pk>.*\w)/$", users.UserViewSet.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'}), name="user-detail"),
 
     # Post Comment URLs
     re_path(r"comment/$",comment_utils.add_comment,name="add_comment"),

@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from urllib.parse import quote
-from ..models import User, Node
+from ..models import User, Node, Comment, Post
 from chartreuse.views import Host
 import base64
 
@@ -87,6 +87,8 @@ class CommentTestCases(TestCase):
             'comment': 'Nice post!',
             'contentType': 'text/plain'
         }, headers=self.creds)
+
+        print(Comment.objects.all())
 
         # Successfully created comment
         self.assertEqual(comment_response.status_code, 201)

@@ -131,7 +131,7 @@ class CommentViewSet(viewsets.ViewSet):
         content_type = request.POST.get('contentType', 'text/markdown')
 
         # User get_or_creat to simplify checking if the user already commented on the post
-        comment = Comment(
+        comment = Comment.objects.create(
             user=user_commenting,
             post=post,
             comment=comment_text,

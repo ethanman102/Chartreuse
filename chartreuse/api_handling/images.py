@@ -153,7 +153,7 @@ def retrieve_from_profile(request, author_id, post_id):
     if post and post.content and post.contentType in ['image/jpeg;base64', 'image/png;base64']:
         # Decode base64 image data from the post content
         image_data = post.content.split(',',1)[1]
-        image_data = base64.b64decode(post.content)
+        image_data = base64.b64decode(image_data)
 
         # Define the path for saving the image
         images_dir = Path("chartreuse/static/images")

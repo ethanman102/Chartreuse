@@ -358,7 +358,7 @@ class ProfileDetailView(DetailView):
 
             auth = (username,password)
 
-            url = f"{quote(user.url_id,safe='')}/followers/{quote(current_user_model.url_id,safe='')}"
+            url = f"{user.url_id}/followers/{quote(current_user_model.url_id,safe='')}"
 
             try:
                 response = requests.get(url,auth=auth)

@@ -74,7 +74,7 @@ class FeedDetailView(DetailView):
                     # make a request to see if they are following remotely.
                     node = node_queryset[0]
                     auth = (node.username,node.password)
-                    url = f"{follower.host}authors/{quote(follower.url_id,safe='')}/followers/{quote(current_user_model.url_id,safe='')}"
+                    url = f"{quote(follower.url_id,safe='')}/followers/{quote(current_user_model.url_id,safe='')}"
 
                     try:
                         response = requests.get(url,auth=auth)

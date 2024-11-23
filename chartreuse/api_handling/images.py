@@ -150,7 +150,7 @@ def retrieve_from_profile(request, author_id, post_id):
     decoded_post_id = unquote(post_id)
     post = models.Post.objects.filter(url_id=decoded_post_id).first()
 
-    if post and post.content and post.contentType in ['image/jpeg', 'image/png']:
+    if post and post.content and post.contentType in ['image/jpeg;base64', 'image/png;base64']:
         # Decode base64 image data from the post content
         image_data = base64.b64decode(post.content)
 

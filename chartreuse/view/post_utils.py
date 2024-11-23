@@ -168,7 +168,7 @@ def update_post(request, post_id):
             post_content = content
 
         elif (content_type == 'commonmark') and content:
-            content_type = 'text/mark'    
+            content_type = 'text/markdown'    
             post_content = content
 
         elif image:

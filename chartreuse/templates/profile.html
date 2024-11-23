@@ -46,44 +46,49 @@
                         </div>
                     </div>
                     <div class="row mt-4">
-                    {% if profile.github %}
-                        <div class="col-6">
-                            <h3><a href="{{ profile.github }}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" id="profile-github">{{ profile.displayName }}'s Github</a></h3>
-                        </div>
-                    {% endif %}
-                    {% if not owner and viewer_id %}
-                        <div class="col-6 ms-auto">
-                            {% if is_following == False and sent_request == False %}
-                            {% url 'chartreuse:profile_follow_request' owner_id viewer_id as follow_request_url %}
-                            <form action="{{follow_request_url}}" method="POST" class="follow_request_form">
-                                {% csrf_token %}
-                                <button class="btn btn-outline-primary btn-lg w-100 follow" type="submit">Follow</button>
-                                {% if remote %}
-                                <input type="hidden" id="remote-follow" name="remote-follow" value="remote">
-                                {% endif %}
-                            </form>
-                            {% elif sent_request == True %}
-                            <button class="btn btn-secondary btn-lg w-100" id="requested" type="button" disabled>Requested</button>
-                            {% else %}
-                            {% url 'chartreuse:profile_unfollow' owner_id viewer_id as unfollow_url %}
-                            <form action="{{unfollow_url}}" method="POST" class="unfollow_form">
-                                {% csrf_token %}
-                                <button class="btn btn-primary btn-lg w-100 follow" type="submit">{{follow_relationship}}</button>
-                            </form>
-                            {% endif %}
-                        </div>
-                    {% endif %}
-
-
-                    {% if owner %}
-                        <div class="col-6 ms-auto">
-                            <form class="follow-forms" method="GET" action="{% url 'chartreuse:user_friends_list' owner_id %}">
-                                <button type="submit" class="btn btn-primary w-100 follow">
-                                    View Friends!
+                        <!-- The Github button -->
+                        {% if profile.github %}
+                            <div class="col-6">
+                                <button id="profile-github"
+                                        class="btn"
+                                        onclick="location.href='{{ profile.github }}'">
+                                    <i class="bi bi-github"></i> Github Profile
                                 </button>
-                            </form>
-                        </div>
-                    {% endif %}
+                            </div>
+                        {% endif %}
+                        <!-- The Follow/Requested/Followed/Friend button -->
+                        {% if not owner and viewer_id %}
+                            <div class="col-6 ms-auto">
+                                {% if is_following == False and sent_request == False %}
+                                    {% url 'chartreuse:profile_follow_request' owner_id viewer_id as follow_request_url %}
+                                    <form action="{{follow_request_url}}" method="POST" class="follow_request_form">
+                                        {% csrf_token %}
+                                        <button class="btn btn-outline-primary btn-lg w-100 follow" type="submit">Follow</button>
+                                        {% if remote %}
+                                            <input type="hidden" id="remote-follow" name="remote-follow" value="remote">
+                                        {% endif %}
+                                    </form>
+                                {% elif sent_request == True %}
+                                    <button class="btn btn-secondary btn-lg w-100" id="requested" type="button" disabled>Requested</button>
+                                {% else %}
+                                    {% url 'chartreuse:profile_unfollow' owner_id viewer_id as unfollow_url %}
+                                    <form action="{{unfollow_url}}" method="POST" class="unfollow_form">
+                                        {% csrf_token %}
+                                        <button class="btn btn-primary btn-lg w-100 follow" type="submit">{{follow_relationship}}</button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        {% if owner %}
+                            <div class="col-6 ms-auto">
+                                <form class="follow-forms" method="GET" action="{% url 'chartreuse:user_friends_list' owner_id %}">
+                                    <button type="submit" class="btn btn-primary w-100 follow">
+                                        View Friends!
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -97,16 +102,39 @@
                 <div class="col-12" id="nav-cols">
                     <nav>
                         <div class="nav nav-tabs nav-justified" id="nav-tab" role="tablist">
-                        <button class="nav-link active" id="nav-posts-tab" data-bs-toggle="tab" data-bs-target="#nav-posts" type="button" role="tab" aria-controls="nav-posts" aria-selected="true">Posts</button>
-                        <button class="nav-link" id="nav-statistics-tab" data-bs-toggle="tab" data-bs-target="#nav-statistics" type="button" role="tab" aria-controls="nav-statistics" aria-selected="false">Statistics</button>
-                        {% if owner %}
-                        <button class="nav-link" id="nav-requests-tab" data-bs-toggle="tab" data-bs-target="#nav-requests" type="button" role="tab" aria-controls="nav-requests" aria-selected="false">Requests
-                            {% if requests %}
-                            <span class="badge bg-danger"> </span>
+                            <button class="nav-link active" 
+                                    id="nav-posts-tab" 
+                                    data-bs-toggle="tab" 
+                                    data-bs-target="#nav-posts" 
+                                    type="button" 
+                                    role="tab" 
+                                    aria-controls="nav-posts" 
+                                    aria-selected="true">
+                                        Posts
+                            </button>
+                            <button class="nav-link" 
+                                    id="nav-statistics-tab" 
+                                    data-bs-toggle="tab" 
+                                    data-bs-target="#nav-statistics" 
+                                    type="button" role="tab" 
+                                    aria-controls="nav-statistics" 
+                                    aria-selected="false">
+                                        Statistics
+                            </button>
+                            {% if owner %}
+                                <button class="nav-link" 
+                                        id="nav-requests-tab" 
+                                        data-bs-toggle="tab" 
+                                        data-bs-target="#nav-requests" 
+                                        type="button" role="tab" 
+                                        aria-controls="nav-requests" 
+                                        aria-selected="false">
+                                            Requests
+                                        {% if requests %}
+                                            <span class="badge bg-danger"> </span>
+                                        {% endif %}
+                                </button>
                             {% endif %}
-                        </button>
-                        {% endif %}
-
                         </div>
                     </nav>
                 </div>
@@ -115,43 +143,42 @@
               <div class="tab-content" id="nav-tabContent">
                 <!-- Check if any posts have been made by the user. Otherwise prompt a nothing message. NTS: Only display posts related to the posts visibility -->
                 <div class="tab-pane fade show active" id="nav-posts" role="tabpanel" aria-labelledby="nav-posts-tab" tabindex="0">
-
                     {% if posts %}
-                    <!-- Loop through all posts of the posting list visible to the user. -->
-                    <!-- Code from home_page.html which was provided to Ethan Keys but Julia Dantas. Allows for consistent post -->
-
- 
-
-                    {% for post in posts %}
-                        {% if post.repost %}
-                        <div class="card mb-3 p-4" style="background-color: rgb(246, 255, 247);">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center">
-                                    <img src="{{ post.repost_user.profileImage }}"  class="rounded-circle me-3 post-image" width="50" height="50">
-                                    <h5 class="card-title">{{ post.repost_user.displayName }}</h5>
+                        <!-- Loop through all posts of the posting list visible to the user. -->
+                        <!-- Code from home_page.html which was provided to Ethan Keys but Julia Dantas. Allows for consistent post -->
+                        {% for post in posts %}
+                            {% if post.repost %}
+                                <div class="card mb-3 p-4" style="background-color: rgb(246, 255, 247);">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ post.repost_user.profileImage }}"  class="rounded-circle me-3 post-image" width="50" height="50">
+                                            <h5 class="card-title">{{ post.repost_user.displayName }}</h5>
+                                        </div>
+                                        <!-- View Repost button -->
+                                        <div class="d-flex align-items-center mb-3" style="gap: 2ch;">
+                                            <button class="btn view-repost-button" 
+                                                    onclick="location.href = '{% url 'chartreuse:profile_view_post'  owner_id post.repost_url %}'" 
+                                                    id="view-repost-button">
+                                                        View Repost <i class="bi bi-box-arrow-up-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <h3 class="card-title mt-2" style="text-align: left;">{{ post.repost_user.displayName }} reposted a post:</h3>
+                                    {% if post.visibility != 'PUBLIC' %}
+                                        <div class = "card mb-3 p-4">
+                                            <h1>Looks like the original post is no longer public :(</h1>
+                                        </div>
+                                    {% else %}
+                                        {% show_feed_post post owner_id viewer_id%}
+                                    {% endif %}
+                                    <p class="text-muted" style="text-align: left;">Reposted on {{ post.repost_time }}</p>
                                 </div>
-                                <div class="d-flex align-items-center mb-3" style="gap: 2ch;">
-                                    <button class="btn view-repost-button" onclick="location.href = '{% url 'chartreuse:profile_view_post'  owner_id post.repost_url %}'"  id="view-repost-button">View Repost</button>
-                                </div>
-                            </div>
-                            <h3 class="card-title mt-2" style="text-align: left;">{{ post.repost_user.displayName }} reposted a post:</h3>
-                            {% if post.visibility != 'PUBLIC' %}
-                            <div class = "card mb-3 p-4">
-                                <h1>Looks like the original post is no longer public :(</h1>
-                            </div>
-                            {% else %}
-                                {% show_feed_post post owner_id viewer_id%}
+                                {% else %}
+                                    {% show_feed_post post owner_id viewer_id%}
                             {% endif %}
-                            <p class="text-muted" style="text-align: left;">Reposted on {{ post.repost_time }}</p>
-                        </div>
-                        {% else %}
-                            {% show_feed_post post owner_id viewer_id%}
-                        {% endif %}
-                    {% endfor %}
-
-
+                        {% endfor %}
                     {% else %}
-                    <h1 class="text-center">there's nothing here... :(</h1>
+                        <h1 class="text-center">there's nothing here... :(</h1>
                     {% endif %}
                 </div>
 
@@ -159,36 +186,33 @@
                     <h2>This is Where some profile statistics for OUR NODE will be shown</h2>
                 </div>
                 {% if owner %}
-                <div class="tab-pane fade" id="nav-requests" role="tabpanel" aria-labelledby="nav-requests-tab" tabindex="0">
-                    <!-- Loop through all follow requests using displaying a fixed number amount per page. -->
-                    {% if requests %}
-                    {% for follow_request in requests %}
-
-                    {% url 'chartreuse:profile_follow_accept' follow_request.requestee.url_id follow_request.requester.url_id as accept_url %}
-                    {% url 'chartreuse:profile_follow_reject' follow_request.requestee.url_id follow_request.requester.url_id as reject_url %}
-                    <div class="follow-request">
-                        <img src="{{follow_request.requester.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
-                        <h5 style="display: inline;">{{follow_request.requester.displayName}} wants to follow you...</h5>
-                        <div id="decision-forms">
-                            <!-- Accept follow request form -->
-                            <form action="{{accept_url}}" method="POST" class="accept_form">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-primary" id="accept">Accept</button>
-                            </form>
-                            <!-- Reject follow request form-->
-                            <form action="{{reject_url}}" method="POST" class="reject_form">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-primary" id="delete">Reject</button>
-                            </form>
-                        </div>
+                    <div class="tab-pane fade" id="nav-requests" role="tabpanel" aria-labelledby="nav-requests-tab" tabindex="0">
+                        <!-- Loop through all follow requests using displaying a fixed number amount per page. -->
+                        {% if requests %}
+                            {% for follow_request in requests %}
+                                {% url 'chartreuse:profile_follow_accept' follow_request.requestee.url_id follow_request.requester.url_id as accept_url %}
+                                {% url 'chartreuse:profile_follow_reject' follow_request.requestee.url_id follow_request.requester.url_id as reject_url %}
+                                <div class="follow-request">
+                                    <img src="{{follow_request.requester.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
+                                    <h5 style="display: inline;">{{follow_request.requester.displayName}} wants to follow you...</h5>
+                                    <div id="decision-forms">
+                                        <!-- Accept follow request form -->
+                                        <form action="{{accept_url}}" method="POST" class="accept_form">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-primary" id="accept">Accept</button>
+                                        </form>
+                                        <!-- Reject follow request form-->
+                                        <form action="{{reject_url}}" method="POST" class="reject_form">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-primary" id="delete">Reject</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <h1 class="text-center">there's nothing here...:(</h1>
+                        {% endif %}
                     </div>
-                    {% endfor %}
-
-
-                    {% else %}
-                    <h1 class="text-center">there's nothing here...:(</h1>
-                    {% endif %}
-                </div>
                 {% endif %}
               </div>
         </div> 

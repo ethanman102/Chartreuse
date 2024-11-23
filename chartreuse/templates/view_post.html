@@ -21,31 +21,33 @@
         <div class="text-center" style="border: solid; border-color: black;">
             <h1 class="mb-4">chartreuse.post</h1>
                 {% if post.repost %}
-                <div class="card mb-3 p-4 mx-4 my-3 p-3" style="border-radius: 10px; background-color: rgb(246, 255, 247);"">
-                    <div class="d-flex mb-4">
-                        <a href="/chartreuse/authors/{{ post.repost_user.url_id }}/" style="text-decoration: none; color:black">
-                            <img src="{{ post.repost_user.profileImage }}" alt="{{ post.repost_user.displayName }} Avatar" class="rounded-circle me-3" width="50" height="50">
-                        </a>
-                        <div class="d-flex justify-content-between align-items-center w-100">
+                    <div class="card mb-3 p-4 mx-4 my-3 p-3" style="border-radius: 10px; background-color: rgb(246, 255, 247);">
+                        <div class="d-flex mb-4">
                             <a href="/chartreuse/authors/{{ post.repost_user.url_id }}/" style="text-decoration: none; color:black">
-                                <div>
-                                    <h5 class="">{{ post.repost_user.displayName }}</h5>
-                                </div>
+                                <img src="{{ post.repost_user.profileImage }}" 
+                                    alt="{{ post.repost_user.displayName }} Avatar" 
+                                    class="rounded-circle me-3" width="50" height="50">
                             </a>
-                            {% if repost_author %}
-                                <div class="d-flex">
-                                    <a href="/chartreuse/homepage/post/{{ post.repost_url }}/delete/" class="btn btn-link p-0" title="Delete Post">
-                                        <img src="{% static 'css/icons/delete-button.svg' %}" alt="Delete" width="30" height="30">
-                                    </a>
-                                </div>
-                            {% endif %}
+                            <div class="d-flex justify-content-between align-items-center w-100">
+                                <a href="/chartreuse/authors/{{ post.repost_user.url_id }}/" style="text-decoration: none; color:black">
+                                    <div>
+                                        <h5 class="">{{ post.repost_user.displayName }}</h5>
+                                    </div>
+                                </a>
+                                {% if repost_author %}
+                                    <div class="d-flex">
+                                        <a href="/chartreuse/homepage/post/{{ post.repost_url }}/delete/" class="btn btn-link p-0" title="Delete Post">
+                                            <img src="{% static 'css/icons/delete-button.svg' %}" alt="Delete" width="30" height="30">
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
                         </div>
-                    </div>
-                    <h4 class="card-title mt-2" style="text-align: left;">{{ post.repost_user.displayName }} reposted a post:</h4>
+                        <h4 class="card-title mt-2" style="text-align: left;">{{ post.repost_user.displayName }} reposted a post:</h4>
                     {% if post.visibility != 'PUBLIC' %}
-                    <div class = "card mb-3 p-4">
-                        <h2>Looks like the original post is no longer public :(</h2>
-                    </div>
+                        <div class = "card mb-3 p-4">
+                            <h2>Looks like the original post is no longer public :(</h2>
+                        </div>
                     {% else %}
                         {% show_singular_post %}
                     {% endif %}

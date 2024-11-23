@@ -168,7 +168,7 @@ def update_post(request, post_id):
             post_content = content
 
         elif (content_type == 'commonmark') and content:
-            content_type = 'text/commonmark'    
+            content_type = 'text/mark'    
             post_content = content
 
         elif image:
@@ -349,7 +349,7 @@ def save_post(request):
             post_content = content
 
         elif content and (content_type == 'commonmark'):
-            content_type = 'text/commonmark'
+            content_type = 'text/markdown'
             post_content = content 
         
         elif image:
@@ -668,7 +668,7 @@ def prepare_posts(posts):
             post.likes_count = Like.objects.filter(post=post).count()
                
                 
-        if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
+        if (post.contentType != "text/plain") and (post.contentType != "text/markdown"):
             post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
         post.url_id = quote(post.url_id,safe='')
             

@@ -112,6 +112,7 @@ def send_post_to_inbox(post_url_id):
         post_json_url = f"{base_url}{quote(post.user.url_id, safe='')}/posts/{quote(post.url_id, safe='')}/"
         post_response = requests.get(post_json_url)
         post_json = post_response.json()
+        print(post_json,'ETHANS POST JSON FRIENDS')
 
 
         followers = Follow.objects.filter(followed = post.user)

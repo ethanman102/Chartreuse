@@ -627,7 +627,8 @@ def get_image_post(pfp_url):
         host = match.group("host")
         author_serial = match.group("author_serial")
         post_serial = match.group("post_serial")
-    
+
+        print(host,'heres host!!!')
         author = User.objects.filter(url_id=f"{host}/authors/{author_serial}").first()
         pfp_post = Post.objects.filter(user=author, url_id=f"{host}/authors/{author_serial}/posts/{post_serial}").first()
 

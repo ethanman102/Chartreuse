@@ -1,5 +1,5 @@
 import json
-
+from rest_framework.authentication import SessionAuthentication
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.auth.password_validation import validate_password
@@ -71,7 +71,11 @@ class UsersSerializer(serializers.Serializer):
 
 class UserViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
-    authentication_classes = []
+    # November 21, 2024. Asked CHATGPT agent why the user isn't staying logged in between tests. Chatgpt recommended checking the forced login to see if it works, and suggested using
+    # sessionauthentication as seen here b/w sessions
+    
+    authentication_classes = [SessionAuthentication]
+    
     
 
     @extend_schema(
@@ -322,6 +326,7 @@ class UserViewSet(viewsets.ViewSet):
         }
     )
     def destroy(self, request, pk=None):
+        
         auth_response = checkIfRequestAuthenticated(request)
         if auth_response.status_code == 401:
             return auth_response
@@ -329,6 +334,8 @@ class UserViewSet(viewsets.ViewSet):
         decoded_user_id = unquote(pk)
 
         host = get_host_from_id(decoded_user_id)
+        print(host)
+        print(views.Host.host)
         
         if(host != views.Host.host):
             # if the user is not on the current host, we need to get the user from the remote host
@@ -341,7 +348,11 @@ class UserViewSet(viewsets.ViewSet):
             return Response({"success": "User deleted successfully."}, status=200)
         else:
             logged_in_user = request.user
+            
             user = get_object_or_404(User, pk=decoded_user_id)
+            
+
+
 
             if logged_in_user != user.user:
                 return Response({"error": "You do not have permission to delete this user."}, status=401)

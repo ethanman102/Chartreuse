@@ -1,48 +1,76 @@
 {% load static %}
 <div class="card mb-3 p-4 mx-4 my-3 p-3" style="border-radius: 10px;">
-    <div class="d-flex mb-4">
-        <a href="/chartreuse/authors/{{ post.user.url_id }}/" style="text-decoration: none; color:black">
-            <img src="{{ post.user.profileImage }}" alt="{{ post.user.displayName }} Avatar" class="rounded-circle me-3" width="50" height="50">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <!-- avatar and name -->
+        <a href="/chartreuse/authors/{{ post.user.url_id }}/" class="d-flex align-items-center" style="text-decoration: none; color:black">
+            <img src="{{ post.user.profileImage }}" class="rounded-circle me-3 post-image" width="50" height="50">
+            <h5 class="card-title mb-0">{{ post.user.displayName }}</h5>
         </a>
-        <div class="d-flex justify-content-between align-items-center w-100">
-            <a href="/chartreuse/authors/{{ post.user.url_id }}/" style="text-decoration: none; color:black">
-                <div>
-                    <h5 class="">{{ post.user.displayName }}</h5>
-                </div>
-            </a>
+        <!-- Top right: follow or edit + delete or view repost button -->
+        <div class="d-flex">
+            <!-- The edit + delete buttons -->
             {% if is_author and not post.repost%}
-                <div class="d-flex">
-                    <a href="/chartreuse/homepage/post/{{ post.url_id }}/edit/" class="btn btn-link p-0" title="Edit Post">
-                        <img src="{% static 'css/icons/edit-button.svg' %}" alt="Edit" width="30" height="30">
-                    </a>
-                    <a href="/chartreuse/homepage/post/{{ post.url_id }}/delete/" class="btn btn-link p-0" title="Delete Post">
-                        <img src="{% static 'css/icons/delete-button.svg' %}" alt="Delete" width="30" height="30">
-                    </a>
-                </div> 
+                <a href="/chartreuse/homepage/post/{{ post.url_id }}/edit/" class="btn btn-link p-0" title="Edit Post">
+                    <img src="{% static 'css/icons/edit-button.svg' %}" alt="Edit" width="30" height="30">
+                </a>
+                <a href="/chartreuse/homepage/post/{{ post.url_id }}/delete/" class="btn btn-link p-0" title="Delete Post">
+                    <img src="{% static 'css/icons/delete-button.svg' %}" alt="Delete" width="30" height="30">
+                </a>
             {% endif %}
+            <!-- The follow button -->
+            {% if not is_author %}
+                {% if post.following_status == "Follow" %}
+                    <button class="btn follow-button" 
+                            data-post-id="{{ post.url_id }}" 
+                            data-user-id="{{ user_details.url_id }}"
+                            data-host="{{ user_details.host }}">
+                                <i class="bi bi-person-plus-fill"></i> {{ post.following_status }}
+                    </button>
+                {% elif post.following_status == "Following" %}
+                    <button class="btn follow-button" 
+                            data-post-id="{{ post.url_id }}" 
+                            data-user-id="{{ user_details.url_id }}"
+                            data-host="{{ user_details.host }}">
+                                <i class="bi bi-check2"></i> {{ post.following_status }}
+                    </button>
+                {% elif post.following_status == "Pending" %}
+                    <button class="btn follow-button" 
+                            data-post-id="{{ post.url_id }}" 
+                            data-user-id="{{ user_details.url_id }}"
+                            data-host="{{ user_details.host }}">
+                                <i class="bi bi-hourglass-split"></i> {{ post.following_status }}
+                    </button>
+                {% else %}
+                <!-- The only case should be "Sign up to follow!" -->
+                    <button class="btn follow-button" 
+                        data-post-id="{{ post.url_id }}" 
+                        data-user-id="{{ user_details.url_id }}"
+                        data-host="{{ user_details.host }}">
+                            {{ post.following_status }}
+                    </button>
+                {% endif %}
+            {% endif %}
+            <!-- The View post button, if it is a repost -->
             {% if post.repost %}
-            <div class="d-flex">
-                <button class="btn view-repost-button" onclick="location.href = '{% url 'chartreuse:profile_view_post'  post.user.url_id post.url_id %}'"  id="view-repost-button">View Post</button>
-            </div>   
+                <button class="btn view-repost-button" 
+                        onclick="location.href='{% url 'chartreuse:profile_view_post' post.user.url_id post.url_id %}'" 
+                        id="view-repost-button">
+                            View Post
+                </button>
             {% endif %}
-            
-        </div>
+        </div> 
     </div>
 
     <h2 class="card-title mb-3" style="font-size: 1.8rem; font-weight: bold; text-align: left;">{{ post.title }}</h2>
     
     {% if post.contentType == "text/plain" %}
         <p class="card-text" style="text-align: left;">{{ post.content }}</p>
-
     {% elif post.contentType == "text/commonmark" %}
-
         <p class="card-text cm_text"  style="text-align: left;">{{ post.content }}</p>
-
     {% elif post.contentType == "image/png" or post.contentType == "image/jpeg" %}
         <div class="text-center">
             <img src="{{ post.content }}" alt="Post Image" class="img-fluid mt-3" style="border: none; max-width: 100%; object-fit: cover;">
         </div>
-
     {% endif %}
     
     <p class="card-text mt-4" style="text-align: left;">{{ post.description }}</p>
@@ -50,62 +78,59 @@
     <p class="text-muted mt-3" style="font-size: 0.9rem; text-align: left;">Published on {{ post.published }}</p>
 
     <div class="d-flex justify-content-start align-items-center mb-2" style="gap: 1.5rem;">
-        {% if not is_author %}
-        <button class="btn follow-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}"> {{ post.following_status }}</button>
-        {% endif %}
         {% if post.has_image and logged_in and not post.repost%}
-        <button class="btn pfp-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">Set pfp</button>
+            <button class="btn pfp-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">Set pfp</button>
         {% endif %}
-        <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">{{ post.likes_count }} likes</button>
+            <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">{{ post.likes_count }} likes</button>
         {% if logged_in and not post.repost and post.visibility == "PUBLIC" %}
-        <button class="btn repost-button" data-post-id="{{post.url_id}}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">Repost</button>
+            <button class="btn repost-button" data-post-id="{{post.url_id}}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">Repost</button>
         {% endif %}
     </div>
     {% if not post.repost %}
-    <div class="mt-5">
-        <h3 style="text-align: left;">Comments</h3>
-    
-        {% if logged_in %}
-            {% csrf_token %}
-            <div class="mb-3" style="text-align: left;">
-                <textarea class="form-control" name="comment" id="comment-text" rows="3" placeholder="Add a comment..." required></textarea>
-            </div>
-            <button type="submit" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" class="btn comment-button" style="width: auto; display: block; text-align: left;">Submit Comment</button>
-        {% endif %}
-
-        <br></br>
-       
-        <div id="comments-section">
-            {% for comment in comments %}
-                <div class="card comment-card mb-3 p-4" style="border-radius: 10px;">
-                    <div class="d-flex mb-4 align-items-center">
-                        <a href="/chartreuse/authors/{{ comment.user.url_id }}/" style="text-decoration: none; color:black;">
-                            <img src="{{ comment.user.profileImage }}" alt="{{ comment.user.displayName }} Avatar" class="rounded-circle me-3" width="40" height="40">
-                        </a>
-                        <div class="flex-grow-1 text-center" style="background-color: white;">
-                            <a href="/chartreuse/authors/{{ comment.user.url_id }}/" style="text-decoration: none; color:black; text-align: left; background-color: white;">
-                                <h5 class="mb-0">{{ comment.user.displayName }}</h5>
-                            </a>
-                        </div>
-                        <div class="d-flex align-items-center ms-2">
-                            {% if comment.is_author %}
-                                <a href="/chartreuse/comment/{{ comment.url_id }}/delete/" class="btn btn-link p-0" title="Delete Comment">
-                                    <img src="{% static 'css/icons/delete-button.svg' %}" alt="Delete" width="30" height="30">
-                                </a>
-                            {% endif %}
-                            <button class="btn like-comment-button ms-2" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-comment-id="{{ comment.url_id }}" data-host="{{ user_details.host }}">
-                                {{ comment.likes_count }} likes
-                            </button>
-                        </div>
-                    </div>
-                    <p style="text-align: left;">{{ comment.comment }}</p>
-                    <p style="text-align: left;">Commented on {{ comment.dateCreated }}</p>
+        <div class="mt-5">
+            <h3 style="text-align: left;">Comments</h3>
+        
+            {% if logged_in %}
+                {% csrf_token %}
+                <div class="mb-3" style="text-align: left;">
+                    <textarea class="form-control" name="comment" id="comment-text" rows="3" placeholder="Add a comment..." required></textarea>
                 </div>
-            {% empty %}
-                <p style="width: auto; display: block; text-align: left;">No comments yet. Be the first to comment!</p>
-            {% endfor %}
-        </div>  
-                                                  
-    </div>
+                <button type="submit" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" class="btn comment-button" style="width: auto; display: block; text-align: left;">Submit Comment</button>
+            {% endif %}
+
+            <br></br>
+        
+            <div id="comments-section">
+                {% for comment in comments %}
+                    <div class="card comment-card mb-3 p-4" style="border-radius: 10px;">
+                        <div class="d-flex mb-4 align-items-center">
+                            <a href="/chartreuse/authors/{{ comment.user.url_id }}/" style="text-decoration: none; color:black;">
+                                <img src="{{ comment.user.profileImage }}" alt="{{ comment.user.displayName }} Avatar" class="rounded-circle me-3" width="40" height="40">
+                            </a>
+                            <div class="flex-grow-1 text-center" style="background-color: white;">
+                                <a href="/chartreuse/authors/{{ comment.user.url_id }}/" style="text-decoration: none; color:black; text-align: left; background-color: white;">
+                                    <h5 class="mb-0">{{ comment.user.displayName }}</h5>
+                                </a>
+                            </div>
+                            <div class="d-flex align-items-center ms-2">
+                                {% if comment.is_author %}
+                                    <a href="/chartreuse/comment/{{ comment.url_id }}/delete/" class="btn btn-link p-0" title="Delete Comment">
+                                        <img src="{% static 'css/icons/delete-button.svg' %}" alt="Delete" width="30" height="30">
+                                    </a>
+                                {% endif %}
+                                <button class="btn like-comment-button ms-2" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-comment-id="{{ comment.url_id }}" data-host="{{ user_details.host }}">
+                                    {{ comment.likes_count }} likes
+                                </button>
+                            </div>
+                        </div>
+                        <p style="text-align: left;">{{ comment.comment }}</p>
+                        <p style="text-align: left;">Commented on {{ comment.dateCreated }}</p>
+                    </div>
+                {% empty %}
+                    <p style="width: auto; display: block; text-align: left;">No comments yet. Be the first to comment!</p>
+                {% endfor %}
+            </div>  
+                                                    
+        </div>
     {% endif %}
 </div>

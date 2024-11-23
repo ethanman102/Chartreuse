@@ -483,12 +483,13 @@ def upload_profile_picture(request):
         if (file_to_read == None or file_name_to_read == None):
             return JsonResponse({'error': 'No file provided'},status=400)
         
-        mime_type = file_to_read.content_type 
+        mime_type = file_to_read.content_type + ';base64'
     
         
         
         image_data = file_to_read.read()
         encoded_image = base64.b64encode(image_data).decode('utf-8')
+        encoded_image = f'data:{mime_type},{encoded_image}'
 
         current_auth_user = request.user
         current_user_model = User.objects.get(user = current_auth_user)

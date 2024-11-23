@@ -8,6 +8,10 @@ from django.contrib.auth.decorators import login_required
 from .view import home_page_view, profile_utils, signup_view, login_view, landing_page_view, profile_view, follow_list_view, post_view, settings_view, post_utils, comment_utils, follow_utils,discover_view, inbox
 app_name = "chartreuse"
 urlpatterns = [
+    re_path(r'homepage/post/(?P<post_id>https?.+\w)/edit/$', post_utils.edit_post, name='edit-post'),
+    re_path(r'homepage/post/(?P<post_id>https?.+\w)/delete/$', post_utils.delete_post, name='delete-post'),
+    re_path(r'homepage/post/(?P<post_id>https?.+\w)/update/$', post_utils.update_post, name='update-post'),
+    re_path(r'homepage/post/(?P<post_id>https?.+\w)/$', post_view.PostDetailView.as_view(), name='view-post'),
     re_path(r"homepage/post/(?P<post_id>https?.+\w)/image$", images.retrieve_from_homepage, name='get_image_post'),
     re_path(r"authors/(?P<author_id>https?.+)/post/(?P<post_id>https?.+\w)/image$", images.retrieve_from_profile, name='get_image_post_profile'),
 
@@ -110,11 +114,6 @@ urlpatterns = [
     re_path(r'.+/like-post/', post_utils.like_post, name='like-post'),
     re_path(r'.+/send-follow-request/', follow_utils.send_follow_request, name='send-follow-request'),
     re_path(r'.+/repost/', post_utils.repost,name='repost'),
-
-    re_path(r'homepage/post/(?P<post_id>https?.+\w)/edit/$', post_utils.edit_post, name='edit-post'),
-    re_path(r'homepage/post/(?P<post_id>https?.+\w)/delete/$', post_utils.delete_post, name='delete-post'),
-    re_path(r'homepage/post/(?P<post_id>https?.+\w)/update/$', post_utils.update_post, name='update-post'),
-    re_path(r'homepage/post/(?P<post_id>https?.+\w)/$', post_view.PostDetailView.as_view(), name='view-post'),
 
     # Follow Request URLs
     re_path(r"authors/(?P<url_id>https?.+)/post/(?P<post_id>https?.+\w)/$",post_view.PostDetailView.as_view(),name="profile_view_post"),

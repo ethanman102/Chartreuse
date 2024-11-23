@@ -25,7 +25,7 @@ urlpatterns = [
     # re_path(r"api/authors/(?P<user_id>.+\w)/posts/(?P<post_id>.+\w)/likes/$", likes.LikeViewSet.get_post_likes, name="post_likes"),
     re_path(r"api/authors/(?P<user_id>.+\w)/posts/(?P<post_id>.+\w)/likes/$", likes.LikeViewSet.as_view({'get': 'get_post_likes'}), name="post_likes"),
     re_path(r"api/authors/(?P<user_id>.+\w)/liked/(?P<like_id>.+\w)/$", likes.LikeViewSet.get_like, name="get_like_object"),
-    re_path(r"api/authors/(?P<user_id>.+\w)/liked/$", likes.LikeViewSet.user_likes, name="get_liked"),
+    re_path(r"api/authors/(?P<user_id>.*\w)/liked/$", likes.LikeViewSet.user_likes, name="get_liked"),
 
     # Comment URLs 
     re_path(r"api/authors/(?P<user_id>.+\w)/posts/(?P<post_id>.+\w)/comments/add/$", comments.CommentViewSet.as_view({'post': 'create_comment'}), name="create_comment"),
@@ -34,7 +34,7 @@ urlpatterns = [
     re_path(r"api/comment/(?P<comment_id>.+)/$", comments.CommentViewSet.get_comment, name="get_comment_by_cid"), 
     re_path(r"api/authors/(?P<user_id>.+\w)/posts/(?P<post_id>.+\w)/comments/$", comments.CommentViewSet.as_view({'get': 'get_comments'}), name="get_comments"),
     re_path(r"api/posts/(?P<post_id>.+\w)/comments/$", comments.CommentViewSet.as_view({'get': 'get_comments'}), name="get_comments_by_pid"),
-    re_path(r"api/authors/(?P<user_id>.+\w)/commented/$", comments.CommentViewSet.as_view({'get': "get_authors_comments", 'post': "create_comment"}), name="get_authors_comments"),
+    re_path(r"api/authors/(?P<user_id>.*\w)/commented/$", comments.CommentViewSet.as_view({'get': "get_authors_comments", 'post': "create_comment"}), name="get_authors_comments"),
     re_path(r"api/authors/(?P<user_id>.+\w)/commented/(?P<comment_id>.+)/$", comments.CommentViewSet.get_comment, name="get_commented"),
     re_path(r"api/commented/(?P<comment_id>.+)/$", comments.CommentViewSet.get_comment, name="get_commented_by_cid"), 
 
@@ -44,14 +44,14 @@ urlpatterns = [
     re_path(r"api/post-exists/$", post_utils.check_duplicate_post, name="check_duplicate_post"),
 
     # Follower API URLs
-    re_path(r"api/authors/(?P<author_id>.+\w)/followers/(?P<foreign_author_id>.+\w)", followers.FollowViewSet.as_view({'get': 'is_follower'}), name="is_follower"),
-    re_path(r"api/authors/(?P<author_id>.+\w)/followers/(?P<foreign_author_id>.+\w)/remove", followers.FollowViewSet.as_view({'delete': 'remove_follower'}), name="remove_follower"),
-    re_path(r"api/authors/(?P<author_id>.+\w)/followers/(?P<foreign_author_id>.+\w)", followers.FollowViewSet.as_view({'post': 'add_follower', 'put': 'add_follower'}), name="add_follower"),
+    re_path(r"api/authors/(?P<author_id>.+\w)/followers/(?P<foreign_author_id>.*\w)", followers.FollowViewSet.as_view({'get': 'is_follower'}), name="is_follower"),
+    re_path(r"api/authors/(?P<author_id>.+\w)/followers/(?P<foreign_author_id>.*\w)/remove", followers.FollowViewSet.as_view({'delete': 'remove_follower'}), name="remove_follower"),
+    re_path(r"api/authors/(?P<author_id>.+\w)/followers/(?P<foreign_author_id>.*\w)", followers.FollowViewSet.as_view({'post': 'add_follower', 'put': 'add_follower'}), name="add_follower"),
     re_path(r"api/authors/(?P<author_id>.+\w)/followers", followers.FollowViewSet.as_view({'get': 'get_followers'}), name="get_followers"),
     
     # Author URLs
     path("api/author/login/", users.UserViewSet.login_user, name="login_user"),
-    re_path(r"api/authors/(?P<pk>.+\w)/$", users.UserViewSet.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'}), name="user-detail"),
+    re_path(r"api/authors/(?P<pk>.*\w)/$", users.UserViewSet.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'}), name="user-detail"),
     path("api/authors/", users.UserViewSet.as_view({'post': 'create', 'get': 'list'}), name="user-list"),
     
     # Follow Request API URLs

@@ -84,7 +84,7 @@ class UserTestCases(TestCase):
         # Successfully created user
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['type'], 'author')
-        self.assertEqual(response.json()['id'], f'{self.hostname}authors/4')
+        self.assertEqual(response.json()['id'], f'{self.hostname}api/authors/4')
         self.assertEqual(response.json()['host'], self.hostname)
         self.assertEqual(response.json()['displayName'], 'Jane Doe')
         self.assertEqual(response.json()['github'], 'http://github.com/jdoe')
@@ -127,7 +127,7 @@ class UserTestCases(TestCase):
         '''
         This tests getting a specific user.
         '''
-        user_id = quote(f"{self.hostname}authors/1", safe='')
+        user_id = quote(f"{self.hostname}api/authors/1", safe='')
         response = self.client.get(reverse('chartreuse:user-detail', args=[user_id]),headers=self.creds)
 
         # Successfully got user
@@ -137,14 +137,14 @@ class UserTestCases(TestCase):
         self.assertEqual(response.json()['profileImage'], 'https://i.imgur.com/k7XVwpB.jpeg')
         self.assertEqual(response.json()['type'], 'author')
         self.assertEqual(response.json()['page'], f"{self.hostname}/authors/{response.json()['id']}")
-        self.assertEqual(response.json()['id'], f'{self.hostname}authors/1')
+        self.assertEqual(response.json()['id'], f'{self.hostname}api/authors/1')
         self.assertEqual(response.json()['host'], self.hostname)
         
     def test_get_user_invalid_id(self):
         '''
         This tests getting a user with an invalid id.
         '''
-        user_id = quote(f"{self.hostname}authors/100", safe='')
+        user_id = quote(f"{self.hostname}api/authors/100", safe='')
         response = self.client.get(reverse('chartreuse:user-detail', args=[user_id]),headers=self.creds)
 
         # User does not exist
@@ -166,7 +166,7 @@ class UserTestCases(TestCase):
         print(self.client.session['_auth_user_id'],'hiii')
    
 
-        user_id = quote(f"{self.hostname}authors/1", safe='')
+        user_id = quote(f"{self.hostname}api/authors/1", safe='')
         response = self.client.delete(reverse('chartreuse:user-detail', args=[user_id]),headers=self.creds)
 
         # Successfully deleted user
@@ -184,7 +184,7 @@ class UserTestCases(TestCase):
             'password': 'ABC123!!!'
         })
 
-        user_id = quote(f"{self.hostname}authors/100", safe='')
+        user_id = quote(f"{self.hostname}api/authors/100", safe='')
         response = self.client.delete(reverse('chartreuse:user-detail', args=[user_id]),headers=self.creds)
 
         # User does not exist
@@ -194,7 +194,7 @@ class UserTestCases(TestCase):
         '''
         This tests updating a user.
         '''
-        user_id = quote(f"{self.hostname}authors/1", safe='')
+        user_id = quote(f"{self.hostname}api/authors/1", safe='')
         url = reverse('chartreuse:user-detail', args=[user_id])
 
         data = {
@@ -260,3 +260,4 @@ class UserTestCases(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {"error": "Invalid credentials."})
+    

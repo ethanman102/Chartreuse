@@ -29,9 +29,11 @@ def create_user_url_id(request, id):
         return id
     else:
         # create the url id
-        host = request.host
+        host = request.get_host()
         scheme = request.scheme
-        return f"{scheme}://{host}/chartreuse/api/authors/{id}"
+        url = f"{scheme}://{host}/chartreuse/api/authors/{id}"
+        print(url)
+        return url
     
 
 class UserSerializer(serializers.ModelSerializer):

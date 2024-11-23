@@ -9,6 +9,11 @@ from .view import home_page_view, profile_utils, signup_view, login_view, landin
 app_name = "chartreuse"
 urlpatterns = [
     re_path(r"api/authors/(?P<pk>.*\w)/$", users.UserViewSet.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'}), name="user-detail"),
+    path('add-post/', post_utils.add_post, name='add_post'),
+    path('add-post/save/', post_utils.save_post, name='save_post'),
+
+    re_path(r'.+/like-post/', post_utils.like_post, name='like-post'),
+    re_path(r'.+/send-follow-request/', follow_utils.send_follow_request, name='send-follow-request'),
     re_path(r'homepage/post/(?P<post_id>https?.+\w)/edit/$', post_utils.edit_post, name='edit-post'),
     re_path(r'homepage/post/(?P<post_id>https?.+\w)/delete/$', post_utils.delete_post, name='delete-post'),
     re_path(r'homepage/post/(?P<post_id>https?.+\w)/update/$', post_utils.update_post, name='update-post'),
@@ -109,11 +114,6 @@ urlpatterns = [
     path('login/authenticate/', login_view.save_login, name='authenticate'),
 
     path("homepage/", home_page_view.FeedDetailView.as_view(), name="homepage"),
-    path('add-post/', post_utils.add_post, name='add_post'),
-    path('add-post/save/', post_utils.save_post, name='save_post'),
-
-    re_path(r'.+/like-post/', post_utils.like_post, name='like-post'),
-    re_path(r'.+/send-follow-request/', follow_utils.send_follow_request, name='send-follow-request'),
     re_path(r'.+/repost/', post_utils.repost,name='repost'),
 
     # Follow Request URLs

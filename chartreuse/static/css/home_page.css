@@ -54,11 +54,6 @@ p {
     box-shadow: 6px 6px 0px #000000;
 }
 
-a {
-    text-decoration: none;
-    color: black;
-}
-
 .pagination {
     display: flex;
     justify-content: center;

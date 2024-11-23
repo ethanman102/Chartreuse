@@ -15,7 +15,7 @@ def add_comment(request):
             post_id = body["post_id"]
 
             user = User.objects.get(url_id=unquote(user_id))
-            post = Post.objects.get(url_id=unquote(post_id))
+            post = Post.objects.filter(url_id=unquote(post_id)).first()
             
             # Parse the JSON body to get the comment text and content type
             body = json.loads(request.body)
@@ -45,7 +45,7 @@ def get_comments(post_id):
         post_id: The id of the post object
     '''
     post_id = unquote(post_id)
-    post = Post.objects.get(url_id=post_id)
+    post = Post.objects.filter(url_id=post_id).first()
 
     comments = Comment.objects.filter(post=post).order_by('-dateCreated')
 
@@ -158,9 +158,6 @@ def send_comment_to_inbox(comment_url_id):
         node_queryset = Node.objects.filter(host=post_owner_host,status='ENABLED',follow_status="OUTGOING")
         if node_queryset.exists():
             node_objs[node_queryset[0].host] = [comment.post.user.url_id]
-
-        
-
 
     if len(node_objs) == 0:
         return []

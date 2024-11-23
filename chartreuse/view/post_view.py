@@ -21,7 +21,7 @@ class PostDetailView(DetailView):
         """
         url_id = self.kwargs.get('post_id')
         url_id = unquote(url_id)
-        post = get_object_or_404(Post, url_id=url_id)
+        post = Post.objects.filter(url_id=url_id).first()
         return post
 
     def get_context_data(self, **kwargs):
@@ -40,8 +40,6 @@ class PostDetailView(DetailView):
             post_owner = post.user
             repost = False
         
-        
-
         current_user_model = None
 
         if self.request.user.is_authenticated:
@@ -67,7 +65,7 @@ class PostDetailView(DetailView):
         post.url_id = quote(post.url_id, safe='')
 
         
-        if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
+        if (post.contentType != "text/plain") and (post.contentType != "text/markdown"):
             post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
             post.has_image = True
 

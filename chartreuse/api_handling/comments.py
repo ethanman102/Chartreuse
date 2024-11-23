@@ -17,6 +17,17 @@ from urllib.parse import unquote
 from ..views import checkIfRequestAuthenticated
 from rest_framework.permissions import AllowAny
 
+def create_user_url_id(request, id):
+    id = unquote(id)
+    if id.find(":") != -1:
+        return id
+    else:
+        # create the url id
+        host = request.get_host()
+        scheme = request.scheme
+        url = f"{scheme}://{host}/chartreuse/api/authors/{id}"
+        return url
+    
 class CommentSerializer(serializers.Serializer):
     type = serializers.CharField(default="comment")
     author = UserSerializer
@@ -450,7 +461,7 @@ class CommentViewSet(viewsets.ViewSet):
             user = get_object_or_404(User, url_id=decoded_author_id)
 
             decoded_post_id = unquote(post_id)
-            post = get_object_or_404(Post, url_id=decoded_post_id, user=user)
+            post = Post.objects.filter(url_id=decoded_post_id, user=user).first()
 
             comment = get_object_or_404(Comment, url_id=decoded_comment_id, post=post)
 
@@ -540,7 +551,7 @@ class CommentViewSet(viewsets.ViewSet):
         size = request.GET.get('size', 10)
 
         # get the author of the comments
-        decoded_author_id = unquote(user_id)
+        decoded_author_id = create_user_url_id(request, user_id)
         comment_author = get_object_or_404(User, url_id=decoded_author_id)
 
         # Get all the comments authored by the given user

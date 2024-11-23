@@ -27,7 +27,7 @@ def get_post_likes(post_id):
     Returns:
         JsonResponse containing the likes for a post.
     """
-    post = Post.objects.get(url_id=post_id)
+    post = Post.objects.filter(url_id=post_id).first()
 
     likes = Like.objects.filter(post=post)
 
@@ -58,6 +58,7 @@ def edit_post(request, post_id):
     # Check if the user is authenticated
     if request.user.is_authenticated:
         current_user = request.user
+        print(current_user,'HELLLLO')
         current_user_model = get_object_or_404(User, user=current_user)
         
         # Check if the current user is the author of the post
@@ -92,6 +93,7 @@ def delete_post(request, post_id):
 
 def send_post_to_inbox(post_url_id):
     post = Post.objects.get(url_id=post_url_id)
+    print(post.url_id,'HERE IS URLID    Yass')
     # send this to the inbox of other nodes
     nodes = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
     
@@ -111,6 +113,7 @@ def send_post_to_inbox(post_url_id):
         post_json_url = f"{base_url}{quote(post.user.url_id, safe='')}/posts/{quote(post.url_id, safe='')}/"
         post_response = requests.get(post_json_url)
         post_json = post_response.json()
+        print(post_json,'ETHANS POST JSON FRIENDS')
 
 
         followers = Follow.objects.filter(followed = post.user)
@@ -167,7 +170,7 @@ def update_post(request, post_id):
             post_content = content
 
         elif (content_type == 'commonmark') and content:
-            content_type = 'text/commonmark'    
+            content_type = 'text/markdown'    
             post_content = content
 
         elif image:
@@ -176,13 +179,13 @@ def update_post(request, post_id):
             image_content = image.content_type.split('/')[1]
             if image_content not in ['jpeg', 'png', 'jpg']:
                 image_content = 'png'
-            content_type = 'image/' + image_content
+            content_type = 'image/' + image_content + ';base64'
             post_content = encoded_image
         elif image_url:
             image_content = image_url.split('.')[-1]
             if image_content not in ['jpeg', 'png', 'jpg']:
                 image_content = 'png'
-            content_type = 'image/' + image_content
+            content_type = 'image/' + image_content + ';base64'
             try:
                 with urlopen(image_url) as url:
                     f = url.read()
@@ -193,7 +196,7 @@ def update_post(request, post_id):
         else:
             return JsonResponse({'error': 'Invalid post data.'}, status=400)
         
-        post = Post.objects.get(url_id=unquote(post_id))
+        post = Post.objects.filter(url_id=unquote(post_id)).first()
         if (post.user != current_user_model):
             return JsonResponse({'error': 'Unauthorized access.'}, status=401)
 
@@ -348,7 +351,7 @@ def save_post(request):
             post_content = content
 
         elif content and (content_type == 'commonmark'):
-            content_type = 'text/commonmark'
+            content_type = 'text/markdown'
             post_content = content 
         
         elif image:
@@ -357,13 +360,13 @@ def save_post(request):
             image_content = image.content_type.split('/')[1]
             if image_content not in ['jpeg', 'png', 'jpg']:
                 image_content = 'png'
-            content_type = 'image/' + image_content
+            content_type = 'image/' + image_content + ';base64'
             post_content = encoded_image
         elif image_url:
             image_content = image_url.split('.')[-1]
             if image_content not in ['jpeg', 'png', 'jpg']:
                 image_content = 'png'
-            content_type = 'image/' + image_content
+            content_type = 'image/' + image_content +';base64'
             try:
                 with urlopen(image_url) as url:
                     f = url.read()
@@ -410,7 +413,7 @@ def like_post(request):
         post_id = body["post_id"]
 
         user = User.objects.get(url_id=unquote(user_id))
-        post = Post.objects.get(url_id=unquote(post_id))
+        post = Post.objects.filter(url_id=unquote(post_id)).first()
 
         # first check if the user has already liked the post
         like = Like.objects.filter(user=user, post=post).first()
@@ -667,7 +670,7 @@ def prepare_posts(posts):
             post.likes_count = Like.objects.filter(post=post).count()
                
                 
-        if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
+        if (post.contentType != "text/plain") and (post.contentType != "text/markdown"):
             post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
         post.url_id = quote(post.url_id,safe='')
             

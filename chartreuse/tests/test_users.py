@@ -144,7 +144,7 @@ class UserTestCases(TestCase):
         '''
         This tests getting a user with an invalid id.
         '''
-        user_id = quote(f"{self.hostname}authors/100", safe='')
+        user_id = quote(f"{self.hostname}api/authors/100", safe='')
         response = self.client.get(reverse('chartreuse:user-detail', args=[user_id]),headers=self.creds)
 
         # User does not exist
@@ -165,7 +165,6 @@ class UserTestCases(TestCase):
         self.client.force_login(greg)
         print(self.client.session['_auth_user_id'],'hiii')
    
-
         user_id = quote(f"{self.hostname}chartreuse/api/authors/1", safe='')
         response = self.client.delete(reverse('chartreuse:user-detail', args=[user_id]),headers=self.creds)
 
@@ -184,7 +183,7 @@ class UserTestCases(TestCase):
             'password': 'ABC123!!!'
         })
 
-        user_id = quote(f"{self.hostname}authors/100", safe='')
+        user_id = quote(f"{self.hostname}api/authors/100", safe='')
         response = self.client.delete(reverse('chartreuse:user-detail', args=[user_id]),headers=self.creds)
 
         # User does not exist
@@ -260,3 +259,4 @@ class UserTestCases(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {"error": "Invalid credentials."})
+    

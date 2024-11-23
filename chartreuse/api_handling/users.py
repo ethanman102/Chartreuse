@@ -22,6 +22,19 @@ from ..models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
+
+def create_user_url_id(request, id):
+    id = unquote(id)
+    if id.find(":") != -1:
+        return id
+    else:
+        # create the url id
+        host = request.get_host()
+        scheme = request.scheme
+        url = f"{scheme}://{host}/chartreuse/api/authors/{id}"
+        return url
+    
+
 class UserSerializer(serializers.ModelSerializer):
     type = serializers.CharField(default="author")
     id = serializers.URLField()
@@ -61,10 +74,7 @@ class UserViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     # November 21, 2024. Asked CHATGPT agent why the user isn't staying logged in between tests. Chatgpt recommended checking the forced login to see if it works, and suggested using
     # sessionauthentication as seen here b/w sessions
-    
     authentication_classes = [SessionAuthentication]
-    
-    
 
     @extend_schema(
         summary="Get a list of users",
@@ -100,12 +110,7 @@ class UserViewSet(viewsets.ViewSet):
 
         Returns:
             JsonResponse containing the paginated list of users.
-        '''
-        auth_response = checkIfRequestAuthenticated(request)
-       
-        if auth_response.status_code == 401:
-            return auth_response
-
+        '''  
         page = request.query_params.get('page', 1)
         size = request.query_params.get('size', 50)
 
@@ -179,7 +184,7 @@ class UserViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the user.
         '''
-        decoded_user_id = unquote(pk)
+        decoded_user_id = create_user_url_id(request, pk)
         
         # case where the user is on the current host
         user = get_object_or_404(User, pk=decoded_user_id)

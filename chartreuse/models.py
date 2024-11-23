@@ -3,7 +3,7 @@ from django.contrib.auth.models import User as AuthUser
 from django.db.models import UniqueConstraint
 
 VISIBILITY_CHOICES = {"PUBLIC": "PUBLIC", "FRIENDS": "FRIENDS", "UNLISTED": "UNLISTED", "DELETED": "DELETED"}
-CONTENT_TYPE_CHOICES = {"text/commonmark": "text/commonmark", "text/plain": "text/plain", "application/base64": "application/base64", "image/png;base64": "image/png;base64", "image/jpeg;base64": "image/jpeg;base64"}
+CONTENT_TYPE_CHOICES = {"text/markdown": "text/markdown", "text/plain": "text/plain", "application/base64": "application/base64", "image/png;base64": "image/png;base64", "image/jpeg;base64": "image/jpeg;base64"}
 FOLLOW_STATUS_CHOICES = {'OUTGOING':'OUTGOING','INCOMING':'INCOMING'}
 ENABLE_DISABLE_CHOICES = {'ENABLED':'ENABLED','DISABLED':'DISABLED'}
 

@@ -14,6 +14,17 @@ from django.core.paginator import Paginator
 from ..views import checkIfRequestAuthenticated
 from rest_framework.permissions import AllowAny
 
+def create_user_url_id(request, id):
+    id = unquote(id)
+    if id.find(":") != -1:
+        return id
+    else:
+        # create the url id
+        host = request.get_host()
+        scheme = request.scheme
+        url = f"{scheme}://{host}/chartreuse/api/authors/{id}"
+        return url
+
 class FollowerSerializer(serializers.Serializer):
     type = serializers.CharField(default="author")
     id = serializers.URLField()
@@ -35,9 +46,10 @@ class FollowersSerializer(serializers.Serializer):
 
 
 class FollowViewSet(viewsets.ViewSet):
-    permission_classes = [AllowAny]
     serializer_class = FollowerSerializer
-    authentication_classes = [SessionAuthentication]
+
+    permission_classes = [AllowAny]
+    authentication_classes = []
 
     @extend_schema(
         summary="Add a follower",
@@ -240,10 +252,19 @@ class FollowViewSet(viewsets.ViewSet):
         decoded_author_id = unquote(author_id)
 
         # Fetch the author based on the provided author_id
-        author = get_object_or_404(User, url_id=decoded_author_id)
+        authors = User.objects.all()
+
+        sent_author = None
+
+        for author in authors:
+            if author.user:
+                print("AUTHOR", author)
+                if author.user.id == decoded_author_id:
+                    sent_author = author
+                    break
         
         # Get all followers for the author
-        followers = Follow.objects.filter(followed=author)
+        followers = Follow.objects.filter(followed=sent_author)
 
         followers_list = []
 
@@ -317,7 +338,9 @@ class FollowViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse with success message.
         '''
-        decoded_author_id = unquote(author_id)
+        
+
+        decoded_author_id = create_user_url_id(request,author_id)
         decoded_foreign_author_id = unquote(foreign_author_id)
 
         author = get_object_or_404(User, url_id=decoded_author_id)

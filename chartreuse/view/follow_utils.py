@@ -50,7 +50,7 @@ def send_follow_request(request):
         post_id = body["post_id"]
 
         user = User.objects.get(url_id=unquote(user_id))
-        post = Post.objects.get(url_id=unquote(post_id))
+        post = Post.objects.filter(url_id=unquote(post_id)).first()
 
         post_author = post.user
 

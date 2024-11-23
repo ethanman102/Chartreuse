@@ -14,6 +14,18 @@ from urllib.parse import unquote
 from ..views import checkIfRequestAuthenticated
 from rest_framework.permissions import AllowAny
 
+def create_user_url_id(request, id):
+    id = unquote(id)
+    if id.find(":") != -1:
+        return id
+    else:
+        # create the url id
+        host = request.get_host()
+        scheme = request.scheme
+        url = f"{scheme}://{host}/chartreuse/api/authors/{id}"
+        return url
+    
+
 class LikeSerializer(serializers.Serializer):
     type = serializers.CharField(default="like")
     author = UserSerializer()
@@ -552,7 +564,7 @@ class LikeViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like objects.
         '''
-        decoded_user_id = unquote(user_id)
+        decoded_user_id = create_user_url_id(request, user_id)
         page = request.GET.get('page')
         size = request.GET.get('size')
 

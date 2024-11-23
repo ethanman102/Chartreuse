@@ -27,8 +27,10 @@ def checkIfRequestAuthenticated(request):
     request: Request object
     '''
     authentication = request.headers.get('Authorization')
+    
     if not authentication or not authentication.startswith('Basic'):
-        
+        print('hereeee')
+        print(authentication)
         return JsonResponse({"error": "Missing or invalid Authorization header"}, status=401)
 
     try:
@@ -39,12 +41,12 @@ def checkIfRequestAuthenticated(request):
         username = auth[0]
         password = auth[1]
     except (IndexError, base64.binascii.Error, UnicodeDecodeError):
-        
+        print('here2')
         return JsonResponse({"error": "Invalid authentication format"}, status=401)
 
     node = Node.objects.filter(username=username, password=password, follow_status="INCOMING", status="ENABLED")
     if len(node) == 0:
-       
+        
         return JsonResponse({"error": "Unauthorized"}, status=401)
 
     

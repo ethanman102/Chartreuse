@@ -6,6 +6,7 @@ import json
 from ..views import Host
 from ..models import User,Node
 import base64
+from django.contrib.auth.models import User as AuthUser
 
 class UserTestCases(TestCase):
     @classmethod
@@ -49,11 +50,15 @@ class UserTestCases(TestCase):
             'lastName': 'Stanley',
         }
 
-        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json')
-        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json')
-        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_3_data, format='json')
-
         cls.node = Node.objects.create(host='http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',username='abc',password='123',follow_status='INCOMING',status='ENABLED')
+        cls.creds = {'Authorization' : 'Basic ' + base64.b64encode(b'abc:123').decode('utf-8')}
+
+        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json',headers=cls.creds)
+        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json',headers=cls.creds)
+        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_3_data, format='json',headers=cls.creds)
+        
+
+        
 
     @classmethod
     def tearDownClass(cls):
@@ -62,7 +67,10 @@ class UserTestCases(TestCase):
     def test_create_user(self):
         '''
         This tests creating a user.
+
         '''
+
+
         response = self.client.post(reverse('chartreuse:user-list'), {
             'displayName': 'Jane Doe',
             'github': 'http://github.com/jdoe',
@@ -71,7 +79,7 @@ class UserTestCases(TestCase):
             'password': 'ABC123!!!',
             'firstName': 'Jane',
             'lastName': 'Doe',
-        }, format='json')
+        }, format='json',headers=self.creds)
 
         # Successfully created user
         self.assertEqual(response.status_code, 200)
@@ -87,7 +95,7 @@ class UserTestCases(TestCase):
         '''
         This tests getting all users from the database.
         '''
-        response = self.client.get(reverse('chartreuse:user-list'))
+        response = self.client.get(reverse('chartreuse:user-list'),headers=self.creds)
 
         # Successfully got all users
         self.assertEqual(response.status_code, 200)
@@ -110,7 +118,7 @@ class UserTestCases(TestCase):
             'password': 'ABC',
             'firstName': 'Jane',
             'lastName': 'Doe',
-        }, format='json')
+        }, format='json',headers=self.creds)
 
         # Invalid password
         self.assertEqual(response.status_code, 400)
@@ -120,7 +128,7 @@ class UserTestCases(TestCase):
         This tests getting a specific user.
         '''
         user_id = quote(f"{self.hostname}authors/1", safe='')
-        response = self.client.get(reverse('chartreuse:user-detail', args=[user_id]))
+        response = self.client.get(reverse('chartreuse:user-detail', args=[user_id]),headers=self.creds)
 
         # Successfully got user
         self.assertEqual(response.status_code, 200)
@@ -137,7 +145,7 @@ class UserTestCases(TestCase):
         This tests getting a user with an invalid id.
         '''
         user_id = quote(f"{self.hostname}authors/100", safe='')
-        response = self.client.get(reverse('chartreuse:user-detail', args=[user_id]))
+        response = self.client.get(reverse('chartreuse:user-detail', args=[user_id]),headers=self.creds)
 
         # User does not exist
         self.assertEqual(response.status_code, 404)
@@ -151,11 +159,18 @@ class UserTestCases(TestCase):
             'username': 'greg',
             'password': 'ABC123!!!'
         })
+        self.assertEqual(response.status_code, 200)
+
+        greg = AuthUser.objects.get(username='greg')
+        self.client.force_login(greg)
+        print(self.client.session['_auth_user_id'],'hiii')
+   
 
         user_id = quote(f"{self.hostname}authors/1", safe='')
-        response = self.client.delete(reverse('chartreuse:user-detail', args=[user_id]))
+        response = self.client.delete(reverse('chartreuse:user-detail', args=[user_id]),headers=self.creds)
 
         # Successfully deleted user
+        
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['success'], 'User deleted successfully.')
     
@@ -170,7 +185,7 @@ class UserTestCases(TestCase):
         })
 
         user_id = quote(f"{self.hostname}authors/100", safe='')
-        response = self.client.delete(reverse('chartreuse:user-detail', args=[user_id]))
+        response = self.client.delete(reverse('chartreuse:user-detail', args=[user_id]),headers=self.creds)
 
         # User does not exist
         self.assertEqual(response.status_code, 404)
@@ -191,9 +206,9 @@ class UserTestCases(TestCase):
         self.client.post(reverse('chartreuse:login_user'), {
             'username': 'greg',
             'password': 'ABC123!!!'
-        })
+        },headers=self.creds)
 
-        response = self.client.put(url, data=json.dumps(data), content_type='application/json')
+        response = self.client.put(url, data=json.dumps(data), content_type='application/json',headers=self.creds)
     
         # Successfully updated user
         self.assertEqual(response.status_code, 200)

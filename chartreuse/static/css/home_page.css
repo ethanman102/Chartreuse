@@ -54,16 +54,6 @@ p {
     box-shadow: 6px 6px 0px #000000;
 }
 
-.follow-button {
-    color:#000000;
-    border-color: black;
-}
-
-.follow-button:hover {
-    color: #ffffff;
-    background-color: #000000;
-}
-
 a {
     text-decoration: none;
     color: black;
@@ -132,6 +122,23 @@ img {
 
     i {
         color: white; 
+    }
+}
+
+.follow-button {
+    background-color: #ffffff;
+    border-width: 1px;
+    border-color: #00356b;
+    border-radius: 0%;
+}
+
+.follow-button:hover {
+    color: chartreuse;
+    background-color: #00356b;
+    box-shadow: 6px 6px 0px #000000;
+
+    i {
+        color: chartreuse; 
     }
 }
 

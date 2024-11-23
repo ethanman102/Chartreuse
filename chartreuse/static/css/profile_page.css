@@ -58,7 +58,7 @@ html body {
 /* github css */
 #profile-github{
     border-radius: 0;
-    background-color: black;
+    background-color: #181717;
     color: white;
     transition: box-shadow 0.3s ease;
     font-size: 100%;
@@ -69,7 +69,7 @@ html body {
 }
 
 #profile-github:hover{
-    background-color: black;
+    background-color: #181717;
     box-shadow: 6px 6px 0px #000000;
 }
 

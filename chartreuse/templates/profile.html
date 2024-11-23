@@ -49,13 +49,6 @@
                         <!-- The Github button -->
                         {% if profile.github %}
                             <div class="col-6">
-                                {% comment %} <h3>
-                                    <a href="{{ profile.github }}" 
-                                        class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" 
-                                        id="profile-github">
-                                            <i class="bi bi-github"></i> Github Profile
-                                    </a>
-                                </h3> {% endcomment %}
                                 <button id="profile-github"
                                         class="btn"
                                         onclick="location.href='{{ profile.github }}'">

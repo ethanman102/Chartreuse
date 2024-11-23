@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from .view import home_page_view, profile_utils, signup_view, login_view, landing_page_view, profile_view, follow_list_view, post_view, settings_view, post_utils, comment_utils, follow_utils,discover_view, inbox
 app_name = "chartreuse"
 urlpatterns = [
-    re_path(r"api/authors/(?P<pk>.*\w)", users.UserViewSet.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'}), name="user-detail"),
+    re_path(r"api/authors/(?P<pk>.*\w)/$", users.UserViewSet.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'}), name="user-detail"),
     re_path(r'homepage/post/(?P<post_id>https?.+\w)/edit/$', post_utils.edit_post, name='edit-post'),
     re_path(r'homepage/post/(?P<post_id>https?.+\w)/delete/$', post_utils.delete_post, name='delete-post'),
     re_path(r'homepage/post/(?P<post_id>https?.+\w)/update/$', post_utils.update_post, name='update-post'),

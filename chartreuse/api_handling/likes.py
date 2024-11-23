@@ -7,12 +7,24 @@ from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_sche
 from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.decorators import action, api_view
-
+from rest_framework.authentication import SessionAuthentication
 from ..models import Like, User, Post, Comment
 from .users import UserSerializer, UserViewSet
 from urllib.parse import unquote
 from ..views import checkIfRequestAuthenticated
 from rest_framework.permissions import AllowAny
+
+def create_user_url_id(request, id):
+    id = unquote(id)
+    if id.find(":") != -1:
+        return id
+    else:
+        # create the url id
+        host = request.get_host()
+        scheme = request.scheme
+        url = f"{scheme}://{host}/chartreuse/api/authors/{id}"
+        return url
+    
 
 class LikeSerializer(serializers.Serializer):
     type = serializers.CharField(default="like")
@@ -39,7 +51,7 @@ class LikesSerializer(serializers.Serializer):
 class LikeViewSet(viewsets.ViewSet):
     serializer_class = LikeSerializer
     permission_classes = [AllowAny]
-    authentication_classes = []
+    authentication_classes = [SessionAuthentication]
 
     @extend_schema(
         summary="Adds a like to a post",
@@ -102,7 +114,9 @@ class LikeViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like object or error messages.
         '''   
-        checkIfRequestAuthenticated(request) 
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response 
         decoded_user_id = unquote(user_id)
 
         # Get the post URL from the request body
@@ -215,7 +229,9 @@ class LikeViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like object.
         '''
-        checkIfRequestAuthenticated(request)
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response
         decoded_user_id = unquote(user_id)
         # Get the post URL from the request body
         postUrl = request.POST.get('post')
@@ -548,7 +564,7 @@ class LikeViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like objects.
         '''
-        decoded_user_id = unquote(user_id)
+        decoded_user_id = create_user_url_id(request, user_id)
         page = request.GET.get('page')
         size = request.GET.get('size')
 

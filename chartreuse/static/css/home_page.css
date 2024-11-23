@@ -31,8 +31,16 @@ h1 {
     padding-left: 3%;
 }
 
+/* This keeps regular post text black (not inlcuding links) */
 p {
     font-size: large;
+    color: black;
+}
+
+/* The post's title is in the colour black */
+p.card-title{
+    font-size: larger;
+    color: black;
 }
 
 .add-post-button {
@@ -52,11 +60,6 @@ p {
     color: chartreuse;
     background-color: #01254a;
     box-shadow: 6px 6px 0px #000000;
-}
-
-a {
-    text-decoration: none;
-    color: black;
 }
 
 .pagination {

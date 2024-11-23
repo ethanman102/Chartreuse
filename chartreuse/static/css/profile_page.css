@@ -1,3 +1,8 @@
+html body {
+    margin-left: 10%;
+    margin-right: 2%;
+}
+
 /*Following related buttons */
 .follow{
     border-radius: 0;
@@ -5,11 +10,6 @@
     color: white;
     transition: box-shadow 0.3s ease;
     font-size: 100%;
-}
-
-html body {
-    margin-left: 10%;
-    margin-right: 2%;
 }
 
 .follow:hover{
@@ -210,12 +210,16 @@ h5{
     box-shadow: 6px 6px 0px #000000;
 }
 
-.post p{
-    color: #1b1b1b;
-    font-size: 2ch;
-    padding-bottom: 2ch;
-    text-align: center;
-    vertical-align: center;
+/* This keeps regular post text black (not inlcuding links) */
+p {
+    font-size: large;
+    color: black;
+}
+
+/* The post's title is in the colour black */
+p.card-title{
+    font-size: larger;
+    color: black;
 }
 
 .post-image{
@@ -250,5 +254,6 @@ p img {
     max-width: 100%;
     height: auto;
 }
+
 
 

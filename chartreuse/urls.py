@@ -24,12 +24,12 @@ urlpatterns = [
     re_path(r"api/authors/(?P<user_id>.+\w)/posts/(?P<post_id>.+\w)/comments/(?P<comment_id>.+\w)/likes/$", likes.LikeViewSet.as_view({'get': 'get_comment_likes'}), name="comment_likes"),
     # re_path(r"api/authors/(?P<user_id>.+\w)/posts/(?P<post_id>.+\w)/likes/$", likes.LikeViewSet.get_post_likes, name="post_likes"),
     re_path(r"api/authors/(?P<user_id>.+\w)/posts/(?P<post_id>.+\w)/likes/$", likes.LikeViewSet.as_view({'get': 'get_post_likes'}), name="post_likes"),
-    re_path(r"api/authors/(?P<user_id>.+\w)/liked/(?P<like_id>.+\w)/$", likes.LikeViewSet.get_like, name="get_like_object"),
+    re_path(r"api/authors/(?P<user_id>https?.+\w)/liked/(?P<like_id>https?.+\w)/$", likes.LikeViewSet.get_like, name="get_like_object"),
     re_path(r"api/authors/(?P<user_id>.*\w)/liked/$", likes.LikeViewSet.user_likes, name="get_liked"),
 
     # Comment URLs 
     re_path(r"api/authors/(?P<user_id>.+\w)/posts/(?P<post_id>.+\w)/comments/add/$", comments.CommentViewSet.as_view({'post': 'create_comment'}), name="create_comment"),
-    re_path(r"api/authors/(?P<user_id>.+\w)/posts/(?P<post_id>.+\w)/comment/(?P<comment_id>.+)/$", comments.CommentViewSet.get_comment, name="get_comment"),
+    re_path(r"api/authors/(?P<user_id>https?.+\w)/posts/(?P<post_id>https?.+\w)/comment/(?P<comment_id>.+)/$", comments.CommentViewSet.get_comment, name="get_comment"),
     re_path(r"api/comment/(?P<comment_id>.+)/remove/$", comments.CommentViewSet.as_view({"delete":"delete_comment"}), name="delete_comment"), 
     re_path(r"api/comment/(?P<comment_id>.+)/$", comments.CommentViewSet.get_comment, name="get_comment_by_cid"), 
     re_path(r"api/authors/(?P<user_id>.+\w)/posts/(?P<post_id>.+\w)/comments/$", comments.CommentViewSet.as_view({'get': 'get_comments'}), name="get_comments"),
@@ -39,7 +39,7 @@ urlpatterns = [
     re_path(r"api/commented/(?P<comment_id>.+)/$", comments.CommentViewSet.get_comment, name="get_commented_by_cid"), 
 
     # Post URLs
-    re_path(r"api/authors/(?P<user_id>.+\w)/posts/(?P<post_id>.+\w)/$", posts.PostViewSet.as_view({"get": "get_post", "delete": "remove_post", "put": "update"}), name="post"),
+    re_path(r"api/authors/(?P<user_id>https?.+\w)/posts/(?P<post_id>https?.+\w)/$", posts.PostViewSet.as_view({"get": "get_post", "delete": "remove_post", "put": "update"}), name="post"),
     re_path(r"api/authors/(?P<user_id>.+\w)/posts/$", posts.PostViewSet.as_view({"get": "get_posts", "post": "create_post"}), name="posts"),
     re_path(r"api/post-exists/$", post_utils.check_duplicate_post, name="check_duplicate_post"),
 

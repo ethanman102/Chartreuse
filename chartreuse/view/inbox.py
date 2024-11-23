@@ -10,6 +10,16 @@ from rest_framework.decorators import action, api_view, permission_classes, auth
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 
+def create_user_url_id(request, id):
+    id = unquote(id)
+    if id.find(":") != -1:
+        return id
+    else:
+        # create the url id
+        host = request.host
+        scheme = request.scheme
+        return f"{scheme}://{host}/chartreuse/api/authors/{id}"
+    
 
 @extend_schema(
     summary="Handle incoming posts, comments, likes, and follow requests",
@@ -86,6 +96,11 @@ from rest_framework.authentication import SessionAuthentication
 @authentication_classes([SessionAuthentication])
 def inbox(request, user_id):
     data = json.loads(request.body.decode('utf-8'))
+
+    decoded_url_id = create_user_url_id(request, user_id)
+    author = User.objects.filter(url_id=decoded_url_id).first()
+    if author is None:
+        return JsonResponse({f"error": "Author,{user_id},not found"}, status=404)
 
     # check request headers
     authorization = request.headers.get('Authorization')

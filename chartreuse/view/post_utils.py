@@ -629,7 +629,7 @@ def get_image_post(pfp_url):
         post_serial = match.group("post_serial")
 
         print(host,'heres host!!!')
-        author = User.objects.filter(url_id=f"{host}/authors/{author_serial}").first()
+        author = User.objects.filter(url_id=f"{host}/chartreuse/api/authors/{author_serial}").first()
         pfp_post = Post.objects.filter(user=author, url_id=f"{host}/authors/{author_serial}/posts/{post_serial}").first()
 
         if pfp_post and pfp_post.content and pfp_post.contentType in ['image/jpeg;base64', 'image/png;bas64', 'image/webp', 'image/jpg;base64']:

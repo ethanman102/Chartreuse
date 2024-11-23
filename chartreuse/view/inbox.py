@@ -125,7 +125,7 @@ def inbox(request, user_id):
         visibility = data["visibility"]
 
         # check whether we need to add this post or update it or delete it
-        post = Post.objects.filter(title=title, description=description, content=content).first()
+        post = Post.objects.filter(url_id=post_id).first()
 
         # get author object
         author_id = unquote(author["id"])

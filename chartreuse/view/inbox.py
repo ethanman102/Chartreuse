@@ -179,8 +179,8 @@ def inbox(request, user_id):
 
             # add like objects
             
-            post_likes = data.get("likes",[])
-            for post_like in post_likes['src']:
+            post_likes = data.get("likes",{})
+            for post_like in post_likes.get('src',[]):
                 author_id = post_like["author"]['id']
 
                 # check to see whether the author has been discovered yet or not!
@@ -212,7 +212,7 @@ def inbox(request, user_id):
         comment_id = data["id"]
         post = data["post"]
         published = data["published"]
-        likes = data.get("likes",[])
+        likes = data.get("likes",{})
         # add this new comment if it does not exist, if it exists, then delete it
 
         comment_author_id = unquote(comment_author["id"])
@@ -229,7 +229,7 @@ def inbox(request, user_id):
             comment.save()
 
         # add comment likes
-        comment_likes = likes["src"]
+        comment_likes = likes.get('src',[])
         for comment_like in comment_likes:
             like_author = comment_like["author"]
             published = comment_like["published"]

@@ -119,8 +119,8 @@ def inbox(request, user_id):
         contentType = data["contentType"]
         content = data["content"]
         author = data["author"]
-        comments = data.get("comments",[])
-        likes = data.get("likes",[])
+        comments = data.get("comments",{})
+        likes = data.get("likes",{})
         published = data["published"]
         visibility = data["visibility"]
 

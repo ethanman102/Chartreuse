@@ -210,11 +210,13 @@ h5{
     box-shadow: 6px 6px 0px #000000;
 }
 
+/* This keeps regular post text black (not inlcuding links) */
 p {
     font-size: large;
     color: black;
 }
 
+/* The post's title is in the colour black */
 p.card-title{
     font-size: larger;
     color: black;

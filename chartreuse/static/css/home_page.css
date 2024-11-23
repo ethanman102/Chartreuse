@@ -31,11 +31,13 @@ h1 {
     padding-left: 3%;
 }
 
+/* This keeps regular post text black (not inlcuding links) */
 p {
     font-size: large;
     color: black;
 }
 
+/* The post's title is in the colour black */
 p.card-title{
     font-size: larger;
     color: black;

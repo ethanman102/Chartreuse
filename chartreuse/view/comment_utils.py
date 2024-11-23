@@ -15,7 +15,7 @@ def add_comment(request):
             post_id = body["post_id"]
 
             user = User.objects.get(url_id=unquote(user_id))
-            post = Post.objects.get(url_id=unquote(post_id))
+            post = Post.objects.filter(url_id=unquote(post_id)).first()
             
             # Parse the JSON body to get the comment text and content type
             body = json.loads(request.body)

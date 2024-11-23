@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.core.paginator import Paginator
 from ..views import checkIfRequestAuthenticated
 from rest_framework.permissions import AllowAny
+from rest_framework.authentication import SessionAuthentication
 
 class FriendSerializer(serializers.Serializer):
     type = serializers.CharField(default="author")
@@ -32,7 +33,7 @@ class FriendsSerializer(serializers.Serializer):
 class FriendsViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     serializer_class = FriendSerializer
-    # authentication_classes = []
+    authentication_classes = [SessionAuthentication]
 
     @extend_schema(
         summary="Retrieve list of friends for a specific author",
@@ -74,7 +75,10 @@ class FriendsViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse with the list of friends.
         '''
-        checkIfRequestAuthenticated(request)
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response
+
         decoded_author_id = unquote(author_id)
         author = get_object_or_404(User, url_id=decoded_author_id)
 
@@ -155,7 +159,10 @@ class FriendsViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse with a message indicating friendship status.
         '''
-        checkIfRequestAuthenticated(request)
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response
+            
         decoded_author_id = unquote(author_id)
         decoded_foreign_author_id = unquote(foreign_author_id)
 

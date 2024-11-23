@@ -8,7 +8,7 @@ from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.authentication import SessionAuthentication
 from ..models import User, Like, Post, Follow, Comment
 from .users import UserSerializer, UserViewSet
 from .likes import LikeSerializer, LikesSerializer, LikeViewSet
@@ -41,7 +41,7 @@ class CommentsSerializer(serializers.Serializer):
 class CommentViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     serializer_class = CommentSerializer
-    # authentication_classes = []
+    authentication_classes = [SessionAuthentication]
 
     @extend_schema(
         summary="Adds a comment on a post",
@@ -102,7 +102,9 @@ class CommentViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing the comment object.  
         """
-        checkIfRequestAuthenticated(request)
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response
             
         decoded_author_id = unquote(user_id)
 
@@ -129,7 +131,7 @@ class CommentViewSet(viewsets.ViewSet):
         content_type = request.POST.get('contentType', 'text/markdown')
 
         # User get_or_creat to simplify checking if the user already commented on the post
-        comment = Comment(
+        comment = Comment.objects.create(
             user=user_commenting,
             post=post,
             comment=comment_text,
@@ -216,7 +218,9 @@ class CommentViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing the comment object.  
         """
-        checkIfRequestAuthenticated(request)
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response
 
         # Get the comment   
         comment = Comment.objects.filter(url_id = unquote(comment_id)).first()

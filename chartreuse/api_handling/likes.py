@@ -7,7 +7,7 @@ from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_sche
 from rest_framework import serializers
 from rest_framework import viewsets
 from rest_framework.decorators import action, api_view
-
+from rest_framework.authentication import SessionAuthentication
 from ..models import Like, User, Post, Comment
 from .users import UserSerializer, UserViewSet
 from urllib.parse import unquote
@@ -39,7 +39,7 @@ class LikesSerializer(serializers.Serializer):
 class LikeViewSet(viewsets.ViewSet):
     serializer_class = LikeSerializer
     permission_classes = [AllowAny]
-    authentication_classes = []
+    authentication_classes = [SessionAuthentication]
 
     @extend_schema(
         summary="Adds a like to a post",
@@ -102,7 +102,9 @@ class LikeViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like object or error messages.
         '''   
-        checkIfRequestAuthenticated(request) 
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response 
         decoded_user_id = unquote(user_id)
 
         # Get the post URL from the request body
@@ -215,7 +217,9 @@ class LikeViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like object.
         '''
-        checkIfRequestAuthenticated(request)
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response
         decoded_user_id = unquote(user_id)
         # Get the post URL from the request body
         postUrl = request.POST.get('post')

@@ -11,6 +11,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParamet
 from django.core.paginator import Paginator
 from ..views import checkIfRequestAuthenticated
 from rest_framework.permissions import AllowAny
+from rest_framework.authentication import SessionAuthentication
 
 class ActorSerializer(serializers.Serializer):
     type = serializers.CharField(default="author")
@@ -55,7 +56,7 @@ class FollowRequestsSerializer(serializers.Serializer):
 class FollowRequestViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
     serializer_class = FollowRequestSerializer
-    # authentication_classes = []
+    authentication_classes = [SessionAuthentication]
 
     @extend_schema(
         summary="Send a follow request",
@@ -105,7 +106,10 @@ class FollowRequestViewSet(viewsets.ViewSet):
             JsonResponse with the follow request details.
         '''
         if request.method == 'POST':
-            checkIfRequestAuthenticated(request)
+            response = checkIfRequestAuthenticated(request)
+            if response.status_code == 401:
+                return response
+
             decoded_author_id = unquote(author_id)
 
             current_user = User.objects.get(user=request.user)
@@ -171,7 +175,9 @@ class FollowRequestViewSet(viewsets.ViewSet):
             JsonResponse with success message.
         '''
         if request.method == 'POST':
-            checkIfRequestAuthenticated(request)
+            response = checkIfRequestAuthenticated(request)
+            if response.status_code == 401:
+                return response
             follow_request = get_object_or_404(FollowRequest, id=request_id)
 
             # Create a follower object
@@ -232,7 +238,9 @@ class FollowRequestViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse with success message.
         '''
-        checkIfRequestAuthenticated(request)
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response
         if request.method == 'DELETE':
             follow_request = get_object_or_404(FollowRequest, id=request_id)
 

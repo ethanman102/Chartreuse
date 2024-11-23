@@ -139,7 +139,7 @@ def inbox(request, user_id):
             
 
             # add comment objects
-            post_comments = comments["src"]
+            post_comments = comments.get('src',[])
             
             for post_comment in post_comments:
                 comment_author = post_comment["author"]
@@ -160,8 +160,9 @@ def inbox(request, user_id):
                 
                 
                 # add comment likes
-                comment_likes = post_comment["likes"]
-                for comment_like in comment_likes['src']:
+                comment_likes = post_comment.get('likes',[])
+                comments_src = comment_likes.get('src',[])
+                for comment_like in comment_likes:
                     like_author = comment_like["author"]
                     published = comment_like["published"]
                     like_id = comment_like["id"]

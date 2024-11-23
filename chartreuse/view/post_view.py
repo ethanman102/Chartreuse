@@ -67,7 +67,7 @@ class PostDetailView(DetailView):
         post.url_id = quote(post.url_id, safe='')
 
         
-        if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
+        if (post.contentType != "text/plain") and (post.contentType != "text/markdown"):
             post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
             post.has_image = True
 

@@ -18,11 +18,15 @@
         {% endblock %}
 
         <div class="container">
+            <!-- This is the container for the page title + back button -->
             <div class="container full-container" id="follow-list-header">
                 <h4>chartreuse.post-likes</h4>
                 <button id="back" type="button" class="custom-button">X</button>
             </div>
+
+            <!-- The list of ppl who liked the post will show up here -->
             <div class="container full-container" id="container-item-box">
+                <!-- If the post has likes, then a bar with their pfp, display name, and a view profile button shows up here -->
                 {% if liked %}
                     {% for author in liked %}
                     
@@ -33,6 +37,7 @@
                     </div>
                     {% endfor %}
                 {% else %}
+                <!-- if there are no likes yet, this prompt shows up -->
                 <h1 class="text-center">nothing here yet... :(</h1>
 
                 {% endif %} 
@@ -43,6 +48,7 @@
             window.addEventListener('load', main); 
     
             function main() {
+                // This is Ethan's code for his view-profile button (used in follow-list page)
                 document.querySelectorAll(".view-profile-button").forEach((button)=>{
                     button.addEventListener('click',function(event){
                         let location = this.getAttribute("url-id");
@@ -51,6 +57,7 @@
                 });
 
                 // Asked OpenAI, ChatGPT how I can make a button redirect to the last visited page (back button), "how to make a back button with JS", 2024-11-21.
+                // This is a back button so the user can go back to the previous page (hopefully the single-post page) 
                 document.getElementById('back').addEventListener('click', function() {
                     window.history.back();
                 });

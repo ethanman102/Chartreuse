@@ -21,7 +21,7 @@ class PostDetailView(DetailView):
         """
         url_id = self.kwargs.get('post_id')
         url_id = unquote(url_id)
-        post = Post.objects.filter(Post, url_id=url_id).first()
+        post = Post.objects.filter(url_id=url_id).first()
         return post
 
     def get_context_data(self, **kwargs):

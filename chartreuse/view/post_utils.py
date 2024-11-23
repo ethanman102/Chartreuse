@@ -360,20 +360,20 @@ def save_post(request):
             image_content = image.content_type.split('/')[1]
             if image_content not in ['jpeg', 'png', 'jpg']:
                 image_content = 'png'
-            content_type = 'image/' + image_content + ';base64,'
-            post_content = f'data:{content_type}{encoded_image},'
+            content_type = 'image/' + image_content + ';base64'
+            post_content = f'data:{content_type},{encoded_image},'
         elif image_url:
             image_content = image_url.split('.')[-1]
             if image_content not in ['jpeg', 'png', 'jpg']:
                 image_content = 'png'
-            content_type = 'image/' + image_content +';base64,'
+            content_type = 'image/' + image_content +';base64'
             try:
                 with urlopen(image_url) as url:
                     f = url.read()
                     encoded_string = base64.b64encode(f).decode("utf-8")
             except Exception as e:
                 raise ValueError(f"Failed to retrieve image from URL: {e}")
-            post_content = f'data:{content_type}{encoded_string},'
+            post_content = f'data:{content_type},{encoded_string}'
         else:
             return JsonResponse({'error': 'Invalid post data.'}, status=400)
         

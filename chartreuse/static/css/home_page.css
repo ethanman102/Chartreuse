@@ -36,6 +36,11 @@ p {
     color: black;
 }
 
+p.card-title{
+    font-size: larger;
+    color: black;
+}
+
 .add-post-button {
     color: chartreuse;
     background-color: #00356b;

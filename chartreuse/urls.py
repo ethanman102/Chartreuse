@@ -44,7 +44,7 @@ urlpatterns = [
     re_path(r"api/post-exists/$", post_utils.check_duplicate_post, name="check_duplicate_post"),
 
     # Follower API URLs
-    re_path(r"api/authors/(?P<author_id>.+\w)/followers/(?P<foreign_author_id>.+\w)/is_follower", followers.FollowViewSet.as_view({'get': 'is_follower'}), name="is_follower"),
+    re_path(r"api/authors/(?P<author_id>.+\w)/followers/(?P<foreign_author_id>.+\w)", followers.FollowViewSet.as_view({'get': 'is_follower'}), name="is_follower"),
     re_path(r"api/authors/(?P<author_id>.+\w)/followers/(?P<foreign_author_id>.+\w)/remove", followers.FollowViewSet.as_view({'delete': 'remove_follower'}), name="remove_follower"),
     re_path(r"api/authors/(?P<author_id>.+\w)/followers/(?P<foreign_author_id>.+\w)", followers.FollowViewSet.as_view({'post': 'add_follower', 'put': 'add_follower'}), name="add_follower"),
     re_path(r"api/authors/(?P<author_id>.+\w)/followers", followers.FollowViewSet.as_view({'get': 'get_followers'}), name="get_followers"),
@@ -53,7 +53,6 @@ urlpatterns = [
     path("api/author/login/", users.UserViewSet.login_user, name="login_user"),
     re_path(r"api/authors/(?P<pk>.+\w)/$", users.UserViewSet.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'}), name="user-detail"),
     path("api/authors/", users.UserViewSet.as_view({'post': 'create', 'get': 'list'}), name="user-list"),
-
     
     # Follow Request API URLs
     re_path(r"api/authors/(?P<author_id>.+\w)/follow-requests/send", follow_requests.FollowRequestViewSet.as_view({'post': 'send_follow_request'}), name="send_follow_request"),

@@ -40,7 +40,7 @@ urlpatterns = [
 
     # Post URLs
     re_path(r"api/authors/(?P<user_id>https?.+\w)/posts/(?P<post_id>https?.+\w)/$", posts.PostViewSet.as_view({"get": "get_post", "delete": "remove_post", "put": "update"}), name="post"),
-    re_path(r"api/authors/(?P<user_id>.+\w)/posts/$", posts.PostViewSet.as_view({"get": "get_posts", "post": "create_post"}), name="posts"),
+    re_path(r"api/authors/(?P<user_id>.+\w)/posts", posts.PostViewSet.as_view({"get": "get_posts", "post": "create_post"}), name="posts"),
     re_path(r"api/post-exists/$", post_utils.check_duplicate_post, name="check_duplicate_post"),
 
     # Follower API URLs

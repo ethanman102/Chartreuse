@@ -18,7 +18,17 @@ from urllib.parse import unquote
 from rest_framework.permissions import AllowAny
 from ..views import checkIfRequestAuthenticated
 from ..view import post_utils
-from id_functions import create_user_url_id
+
+def create_user_url_id(request, id):
+    id = unquote(id)
+    if id.find(":") != -1:
+        return id
+    else:
+        # create the url id
+        host = request.host
+        scheme = request.scheme
+        return f"{scheme}://{host}/chartreuse/api/authors/{id}"
+    
 
 
 class PostSerializer(serializers.Serializer):

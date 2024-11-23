@@ -16,8 +16,17 @@ from .friends import FriendsViewSet
 from urllib.parse import unquote
 from ..views import checkIfRequestAuthenticated
 from rest_framework.permissions import AllowAny
-from id_functions import create_user_url_id
 
+def create_user_url_id(request, id):
+    id = unquote(id)
+    if id.find(":") != -1:
+        return id
+    else:
+        # create the url id
+        host = request.host
+        scheme = request.scheme
+        return f"{scheme}://{host}/chartreuse/api/authors/{id}"
+    
 class CommentSerializer(serializers.Serializer):
     type = serializers.CharField(default="comment")
     author = UserSerializer

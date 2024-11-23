@@ -620,7 +620,7 @@ def check_duplicate_post(request):
     
 def get_image_post(pfp_url):
     print(pfp_url,'heyyy')
-    pattern = r"(?P<host>https?:\/\/.+?herokuapp\.com)\/authors\/(?P<author_serial>\d+)\/posts\/(?P<post_serial>\d+)\/image"
+    pattern = r"(?P<host>https?:\/\/.+?herokuapp\.com)(\/chartreuse\/api)?\/authors\/(?P<author_serial>\d+)\/posts\/(?P<post_serial>\d+)\/image"
     match = re.search(pattern, pfp_url)
 
     if match:

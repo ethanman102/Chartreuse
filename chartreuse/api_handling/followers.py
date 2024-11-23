@@ -13,6 +13,17 @@ from django.core.paginator import Paginator
 from ..views import checkIfRequestAuthenticated
 from rest_framework.permissions import AllowAny
 
+def create_user_url_id(request, id):
+    id = unquote(id)
+    if id.find(":") != -1:
+        return id
+    else:
+        # create the url id
+        host = request.get_host()
+        scheme = request.scheme
+        url = f"{scheme}://{host}/chartreuse/api/authors/{id}"
+        return url
+
 class FollowerSerializer(serializers.Serializer):
     type = serializers.CharField(default="author")
     id = serializers.URLField()
@@ -321,7 +332,9 @@ class FollowViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse with success message.
         '''
-        decoded_author_id = unquote(author_id)
+        
+
+        decoded_author_id = create_user_url_id(request,author_id)
         decoded_foreign_author_id = unquote(foreign_author_id)
 
         author = get_object_or_404(User, url_id=decoded_author_id)

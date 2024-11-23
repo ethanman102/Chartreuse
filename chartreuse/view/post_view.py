@@ -40,8 +40,6 @@ class PostDetailView(DetailView):
             post_owner = post.user
             repost = False
         
-        
-
         current_user_model = None
 
         if self.request.user.is_authenticated:

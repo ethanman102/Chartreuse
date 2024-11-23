@@ -194,7 +194,7 @@ def update_post(request, post_id):
         else:
             return JsonResponse({'error': 'Invalid post data.'}, status=400)
         
-        post = Post.objects.get(url_id=unquote(post_id))
+        post = Post.objects.filter(url_id=unquote(post_id)).first()
         if (post.user != current_user_model):
             return JsonResponse({'error': 'Unauthorized access.'}, status=401)
 
@@ -411,7 +411,7 @@ def like_post(request):
         post_id = body["post_id"]
 
         user = User.objects.get(url_id=unquote(user_id))
-        post = Post.objects.get(url_id=unquote(post_id))
+        post = Post.objects.filter(url_id=unquote(post_id)).first()
 
         # first check if the user has already liked the post
         like = Like.objects.filter(user=user, post=post).first()

@@ -5,7 +5,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from chartreuse.views import  error, test
 from django.contrib.auth.decorators import login_required
-from .view import home_page_view, profile_utils, signup_view, login_view, landing_page_view, profile_view, follow_list_view, post_view, settings_view, post_utils, comment_utils, follow_utils,discover_view, inbox
+from .view import home_page_view, profile_utils, signup_view, login_view, landing_page_view, profile_view, follow_list_view, post_view, settings_view, post_utils, comment_utils, follow_utils,discover_view, inbox, liked_list_view
 app_name = "chartreuse"
 urlpatterns = [
     re_path(r'homepage/post/(?P<post_id>https?.+\w)/edit/', post_utils.edit_post, name='edit-post'),
@@ -114,6 +114,9 @@ urlpatterns = [
     re_path(r'.+/like-post/', post_utils.like_post, name='like-post'),
     re_path(r'.+/send-follow-request/', follow_utils.send_follow_request, name='send-follow-request'),
     re_path(r'.+/repost/', post_utils.repost,name='repost'),
+
+    # URL to view the users who liked a post
+    re_path(r"authors/(?P<url_id>https?.+)/post/liked-users/(?P<post_id>https?.+\w)/$", liked_list_view.LikedListDetailView.as_view(),name="users_who_liked"),
 
     # Follow Request URLs
     re_path(r"authors/(?P<url_id>https?.+)/post/(?P<post_id>https?.+\w)/$",post_view.PostDetailView.as_view(),name="profile_view_post"),

@@ -64,9 +64,9 @@
     <h2 class="card-title mb-3" style="font-size: 1.8rem; font-weight: bold; text-align: left;">{{ post.title }}</h2>
     
     {% if post.contentType == "text/plain" %}
-        <p class="card-text" style="text-align: left;">{{ post.content }}</p>
+        <p class="card-text" style="text-align: left;">{{ post.content|linebreaksbr }}</p>
     {% elif post.contentType == "text/markdown" %}
-        <p class="card-text cm_text"  style="text-align: left;">{{ post.content }}</p>
+        <p class="card-text cm_text"  style="text-align: left;">{{ post.content|linebreaksbr }}</p>
     {% elif post.contentType == "image/png;base64" or post.contentType == "image/jpeg;base64" %}
         <div class="text-center">
             <img src="{{ post.content }}" alt="Post Image" class="img-fluid mt-3" style="border: none; max-width: 100%; object-fit: cover;">
@@ -78,9 +78,9 @@
     <p class="text-muted mt-3" style="font-size: 0.9rem; text-align: left;">Published on {{ post.published }}</p>
 
     <div class="d-flex justify-content-start align-items-center mb-2" style="gap: 1.5rem;">
-        {% if post.has_image and logged_in and not post.repost%}
+        {% comment %} {% if post.has_image and logged_in and not post.repost%}
             <button class="btn pfp-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">Set pfp</button>
-        {% endif %}
+        {% endif %} {% endcomment %}
             <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">{{ post.likes_count }} likes</button>
 
             <a href="{% url 'chartreuse:users_who_liked' user_url_quoted post.url_id %}"> 
@@ -88,7 +88,6 @@
                 <!-- added href for the redirect -->
                 <button class="btn likes-list-button" data-post-id="{{post.url_id}}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">See Likes</button>
             </a>
-            
         {% if logged_in and not post.repost and post.visibility == "PUBLIC" %}
             <button class="btn repost-button" data-post-id="{{post.url_id}}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">Repost</button>
         {% endif %}

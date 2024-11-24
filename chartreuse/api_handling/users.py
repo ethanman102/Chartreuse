@@ -383,7 +383,9 @@ class UserViewSet(viewsets.ViewSet):
         
         Returns:
             JsonResponse containing the newly created user.
+            
         '''
+        
         auth_response = checkIfRequestAuthenticated(request)
         if auth_response.status_code == 401:
             return auth_response

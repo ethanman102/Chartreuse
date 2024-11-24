@@ -19,6 +19,7 @@ def create_user_url_id(request, id):
         host = request.get_host()
         scheme = request.scheme
         url = f"{scheme}://{host}/chartreuse/api/authors/{id}"
+        print(url,'kkkk')
         return url
     
 
@@ -96,12 +97,13 @@ def create_user_url_id(request, id):
 @permission_classes([AllowAny])
 @authentication_classes([SessionAuthentication])
 def inbox(request, user_id):
+    
     data = json.loads(request.body.decode('utf-8'))
 
     decoded_url_id = create_user_url_id(request, user_id)
     author = User.objects.filter(url_id=decoded_url_id).first()
     if author is None:
-        return JsonResponse({f"error": "Author,{user_id},not found"}, status=404)
+        return JsonResponse({"error": f"Author,{user_id},not found"}, status=404)
 
     # check request headers
     authorization = request.headers.get('Authorization')
@@ -129,7 +131,7 @@ def inbox(request, user_id):
 
         # get author object
         author_id = unquote(author["id"])
-        author = User.objects.get(pk=author_id)
+        author = discover_author(author_id,author)
 
         if post is None:
             # create a new post
@@ -148,7 +150,7 @@ def inbox(request, user_id):
                 comment_id = post_comment["id"]
                 post = post_comment["post"]
                 published = post_comment["published"]
-                likes = post_comment["likes"]
+                likes = post_comment.get('likes',{})
 
                 comment_author_id = unquote(comment_author["id"])
                 comment_author = discover_author(comment_author_id,post_comment['author'])
@@ -160,9 +162,9 @@ def inbox(request, user_id):
                 
                 
                 # add comment likes
-                comment_likes = post_comment.get('likes',[])
+                comment_likes = post_comment.get('likes',{})
                 comments_src = comment_likes.get('src',[])
-                for comment_like in comment_likes:
+                for comment_like in comments_src:
                     like_author = comment_like["author"]
                     published = comment_like["published"]
                     like_id = comment_like["id"]
@@ -203,7 +205,7 @@ def inbox(request, user_id):
             post.content = content
             post.save()
                     
-        return JsonResponse({"status": "Post added successfully"})
+        return JsonResponse({"status": "Post added successfully"},status=200)
 
     elif (data["type"] == "comment"):
         comment_author = data["author"]

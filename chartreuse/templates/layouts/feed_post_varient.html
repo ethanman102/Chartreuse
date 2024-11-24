@@ -29,9 +29,9 @@
     <a href="{% url 'chartreuse:profile_view_post' owner_id post.url_id %}" class="card-link px-4" style="text-decoration: none;">
         <p class="card-title mt-2" style="text-align: left;">{{ post.title }}</p>
             {% if post.contentType == "text/plain" %}
-                <p class="card-text mt-2" style="text-align: left;">{{ post.content }}</p>
+                <p class="card-text mt-2" style="text-align: left;">{{ post.content|linebreaksbr }}</p>
             {% elif post.contentType == "text/markdown" %}
-                <p class="card-text mt-2 cm_text" style="text-align: left;">{{ post.content }}</p>
+                <p class="card-text mt-2 cm_text" style="text-align: left;">{{ post.content|linebreaksbr }}</p>
             {% elif post.contentType == "image/png;base64" or post.contentType == "image/jpeg;base64" %}
                 <div class="d-flex justify-content-start">
                     <img src="{{ post.content }}" alt="Post Image" class="img-fluid mt-3" style="border: none; max-width: 20%;">

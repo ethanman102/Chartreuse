@@ -4,6 +4,9 @@ import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
 
+def create_singleton(apps, schema_editor):
+    Settings = apps.get_model('chartreuse', 'Settings')
+    Settings.objects.get_or_create(pk=1)
 
 class Migration(migrations.Migration):
 
@@ -39,6 +42,7 @@ class Migration(migrations.Migration):
                 ('approval_required', models.BooleanField(default=False)),
             ],
         ),
+        migrations.RunPython(create_singleton),
         migrations.CreateModel(
             name='User',
             fields=[

@@ -361,7 +361,7 @@ def save_post(request):
             if image_content not in ['jpeg', 'png', 'jpg']:
                 image_content = 'png'
             content_type = 'image/' + image_content + ';base64'
-            post_content = encoded_image
+            post_content = f'data:{content_type},{encoded_image},'
         elif image_url:
             image_content = image_url.split('.')[-1]
             if image_content not in ['jpeg', 'png', 'jpg']:
@@ -373,7 +373,7 @@ def save_post(request):
                     encoded_string = base64.b64encode(f).decode("utf-8")
             except Exception as e:
                 raise ValueError(f"Failed to retrieve image from URL: {e}")
-            post_content = encoded_string
+            post_content = f'data:{content_type},{encoded_string}'
         else:
             return JsonResponse({'error': 'Invalid post data.'}, status=400)
         
@@ -619,19 +619,22 @@ def check_duplicate_post(request):
         return JsonResponse({'error': 'Invalid request method.'}, status=400)
     
 def get_image_post(pfp_url):
-    pattern = r"(?P<host>https?:\/\/.+?herokuapp\.com)\/authors\/(?P<author_serial>\d+)\/posts\/(?P<post_serial>\d+)\/image"
+    print(pfp_url,'heyyy')
+    pattern = r"(?P<host>https?:\/\/.+?herokuapp\.com)(\/chartreuse\/api)?\/authors\/(?P<author_serial>\d+)\/posts\/(?P<post_serial>\d+)\/image"
     match = re.search(pattern, pfp_url)
 
     if match:
         host = match.group("host")
         author_serial = match.group("author_serial")
         post_serial = match.group("post_serial")
-    
-        author = User.objects.filter(url_id=f"{host}/authors/{author_serial}").first()
-        pfp_post = Post.objects.filter(user=author, url_id=f"{host}/authors/{author_serial}/posts/{post_serial}").first()
+        author = User.objects.filter(url_id=f"{host}/chartreuse/api/authors/{author_serial}").first()
+        pfp_post = Post.objects.filter(user=author, url_id=f"{host}/chartreuse/api/authors/{author_serial}/posts/{post_serial}").first()
 
-        if pfp_post and pfp_post.content and pfp_post.contentType in ['image/jpeg', 'image/png', 'image/webp', 'image/jpg']:
-            pfp_url = f"data:{pfp_post.contentType};charset=utf-8;base64, {pfp_post.content}"
+        if pfp_post and pfp_post.content and pfp_post.contentType in ['image/jpeg;base64', 'image/png;base64', 'image/webp', 'image/jpg;base64']:
+            if not pfp_post.content.startswith('data:'):
+                pfp_url = f"data:{pfp_post.contentType};charset=utf-8;base64, {pfp_post.content}"
+            else:
+                pfp_url = pfp_post.content
         else:
             pfp_url = f"{Host.host}/static/images/default_pfp_1.png"
         return pfp_url
@@ -671,7 +674,8 @@ def prepare_posts(posts):
                
                 
         if (post.contentType != "text/plain") and (post.contentType != "text/markdown"):
-            post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+            if not post.content.startswith('data:'):
+                post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
         post.url_id = quote(post.url_id,safe='')
             
         prepared.append(post)

@@ -66,21 +66,26 @@ def retrieve_from_homepage(request, post_id):
     decoded_post_id = unquote(post_id)
     post = models.Post.objects.filter(url_id=decoded_post_id).first()
 
-    if post and post.content and post.contentType in ['image/jpeg', 'image/png']:
+    if post and post.content and post.contentType in ['image/jpeg;base64', 'image/png;base64']:
         # Decode base64 image data from the post content
+        image_data = post.content.split(',',1)[1]
         image_data = base64.b64decode(post.content)
 
         # Define the path for saving the image
         images_dir = Path("chartreuse/static/images")
         images_dir.mkdir(parents=True, exist_ok=True)  # Ensure the directory exists
-        image_path = images_dir / f"{post.id}.png"  # Save as .png based on post content type
+        if post.contentType == 'image/jpeg;base64':
+            suffix = '.jpg'
+        else:
+            suffix = '.png'
+        image_path = images_dir / f"{post.id}{suffix}"  # Save as .png based on post content type
 
         # Write the decoded image data to the file
         with image_path.open("wb") as f:
             f.write(image_data)
 
         # Redirect to the saved image
-        return redirect(f"/static/images/{post.id}.png")
+        return redirect(f"/static/images/{post.id}{suffix}")
     else:
         return JsonResponse({'error': 'Not an image'}, status=404)
 
@@ -150,21 +155,26 @@ def retrieve_from_profile(request, author_id, post_id):
     decoded_post_id = unquote(post_id)
     post = models.Post.objects.filter(url_id=decoded_post_id).first()
 
-    if post and post.content and post.contentType in ['image/jpeg', 'image/png']:
+    if post and post.content and post.contentType in ['image/jpeg;base64', 'image/png;base64']:
         # Decode base64 image data from the post content
-        image_data = base64.b64decode(post.content)
+        image_data = post.content.split(',',1)[1]
+        image_data = base64.b64decode(image_data)
 
         # Define the path for saving the image
         images_dir = Path("chartreuse/static/images")
         images_dir.mkdir(parents=True, exist_ok=True)  # Ensure the directory exists
-        image_path = images_dir / f"{post.id}.png"  # Save as .png based on post content type
+        if post.contentType == 'image/jpeg;base64':
+            suffix = '.jpg'
+        else:
+            suffix = '.png'
+        image_path = images_dir / f"{post.id}{suffix}"  # Save as .png based on post content type
 
         # Write the decoded image data to the file
         with image_path.open("wb") as f:
             f.write(image_data)
 
         # Redirect to the saved image
-        return redirect(f"/static/images/{post.id}.png")
+        return redirect(f"/static/images/{post.id}{suffix}")
     else:
         return JsonResponse({'error': 'Not an image'}, status=404)
 

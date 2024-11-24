@@ -39,7 +39,6 @@ def checkIfRequestAuthenticated(request):
         username = auth[0]
         password = auth[1]
     except (IndexError, base64.binascii.Error, UnicodeDecodeError):
-        print('here2')
         return JsonResponse({"error": "Invalid authentication format"}, status=401)
 
     node = Node.objects.filter(username=username, password=password, follow_status="INCOMING", status="ENABLED")

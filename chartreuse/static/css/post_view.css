@@ -59,7 +59,7 @@ h1 {
     box-shadow: 6px 6px 0px #000000;
 }
 
-.pfp-button {
+/* .pfp-button {
     color: #000000;
     background-color: #ffffff;
     border-color: black;
@@ -68,7 +68,7 @@ h1 {
 .pfp-button:hover {
     color: #ffffff;
     background-color: #000000;
-}
+} */
 
 .likes-list-button {
     color: chartreuse;

@@ -91,6 +91,7 @@ class PostDetailView(DetailView):
         if (repost and post_owner==current_user_model):
             context['repost_author'] = True
         context['user_details'] = current_user_model
+        context['user_url_quoted'] = quote(current_user_model.url_id)
 
         return context
     

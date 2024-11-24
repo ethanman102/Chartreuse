@@ -116,7 +116,7 @@ urlpatterns = [
     re_path(r'.+/repost/', post_utils.repost,name='repost'),
 
     # URL to view the users who liked a post
-    re_path(r"authors/(?P<url_id>https?.+?)/post/liked-users/(?P<post_id>https?.+\w)/$",user_list_view.UserListDetailView.as_view(),name="users_who_liked"),
+    re_path(r"authors/(?P<url_id>https?.+)/post/liked-users/(?P<post_id>https?.+\w)/$",user_list_view.UserListDetailView.as_view(),name="users_who_liked"),
 
     # Follow Request URLs
     re_path(r"authors/(?P<url_id>https?.+)/post/(?P<post_id>https?.+\w)/$",post_view.PostDetailView.as_view(),name="profile_view_post"),

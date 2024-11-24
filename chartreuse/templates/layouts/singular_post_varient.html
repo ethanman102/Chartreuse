@@ -83,7 +83,7 @@
         {% endif %}
             <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">{{ post.likes_count }} likes</button>
 
-            <a href="{% url 'chartreuse:users_who_liked' owner_id post.url_id %}"> 
+            <a href="{% url 'chartreuse:users_who_liked' user_details.url_id post.url_id %}"> 
                 <!-- This button will redirect the user to the page with the list of authors who liked the post -->
                 <!-- added href for the redirect -->
                 <button class="btn likes-list-button" data-post-id="{{post.url_id}}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">See Likes</button>

@@ -19,6 +19,7 @@ def create_user_url_id(request, id):
         host = request.get_host()
         scheme = request.scheme
         url = f"{scheme}://{host}/chartreuse/api/authors/{id}"
+        print(url,'kkkk')
         return url
     
 
@@ -130,7 +131,7 @@ def inbox(request, user_id):
 
         # get author object
         author_id = unquote(author["id"])
-        author = User.objects.get(pk=author_id)
+        author = discover_author(author_id,author)
 
         if post is None:
             # create a new post
@@ -204,7 +205,7 @@ def inbox(request, user_id):
             post.content = content
             post.save()
                     
-        return JsonResponse({"status": "Post added successfully"})
+        return JsonResponse({"status": "Post added successfully"},status=200)
 
     elif (data["type"] == "comment"):
         comment_author = data["author"]

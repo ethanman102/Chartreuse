@@ -96,12 +96,13 @@ def create_user_url_id(request, id):
 @permission_classes([AllowAny])
 @authentication_classes([SessionAuthentication])
 def inbox(request, user_id):
+    
     data = json.loads(request.body.decode('utf-8'))
 
     decoded_url_id = create_user_url_id(request, user_id)
     author = User.objects.filter(url_id=decoded_url_id).first()
     if author is None:
-        return JsonResponse({f"error": "Author,{user_id},not found"}, status=404)
+        return JsonResponse({"error": f"Author,{user_id},not found"}, status=404)
 
     # check request headers
     authorization = request.headers.get('Authorization')

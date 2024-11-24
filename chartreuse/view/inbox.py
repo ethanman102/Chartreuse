@@ -150,7 +150,7 @@ def inbox(request, user_id):
                 comment_id = post_comment["id"]
                 post = post_comment["post"]
                 published = post_comment["published"]
-                likes = post_comment["likes"]
+                likes = post_comment.get('likes',{})
 
                 comment_author_id = unquote(comment_author["id"])
                 comment_author = discover_author(comment_author_id,post_comment['author'])
@@ -162,9 +162,9 @@ def inbox(request, user_id):
                 
                 
                 # add comment likes
-                comment_likes = post_comment.get('likes',[])
+                comment_likes = post_comment.get('likes',{})
                 comments_src = comment_likes.get('src',[])
-                for comment_like in comment_likes:
+                for comment_like in comments_src:
                     like_author = comment_like["author"]
                     published = comment_like["published"]
                     like_id = comment_like["id"]

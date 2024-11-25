@@ -219,7 +219,7 @@ class ProfileDetailView(DetailView):
         '''
         context = super().get_context_data(**kwargs)
         user = context['profile']
-        context['owner_id'] = quote(user.url_id,safe='')
+        context['owner_id'] = user.url_id
         
         hostname = self.request.get_host()
         host_obj = Host(hostname)

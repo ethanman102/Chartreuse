@@ -11,7 +11,7 @@ html body {
     width: 60%;
 }
 
-h1 {
+h1.page-header {
     color: chartreuse;
     background-color: #00356b;
     font-size: 4ch;

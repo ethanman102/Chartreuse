@@ -129,7 +129,8 @@ class FeedDetailView(DetailView):
                 post.url_id = quote(post.url_id, safe='')
                 post.following_status = "Sign up to follow!"
                 if (post.contentType != "text/plain") and (post.contentType != "text/markdown"):
-                    post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+                    if not post.content.startswith('data:'):
+                        post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
                 post.user.profileImage = get_image_post(post.user.profileImage)
             
             return posts

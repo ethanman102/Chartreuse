@@ -21,7 +21,7 @@ html body {
     box-shadow: 6px 6px 0px #0000005d;
 }
 
-h1 {
+h1.page-header {
     color: chartreuse;
     background-color: #00356b;
     font-size: 4ch;

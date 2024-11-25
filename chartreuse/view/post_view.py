@@ -20,6 +20,7 @@ class PostDetailView(DetailView):
         Retrieve the post object based on the URL parameter 'url_id'.
         """
         url_id = self.kwargs.get('post_id')
+        print('HELLLLOOO','POSTID')
         url_id = unquote(url_id)
         post = Post.objects.filter(url_id=url_id).first()
         return post

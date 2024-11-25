@@ -156,7 +156,7 @@
                                         </div>
                                         <!-- View Repost button -->
                                         <div class="d-flex align-items-center mb-3" style="gap: 2ch;">
-                                            {% url 'chartreuse:profile_view_post'  owner_id post.repost_url as reposturl%}
+                                            {% url 'chartreuse:profile_view_post'  owner_id|urlencode post.repost_url|urlencode as reposturl%}
                                             <button class="btn view-repost-button" 
                                                     onclick="location.href = '{{ reposturl }}' " 
                                                     id="view-repost-button">

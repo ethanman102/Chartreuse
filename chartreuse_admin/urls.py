@@ -22,6 +22,7 @@ from drf_spectacular.views import (
     SpectacularAPIView, 
     SpectacularSwaggerView,
 )
+from django.views.generic.base import RedirectView
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -34,6 +35,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("chartreuse/", include("chartreuse.urls")),
+    path("", RedirectView.as_view(url="/chartreuse/", permanent=True)),
     path('auth/', include('django.contrib.auth.urls')),
     path("admin/", admin.site.urls),
     path('chartreuse/schema/', SpectacularAPIView.as_view(), name='schema'),

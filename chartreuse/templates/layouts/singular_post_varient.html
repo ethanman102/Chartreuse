@@ -82,12 +82,7 @@
             <button class="btn pfp-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">Set pfp</button>
         {% endif %} {% endcomment %}
             <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">{{ post.likes_count }} likes</button>
-
-            <a href="{% url 'chartreuse:users_who_liked' user_url_quoted post.url_id %}"> 
-                <!-- This button will redirect the user to the page with the list of authors who liked the post -->
-                <!-- added href for the redirect -->
-                <button class="btn likes-list-button" data-post-id="{{post.url_id}}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">See Likes</button>
-            </a>
+         
         {% if logged_in and not post.repost and post.visibility == "PUBLIC" %}
             <button class="btn repost-button" data-post-id="{{post.url_id}}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">Repost</button>
         {% endif %}

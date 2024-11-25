@@ -82,7 +82,7 @@ def send_follow_request(request):
                     "Content-Type": "application/json; charset=utf-8"
                 }
 
-                author_username = post_author.split('/')[-1]
+                author_username = post_author.url_id.split('/')[-1]
 
                 data = {
                 'type': 'follow',
@@ -108,7 +108,7 @@ def send_follow_request(request):
                     }
                 }
 
-                url = f"{post_author.host}authors/{quote(author_username,safe='')}/inbox/"
+                url = f"{post_author.host}authors/{quote(author_username,safe='')}/inbox"
                 try:
                     requests.post(url, headers=headers, json=data, auth=auth)
                     follow_request_status = "Sent Follow Request"

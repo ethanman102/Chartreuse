@@ -35,7 +35,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("chartreuse/", include("chartreuse.urls")),
-    path(" ", landing_page_view.landing_page, name='home'),     # possibly url toredirect user to landing page
+    # path(" ", landing_page_view.landing_page),     # possibly url toredirect user to landing page
     path('auth/', include('django.contrib.auth.urls')),
     path("admin/", admin.site.urls),
     path('chartreuse/schema/', SpectacularAPIView.as_view(), name='schema'),

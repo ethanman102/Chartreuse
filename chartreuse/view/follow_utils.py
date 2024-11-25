@@ -82,7 +82,7 @@ def send_follow_request(request):
                     "Content-Type": "application/json; charset=utf-8"
                 }
 
-                author_username = post_author.split('/')[-1]
+                author_username = post_author.url_id.split('/')[-1]
 
                 data = {
                 'type': 'follow',

@@ -1,3 +1,8 @@
+html body {
+    margin-left: 10%;
+    margin-right: 2%;
+}
+
 /*Following related buttons */
 .follow{
     border-radius: 0;
@@ -5,11 +10,6 @@
     color: white;
     transition: box-shadow 0.3s ease;
     font-size: 100%;
-}
-
-html body {
-    margin-left: 10%;
-    margin-right: 2%;
 }
 
 .follow:hover{
@@ -50,23 +50,26 @@ html body {
     background-color: #00356B;
 }
 
-#profile-header > h4{
+#profile-header h4{
     font-weight: bold;
     color: chartreuse;
 }
 
 /* github css */
 #profile-github{
-    transition: font-size 0.3s ease;
-    color: chartreuse !important;
-    background-color: #00356B;
-    font-size: 1.5ch;
-    padding-inline: 2ch;
+    border-radius: 0;
+    background-color: #181717;
+    color: white;
+    transition: box-shadow 0.3s ease;
+    font-size: 100%;
 
+    i {
+        color: white;
+    }
 }
 
 #profile-github:hover{
-    font-size: 105%;
+    background-color: #181717;
     box-shadow: 6px 6px 0px #000000;
 }
 
@@ -152,8 +155,6 @@ h5{
     padding-left: 2ch;
 }
 
-
-
 #delete{
     background-color: red;
     border: none;
@@ -191,31 +192,16 @@ h5{
 
 /*Posts CSS as provided by Julia Dantas for the consistentcy of the looks of posts*/
 
-.like-button {
-    color: chartreuse;
-    background-color: #00356b;
-    border-bottom-style: solid;
-    text-align: center;
-    border-bottom-color: #1b1b1b;
-    border-radius: 0;
-    box-shadow: none;
-    text-decoration: none;
-    padding: 10px 20px;
-    transition: box-shadow 0.3s ease;
+/* This keeps regular post text black (not inlcuding links) */
+p {
+    font-size: large;
+    color: black;
 }
 
-.like-button:hover {
-    color: chartreuse;
-    background-color: #01254a;
-    box-shadow: 6px 6px 0px #000000;
-}
-
-.post p{
-    color: #1b1b1b;
-    font-size: 2ch;
-    padding-bottom: 2ch;
-    text-align: center;
-    vertical-align: center;
+/* The post's title is in the colour black */
+p.card-title{
+    font-size: larger;
+    color: black;
 }
 
 .post-image{
@@ -224,9 +210,6 @@ h5{
 
 .card{
     margin-top: 2ch;
-}
-
-.card {
     transition: box-shadow 0.3s ease;
 }
 
@@ -234,16 +217,21 @@ h5{
     box-shadow: 6px 6px 0px #0000005d;
 }
 
-
 .view-repost-button {
-    color:#000000;
-    border: solid black 2px;
-    background-color: white;
+    background-color: #ffffff;
+    border-width: 1px;
+    border-color: #00356b;
+    border-radius: 0%;
 }
 
 .view-repost-button:hover {
-    color: #ffffff;
-    background-color: #000000;
+    color: chartreuse;
+    background-color: #00356b;
+    box-shadow: 6px 6px 0px #000000;
+
+    i {
+        color: chartreuse; 
+    }
 }
 
 p img {
@@ -251,4 +239,23 @@ p img {
     height: auto;
 }
 
+.feed-comment-button, 
+.like-button, 
+.copy-button {
+    background-color: #ffffff;
+}
 
+.feed-comment-button:hover, 
+.like-button:hover, 
+.copy-button:hover {
+    background-color: #00356b;
+    color: white;
+
+    i {
+        color: white; 
+    }
+}
+
+i {
+    color:#00356b;
+}

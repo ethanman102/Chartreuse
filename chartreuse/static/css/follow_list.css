@@ -1,5 +1,10 @@
+html body{
+    margin-left: 10%;
+    margin-right: 2%;
+}
+
 #follow-list-header{
-    background-color: #002549;
+    background-color: #00356b;
     margin-top: 30px;
 }
 
@@ -10,7 +15,7 @@
 #container-item-box{
     padding-top: 2ch;
     padding-bottom: 2ch;
-    background-color: #D9D9D9;
+    background-color: #bebfc5;
     overflow-y: scroll;
     max-height: 400px;
     min-height: 400px;
@@ -31,7 +36,7 @@ h4{
 }
 
 
-img{
+.follower-box img{
     border: black solid 2px;
 }
 
@@ -60,9 +65,10 @@ img{
     transition: box-shadow 0.3s ease;
     background-color: transparent;
     padding-inline: 1ch;
-    font-weight: bolder;
+    font-weight: 600;
 }
 
 .custom-button:hover {
     color: white;
+    background-color: chartreuse;
 }

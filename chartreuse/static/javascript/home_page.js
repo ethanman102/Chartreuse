@@ -97,30 +97,30 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-document.querySelectorAll('.pfp-button').forEach(button => {
-    button.addEventListener('click', function() {
-        const postId = this.getAttribute('data-post-id');
-        const userId = this.getAttribute('data-user-id');
-        const url = `/chartreuse/set-profile-image/`; 
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                post_id: postId,
-                user_id: userId
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
-            window.location.reload();
-        })
-        .catch(error => console.error('Error:', error));
-    });
-});
+// document.querySelectorAll('.pfp-button').forEach(button => {
+//     button.addEventListener('click', function() {
+//         const postId = this.getAttribute('data-post-id');
+//         const userId = this.getAttribute('data-user-id');
+//         const url = `/chartreuse/set-profile-image/`; 
+//         fetch(url, {
+//             method: 'POST',
+//             headers: {
+//                 'X-CSRFToken': csrftoken,
+//                 'Content-Type': 'application/json'
+//             },
+//             body: JSON.stringify({
+//                 post_id: postId,
+//                 user_id: userId
+//             })
+//         })
+//         .then(response => response.json())
+//         .then(data => {
+//             console.log('Success:', data);
+//             window.location.reload();
+//         })
+//         .catch(error => console.error('Error:', error));
+//     });
+// });
 
 document.querySelectorAll('.comment-button').forEach(button => {
     button.addEventListener('click', function() {
@@ -187,3 +187,12 @@ document.querySelectorAll('.like-comment-button').forEach(button => {
         .catch(error => console.error('Error:', error));
     });
 });
+
+document.querySelectorAll('.copy-button').forEach(button => {
+    button.addEventListener('click', function() {
+        const link = this.getAttribute('data-url');
+        const fullUrl = window.location.protocol + '//' + window.location.host + link;
+        navigator.clipboard.writeText(fullUrl);
+        alert('Post link copied to clipboard!');
+    });
+})

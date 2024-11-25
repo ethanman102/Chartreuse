@@ -74,7 +74,7 @@ class FeedDetailView(DetailView):
                     # make a request to see if they are following remotely.
                     node = node_queryset[0]
                     auth = (node.username,node.password)
-                    url = f"{follower.host}authors/{quote(follower.url_id,safe='')}/followers/{quote(current_user_model.url_id,safe='')}/is_follower"
+                    url = f"{follower.url_id}/followers/{quote(current_user_model.url_id,safe='')}"
 
                     try:
                         response = requests.get(url,auth=auth)
@@ -128,8 +128,9 @@ class FeedDetailView(DetailView):
                 post.likes_count = Like.objects.filter(post=post).count()
                 post.url_id = quote(post.url_id, safe='')
                 post.following_status = "Sign up to follow!"
-                if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
-                    post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+                if (post.contentType != "text/plain") and (post.contentType != "text/markdown"):
+                    if not post.content.startswith('data:'):
+                        post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
                 post.user.profileImage = get_image_post(post.user.profileImage)
             
             return posts

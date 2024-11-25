@@ -5,6 +5,8 @@ html body{
 
 .card{
     margin: 0.5ch;
+    height: 80%;
+    overflow-y: scroll;
   
 }
 
@@ -18,11 +20,12 @@ html body{
     font-size: 2ch;
     padding-left: 5px;
     padding-right: 5px;
+    align-self: self-start;
 }
 
 .node-button:hover{
-    color: white;
-    background-color: black;
+    color: chartreuse;
+    background-color: #00356b;
     border: 2px solid black;
 }
 

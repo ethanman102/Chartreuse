@@ -21,7 +21,7 @@ html body {
     box-shadow: 6px 6px 0px #0000005d;
 }
 
-h1 {
+h1.page-header {
     color: chartreuse;
     background-color: #00356b;
     font-size: 4ch;
@@ -31,28 +31,16 @@ h1 {
     padding-left: 3%;
 }
 
+/* This keeps regular post text black (not inlcuding links) */
 p {
-    font-family: "Sometype Mono", monospace;
     font-size: large;
+    color: black;
 }
 
-.like-button {
-    color: chartreuse;
-    background-color: #00356b;
-    border-bottom-style: solid;
-    text-align: center;
-    border-bottom-color: #1b1b1b;
-    border-radius: 0;
-    box-shadow: none;
-    text-decoration: none;
-    padding: 10px 20px;
-    transition: box-shadow 0.3s ease;
-}
-
-.like-button:hover {
-    color: chartreuse;
-    background-color: #01254a;
-    box-shadow: 6px 6px 0px #000000;
+/* The post's title is in the colour black */
+p.card-title{
+    font-size: larger;
+    color: black;
 }
 
 .add-post-button {
@@ -72,21 +60,6 @@ p {
     color: chartreuse;
     background-color: #01254a;
     box-shadow: 6px 6px 0px #000000;
-}
-
-.follow-button {
-    color:#000000;
-    border-color: black;
-}
-
-.follow-button:hover {
-    color: #ffffff;
-    background-color: #000000;
-}
-
-a {
-    text-decoration: none;
-    color: black;
 }
 
 .pagination {
@@ -127,4 +100,52 @@ a {
 img {
     max-width: 100%;
     height: auto;
+}
+
+.button-collection {
+    margin-left:0rem;
+    margin-right:0rem;
+}
+
+/*
+although they have the same styling, classes for
+comment, like, and copy are separate because we need them for JS
+*/
+
+.feed-comment-button, 
+.like-button, 
+.copy-button {
+    background-color: #ffffff;
+}
+
+.feed-comment-button:hover, 
+.like-button:hover, 
+.copy-button:hover {
+    background-color: #00356b;
+    color: white;
+
+    i {
+        color: white; 
+    }
+}
+
+.follow-button {
+    background-color: #ffffff;
+    border-width: 1px;
+    border-color: #00356b;
+    border-radius: 0%;
+}
+
+.follow-button:hover {
+    color: chartreuse;
+    background-color: #00356b;
+    box-shadow: 6px 6px 0px #000000;
+
+    i {
+        color: chartreuse; 
+    }
+}
+
+i {
+    color:#00356b;
 }

@@ -1,11 +1,13 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from ..api_handling import images
+from ..models import User
 
 class ImageTestCases(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
         cls.client = Client()
 
         cls.test_user_1_data = {
@@ -21,6 +23,10 @@ class ImageTestCases(TestCase):
 
         cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json')
         cls.imagePath = 'chartreuse/static/images/buba.jpg'
+
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
     
     def test_encode_image_from_url(self):
         '''

@@ -15,7 +15,7 @@ def add_comment(request):
             post_id = body["post_id"]
 
             user = User.objects.get(url_id=unquote(user_id))
-            post = Post.objects.get(url_id=unquote(post_id))
+            post = Post.objects.filter(url_id=unquote(post_id)).first()
             
             # Parse the JSON body to get the comment text and content type
             body = json.loads(request.body)
@@ -45,7 +45,7 @@ def get_comments(post_id):
         post_id: The id of the post object
     '''
     post_id = unquote(post_id)
-    post = Post.objects.get(url_id=post_id)
+    post = Post.objects.filter(url_id=post_id).first()
 
     comments = Comment.objects.filter(post=post).order_by('-dateCreated')
 
@@ -145,17 +145,19 @@ def send_comment_to_inbox(comment_url_id):
         for follow in post_owner_follows:
             if follow.follower.host in all_outgoing:
                 follow_hosts.add(follow.follower.host)
-        node_objs = []
+        node_objs = {}
         for hostname in follow_hosts:
-            node_objs.append(Node.objects.get(host=hostname,status='ENABLED',follow_status='OUTGOING'))
+            node_objs[hostname] = list()
+        
+        for follow in post_owner_follows:
+            if follow.follower.host in node_objs:
+                node_objs[follow.follower.host].append(follow.follower.url_id)
     else:
         post_owner_host = comment.post.user.host
-        node_objs = []
+        node_objs = {}
         node_queryset = Node.objects.filter(host=post_owner_host,status='ENABLED',follow_status="OUTGOING")
         if node_queryset.exists():
-            node_objs.append(node_queryset[0])
-        
-
+            node_objs[node_queryset[0].host] = [comment.post.user.url_id]
 
     if len(node_objs) == 0:
         return []
@@ -166,29 +168,29 @@ def send_comment_to_inbox(comment_url_id):
     comments_response = requests.get(comments_json_url)
     comments_json = comments_response.json()
 
-    followers = Follow.objects.filter(followed=comment.user)
     for node in node_objs:
-        author_url_id = comment.user.url_id
-        host = node.host
-        username = node.username
-        password = node.password
+        for to_send_url_id in node_objs[node]:
 
-        url = host
-        
-        url += 'authors/'
+            
+            node_copy = Node.objects.get(host=node,follow_status='OUTGOING')
+            username = node_copy.username
+            password = node_copy.password
 
-        url += f'{quote(author_url_id, safe = "")}/inbox/'
+            url = node
+            
+            url += 'authors/'
 
-        headers = {
-            "Content-Type": "application/json; charset=utf-8"
-        }
+            url += f"{unquote(to_send_url_id).split('/')[-1]}/inbox"
+
+            headers = {
+                "Content-Type": "application/json; charset=utf-8",
+                "X-Original-Host": comment.user.host
+            }
 
         # send to inbox
         try:
             requests.post(url, headers=headers, json=comments_json, auth=(username, password))
-            print('Comment sent to inbox successfully.')
         except Exception as e:
-            print('Failed to send comment to inbox.', e)
             return JsonResponse({'error': 'Failed to send comment to inbox.'})
     
     return JsonResponse({'status': 'Comment sent to inbox successfully.'})

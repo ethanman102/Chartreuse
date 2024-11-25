@@ -75,8 +75,8 @@ class DiscoverAuthorListView(ListView):
         
         node = node[0]
         
-        username = base64.b64encode(bytes(node.username,encoding='utf-8')).decode('utf-8')
-        password = base64.b64encode(bytes(node.password,encoding='utf-8')).decode('utf-8')
+        username = node.username
+        password = node.password
 
         url = host
         if not host.endswith('api/'):
@@ -86,10 +86,16 @@ class DiscoverAuthorListView(ListView):
         params = {
             'page':page,
             'size':PAGE_SIZE
+        }   
+
+        user = self.request.user
+        user_object = User.objects.get(user=user)
+
+        headers = {
+            "X-Original-Host": user_object.host
         }
 
-        response = requests.get(url, params=params, auth=(username,password))
-        
+        response = requests.get(url, params=params, auth=(username,password), headers=headers)       
         
         if response.status_code != 200:
             return []

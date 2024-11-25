@@ -1,10 +1,14 @@
+html body{
+    margin-left: 10%;
+    margin-right: 2%;
+}
+
 .card{
     margin: 0.5ch;
     padding-top: 1ch;
     padding-bottom: 1ch;
   
 }
-
 
 #title-container{
     background-color: #00356b;
@@ -22,6 +26,22 @@
 #header{
     color: chartreuse;
     font-weight: bold;
+}
+
+#back {
+    color: chartreuse;
+    float: right;
+    transition: box-shadow 0.3s ease;
+    background-color: transparent;
+    padding-inline: 1ch;
+    font-weight: 600;
+    right: 0;
+
+}
+
+#back:hover {
+    color: white;
+    background-color: chartreuse;
 }
 
 .author{
@@ -51,14 +71,32 @@
 
 .view-profile-button:hover{
     box-shadow: 6px 6px 0px #000000;
+    color: #00356b;
+    background-color: chartreuse;
 }
 
 .your-profile-remote{
     float: right;
     border-color: black solid 2px;
+    color: #bebfc5;
     border-radius: 5px;
     padding-top: 4px;
     padding-bottom: 4px;
     padding-left: 2ch;
     padding-right: 2ch;
+}
+
+#page_buttons {
+    display: flex;
+    
+}
+
+#page_buttons button:hover{
+    color: chartreuse;
+    background-color: #00356b;
+}
+
+.author .img-fluid {
+    /* adding border around the icon */
+    border: black solid 2px;
 }

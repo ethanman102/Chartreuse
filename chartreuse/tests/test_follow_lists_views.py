@@ -35,6 +35,10 @@ class TestProfileViews(TestCase):
         cls.user_2_id = quote(cls.user_2.url_id,safe = '')
         cls.user_3_id = quote(cls.user_3.url_id,safe = '')
 
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
+
     # How to Authenticate User in tests: https://www.geeksforgeeks.org/how-to-authenticate-a-user-in-tests-in-django/ (Geeks for Geeks)
     # Article Last Updated on September 25, 2024
     # Purpose: To help authenticate a user each test to check for friendslist viewing permissions.

@@ -1,5 +1,5 @@
 import json
-
+from rest_framework.authentication import SessionAuthentication
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.auth.password_validation import validate_password
@@ -21,6 +21,19 @@ from .. import views
 from ..models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+
+
+def create_user_url_id(request, id):
+    id = unquote(id)
+    if id.find(":") != -1:
+        return id
+    else:
+        # create the url id
+        host = request.get_host()
+        scheme = request.scheme
+        url = f"{scheme}://{host}/chartreuse/api/authors/{id}"
+        return url
+    
 
 class UserSerializer(serializers.ModelSerializer):
     type = serializers.CharField(default="author")
@@ -59,7 +72,9 @@ class UsersSerializer(serializers.Serializer):
 
 class UserViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
-    authentication_classes = []
+    # November 21, 2024. Asked CHATGPT agent why the user isn't staying logged in between tests. Chatgpt recommended checking the forced login to see if it works, and suggested using
+    # sessionauthentication as seen here b/w sessions
+    authentication_classes = [SessionAuthentication]
 
     @extend_schema(
         summary="Get a list of users",
@@ -95,8 +110,7 @@ class UserViewSet(viewsets.ViewSet):
 
         Returns:
             JsonResponse containing the paginated list of users.
-        '''
-        checkIfRequestAuthenticated(request)
+        '''  
         page = request.query_params.get('page', 1)
         size = request.query_params.get('size', 50)
 
@@ -170,10 +184,10 @@ class UserViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the user.
         '''
-        decoded_user_id = unquote(pk)
+        decoded_user_id = create_user_url_id(request, pk)
         
         # case where the user is on the current host
-        user = User.objects.filter(url_id=decoded_user_id).first()
+        user = get_object_or_404(User, pk=decoded_user_id)
         page = user.host + "/authors/" + user.url_id
 
         # We only want to return the required fields
@@ -226,7 +240,11 @@ class UserViewSet(viewsets.ViewSet):
         }
     )
     def update(self, request, pk=None):
-        checkIfRequestAuthenticated(request)
+        auth_response = checkIfRequestAuthenticated(request)
+
+        if auth_response.status_code == 401:
+            return auth_response
+
         decoded_user_id = unquote(pk)
         host = get_host_from_id(decoded_user_id)
 
@@ -301,14 +319,20 @@ class UserViewSet(viewsets.ViewSet):
         }
     )
     def destroy(self, request, pk=None):
-        checkIfRequestAuthenticated(request)
+        
+        auth_response = checkIfRequestAuthenticated(request)
+        if auth_response.status_code == 401:
+            return auth_response
+        
         decoded_user_id = unquote(pk)
 
         host = get_host_from_id(decoded_user_id)
+        print(host)
+        print(views.Host.host)
         
         if(host != views.Host.host):
             # if the user is not on the current host, we need to get the user from the remote host
-            api_url = host + "api/authors/" + pk
+            api_url = host + "api/authors/" + decoded_user_id
             response = requests.delete(api_url)
 
             # Raise an exception if the request failed
@@ -317,7 +341,11 @@ class UserViewSet(viewsets.ViewSet):
             return Response({"success": "User deleted successfully."}, status=200)
         else:
             logged_in_user = request.user
+            
             user = get_object_or_404(User, pk=decoded_user_id)
+            
+
+
 
             if logged_in_user != user.user:
                 return Response({"error": "You do not have permission to delete this user."}, status=401)
@@ -355,8 +383,13 @@ class UserViewSet(viewsets.ViewSet):
         
         Returns:
             JsonResponse containing the newly created user.
+            
         '''
-        checkIfRequestAuthenticated(request)
+        
+        auth_response = checkIfRequestAuthenticated(request)
+        if auth_response.status_code == 401:
+            return auth_response
+        
         firstName = request.data.get('firstName')
         lastName = request.data.get('lastName')
         displayName = request.data.get('displayName')
@@ -386,7 +419,7 @@ class UserViewSet(viewsets.ViewSet):
         authUser.set_password(password)
         authUser.save()
 
-        id = host + "authors/" + str(authUser.id)
+        id = host + "chartreuse/api/authors/" + str(authUser.id)
 
         user = User.objects.create(
             url_id = id,
@@ -400,12 +433,11 @@ class UserViewSet(viewsets.ViewSet):
         # Save the user
         user.save()
 
-        id = str(user.url_id)
         page = user.host + "/authors/" + user.url_id
 
         return JsonResponse({
             "type": "author",
-            "id": id,
+            "id": user.url_id,
             "host": user.host,
             "displayName": user.displayName,
             "github": user.github,

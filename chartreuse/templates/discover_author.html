@@ -18,15 +18,21 @@
 
     <div class="container" id="title-container">
         <div class="row">
-            <div class="col-12">
+            <div class="col-11">
                 <h4 id="header">chartreuse.remote-authors</h4>
             </div>
+
+            <div class="col-1">
+                <!-- back button to get to discover node page  -->
+                <button id="back" type="button" class="custom-button">X</button>
+            </div>
+            
         </div>
     </div>
     <div class="container node-container">
         <div class="row">
             <div class="col-12">
-                <h3><b>Look carefully,</b> you're exploring the wilderness of the discovered authors on: <span id='host-page-message'><b><u>{{ host }}</u></b></span></h3>
+                <h3><b>Tread carefully,</b> you're exploring authors in the wilderness of: <span id='host-page-message'><b><u>{{ host }}</u></b></span></h3>
             </div>
         </div>
         {% if authors %}
@@ -35,7 +41,7 @@
                 {% for author in authors %}
                     <!-- Create clickable cards to be navigation tools to the other nodes authors... -->
                     <div class="author">
-                        <img src="{{author.profileImage}}" class="rounded img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
+                        <img src="{{author.profileImage}}" class="img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
                         <h5 style="display:inline">{{author.displayName}}</h5>
                         {% if author.url_id == current_user_url_id %}
                             <p class="your-profile-remote"> This is you </p>
@@ -47,21 +53,21 @@
             </div>
         {% else %}
             <div class="card">
-                <h3>You've reached the end... </h3>
+                <h3>You've reached uncharted territory... </h3>
             </div>
         {% endif %}
 
-        <div class="row">
+        <div class="row" id="page_buttons">
             {% if has_first %}
-                <div class="col-2">
+                <div class="col-5">
                     <button id="first-button">First</button>
                 </div>
-                <div class="col-3 offset-2">
+                <div class="col-1">
                     <button id="previous-button" current="{{ page_number }}">Previous</button>
                 </div>
             {% endif %}
             {% if has_next %}
-                <div class="col-3 offset-8">
+                <div class="col-1">
                     <button id="next-button" current="{{ page_number }}">Next</button>
                 </div>
             {% endif %}
@@ -116,6 +122,14 @@
                 });
             }
 
+
+            // Asked OpenAI, ChatGPT how I can make a button redirect me to a specific page using JS, "how can I make a button take me to a specific page with JS?" and 
+            // "it says the function goToPage() is undefined. How do I fix this?", followed the addEventListener solution, 2024-11-21.
+            document.getElementById('back').addEventListener('click', function() {
+                window.location.href = "{% url 'chartreuse:discover_nodes' %}";
+            });
+
+           
 
         }
     </script>

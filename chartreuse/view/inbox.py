@@ -4,14 +4,106 @@ from ..views import Host, checkIfRequestAuthenticated
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
+from rest_framework import serializers
+from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.authentication import SessionAuthentication
 
+def create_user_url_id(request, id):
+    id = unquote(id)
+    if id.find(":") != -1:
+        return id
+    else:
+        # create the url id
+        host = request.get_host()
+        scheme = request.scheme
+        url = f"{scheme}://{host}/chartreuse/api/authors/{id}"
+        print(url,'kkkk')
+        return url
+    
+
+@extend_schema(
+    summary="Handle incoming posts, comments, likes, and follow requests",
+    description=(
+        "Processes data sent to an author's inbox for different types of content, "
+        "including posts, comments, likes, and follow requests. Depending on the content type, "
+        "the function adds, updates, or removes the relevant objects in the database."
+        "\n\n**When to use:** Use this endpoint when sending new posts, comments, likes, or follow requests "
+        "to a remote author's inbox for further processing."
+        "\n\n**How to use:** Send a POST request with the remote author's `user_id` in the URL path and a valid JSON payload "
+        "specifying the `type` (e.g., 'post', 'comment', 'like', or 'follow') along with the required data."
+        "\n\n**Why to use:** This endpoint provides a centralized mechanism to handle interactions with a remote author's "
+        "inbox, ensuring consistency in the database."
+        "\n\n**Why not to use:** Avoid using this endpoint for retrieving data or if the required data format is unavailable."
+    ),
+    request=inline_serializer(
+        name="InboxRequest",
+        fields={
+            "type": serializers.ChoiceField(
+                choices=["post", "comment", "like", "follow"],
+                help_text="The type of data being sent to the inbox."
+            ),
+            "id": serializers.CharField(help_text="Unique ID of the post/comment/like/follow."),
+            "author": serializers.JSONField(help_text="Author information of the object."),
+            "published": serializers.DateTimeField(help_text="Timestamp when the object was created."),
+            "content": serializers.JSONField(required=False, help_text="Content of the post or comment."),
+            "comments": serializers.JSONField(required=False, help_text="Comments associated with the post."),
+            "likes": serializers.JSONField(required=False, help_text="Likes associated with the post or comment."),
+        }
+    ),
+    responses={
+        200: OpenApiResponse(
+            description="Request processed successfully.",
+            response=inline_serializer(
+                name="SuccessfulResponse",
+                fields={
+                "status": serializers.CharField(default="Post added successfully")
+            }
+            )
+            
+        ),
+        400: OpenApiResponse(
+            description="Invalid request format.",
+            response=inline_serializer(
+                name="BadRequestResponse",
+                fields={
+                    "error": serializers.CharField(default="Invalid input data.")
+                }
+            )
+        ),
+        401: OpenApiResponse(
+            description="Unauthorized request.",
+            response=inline_serializer(
+                name="UnauthorizedResponse",
+                fields={
+                    "error": serializers.CharField(default="Unauthorized.")
+                }
+            )
+        ),
+        404: OpenApiResponse(
+            description="User not found or data references invalid objects.",
+            response=inline_serializer(
+                name="NotFoundResponse",
+                fields={
+                    "error": serializers.CharField(default="Resource not found.")
+                }
+            )
+        ),
+    }
+)
+@api_view(["POST"])
 @csrf_exempt
+@permission_classes([AllowAny])
+@authentication_classes([SessionAuthentication])
 def inbox(request, user_id):
-    decoded_user_id = unquote(user_id)
-
-    user = User.objects.get(pk=decoded_user_id)
-
+    
     data = json.loads(request.body.decode('utf-8'))
+
+    decoded_url_id = create_user_url_id(request, user_id)
+    author = User.objects.filter(url_id=decoded_url_id).first()
+    if author is None:
+        return JsonResponse({"error": f"Author,{user_id},not found"}, status=404)
 
     # check request headers
     authorization = request.headers.get('Authorization')
@@ -29,8 +121,8 @@ def inbox(request, user_id):
         contentType = data["contentType"]
         content = data["content"]
         author = data["author"]
-        comments = data["comments"]
-        likes = data["likes"]
+        comments = data.get("comments",{})
+        likes = data.get("likes",{})
         published = data["published"]
         visibility = data["visibility"]
 
@@ -39,7 +131,7 @@ def inbox(request, user_id):
 
         # get author object
         author_id = unquote(author["id"])
-        author = User.objects.get(pk=author_id)
+        author = discover_author(author_id,author)
 
         if post is None:
             # create a new post
@@ -49,7 +141,8 @@ def inbox(request, user_id):
             
 
             # add comment objects
-            post_comments = comments["src"]
+            post_comments = comments.get('src',[])
+            
             for post_comment in post_comments:
                 comment_author = post_comment["author"]
                 comment = post_comment["comment"]
@@ -57,7 +150,7 @@ def inbox(request, user_id):
                 comment_id = post_comment["id"]
                 post = post_comment["post"]
                 published = post_comment["published"]
-                likes = post_comment["likes"]
+                likes = post_comment.get('likes',{})
 
                 comment_author_id = unquote(comment_author["id"])
                 comment_author = discover_author(comment_author_id,post_comment['author'])
@@ -69,8 +162,9 @@ def inbox(request, user_id):
                 
                 
                 # add comment likes
-                comment_likes = post_comment["likes"]
-                for comment_like in comment_likes['src']:
+                comment_likes = post_comment.get('likes',{})
+                comments_src = comment_likes.get('src',[])
+                for comment_like in comments_src:
                     like_author = comment_like["author"]
                     published = comment_like["published"]
                     like_id = comment_like["id"]
@@ -87,8 +181,8 @@ def inbox(request, user_id):
 
             # add like objects
             
-            post_likes = data['likes']
-            for post_like in post_likes['src']:
+            post_likes = data.get("likes",{})
+            for post_like in post_likes.get('src',[]):
                 author_id = post_like["author"]['id']
 
                 # check to see whether the author has been discovered yet or not!
@@ -111,7 +205,7 @@ def inbox(request, user_id):
             post.content = content
             post.save()
                     
-        return JsonResponse({"status": "Post added successfully"})
+        return JsonResponse({"status": "Post added successfully"},status=200)
 
     elif (data["type"] == "comment"):
         comment_author = data["author"]
@@ -120,15 +214,16 @@ def inbox(request, user_id):
         comment_id = data["id"]
         post = data["post"]
         published = data["published"]
-        likes = data["likes"]
+        likes = data.get("likes",{})
         # add this new comment if it does not exist, if it exists, then delete it
 
         comment_author_id = unquote(comment_author["id"])
+        
         comment_author = discover_author(comment_author_id,comment_author)
         new_post = Post.objects.get(url_id=post)
 
         # check whether comment already exists
-        comment = Comment.objects.filter(url_id=comment_id).first()
+        comment = Comment.objects.filter(comment=comment_text, user=comment_author, post=new_post).first()
 
         if comment is None:
             comment = Comment.objects.create(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post)
@@ -136,7 +231,7 @@ def inbox(request, user_id):
             comment.save()
 
         # add comment likes
-        comment_likes = likes["src"]
+        comment_likes = likes.get('src',[])
         for comment_like in comment_likes:
             like_author = comment_like["author"]
             published = comment_like["published"]
@@ -182,9 +277,7 @@ def inbox(request, user_id):
                 new_like.dateCreated = published
                 new_like.save()
                 return JsonResponse({"status": "Like added successfully"})
-            else:
-                like.delete()
-                return JsonResponse({"status": "Like removed successfully"})
+
         else:
             comment = Comment.objects.filter(url_id=object_id).first()
             like = Like.objects.filter(user=author, comment=comment).first()
@@ -193,9 +286,7 @@ def inbox(request, user_id):
                 new_like.dateCreated = published
                 new_like.save()
                 return JsonResponse({"status": "Like added successfully"})
-            else:
-                like.delete()
-                return JsonResponse({"status": "Like removed successfully"})
+       
             
 
     elif (data["type"] == "follow"):
@@ -243,10 +334,10 @@ def discover_author(url_id,json_obj):
     if not author_queryset.exists():
         current_author = User.objects.create(
             url_id = url_id,
-            displayName = json_obj['displayName'],
-            host = json_obj['host'],
-            github = json_obj['github'],
-            profileImage = json_obj['profileImage']
+            displayName = json_obj.get('displayName'),
+            host = json_obj.get('host'),
+            github = json_obj.get('github'),
+            profileImage = json_obj.get('profileImage')
         )
     else:
         current_author = author_queryset[0]

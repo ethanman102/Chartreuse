@@ -27,7 +27,7 @@ def get_post_likes(post_id):
     Returns:
         JsonResponse containing the likes for a post.
     """
-    post = Post.objects.get(url_id=post_id)
+    post = Post.objects.filter(url_id=post_id).first()
 
     likes = Like.objects.filter(post=post)
 
@@ -58,6 +58,7 @@ def edit_post(request, post_id):
     # Check if the user is authenticated
     if request.user.is_authenticated:
         current_user = request.user
+        print(current_user,'HELLLLO')
         current_user_model = get_object_or_404(User, user=current_user)
         
         # Check if the current user is the author of the post
@@ -92,9 +93,10 @@ def delete_post(request, post_id):
 
 def send_post_to_inbox(post_url_id):
     post = Post.objects.get(url_id=post_url_id)
+    print(post.url_id,'HERE IS URLID    Yass')
     # send this to the inbox of other nodes
     nodes = Node.objects.filter(follow_status='OUTGOING', status='ENABLED')
-
+    
     if not nodes.exists():
         return []
     
@@ -111,17 +113,19 @@ def send_post_to_inbox(post_url_id):
         post_json_url = f"{base_url}{quote(post.user.url_id, safe='')}/posts/{quote(post.url_id, safe='')}/"
         post_response = requests.get(post_json_url)
         post_json = post_response.json()
+        print(post_json,'ETHANS POST JSON FRIENDS')
 
 
         followers = Follow.objects.filter(followed = post.user)
         for follower in followers:
             if follower.follower.host == host:
                 author_url_id = follower.follower.url_id
-                full_url = url + f'{quote(author_url_id, safe = "")}/inbox/'
+                full_url = url + f"{unquote(author_url_id).split('/')[-1]}/inbox"
                 
 
                 headers = {
-                    "Content-Type": "application/json; charset=utf-8"
+                    "Content-Type": "application/json; charset=utf-8",
+                    "X-Original-Host": post.user.host
                 }
 
                 # send to inbox
@@ -166,7 +170,7 @@ def update_post(request, post_id):
             post_content = content
 
         elif (content_type == 'commonmark') and content:
-            content_type = 'text/commonmark'    
+            content_type = 'text/markdown'    
             post_content = content
 
         elif image:
@@ -175,13 +179,13 @@ def update_post(request, post_id):
             image_content = image.content_type.split('/')[1]
             if image_content not in ['jpeg', 'png', 'jpg']:
                 image_content = 'png'
-            content_type = 'image/' + image_content
+            content_type = 'image/' + image_content + ';base64'
             post_content = encoded_image
         elif image_url:
             image_content = image_url.split('.')[-1]
             if image_content not in ['jpeg', 'png', 'jpg']:
                 image_content = 'png'
-            content_type = 'image/' + image_content
+            content_type = 'image/' + image_content + ';base64'
             try:
                 with urlopen(image_url) as url:
                     f = url.read()
@@ -192,7 +196,7 @@ def update_post(request, post_id):
         else:
             return JsonResponse({'error': 'Invalid post data.'}, status=400)
         
-        post = Post.objects.get(url_id=unquote(post_id))
+        post = Post.objects.filter(url_id=unquote(post_id)).first()
         if (post.user != current_user_model):
             return JsonResponse({'error': 'Unauthorized access.'}, status=401)
 
@@ -334,7 +338,6 @@ def save_post(request):
         current_user = request.user
         current_user_model = get_object_or_404(User, user=current_user)
         
-
         # Ensure that either content, image, or image URL is provided
         if not content_type and not image and not image_url:
             return JsonResponse({'error': 'Post content is required.'}, status=400)
@@ -348,7 +351,7 @@ def save_post(request):
             post_content = content
 
         elif content and (content_type == 'commonmark'):
-            content_type = 'text/commonmark'
+            content_type = 'text/markdown'
             post_content = content 
         
         elif image:
@@ -357,20 +360,20 @@ def save_post(request):
             image_content = image.content_type.split('/')[1]
             if image_content not in ['jpeg', 'png', 'jpg']:
                 image_content = 'png'
-            content_type = 'image/' + image_content
-            post_content = encoded_image
+            content_type = 'image/' + image_content + ';base64'
+            post_content = f'data:{content_type},{encoded_image}'
         elif image_url:
             image_content = image_url.split('.')[-1]
             if image_content not in ['jpeg', 'png', 'jpg']:
                 image_content = 'png'
-            content_type = 'image/' + image_content
+            content_type = 'image/' + image_content +';base64'
             try:
                 with urlopen(image_url) as url:
                     f = url.read()
                     encoded_string = base64.b64encode(f).decode("utf-8")
             except Exception as e:
                 raise ValueError(f"Failed to retrieve image from URL: {e}")
-            post_content = encoded_string
+            post_content = f'data:{content_type},{encoded_string}'
         else:
             return JsonResponse({'error': 'Invalid post data.'}, status=400)
         
@@ -410,7 +413,7 @@ def like_post(request):
         post_id = body["post_id"]
 
         user = User.objects.get(url_id=unquote(user_id))
-        post = Post.objects.get(url_id=unquote(post_id))
+        post = Post.objects.filter(url_id=unquote(post_id)).first()
 
         # first check if the user has already liked the post
         like = Like.objects.filter(user=user, post=post).first()
@@ -458,15 +461,20 @@ def send_like_to_inbox(like_url_id):
             for follow in post_owner_follows:
                 if follow.follower.host in all_outgoing:
                     follow_hosts.add(follow.follower.host)
-            node_objs = []
+            node_objs = {}
             for hostname in follow_hosts:
-                node_objs.append(Node.objects.get(host=hostname,status='ENABLED',follow_status='OUTGOING'))
+                node_objs[hostname] = list()
+            
+            for follow in post_owner_follows:
+                if follow.follower.host in node_objs:
+                    node_objs[follow.follower.host].append(follow.follower.url_id)
+
         else:
             post_owner_host = like.post.user.host
-            node_objs = []
+            node_objs = {}
             node_queryset = Node.objects.filter(host=post_owner_host,status='ENABLED',follow_status="OUTGOING")
             if node_queryset.exists():
-                node_objs.append(node_queryset[0])
+                node_objs[node_queryset[0].host] = [like.post.user.url_id]
     else:
         # this is a comment like.....
         if like.user.host == like.comment.user.host:
@@ -475,6 +483,7 @@ def send_like_to_inbox(like_url_id):
                 return []
             
             if like.comment.user.host == like.comment.post.user.host:
+                # send the comment like to all the post owners followers!
                 all_outgoing = set()
                 for node in nodes:
                     all_outgoing.add(node.host)
@@ -484,33 +493,29 @@ def send_like_to_inbox(like_url_id):
                 for follow in post_owner_follows:
                     if follow.follower.host in all_outgoing:
                         follow_hosts.add(follow.follower.host)
-                node_objs = []
+                node_objs = {}
                 for hostname in follow_hosts:
-                    node_objs.append(Node.objects.get(host=hostname,status='ENABLED',follow_status='OUTGOING'))
+                    node_objs[hostname] = list()
+                
+                for follow in post_owner_follows:
+                    if follow.follower.host in node_objs:
+                        node_objs[follow.follower.host].append(follow.follower.url_id)
+                
+            
             else:
                 post_owner_host = like.comment.post.user.host
-                node_objs = []
+                node_objs = {}
                 node_queryset = Node.objects.filter(host=post_owner_host,status="ENABLED",follow_status="OUTGOING")
                 if node_queryset.exists():
-                    node_objs.append(node_queryset[0])
+                    node_objs[node_queryset[0].host] = [like.comment.post.user.url_id]
 
         else:
+            # case when local user likes the comment of another node's user!
             comment_owner_host = like.comment.user.host
-            node_objs = []
+            node_objs = {}
             node_queryset = Node.objects.filter(host=comment_owner_host,status='ENABLED',follow_status="OUTGOING")
             if node_queryset.exists():
-                node_objs.append(node_queryset[0])
-
-
-            
-
-                
-                
-
-            
-        
-    
-
+                node_objs[node_queryset[0].host] = [like.comment.user.url_id]
     
     base_url = f"{like.user.host}authors/"
     likes_json_url = f"{base_url}{quote(like.user.url_id, safe='')}/liked/{quote(like.url_id, safe='')}/"
@@ -519,27 +524,29 @@ def send_like_to_inbox(like_url_id):
     likes_json = likes_response.json()
 
     for node in node_objs:
-        author_url_id = like.user.url_id
-        host = node.host
-        username = node.username
-        password = node.password
-
-        url = host
+        # author_url_id = like.user.url_id
         
-        url += 'authors/'
+        node_copy = Node.objects.get(host=node,follow_status='OUTGOING')
+        for to_send_id in node_objs[node]:
+        
+            username = node_copy.username
+            password = node_copy.password
 
-        url += f'{quote(author_url_id, safe = "")}/inbox/'
+            url = node
+            
+            url += 'authors/'
 
-        headers = {
-            "Content-Type": "application/json; charset=utf-8"
-        }
+            url += f"{unquote(to_send_id).split('/')[-1]}/inbox"
 
+            headers = {
+                "Content-Type": "application/json; charset=utf-8",
+                "X-Original-Host": like.user.host
+            }
+            
         # send to inbox
         try:
             requests.post(url, headers=headers, json=likes_json, auth=(username, password))
-            print("Like sent to inbox")
         except Exception as e:
-            print("Failed to send like to inbox", e)
             return JsonResponse({'error': 'Failed to send comment to inbox.'})
 
     return JsonResponse({"status": "Like added successfully"})
@@ -612,19 +619,22 @@ def check_duplicate_post(request):
         return JsonResponse({'error': 'Invalid request method.'}, status=400)
     
 def get_image_post(pfp_url):
-    pattern = r"(?P<host>https?:\/\/.+?herokuapp\.com)\/authors\/(?P<author_serial>\d+)\/posts\/(?P<post_serial>\d+)\/image"
+    print(pfp_url,'heyyy')
+    pattern = r"(?P<host>https?:\/\/.+?herokuapp\.com)(\/chartreuse\/api)?\/authors\/(?P<author_serial>\d+)\/posts\/(?P<post_serial>\d+)\/image"
     match = re.search(pattern, pfp_url)
 
     if match:
         host = match.group("host")
         author_serial = match.group("author_serial")
         post_serial = match.group("post_serial")
-    
-        author = User.objects.filter(url_id=f"{host}/authors/{author_serial}").first()
-        pfp_post = Post.objects.filter(user=author, url_id=f"{host}/authors/{author_serial}/posts/{post_serial}").first()
+        author = User.objects.filter(url_id=f"{host}/chartreuse/api/authors/{author_serial}").first()
+        pfp_post = Post.objects.filter(user=author, url_id=f"{host}/chartreuse/api/authors/{author_serial}/posts/{post_serial}").first()
 
-        if pfp_post and pfp_post.content and pfp_post.contentType in ['image/jpeg', 'image/png', 'image/webp', 'image/jpg']:
-            pfp_url = f"data:{pfp_post.contentType};charset=utf-8;base64, {pfp_post.content}"
+        if pfp_post and pfp_post.content and pfp_post.contentType in ['image/jpeg;base64', 'image/png;base64', 'image/webp', 'image/jpg;base64']:
+            if not pfp_post.content.startswith('data:'):
+                pfp_url = f"data:{pfp_post.contentType};charset=utf-8;base64, {pfp_post.content}"
+            else:
+                pfp_url = pfp_post.content
         else:
             pfp_url = f"{Host.host}/static/images/default_pfp_1.png"
         return pfp_url
@@ -663,8 +673,9 @@ def prepare_posts(posts):
             post.likes_count = Like.objects.filter(post=post).count()
                
                 
-        if (post.contentType != "text/plain") and (post.contentType != "text/commonmark"):
-            post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
+        if (post.contentType != "text/plain") and (post.contentType != "text/markdown"):
+            if not post.content.startswith('data:'):
+                post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
         post.url_id = quote(post.url_id,safe='')
             
         prepared.append(post)

@@ -3,7 +3,7 @@ from django.contrib.auth.models import User as AuthUser
 from django.db.models import UniqueConstraint
 
 VISIBILITY_CHOICES = {"PUBLIC": "PUBLIC", "FRIENDS": "FRIENDS", "UNLISTED": "UNLISTED", "DELETED": "DELETED"}
-CONTENT_TYPE_CHOICES = {"text/commonmark": "text/commonmark", "text/plain": "text/plain", "application/base64": "application/base64", "image/png;base64": "image/png;base64", "image/jpeg;base64": "image/jpeg;base64"}
+CONTENT_TYPE_CHOICES = {"text/markdown": "text/markdown", "text/plain": "text/plain", "application/base64": "application/base64", "image/png;base64": "image/png;base64", "image/jpeg;base64": "image/jpeg;base64"}
 FOLLOW_STATUS_CHOICES = {'OUTGOING':'OUTGOING','INCOMING':'INCOMING'}
 ENABLE_DISABLE_CHOICES = {'ENABLED':'ENABLED','DISABLED':'DISABLED'}
 
@@ -33,8 +33,7 @@ class Post(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if self.url_id == None or self.url_id == '':
-            self.url_id = f"{self.user.url_id}/posts/{self.pk}"
-        
+            self.url_id = f"{self.user.url_id}/posts/{self.pk}"     
 
     def __str__(self):
         return f"Post(id={self.id}, url_id={self.url_id}, title={self.title}, description={self.description}, user={self.user}, published={self.published}, visibility={self.visibility})"
@@ -52,7 +51,7 @@ class Comment(models.Model):
         super().save(*args, **kwargs)
         if self.url_id == None or self.url_id == '':
             self.url_id = f"{self.user.url_id}/commented/{self.id}"
-        super().save(*args, **kwargs)
+        
         
 
     def __str__(self):

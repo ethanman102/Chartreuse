@@ -50,7 +50,7 @@ def send_follow_request(request):
         post_id = body["post_id"]
 
         user = User.objects.get(url_id=unquote(user_id))
-        post = Post.objects.get(url_id=unquote(post_id))
+        post = Post.objects.filter(url_id=unquote(post_id)).first()
 
         post_author = post.user
 
@@ -82,13 +82,15 @@ def send_follow_request(request):
                     "Content-Type": "application/json; charset=utf-8"
                 }
 
+                author_username = post_author.url_id.split('/')[-1]
+
                 data = {
                 'type': 'follow',
                 'summary':'actor wants to follow object',
                 'actor':
                     {
                         'type':'author',
-                        'id': user.url_id,
+                        'id': user.user.id,
                         'host': user.host,
                         'displayName': user.displayName,
                         'page': f'{user.host}/authors/{user.url_id}/',
@@ -97,7 +99,7 @@ def send_follow_request(request):
                     },
                     'object':{
                         'type':'author',
-                        'id': post_author.url_id,
+                        'id': author_username,
                         'host': post_author.host,
                         'displayName': post_author.displayName,
                         'page': f'{post_author.host}/authors/{post_author.url_id}/',
@@ -106,7 +108,7 @@ def send_follow_request(request):
                     }
                 }
 
-                url = f"{post_author.host}authors/{quote(post_author.url_id,safe='')}/inbox/"
+                url = f"{post_author.host}authors/{quote(author_username,safe='')}/inbox"
                 try:
                     requests.post(url, headers=headers, json=data, auth=auth)
                     follow_request_status = "Sent Follow Request"

@@ -6,8 +6,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 import base64
 from urllib.request import urlopen
 
-
-
 class TestSettingsViews(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -24,6 +22,10 @@ class TestSettingsViews(TestCase):
         )
 
         cls.user_2 = User.objects.create(user=cls.auth_user_2,displayName='ethankeysboy',github=None,url_id="http://nodeaaaa/api/authors/222")
+
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
 
     def test_incorrect_old_password(self):
         self.client.force_login(self.auth_user_1)
@@ -115,7 +117,6 @@ class TestSettingsViews(TestCase):
         updated = User.objects.get(user=self.auth_user_1)
 
         self.assertEqual(updated.github,'https://github.com/')
-
     
     def test_add_github(self):
         self.client.force_login(self.auth_user_2)
@@ -127,7 +128,6 @@ class TestSettingsViews(TestCase):
         updated = User.objects.get(user=self.auth_user_2)
 
         self.assertEqual(updated.github,'https://github.com/')
-
     
     def test_reject_non_github(self):
         self.client.force_login(self.auth_user_2)
@@ -198,8 +198,7 @@ class TestSettingsViews(TestCase):
             'file':image
         })
 
-        encoded_image = base64.b64encode(b'file_content').decode('utf-8')
-        
+        encoded_image = base64.b64encode(b'file_content').decode('utf-8') 
 
         self.assertEqual(response.status_code,200)
         data = response.json()
@@ -243,7 +242,7 @@ class TestSettingsViews(TestCase):
             with urlopen('https://kirby.nintendo.com/assets/img/about/char-kirby.png') as url:
                 f = url.read()
                 encoded_string = base64.b64encode(f).decode("utf-8")
-        except Exception as e:
+        except Exception:
             self.assertEqual('fail',"FAIL")
 
         new_image = Post.objects.filter(user=self.user_2)
@@ -251,7 +250,7 @@ class TestSettingsViews(TestCase):
 
         new_image = new_image.first()
     
-        self.assertEqual(new_image.content,encoded_string)
+        self.assertEqual(new_image.content, encoded_string)
 
         updated = User.objects.get(user=self.auth_user_2)
-        self.assertEqual(updated.profileImage,new_image.url_id + '/image')
+        self.assertEqual(updated.profileImage, new_image.url_id + '/image')

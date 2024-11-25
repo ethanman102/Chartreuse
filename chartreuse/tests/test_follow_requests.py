@@ -1,10 +1,12 @@
 from django.test import TestCase
 from django.urls import reverse
-from ..models import User, FollowRequest, Follow
+from ..models import User, FollowRequest, Follow, Node
 from django.shortcuts import get_object_or_404
 from rest_framework.test import APIClient
 from chartreuse.views import Host
 from urllib.parse import quote
+import base64
+
 
 import json
 
@@ -41,26 +43,27 @@ class FollowRequestsTestCases(TestCase):
             'firstName': 'John',
             'lastName': 'Smith',
         }
+        cls.node = Node.objects.create(host='http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',username='abc',password='123',follow_status='INCOMING',status='ENABLED')
+        cls.creds = {'Authorization' : 'Basic ' + base64.b64encode(b'abc:123').decode('utf-8')}
 
         # Create test users
-        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json')
-        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json')
+        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json', headers=cls.creds)
+        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json', headers=cls.creds)
 
         # log in as user 1
-        cls.client.post(reverse('chartreuse:login_user'), {
+        test_response = cls.client.post(reverse('chartreuse:login_user'), {
             'username': 'greg',
             'password': 'ABC123!!!'
         })
-        # for sure logged in
 
         # sends a follow request to user 2
-        cls.response = cls.client.post(reverse('chartreuse:send_follow_request', args=[quote(f"{cls.test_user_2_data['host']}authors/2", safe='')]))
+        cls.response = cls.client.post(reverse('chartreuse:send_follow_request', args=[quote(f"{cls.test_user_2_data['host']}chartreuse/api/authors/2", safe='')]), headers=cls.creds)
 
         # user 1 logout
         cls.client.logout()
 
-        cls.greg = get_object_or_404(User, url_id=f"{cls.test_user_1_data['host']}authors/1")
-        cls.john = get_object_or_404(User, url_id=f"{cls.test_user_2_data['host']}authors/2")
+        cls.greg = get_object_or_404(User, url_id=f"{cls.test_user_1_data['host']}chartreuse/api/authors/1")
+        cls.john = get_object_or_404(User, url_id=f"{cls.test_user_2_data['host']}chartreuse/api/authors/2")
 
     def setUp(self):
         '''
@@ -71,6 +74,10 @@ class FollowRequestsTestCases(TestCase):
             'username': 'greg',
             'password': 'ABC123!!!'
         })
+
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
     
     def test_send_follow_request(self):
         '''
@@ -92,7 +99,7 @@ class FollowRequestsTestCases(TestCase):
 
         # Approve the follow request as user 2
         follow_request = FollowRequest.objects.get(requester=self.greg, requestee=self.john)
-        response = self.client.post(reverse('chartreuse:accept_follow_request', args=[follow_request.id]))
+        response = self.client.post(reverse('chartreuse:accept_follow_request', args=[follow_request.id]), headers=self.creds)
 
         # Successfully approved follow request
         self.assertEqual(response.status_code, 200)
@@ -111,7 +118,7 @@ class FollowRequestsTestCases(TestCase):
 
         # Reject the follow request as user 2
         follow_request = FollowRequest.objects.get(requester=self.greg, requestee=self.john)
-        response = self.client.delete(reverse('chartreuse:reject_follow_request', args=[follow_request.id]))
+        response = self.client.delete(reverse('chartreuse:reject_follow_request', args=[follow_request.id]), headers=self.creds)
 
         # Successfully rejected follow request
         self.assertEqual(response.status_code, 200)
@@ -127,7 +134,7 @@ class FollowRequestsTestCases(TestCase):
             'password': '87@398dh817b!'
         })
 
-        response = self.client.get(reverse('chartreuse:get_follow_requests'))
+        response = self.client.get(reverse('chartreuse:get_follow_requests'), headers=self.creds)
 
         # Successfully got follow requests
         self.assertEqual(response.status_code, 200)

@@ -16,8 +16,20 @@ from .likes import LikesSerializer
 from .comments import CommentsSerializer
 from urllib.parse import unquote
 from rest_framework.permissions import AllowAny
+from rest_framework.authentication import SessionAuthentication
 from ..views import checkIfRequestAuthenticated
 from ..view import post_utils
+
+def create_user_url_id(request, id):
+    id = unquote(id)
+    if id.find(":") != -1:
+        return id
+    else:
+        # create the url id
+        host = request.get_host()
+        scheme = request.scheme
+        url = f"{scheme}://{host}/chartreuse/api/authors/{id}"
+        return url
 
 
 class PostSerializer(serializers.Serializer):
@@ -46,6 +58,7 @@ class PostsSerializer(serializers.Serializer):
 class PostViewSet(viewsets.ViewSet):
     serializer_class = PostSerializer
     permission_classes = [AllowAny]
+    authentication_classes = [SessionAuthentication]
 
     @extend_schema(
         summary="Adds a post",
@@ -107,7 +120,9 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing the new post    
         """        
-        checkIfRequestAuthenticated(request)
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response
         
         decoded_user_id = unquote(user_id)
 
@@ -134,6 +149,7 @@ class PostViewSet(viewsets.ViewSet):
         # Create and save the post
         post = Post.objects.create(user=author, title=post_title, description=post_description, contentType=contentType_description, content=content_description, visibility=post_type)
         post.save()
+        print(post.url_id,'FRIENDS POST URLID')
         post_utils.send_post_to_inbox(post.url_id)
 
         # get the author data
@@ -234,7 +250,9 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponse containing the like object.
         """
-        checkIfRequestAuthenticated(request)
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response
         decoded_user_id = unquote(user_id)
         decoded_post_url = unquote(post_id)
 
@@ -423,7 +441,7 @@ class PostViewSet(viewsets.ViewSet):
             postObject = {
                 "type": "post",
                 "title": post.title,
-                "id": post.id,
+                "id": post.url_id,
                 "description": post.description,
                 "contentType": post.contentType,
                 "content": post.content,
@@ -523,7 +541,9 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing updated post 
         """
-        checkIfRequestAuthenticated(request)
+        response = checkIfRequestAuthenticated(request)
+        if response.status_code == 401:
+            return response
 
         decoded_user_id = unquote(user_id)
         decoded_post_id = unquote(post_id)
@@ -648,7 +668,8 @@ class PostViewSet(viewsets.ViewSet):
             JsonResponse containing the post objects.
         """
         checkIfRequestAuthenticated(request)
-        decoded_author_id = unquote(user_id)
+        decoded_author_id = create_user_url_id(request, user_id)
+
         page = request.GET.get("page")
         size = request.GET.get("size")
 

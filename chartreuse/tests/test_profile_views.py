@@ -47,6 +47,10 @@ class TestProfileViews(TestCase):
         cls.follow_request_1 = FollowRequest.objects.create(requestee=cls.user_1,requester=cls.user_2)
         cls.follow_1 = Follow.objects.create(followed=cls.user_3,follower=cls.user_1)
 
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
+    
     def test_follow_accept_method_not_allowed(self):
         response = self.client.get(reverse('chartreuse:profile_follow_accept', args=[self.user_1_id,self.user_2_id]))
         self.assertEqual(response.status_code,405) # equivalence class of tests is checking other methods other than post.

@@ -6,8 +6,6 @@ from urllib.parse import unquote, quote
 from . import post_utils
 from ..views import Host
 import requests
-import base64
-import json
 
 def follow_accept(request,followed,follower):
 
@@ -25,9 +23,6 @@ def follow_accept(request,followed,follower):
         follower = unquote(follower)
         followed_user = get_object_or_404(User,url_id=followed)
         following_user = get_object_or_404(User,url_id=follower)
-
-        
-
 
         # check to see if its a remote follow or not.
 
@@ -147,6 +142,9 @@ def profile_follow_request(request,requestee,requester):
             follow = Follow(follower=requester_user,followed=requestee_user) # create the new follow!
             follow.save()
 
+            requestee_username = unquote(requestee_user.url_id).split('/')[-1]
+            our_username = unquote(requester_user.url_id).split('/')[-1]
+
             data = {
                 'type': 'follow',
                 'summary':'actor wants to follow object',
@@ -170,16 +168,16 @@ def profile_follow_request(request,requestee,requester):
                     'profileImage': requestee_user.profileImage
                 }
             }
-
-            url = f"{requestee_user.host}authors/{quote(requestee_user.url_id,safe='')}/inbox/"
+            url = f"{requestee_user.host}authors/{quote(requestee_username,safe='')}/inbox"
 
             headers = {
-                "Content-Type": "application/json; charset=utf-8"
+                "Content-Type": "application/json; charset=utf-8",
+                "X-Original-Host": requester_user.host
             }
 
             try:
                 requests.post(url, headers=headers, json=data, auth=(username, password))
-            except: 
+            except:
                 return redirect("chartreuse:profile",url_id=quote(requestee,safe=''))
             
         else:
@@ -187,12 +185,7 @@ def profile_follow_request(request,requestee,requester):
         return redirect("chartreuse:profile",url_id=quote(requestee,safe=''))
     return HttpResponseNotAllowed(["POST"])
 
-
-
-
 class ProfileDetailView(DetailView):
-
-
     '''
     Purpose: Serve associated files related to the user specified in the URL pk
 
@@ -200,8 +193,7 @@ class ProfileDetailView(DetailView):
     By overriding get_context_data, and retreiving the nested user primary key in the url by overriding get_object)
 
     '''
-
-
+    
     model = User
     template_name = "profile.html"
     context_object_name= "profile"
@@ -366,7 +358,7 @@ class ProfileDetailView(DetailView):
 
             auth = (username,password)
 
-            url = f"{user.host}authors/{quote(user.url_id,safe='')}/followers/{quote(current_user_model.url_id,safe='')}/is_follower"
+            url = f"{user.url_id}/followers/{quote(current_user_model.url_id,safe='')}"
 
             try:
                 response = requests.get(url,auth=auth)

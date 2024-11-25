@@ -2,7 +2,9 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from urllib.parse import quote
+from ..models import User, Node, Comment, Post
 from chartreuse.views import Host
+import base64
 
 class CommentTestCases(TestCase):
     @classmethod
@@ -22,7 +24,7 @@ class CommentTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/k7XVwpB.jpeg',
             'username': 'greg',
             'password': 'ABC123!!!',
-            'host': 'http://nodeaaaa/api/',
+            'host': cls.host,
             'firstName': 'Greg',
             'lastName': 'Johnson',
         }
@@ -33,17 +35,19 @@ class CommentTestCases(TestCase):
             'profileImage': 'https://i.imgur.com/1234.jpeg',
             'username': 'john',
             'password': '87@398dh817b!',
-            'host': 'http://nodeaaaa/api/',
+            'host': cls.host,
             'firstName': 'John',
             'lastName': 'Smith',
         }
+        cls.node = Node.objects.create(host='http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',username='abc',password='123',follow_status='INCOMING',status='ENABLED')
+        cls.creds = {'Authorization' : 'Basic ' + base64.b64encode(b'abc:123').decode('utf-8')}
 
         # Create test users
-        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json')
-        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json')
+        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json', headers=cls.creds)
+        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json', headers=cls.creds)
 
-        cls.user_id_1 = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/1", safe="")
-        cls.user_id_2 = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/authors/2", safe="")
+        cls.user_id_1 = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/api/authors/1", safe="")
+        cls.user_id_2 = quote("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/api/authors/2", safe="")
 
         # Create a post for testing comments
         cls.client.post(reverse('chartreuse:login_user'), {
@@ -56,7 +60,7 @@ class CommentTestCases(TestCase):
             "description": "Test post description", 
             "contentType": "text/plain", 
             "content": "Hello World!"
-        })
+        }, headers=cls.creds)
         cls.post_id = quote(cls.post_response.json()['id'], safe="")
     
     def setUp(self):
@@ -68,6 +72,10 @@ class CommentTestCases(TestCase):
             'username': 'john',
             'password': '87@398dh817b!'
         })
+
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
     
     def test_create_comment(self):
         """
@@ -78,7 +86,9 @@ class CommentTestCases(TestCase):
         comment_response = self.client.post(reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]), {
             'comment': 'Nice post!',
             'contentType': 'text/plain'
-        })
+        }, headers=self.creds)
+
+        print(Comment.objects.all())
 
         # Successfully created comment
         self.assertEqual(comment_response.status_code, 201)
@@ -107,10 +117,10 @@ class CommentTestCases(TestCase):
         """
         self.client.post(
             reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]),
-            {'comment': "This is a test comment.", 'contentType': "text/plain"}
-        )
+            {'comment': "This is a test comment.", 'contentType': "text/plain"},
+        headers=self.creds)
 
-        response = self.client.get(reverse('chartreuse:get_comments', args=[self.user_id_1, self.post_id]))
+        response = self.client.get(reverse('chartreuse:get_comments', args=[self.user_id_1, self.post_id]), headers=self.creds)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['type'], 'comments')
@@ -122,10 +132,10 @@ class CommentTestCases(TestCase):
         """
         self.client.post(
             reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]),
-            {'comment': "This is a test comment.", 'contentType': "text/plain"}
-        )
+            {'comment': "This is a test comment.", 'contentType': "text/plain"},
+        headers=self.creds)
 
-        response = self.client.get(reverse('chartreuse:get_comments_by_pid', args=[self.post_id]))
+        response = self.client.get(reverse('chartreuse:get_comments_by_pid', args=[self.post_id]), headers=self.creds)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['type'], 'comments')
@@ -137,12 +147,12 @@ class CommentTestCases(TestCase):
         """
         response = self.client.post(
             reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]),
-            {'comment': "This is a test comment.", 'contentType': "text/plain"}
-        )
+            {'comment': "This is a test comment.", 'contentType': "text/plain"},
+        headers=self.creds)
        
         comment_id = quote(response.json()["id"], safe="")
 
-        response = self.client.get(reverse('chartreuse:get_comment', args=[self.user_id_1, self.post_id, comment_id]))
+        response = self.client.get(reverse('chartreuse:get_comment', args=[self.user_id_1, self.post_id, comment_id]), headers=self.creds)
   
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['type'], 'comment')
@@ -154,12 +164,12 @@ class CommentTestCases(TestCase):
         """
         response = self.client.post(
             reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]),
-            {'comment': "This is a test comment.", 'contentType': "text/plain"}
-        )
+            {'comment': "This is a test comment.", 'contentType': "text/plain"},
+        headers=self.creds)
        
         comment_id = quote(response.json()["id"], safe="")
 
-        response = self.client.get(reverse('chartreuse:get_comment_by_cid', args=[comment_id]))
+        response = self.client.get(reverse('chartreuse:get_comment_by_cid', args=[comment_id]), headers=self.creds)
         
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['type'], 'comment')
@@ -167,19 +177,19 @@ class CommentTestCases(TestCase):
 
     def test_get_authors_comments(self):
         """
-        Tests retrieving a specific comment using the comment id.
+        Tests retrieving a comments by an author.
         """
         self.client.post(
             reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]),
-            {'comment': "This is a test comment.", 'contentType': "text/plain"}
-        )
+            {'comment': "This is a test comment.", 'contentType': "text/plain"},
+        headers=self.creds)
 
         self.client.post(
             reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]),
-            {'comment': "This is a second test comment.", 'contentType': "text/plain"}
-        )
+            {'comment': "This is a second test comment.", 'contentType': "text/plain"},
+        headers=self.creds)
 
-        response = self.client.get(reverse('chartreuse:get_authors_comments', args=[self.user_id_2]))
+        response = self.client.get(reverse('chartreuse:get_authors_comments', args=[self.user_id_2]), headers=self.creds)
         
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()['src']), 2)
@@ -194,7 +204,7 @@ class CommentTestCases(TestCase):
             'comment': 'Nice post!',
             'contentType': 'text/plain',
             'id': self.post_id,
-        })
+        }, headers=self.creds)
 
         # Successfully created comment
         self.assertEqual(comment_response.status_code, 201)
@@ -210,12 +220,13 @@ class CommentTestCases(TestCase):
         comment_response = self.client.post(reverse('chartreuse:create_comment', args=[self.user_id_1, self.post_id]), {
             'comment': 'Nice post!',
             'contentType': 'text/plain'
-        })
+        }, headers=self.creds)
 
         comment_id = quote(comment_response.json()["id"], safe="")
+        print(comment_id)
 
         # Remove the comment
-        comment_response = self.client.delete(reverse('chartreuse:delete_comment', args=[comment_id]))
+        comment_response = self.client.delete(reverse('chartreuse:delete_comment', args=[comment_id]), headers=self.creds)
 
         # Successfully created comment
         self.assertEqual(comment_response.status_code, 200)

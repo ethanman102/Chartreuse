@@ -3,6 +3,8 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from urllib.parse import quote
 from chartreuse.views import Host
+from ..models import User, Node
+import base64
 
 class LikeTestCases(TestCase):
     @classmethod
@@ -48,14 +50,16 @@ class LikeTestCases(TestCase):
             'firstName': 'Benjamin',
             'lastName': 'Stanley',
         }
+        cls.node = Node.objects.create(host='http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/',username='abc',password='123',follow_status='INCOMING',status='ENABLED')
+        cls.creds = {'Authorization' : 'Basic ' + base64.b64encode(b'abc:123').decode('utf-8')}
 
-        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json')
-        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json')
-        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_3_data, format='json')
+        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_1_data, format='json', headers=cls.creds)
+        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_2_data, format='json', headers=cls.creds)
+        cls.client.post(reverse('chartreuse:user-list'), cls.test_user_3_data, format='json', headers=cls.creds)
 
-        cls.user_id_1 = quote(f"{cls.host}authors/1", safe = "")
-        cls.user_id_2 = quote(f"{cls.host}authors/2", safe = "")
-        cls.user_id_3 = quote(f"{cls.host}authors/3", safe = "")
+        cls.user_id_1 = quote(f"{cls.host}chartreuse/api/authors/1", safe = "")
+        cls.user_id_2 = quote(f"{cls.host}chartreuse/api/authors/2", safe = "")
+        cls.user_id_3 = quote(f"{cls.host}chartreuse/api/authors/3", safe = "")
 
         # log in as john and create 2 posts
         cls.client.post(reverse('chartreuse:login_user'), {
@@ -70,8 +74,8 @@ class LikeTestCases(TestCase):
             "description": "Test post description", 
             "contentType": "text/plain", 
             "content": "Hello World! \nThis is a short message from greg!"
-        })
-        cls.post_id = quote(f"{cls.host}authors/2/posts/1" , safe="")
+        }, headers=cls.creds)
+        cls.post_id = quote(f"{cls.host}chartreuse/api/authors/2/posts/1" , safe="")
 
         # second post
         cls.client.post(reverse('chartreuse:posts', args=[cls.user_id_2]), {
@@ -80,8 +84,8 @@ class LikeTestCases(TestCase):
             "description": "Test post description", 
             "contentType": "text/plain", 
             "content": "Hello World! \nThis is a short message from greg!"
-        })
-        cls.post_id_2 = quote(f"{cls.host}authors/2/posts/2" , safe="")
+        }, headers=cls.creds)
+        cls.post_id_2 = quote(f"{cls.host}chartreuse/api/authors/2/posts/2" , safe="")
 
     def setUp(self):
         '''
@@ -92,18 +96,22 @@ class LikeTestCases(TestCase):
             'password': 'ABC123!!!'
         })
 
+    @classmethod
+    def tearDownClass(cls):
+        return super().tearDownClass()
+
     def test_like_post(self):
         '''
         This tests liking a post.
         '''
-        response = self.client.post(reverse('chartreuse:like', args=[self.user_id_1]), {'post': self.post_id})
+        response = self.client.post(reverse('chartreuse:like', args=[self.user_id_1]), {'post': self.post_id}, headers=self.creds)
 
         # Successfully liked post
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['type'], 'like')
         self.assertEqual(response.json()['author']['displayName'], 'Greg Johnson')
-        self.assertEqual(response.json()['id'], f"{self.host}authors/1/liked/1")
-        self.assertEqual(response.json()['object'], f"{self.host}authors/2/posts/1")
+        self.assertEqual(response.json()['id'], f"{self.host}chartreuse/api/authors/1/liked/1")
+        self.assertEqual(response.json()['object'], f"{self.host}chartreuse/api/authors/2/posts/1")
     
     def test_like_post_twice_invalid(self):
         '''
@@ -111,11 +119,11 @@ class LikeTestCases(TestCase):
         '''
         response = self.client.post(reverse('chartreuse:like', args=[self.user_id_1]), {
             'post': self.post_id
-        })
+        }, headers=self.creds)
 
         response = self.client.post(reverse('chartreuse:like', args=[self.user_id_1]), {
             'post': self.post_id
-        })
+        }, headers=self.creds)
 
         # Cannot like post twice
         self.assertEqual(response.status_code, 400)
@@ -124,39 +132,39 @@ class LikeTestCases(TestCase):
         """
         This tests getting a like by an author.
         """
-        like = self.client.post(reverse('chartreuse:like', args=[self.user_id_1]), {'post': self.post_id})
+        like = self.client.post(reverse('chartreuse:like', args=[self.user_id_1]), {'post': self.post_id}, headers=self.creds)
 
         like_id = like.json()['id']
         user_id = like.json()['author']['id']
         user_id = quote(user_id, safe='')
         like_id = quote(like_id, safe='')
 
-        response = self.client.get(reverse('chartreuse:get_like_object', args=[user_id, like_id]))
+        response = self.client.get(reverse('chartreuse:get_like_object', args=[user_id, like_id]), headers=self.creds)
 
         # Assertions to verify the response
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['type'], 'like')
         self.assertEqual(response.json()['author']['displayName'], 'Greg Johnson')
-        self.assertEqual(response.json()['id'], f"{self.host}authors/1/liked/1")
-        self.assertEqual(response.json()['object'], f"{self.host}authors/2/posts/1")
+        self.assertEqual(response.json()['id'], f"{self.host}chartreuse/api/authors/1/liked/1")
+        self.assertEqual(response.json()['object'], f"{self.host}chartreuse/api/authors/2/posts/1")
     
     def test_get_all_likes_by_author(self):
         '''
         This tests getting all likes by an author.
         '''
-        like1 = self.client.post(reverse('chartreuse:like', args=[self.user_id_1]), {'post': self.post_id})
-        like2 = self.client.post(reverse('chartreuse:like', args=[self.user_id_1]), {'post': self.post_id_2})
+        like1 = self.client.post(reverse('chartreuse:like', args=[self.user_id_1]), {'post': self.post_id}, headers=self.creds)
+        like2 = self.client.post(reverse('chartreuse:like', args=[self.user_id_1]), {'post': self.post_id_2}, headers=self.creds)
 
         user_id = like1.json()['author']['id']
         user_id = quote(user_id, safe='')
         
-        response = self.client.get(reverse('chartreuse:get_liked', args=[user_id]))
+        response = self.client.get(reverse('chartreuse:get_liked', args=[user_id]), headers=self.creds)
 
         # Successfully got all likes
         self.assertEqual(response.status_code, 200)
 
         # Assert the values in the response
-        self.assertEqual(response.json()['page'], f'{self.host}authors/1/posts/')
+        self.assertEqual(response.json()['page'], f'{self.host}chartreuse/api/authors/1/posts/')
         self.assertEqual(response.json()['page_number'], 1)
         self.assertEqual(response.json()['size'], 50)
         self.assertEqual(response.json()['count'], 2)
@@ -167,18 +175,18 @@ class LikeTestCases(TestCase):
 
         # Assert the structure of the first like in 'src'
         like_object = response.json()['src'][0]
-        self.assertEqual(like_object['id'], f'{self.host}authors/1/liked/1')
-        self.assertEqual(like_object['object'], f'{self.host}authors/2/posts/1')
+        self.assertEqual(like_object['id'], f'{self.host}chartreuse/api/authors/1/liked/1')
+        self.assertEqual(like_object['object'], f'{self.host}chartreuse/api/authors/2/posts/1')
 
         like_object_2 = response.json()['src'][1]
-        self.assertEqual(like_object_2['id'], f'{self.host}authors/1/liked/2')
-        self.assertEqual(like_object_2['object'], f'{self.host}authors/2/posts/2')
+        self.assertEqual(like_object_2['id'], f'{self.host}chartreuse/api/authors/1/liked/2')
+        self.assertEqual(like_object_2['object'], f'{self.host}chartreuse/api/authors/2/posts/2')
 
     def test_get_post_likes(self):
         """
         This tests getting likes on a post.
         """
-        like = self.client.post(reverse('chartreuse:like', args=[self.user_id_1]), {'post': self.post_id})
+        like = self.client.post(reverse('chartreuse:like', args=[self.user_id_1]), {'post': self.post_id}, headers=self.creds)
 
         like_id = like.json()['id']
         user_id = like.json()['author']['id']
@@ -186,14 +194,14 @@ class LikeTestCases(TestCase):
         like_id = quote(like_id, safe='')
 
         # Missing 1 required argument: 'request'
-        response = self.client.get(reverse('chartreuse:post_likes', args=[user_id, self.post_id]))
+        response = self.client.get(reverse('chartreuse:post_likes', args=[user_id, self.post_id]), headers=self.creds)
 
         # Assertions to verify the response
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['type'], 'likes')
         self.assertEqual(response.json()["src"][0]['author']['displayName'], 'Greg Johnson')
-        self.assertEqual(response.json()['src'][0]['id'], f"{self.host}authors/1/liked/1")
-        self.assertEqual(response.json()["src"][0]['object'], f"{self.host}authors/2/posts/1")
+        self.assertEqual(response.json()['src'][0]['id'], f"{self.host}chartreuse/api/authors/1/liked/1")
+        self.assertEqual(response.json()["src"][0]['object'], f"{self.host}chartreuse/api/authors/2/posts/1")
 
     def test_get_comment_likes(self):
         """
@@ -203,12 +211,12 @@ class LikeTestCases(TestCase):
         comment_response = self.client.post(reverse('chartreuse:create_comment', args=[self.user_id_2, self.post_id]), {
             'comment': 'Nice post!',
             'contentType': 'text/plain'
-        })
+        }, headers=self.creds)
 
         comment_id = quote(comment_response.json()["id"], safe="")
 
         # Like the comment
-        like = self.client.post(reverse('chartreuse:like', args=[self.user_id_1]), {'post': self.post_id, "comment":comment_id})
+        like = self.client.post(reverse('chartreuse:like', args=[self.user_id_1]), {'post': self.post_id, "comment":comment_id}, headers=self.creds)
 
         like_id = like.json()['id']
         user_id = like.json()['author']['id']
@@ -216,13 +224,13 @@ class LikeTestCases(TestCase):
         like_id = quote(like_id, safe='')
 
         # get the comment likes
-        response = self.client.get(reverse('chartreuse:comment_likes', args=[user_id, self.post_id, comment_id]))  
+        response = self.client.get(reverse('chartreuse:comment_likes', args=[user_id, self.post_id, comment_id]), headers=self.creds)  
 
         # Assertions to verify the response
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['type'], 'likes')
         self.assertEqual(response.json()["src"][0]['author']['displayName'], 'Greg Johnson')
-        self.assertEqual(response.json()["src"][0]['id'], f"{self.host}authors/1/liked/1")
-        self.assertEqual(response.json()["src"][0]['object'], f"{self.host}authors/1/commented/1")
+        self.assertEqual(response.json()["src"][0]['id'], f"{self.host}chartreuse/api/authors/1/liked/1")
+        self.assertEqual(response.json()["src"][0]['object'], f"{self.host}chartreuse/api/authors/1/commented/1")
 
         

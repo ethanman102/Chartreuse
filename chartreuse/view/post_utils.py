@@ -664,6 +664,9 @@ def prepare_posts(posts):
 
             post.repost = True
             post.repost_user = repost_user
+            # On November 25, 2024 Asked OpenAI's ChatGpt why our repost button in profile.html wasn't mapping to the correct URL. It instead mapped to an API 
+            # ChatGpt said after the link of the request was shared to the agent that one url was double encoded. After trying template tags |urlencode and nothing
+            # fixing the issue, We noticed that the url below was not encoded in the request url and tried quoting it ourself, and it matched to the right URL.
             post.repost_url = quote(repost_url,safe='')
             post.likes_count = Like.objects.filter(post=original_post).count()
             post.repost_time = repost_time

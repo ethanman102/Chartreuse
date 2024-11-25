@@ -664,7 +664,7 @@ def prepare_posts(posts):
 
             post.repost = True
             post.repost_user = repost_user
-            post.repost_url = repost_url
+            post.repost_url = quote(repost_url,safe='')
             post.likes_count = Like.objects.filter(post=original_post).count()
             post.repost_time = repost_time
             post.user.profileImage = get_image_post(post.user.profileImage)

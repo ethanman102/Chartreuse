@@ -15,6 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from chartreuse.view import landing_page_view
 from django.urls import path, include
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -34,6 +35,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("chartreuse/", include("chartreuse.urls")),
+    path(" ", landing_page_view.landing_page, name='home'),     # possibly url toredirect user to landing page
     path('auth/', include('django.contrib.auth.urls')),
     path("admin/", admin.site.urls),
     path('chartreuse/schema/', SpectacularAPIView.as_view(), name='schema'),

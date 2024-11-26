@@ -215,10 +215,10 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-6 current-github-text">
+                        <div class="col-3 current-github-text">
                             <h5>Current Github:</h5>
                         </div>
-                        <div class="col-2">
+                        <div class="col-3">
                             <p id="github-url-text">{{user.github}}</p>
                         </div>
                     </div>
@@ -233,10 +233,10 @@
                         </div>
                     </div>
                     <div class="row" id="github-add-section">
-                        <div class="col-3">
+                        <div class="col-4">
                             <label for="github-input">URL:</label>
                         </div>
-                        <div class="col-4">
+                        <div class="col-2">
                             <form method="POST">
                                 {% csrf_token %}
                                 <input id="github-input" name="github-input" type="text" class="form-control" required placeholder="Your GITHUB"/>

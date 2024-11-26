@@ -26,7 +26,7 @@
         {% endif %}
     </div>
     <!-- Post content -->
-    <a href="{% url 'chartreuse:profile_view_post' owner_id|urlencode post.url_id %}" class="card-link px-4" style="text-decoration: none;">
+    <a href="{% url 'chartreuse:profile_view_post' owner_id post.url_id %}" class="card-link px-4" style="text-decoration: none;">
         <p class="card-title mt-2" style="text-align: left;">{{ post.title }}</p>
             {% if post.contentType == "text/plain" %}
                 <p class="card-text mt-2" style="text-align: left;">{{ post.content|linebreaksbr }}</p>

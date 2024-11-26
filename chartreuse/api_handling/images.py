@@ -225,11 +225,6 @@ def decode_image(encoded_string):
         raise ValueError(f"Failed to decode image: {e}")
     
 def create_post_url_id(request, author_id,post_id):
-    id = unquote(id)
-    if id.find(":") != -1:
-        return id
-    else:
-        # create the url id
         host = request.get_host()
         scheme = request.scheme
         url = f"{scheme}://{host}/chartreuse/api/authors/{author_id}/posts/{post_id}"

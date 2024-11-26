@@ -152,7 +152,10 @@ def retrieve_from_profile(request, author_id, post_id):
     Returns:
         HttpResponse containing the image data of the post.
     '''    
-    decoded_post_id = unquote(post_id)
+    if author_id.isdigit() and post_id.isdigit(): # given serials
+        decoded_post_id = create_post_url_id(request,author_id,post_id)
+    else: # given FQID
+        decoded_post_id = unquote(post_id)
     post = models.Post.objects.filter(url_id=decoded_post_id).first()
 
     if post and post.content and post.contentType in ['image/jpeg;base64', 'image/png;base64']:

@@ -652,6 +652,59 @@ class AuthenticationTestCases(TestCase):
         response = self.client.post(reverse('chartreuse:inbox',args=[quote('http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/api/authors/1',safe='')]), comment_obj, content_type='application/json',headers=self.creds)
         self.assertEqual(response.status_code,404)
 
+    def test_invalid_like_json(self):
+        postObject = {
+                "type": "post",
+                "title": 'ETHAN TITLE',
+                "id": 'http://github.com/gjohnson/id',
+                "description": 'ETHAN DESCRIPTION',
+                "contentType": 'text/plain',
+                "content": 'This is ethans test post',
+                "author": {
+                    "type": "author",
+                    "id": 'http://github.com/gjohnson',
+                    "page": 'fillerdata',
+                    "host": 'http://github.com/gjohnson/host',
+                    "displayName": 'ETHANAUTHOR',
+                    "github": '',
+                    "profileImage": 'https://profile.png'
+                },
+                "comments":{
+                    "type": "comments",
+                    "src": []
+                },
+                "likes": {
+                    "types": "likes",
+                    "src": [
+                    ]
+                },
+                "published": datetime.now(),
+                "visibility": 'PUBLIC',
+            }
+        
+        
+        self.client.post(reverse('chartreuse:inbox',args=[quote('http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/api/authors/1',safe='')]), postObject, content_type='application/json',headers=self.creds)
+
+        like_object = {
+            "type": "like",
+            "author": {
+                "type": "author",
+                "id": 'http://github.com/gjohnson/like',
+                "page": 'whateverpage',
+                "host": 'http://github.com/gjohnson/host',
+                "displayName": 'ETHANLIKE',
+                "github": '',
+                "profileImage": 'https://profile.png',
+            },
+            "published": datetime.now(),
+            "id": 'blahlfnieid',
+            "object": 'http://github.com/gjohnson/id'
+        }
+        response = self.client.post(reverse('chartreuse:inbox',args=[quote('http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/api/authors/1',safe='')]), like_object, content_type='application/json',headers=self.creds)
+        self.assertEqual(response.status_code,400)
+
+
+
 
     
 

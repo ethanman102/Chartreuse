@@ -155,6 +155,7 @@ def inbox(request, user_id):
                 new_post = Post.objects.create(title=title, url_id=post_id, description=description, contentType=contentType, content=content, user=author, published=published, visibility=visibility)
                 new_post.published = published
                 new_post.save()
+                new_post.full_clean()
             except ValidationError:
                 return JsonResponse({'error':'Invalid JSON Format'},status=400)
             
@@ -187,6 +188,7 @@ def inbox(request, user_id):
                     new_comment = Comment.objects.create(user=comment_author, url_id=comment_id, comment=comment, contentType=contentType, post=new_post)
                     new_comment.dateCreated = published
                     new_comment.save()
+                    new_comment.full_clean()
                 except ValidationError:
                     continue
 
@@ -217,6 +219,7 @@ def inbox(request, user_id):
                         new_like = Like.objects.create(user=like_author, url_id=like_id, comment=new_comment)
                         new_like.dateCreated = published
                         new_like.save()
+                        new_like.full_clean()
                     except ValidationError:
                         continue
                     
@@ -246,6 +249,7 @@ def inbox(request, user_id):
                     new_like = Like.objects.create(user=current_author, url_id=like_id, post=new_post)
                     new_like.dateCreated = published
                     new_like.save()
+                    new_like.full_clean()
                 except ValidationError:
                     continue
                     
@@ -258,6 +262,7 @@ def inbox(request, user_id):
                 post.contentType = contentType
                 post.content = content
                 post.save()
+                post.full_clean()
             except ValidationError:
                 JsonResponse({'error':'Invalid JSON Format'},status=400)
                     
@@ -294,9 +299,12 @@ def inbox(request, user_id):
         comment = Comment.objects.filter(comment=comment_text, user=comment_author, post=new_post).first()
 
         if comment is None:
-            comment = Comment.objects.create(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post)
-            comment.dateCreated = published
-            comment.save()
+            try:
+                comment = Comment.objects.create(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post)
+                comment.dateCreated = published
+                comment.save()
+            except ValidationError:
+                return JsonResponse({'error':'Invalid JSON Format'},status=400)
 
         # add comment likes
         comment_likes = likes.get('src',[])
@@ -328,6 +336,7 @@ def inbox(request, user_id):
                     new_like = Like.objects.create(user=like_author, url_id=like_id, comment=comment)
                     new_like.dateCreated = published
                     new_like.save()
+                    new_like.full_clean()
                 except ValidationError:
                     continue
 
@@ -364,10 +373,14 @@ def inbox(request, user_id):
         if object_type == "post":
             like = Like.objects.filter(user=author, post=post).first()
             if like is None:
-                new_like = Like.objects.create(user=author, url_id=like_id, post=post)
-                new_like.dateCreated = published
-                new_like.save()
-                return JsonResponse({"status": "Like added successfully"})
+                try:
+                    new_like = Like.objects.create(user=author, url_id=like_id, post=post)
+                    new_like.dateCreated = published
+                    new_like.save()
+                    new_like.full_clean()
+                    return JsonResponse({"status": "Like added successfully"})
+                except ValidationError:
+                    return JsonResponse({'error':'Invalid JSON format'},status=400)
 
         else:
             comment = Comment.objects.filter(url_id=object_id).first()
@@ -375,10 +388,14 @@ def inbox(request, user_id):
                 return JsonResponse({"error":'Object to like does not exist'},status=404)
             like = Like.objects.filter(user=author, comment=comment).first()
             if like is None:
-                new_like = Like.objects.create(user=author, url_id=like_id, comment=comment)
-                new_like.dateCreated = published
-                new_like.save()
-                return JsonResponse({"status": "Like added successfully"})
+                try:
+                    new_like = Like.objects.create(user=author, url_id=like_id, comment=comment)
+                    new_like.dateCreated = published
+                    new_like.save()
+                    new_like.full_clean()
+                    return JsonResponse({"status": "Like added successfully"})
+                except ValidationError:
+                    return JsonResponse({'error':'Invalid JSON format'},status=400)
        
             
 
@@ -408,6 +425,7 @@ def inbox(request, user_id):
                     github = actor.get('github',''),
                     profileImage = actor.get('profileImage',''),
                 )
+                remote_author.full_clean()
             except ValidationError:
                 return JsonResponse({'error':'Invalid JSON format'},status=400)
         else:
@@ -449,10 +467,8 @@ def discover_author(url_id,json_obj):
                 github = json_obj.get('github'),
                 profileImage = json_obj.get('profileImage')
             )
-            print(current_author)
             current_author.full_clean()
         except ValidationError:
-            print(json_obj,'\n')
             return None
     else:
         current_author = author_queryset[0]

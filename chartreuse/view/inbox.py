@@ -99,7 +99,10 @@ def create_user_url_id(request, id):
 @authentication_classes([SessionAuthentication])
 def inbox(request, user_id):
     
-    data = json.loads(request.body.decode('utf-8'))
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+    except:
+        return JsonResponse({'error':'Invalid JSON Format'},status=400)
 
     decoded_url_id = create_user_url_id(request, user_id)
     author = User.objects.filter(url_id=decoded_url_id).first()
@@ -114,51 +117,78 @@ def inbox(request, user_id):
     authorization_response = checkIfRequestAuthenticated(request)
     if authorization_response.status_code != 200:
         return authorization_response
+    
+    if data.get('type') is None:
+        return JsonResponse({'error':'Invalid JSON Format'},status=400)
 
     if (data["type"] == "post"):
-        title = data["title"]
-        description = data["description"]
-        post_id = data["id"]
-        contentType = data["contentType"]
-        content = data["content"]
-        author = data["author"]
-        comments = data.get("comments",{})
-        likes = data.get("likes",{})
-        published = data["published"]
-        visibility = data["visibility"]
+        try:
+            title = data["title"]
+            description = data["description"]
+            post_id = data["id"]
+            contentType = data["contentType"]
+            content = data["content"]
+            author = data["author"]
+            comments = data.get("comments",{})
+            likes = data.get("likes",{})
+            published = data["published"]
+            visibility = data["visibility"]
+        except KeyError:
+            return JsonResponse({'error':'Invalid JSON Format'},status=400)
 
         # check whether we need to add this post or update it or delete it
         post = Post.objects.filter(url_id=post_id).first()
 
         # get author object
-        author_id = unquote(author["id"])
+        try:
+            author_id = unquote(author["id"])
+        except KeyError:
+            return JsonResponse({'error':'Author missing ID field'},status=400)
         author = discover_author(author_id,author)
+
+        if author is None:
+            return JsonResponse({'error':'Invalid JSON Format'},status=400)
 
         if post is None:
             # create a new post
-            new_post = Post.objects.create(title=title, url_id=post_id, description=description, contentType=contentType, content=content, user=author, published=published, visibility=visibility)
-            new_post.published = published
-            new_post.save()
+            try:
+                new_post = Post.objects.create(title=title, url_id=post_id, description=description, contentType=contentType, content=content, user=author, published=published, visibility=visibility)
+                new_post.published = published
+                new_post.save()
+            except ValidationError:
+                return JsonResponse({'error':'Invalid JSON Format'},status=400)
             
 
             # add comment objects
             post_comments = comments.get('src',[])
             
             for post_comment in post_comments:
-                comment_author = post_comment["author"]
-                comment = post_comment["comment"]
-                contentType = post_comment["contentType"]
-                comment_id = post_comment["id"]
-                post = post_comment["post"]
-                published = post_comment["published"]
-                likes = post_comment.get('likes',{})
+                try:
+                    comment_author = post_comment["author"]
+                    comment = post_comment["comment"]
+                    contentType = post_comment["contentType"]
+                    comment_id = post_comment["id"]
+                    post = post_comment["post"]
+                    published = post_comment["published"]
+                    likes = post_comment.get('likes',{})
+                except KeyError:
+                    continue
+                
+                try:
+                    comment_author_id = unquote(comment_author["id"])
+                except KeyError:
+                    continue
 
-                comment_author_id = unquote(comment_author["id"])
                 comment_author = discover_author(comment_author_id,post_comment['author'])
+                if comment_author is None:
+                    continue
 
-                new_comment = Comment.objects.create(user=comment_author, url_id=comment_id, comment=comment, contentType=contentType, post=new_post)
-                new_comment.dateCreated = published
-                new_comment.save()
+                try:
+                    new_comment = Comment.objects.create(user=comment_author, url_id=comment_id, comment=comment, contentType=contentType, post=new_post)
+                    new_comment.dateCreated = published
+                    new_comment.save()
+                except ValidationError:
+                    continue
 
                 
                 
@@ -166,45 +196,70 @@ def inbox(request, user_id):
                 comment_likes = post_comment.get('likes',{})
                 comments_src = comment_likes.get('src',[])
                 for comment_like in comments_src:
-                    like_author = comment_like["author"]
-                    published = comment_like["published"]
-                    like_id = comment_like["id"]
-                    post = comment_like["object"]
-
-                    like_author_id = unquote(like_author["id"])
+                    try:
+                        like_author = comment_like["author"]
+                        published = comment_like["published"]
+                        like_id = comment_like["id"]
+                        post = comment_like["object"]
+                    except KeyError:
+                        continue
+                    
+                    try:
+                        like_author_id = unquote(like_author["id"])
+                    except KeyError:
+                        continue
                     like_author = discover_author(like_author_id,comment_like['author'])
 
-                    new_like = Like.objects.create(user=like_author, url_id=like_id, comment=new_comment)
-                    new_like.dateCreated = published
-                    new_like.save()
-                
+                    if like_author is None:
+                        continue
+                    
+                    try:
+                        new_like = Like.objects.create(user=like_author, url_id=like_id, comment=new_comment)
+                        new_like.dateCreated = published
+                        new_like.save()
+                    except ValidationError:
+                        continue
+                    
                    
 
             # add like objects
             
             post_likes = data.get("likes",{})
             for post_like in post_likes.get('src',[]):
-                author_id = post_like["author"]['id']
+                try:
+                    author_id = post_like["author"]['id']
+                except KeyError:
+                    continue
 
                 # check to see whether the author has been discovered yet or not!
                 current_author = discover_author(author_id,post_like['author'])
-
-                published = post_like["published"]
-                like_id = post_like["id"]
-                post = post_like["object"]
-
-                new_like = Like.objects.create(user=current_author, url_id=like_id, post=new_post)
-                new_like.dateCreated = published
-                new_like.save()
+                if current_author is None:
+                    continue
+                try:
+                    published = post_like["published"]
+                    like_id = post_like["id"]
+                    post = post_like["object"]
+                except KeyError:
+                    continue
                 
+                try:
+                    new_like = Like.objects.create(user=current_author, url_id=like_id, post=new_post)
+                    new_like.dateCreated = published
+                    new_like.save()
+                except ValidationError:
+                    continue
+                    
 
         else:
-            post.visibility = visibility
-            post.title = title
-            post.description = description
-            post.contentType = contentType
-            post.content = content
-            post.save()
+            try:
+                post.visibility = visibility
+                post.title = title
+                post.description = description
+                post.contentType = contentType
+                post.content = content
+                post.save()
+            except ValidationError:
+                JsonResponse({'error':'Invalid JSON Format'},status=400)
                     
         return JsonResponse({"status": "Post added successfully"},status=200)
 

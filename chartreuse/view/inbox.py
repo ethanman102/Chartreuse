@@ -209,19 +209,31 @@ def inbox(request, user_id):
         return JsonResponse({"status": "Post added successfully"},status=200)
 
     elif (data["type"] == "comment"):
-        comment_author = data["author"]
-        comment_text = data["comment"]
-        contentType = data["contentType"]
-        comment_id = data["id"]
-        post = data["post"]
-        published = data["published"]
+        try:
+            comment_author = data["author"]
+            comment_text = data["comment"]
+            contentType = data["contentType"]
+            comment_id = data["id"]
+            post = data["post"]
+            published = data["published"]
+        except KeyError:
+            return JsonResponse({'error':'Invalid JSON Format'},status=400)
         likes = data.get("likes",{})
         # add this new comment if it does not exist, if it exists, then delete it
 
-        comment_author_id = unquote(comment_author["id"])
+        try:
+            comment_author_id = unquote(comment_author["id"])
+        except KeyError:
+            return JsonResponse({'error':'Invalid JSON Format'},status=400)
         
         comment_author = discover_author(comment_author_id,comment_author)
-        new_post = Post.objects.get(url_id=post)
+        if comment_author is None:
+            return JsonResponse({'error':'Invalid JSON Format'},status=400)
+        
+        new_post = Post.objects.filter(url_id=post).first()
+
+        if new_post is None:
+            return JsonResponse({'error':'Post does not exist'},status=404)
 
         # check whether comment already exists
         comment = Comment.objects.filter(comment=comment_text, user=comment_author, post=new_post).first()
@@ -234,22 +246,35 @@ def inbox(request, user_id):
         # add comment likes
         comment_likes = likes.get('src',[])
         for comment_like in comment_likes:
-            like_author = comment_like["author"]
-            published = comment_like["published"]
-            like_id = comment_like["id"]
-            post = comment_like["object"]
+            try:
+                like_author = comment_like["author"]
+                published = comment_like["published"]
+                like_id = comment_like["id"]
+                post = comment_like["object"]
+            except KeyError:
+                continue # just skip to the next like.
 
-            like_author_id = unquote(like_author["id"])
+            try: # see if author would be correctly formatted...
+                like_author_id = unquote(like_author["id"])
+            except KeyError:
+                continue
+
             like_author = discover_author(like_author_id,like_author)
+
+            if like_author is None:
+                continue
             
 
             # check whether like already exists
             like = Like.objects.filter(user=like_author, url_id=like_id, comment=comment).first()
 
             if like is None:
-                new_like = Like.objects.create(user=like_author, url_id=like_id, comment=comment)
-                new_like.dateCreated = published
-                new_like.save()
+                try:
+                    new_like = Like.objects.create(user=like_author, url_id=like_id, comment=comment)
+                    new_like.dateCreated = published
+                    new_like.save()
+                except ValidationError:
+                    continue
 
         return JsonResponse({"status": "Comment added successfully"})
         
@@ -262,8 +287,15 @@ def inbox(request, user_id):
         except KeyError:
             return JsonResponse({'error':"Invalid JSON format"},status=400)
         # add the like if it does not exist, if it exists, delete the like
-        author_id = unquote(author["id"])
+        try:
+            author_id = unquote(author["id"])
+        except KeyError:
+            return JsonResponse({'error':"Invalid JSON format"},status=400)
+        
         author = discover_author(author_id,author)
+
+        if author is None:
+            return JsonResponse({'error':"Invalid JSON format"},status=400)
         
 
         post = Post.objects.filter(url_id=object_id).first()
@@ -354,13 +386,16 @@ def discover_author(url_id,json_obj):
 
     author_queryset = User.objects.filter(url_id=url_id)
     if not author_queryset.exists():
-        current_author = User.objects.create(
-            url_id = url_id,
-            displayName = json_obj.get('displayName'),
-            host = json_obj.get('host'),
-            github = json_obj.get('github'),
-            profileImage = json_obj.get('profileImage')
-        )
+        try:
+            current_author = User.objects.create(
+                url_id = url_id,
+                displayName = json_obj.get('displayName'),
+                host = json_obj.get('host'),
+                github = json_obj.get('github'),
+                profileImage = json_obj.get('profileImage')
+            )
+        except ValidationError:
+            return None
     else:
         current_author = author_queryset[0]
     return current_author

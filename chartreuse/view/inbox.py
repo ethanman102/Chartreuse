@@ -303,6 +303,7 @@ def inbox(request, user_id):
                 comment = Comment.objects.create(user=comment_author, comment=comment_text, url_id=comment_id, contentType=contentType, post=new_post)
                 comment.dateCreated = published
                 comment.save()
+                comment.full_clean()
             except ValidationError:
                 return JsonResponse({'error':'Invalid JSON Format'},status=400)
 

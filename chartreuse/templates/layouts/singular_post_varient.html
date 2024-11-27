@@ -73,7 +73,7 @@
         </div>
     {% endif %}
     
-    <p class="card-text mt-4" style="text-align: left;">{{ post.description }}</p>
+    <p class="card-text mt-4" style="text-align: left;">DESCRIPTION: {{ post.description }}</p>
 
     <p class="text-muted mt-3" style="font-size: 0.9rem; text-align: left;">Published on {{ post.published }}</p>
 
@@ -82,7 +82,8 @@
             <button class="btn pfp-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">Set pfp</button>
         {% endif %} {% endcomment %}
             <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">{{ post.likes_count }} likes</button>
-         
+            
+            
         {% if logged_in and not post.repost and post.visibility == "PUBLIC" %}
             <button class="btn repost-button" data-post-id="{{post.url_id}}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">Repost</button>
         {% endif %}

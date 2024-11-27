@@ -253,10 +253,13 @@ def inbox(request, user_id):
         return JsonResponse({"status": "Comment added successfully"})
         
     elif (data["type"] == "like"):
-        author = data["author"]
-        published = data["published"]
-        like_id = data["id"]
-        object_id = data["object"]
+        try:
+            author = data["author"]
+            published = data["published"]
+            like_id = data["id"]
+            object_id = data["object"]
+        except KeyError:
+            return JsonResponse({'error':"Invalid JSON format"},status=400)
         # add the like if it does not exist, if it exists, delete the like
         author_id = unquote(author["id"])
         author = discover_author(author_id,author)
@@ -280,6 +283,8 @@ def inbox(request, user_id):
 
         else:
             comment = Comment.objects.filter(url_id=object_id).first()
+            if comment is None:
+                return JsonResponse({"error":'Object to like does not exist'},status=400)
             like = Like.objects.filter(user=author, comment=comment).first()
             if like is None:
                 new_like = Like.objects.create(user=author, url_id=like_id, comment=comment)

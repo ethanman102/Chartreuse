@@ -85,9 +85,9 @@
 
             <!-- This button will redirect the user to the page with the list of authors who liked the post -->
             <!-- added href for the redirect -->
-            <a href="{% url 'chartreuse:users_who_liked' user_url_quoted post.url_id %}"> 
+            <!-- <a href="{% url 'chartreuse:users_who_liked' user_url_quoted post.url_id %}"> 
                 <button class="btn likes-list-button" href="" data-post-id="{{post.url_id}}">See Likes</button>
-            </a>
+            </a> -->
             
         {% if logged_in and not post.repost and post.visibility == "PUBLIC" %}
             <button class="btn repost-button" data-post-id="{{post.url_id}}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">Repost</button>

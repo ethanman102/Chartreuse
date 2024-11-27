@@ -152,7 +152,10 @@ def retrieve_from_profile(request, author_id, post_id):
     Returns:
         HttpResponse containing the image data of the post.
     '''    
-    decoded_post_id = unquote(post_id)
+    if author_id.isdigit() and post_id.isdigit(): # given serials
+        decoded_post_id = create_post_url_id(request,author_id,post_id)
+    else: # given FQID
+        decoded_post_id = unquote(post_id)
     post = models.Post.objects.filter(url_id=decoded_post_id).first()
 
     if post and post.content and post.contentType in ['image/jpeg;base64', 'image/png;base64']:
@@ -220,3 +223,9 @@ def decode_image(encoded_string):
         return imageData
     except Exception as e:
         raise ValueError(f"Failed to decode image: {e}")
+    
+def create_post_url_id(request, author_id,post_id):
+        host = request.get_host()
+        scheme = request.scheme
+        url = f"{scheme}://{host}/chartreuse/api/authors/{author_id}/posts/{post_id}"
+        return url

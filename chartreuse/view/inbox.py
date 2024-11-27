@@ -467,6 +467,8 @@ def discover_author(url_id,json_obj):
                 github = json_obj.get('github'),
                 profileImage = json_obj.get('profileImage')
             )
+            # CHATGPT (OpenAI) citation. on November 26, 2024, asked: "why is my validation not being checked, and does the create method check for validation",
+            # To which chat gpt said my test data urls in test_inpox.py were incorrect and that calling full_clean will validate the items.
             current_author.full_clean()
         except ValidationError:
             return None

@@ -372,7 +372,7 @@ def inbox(request, user_id):
         else:
             comment = Comment.objects.filter(url_id=object_id).first()
             if comment is None:
-                return JsonResponse({"error":'Object to like does not exist'},status=400)
+                return JsonResponse({"error":'Object to like does not exist'},status=404)
             like = Like.objects.filter(user=author, comment=comment).first()
             if like is None:
                 new_like = Like.objects.create(user=author, url_id=like_id, comment=comment)
@@ -449,7 +449,10 @@ def discover_author(url_id,json_obj):
                 github = json_obj.get('github'),
                 profileImage = json_obj.get('profileImage')
             )
+            print(current_author)
+            current_author.full_clean()
         except ValidationError:
+            print(json_obj,'\n')
             return None
     else:
         current_author = author_queryset[0]

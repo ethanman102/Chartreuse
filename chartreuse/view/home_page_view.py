@@ -118,6 +118,7 @@ class FeedDetailView(DetailView):
                 
                 
                 post.user.profileImage = get_image_post(post.user.profileImage)
+                post.user.url_id = quote(post.user.url_id,safe='')
 
             return posts
         
@@ -132,6 +133,7 @@ class FeedDetailView(DetailView):
                     if not post.content.startswith('data:'):
                         post.content = f"data:{post.contentType};charset=utf-8;base64, {post.content}"
                 post.user.profileImage = get_image_post(post.user.profileImage)
+                post.user.url_id = quote(post.user.url_id,safe='')
             
             return posts
 

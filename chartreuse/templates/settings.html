@@ -347,7 +347,7 @@
                 // Learned how to construct the correct src for base 64 images through author Hemant Metalia's post on December 14, 2011 
                 if (response.status === 200){
                     let imageBytes = data.image;
-                    let srcString = `data:${file.type};charset=utf-8;base64, ${imageBytes}`;
+                    let srcString = `${imageBytes}`;
                     imageUploadMessage.style.color = 'chartreuse';
                     imageUploadMessage.innerText = data.success;
                     imageUploadMessage.style.visibility = 'visible';

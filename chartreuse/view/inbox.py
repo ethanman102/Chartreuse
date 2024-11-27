@@ -9,6 +9,7 @@ from rest_framework import serializers
 from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
+from django.core.exceptions import ValidationError
 
 def create_user_url_id(request, id):
     id = unquote(id)
@@ -295,31 +296,47 @@ def inbox(request, user_id):
             
 
     elif (data["type"] == "follow"):
-        actor = data["actor"]
-        object_to_follow = data["object"]
+        try:
+            actor = data["actor"]
+            object_to_follow = data["object"]
+        except KeyError:
+            return JsonResponse({'error':'Invalid JSON format'},status=400)
 
-        author_queryset = User.objects.filter(url_id=unquote(actor['id'])).first()
+        try:
+            author_queryset = User.objects.filter(url_id=unquote(actor['id'])).first()
+        except:
+            return JsonResponse({'error':'Missing object id field'})
 
         if not author_queryset:
             # discovered a new author to add to database...
 
             # November 14, 2024: Asked Agent: CHAT GPT, why we may be getting null constraints failed when we have nullability allowed, chatgpt recommended setting the value explicitly to null or
             # maybe migrations we not applied.
-            remote_author = User.objects.create(
-                user = None,
-                url_id = unquote(actor['id']),
-                displayName = actor.get('displayName',''),
-                host = actor.get('host'),
-                github = actor.get('github',''),
-                profileImage = actor.get('profileImage',''),
-            )
+            try:
+                remote_author = User.objects.create(
+                    user = None,
+                    url_id = unquote(actor['id']),
+                    displayName = actor.get('displayName',''),
+                    host = actor.get('host',''),
+                    github = actor.get('github',''),
+                    profileImage = actor.get('profileImage',''),
+                )
+            except ValidationError:
+                return JsonResponse({'error':'Invalid JSON format'},status=400)
         else:
             remote_author = author_queryset
 
         # check if either a follow already exists or a follow request is already sent to them...
 
-        follower = User.objects.get(pk=unquote(actor["id"]))
-        followed = User.objects.get(pk=unquote(object_to_follow["id"]))
+        try:
+            follower = User.objects.get(pk=unquote(actor["id"]))
+            followed = User.objects.filter(pk=unquote(object_to_follow["id"])).first()
+            if followed is None:
+                return JsonResponse({'error':'User to follow does not exist'},status=404)
+            
+        except KeyError:
+            return JsonResponse({'error':'Invalid JSON format'},status=400)
+
 
         follow_queryset = Follow.objects.filter(followed=followed,follower=follower)
         follow_request_queryset = FollowRequest.objects.filter(requester=remote_author,requestee=followed)

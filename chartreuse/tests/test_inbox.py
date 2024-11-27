@@ -66,18 +66,18 @@ class AuthenticationTestCases(TestCase):
         postObject = {
                 "type": "post",
                 "title": 'ETHAN TITLE',
-                "id": 'https://FQID/NEW',
+                "id": 'http://github.com/gjohnson/id',
                 "description": 'ETHAN DESCRIPTION',
                 "contentType": 'text/plain',
                 "content": 'This is ethans test post',
                 "author": {
                     "type": "author",
-                    "id": 'https://newest_author/2/2/2',
+                    "id": 'http://github.com/gjohnson',
                     "page": 'fillerdata',
-                    "host": 'https://newest_author/',
+                    "host": 'http://github.com/gjohnson/2',
                     "displayName": 'ETHANAUTHOR',
                     "github": '',
-                    "profileImage": 'fakeimg.png'
+                    "profileImage": 'https://profile.png'
                 },
                 "comments":{
                     "type": "comments",
@@ -103,13 +103,13 @@ class AuthenticationTestCases(TestCase):
 
         # check that the new author was added.
 
-        author_queryset = User.objects.filter(url_id='https://newest_author/2/2/2')
+        author_queryset = User.objects.filter(url_id='http://github.com/gjohnson')
         self.assertTrue(author_queryset.exists())
         self.assertEqual(author_queryset.count(),1)
 
         # check that the post was added.
 
-        post_queryset = Post.objects.filter(url_id='https://FQID/NEW')
+        post_queryset = Post.objects.filter(url_id='http://github.com/gjohnson/id')
         self.assertTrue(post_queryset.exists())
         self.assertEqual(post_queryset.count(),1)
 
@@ -126,18 +126,18 @@ class AuthenticationTestCases(TestCase):
         postObject = {
                 "type": "post",
                 "title": 'ETHAN TITLE',
-                "id": 'https://FQID/NEW',
+                "id": 'http://github.com/gjohnson/id',
                 "description": 'ETHAN DESCRIPTION',
                 "contentType": 'text/plain',
                 "content": 'This is ethans test post',
                 "author": {
                     "type": "author",
-                    "id": 'https://newest_author/2/2/2',
+                    "id": 'http://github.com/gjohnson',
                     "page": 'fillerdata',
-                    "host": 'https://newest_author/',
+                    "host": 'http://github.com/gjohnson/host',
                     "displayName": 'ETHANAUTHOR',
                     "github": '',
-                    "profileImage": 'fakeimg.png'
+                    "profileImage": 'https://profile.png'
                 },
                 "comments":{
                     "type": "comments",
@@ -163,13 +163,13 @@ class AuthenticationTestCases(TestCase):
 
         # check that the new author was added.
 
-        author_queryset = User.objects.filter(url_id='https://newest_author/2/2/2')
+        author_queryset = User.objects.filter(url_id='http://github.com/gjohnson')
         self.assertTrue(author_queryset.exists())
         self.assertEqual(author_queryset.count(),1)
 
         # check that the post was added.
 
-        post_queryset = Post.objects.filter(url_id='https://FQID/NEW')
+        post_queryset = Post.objects.filter(url_id='http://github.com/gjohnson/id')
         self.assertTrue(post_queryset.exists())
         self.assertEqual(post_queryset.count(),1)
 
@@ -184,18 +184,18 @@ class AuthenticationTestCases(TestCase):
         postObject = {
                 "type": "post",
                 "title": 'ETHAN TITLE NEWWWWWWWW',
-                "id": 'https://FQID/NEW',
+                "id": 'http://github.com/gjohnson/id',
                 "description": 'ETHAN DESCRIPTION',
                 "contentType": 'text/plain',
                 "content": 'This is ethans test post',
                 "author": {
                     "type": "author",
-                    "id": 'https://newest_author/2/2/2',
+                    "id": 'http://github.com/gjohnson',
                     "page": 'fillerdata',
-                    "host": 'https://newest_author/',
+                    "host": 'http://github.com/gjohnson/host',
                     "displayName": 'ETHANAUTHOR',
                     "github": '',
-                    "profileImage": 'fakeimg.png'
+                    "profileImage": 'https://profile.png'
                 },
                 "comments":{
                     "type": "comments",
@@ -210,7 +210,7 @@ class AuthenticationTestCases(TestCase):
             }
         
         response = self.client.post(reverse('chartreuse:inbox',args=[quote('http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/api/authors/1',safe='')]), postObject, content_type='application/json',headers=self.creds)
-        post_queryset = Post.objects.filter(url_id='https://FQID/NEW')
+        post_queryset = Post.objects.filter(url_id='http://github.com/gjohnson/id')
         self.assertTrue(post_queryset.exists())
         self.assertEqual(post_queryset.count(),1)
 
@@ -227,18 +227,18 @@ class AuthenticationTestCases(TestCase):
         postObject = {
                 "type": "post",
                 "title": 'ETHAN TITLE',
-                "id": 'https://FQID/NEW',
+                "id": 'http://github.com/gjohnson/id',
                 "description": 'ETHAN DESCRIPTION',
                 "contentType": 'text/plain',
                 "content": 'This is ethans test post',
                 "author": {
                     "type": "author",
-                    "id": 'https://newest_author/2/2/2',
+                    "id": 'http://github.com/gjohnson',
                     "page": 'fillerdata',
-                    "host": 'https://newest_author/',
+                    "host": 'http://github.com/gjohnson/host',
                     "displayName": 'ETHANAUTHOR',
                     "github": '',
-                    "profileImage": 'fakeimg.png'
+                    "profileImage": 'https://profile.png'
                 },
                 "comments":{
                     "type": "comments",
@@ -247,18 +247,18 @@ class AuthenticationTestCases(TestCase):
                         "type": "comment",
                         "author": {
                             "type": "author",
-                            "id": 'https://newest_author/2/a/3',
+                            "id": 'http://github.com/gjohnson/321',
                             "page": 'whateverpage',
-                            "host": 'https://woah',
+                            "host": 'http://github.com/gjohnson/commentauthor',
                             "displayName": 'comment author',
                             "github": '',
-                            "profileImage": 'testtest.png',
+                            "profileImage": 'https://profile.png',
                         },
                         "comment": 'NEW COMMENT HI',
                         "contentType": 'text/plain',
                         "published": datetime.now(),
-                        "id": 'http://newcomment/',
-                        "post": 'https://FQID/NEW',
+                        "id": 'http://github.com/gjohnson/comment',
+                        "post": 'http://github.com/gjohnson/id',
                     }
                     ]
                 },
@@ -282,17 +282,17 @@ class AuthenticationTestCases(TestCase):
 
         # check that the new author was added.
 
-        author_queryset = User.objects.filter(url_id='https://newest_author/2/2/2')
+        author_queryset = User.objects.filter(url_id='http://github.com/gjohnson')
         self.assertTrue(author_queryset.exists())
         self.assertEqual(author_queryset.count(),1)
 
         # check that the comment author got added
-        author_queryset_comment = User.objects.filter(url_id='https://newest_author/2/a/3')
+        author_queryset_comment = User.objects.filter(url_id='http://github.com/gjohnson/321')
         self.assertTrue(author_queryset_comment.exists())
         self.assertEqual(author_queryset_comment.count(),1)
 
         # check that the post got added.
-        post_queryset = Post.objects.filter(url_id='https://FQID/NEW')
+        post_queryset = Post.objects.filter(url_id='http://github.com/gjohnson/id')
         self.assertTrue(post_queryset.exists())
         self.assertEqual(post_queryset.count(),1)
 
@@ -306,7 +306,7 @@ class AuthenticationTestCases(TestCase):
 
         # check that the comment got added.
 
-        comment_queryset = Comment.objects.filter(url_id='http://newcomment/')
+        comment_queryset = Comment.objects.filter(url_id='http://github.com/gjohnson/comment')
 
         self.assertTrue(comment_queryset.exists())
         self.assertEqual(comment_queryset.count(),1)
@@ -322,18 +322,18 @@ class AuthenticationTestCases(TestCase):
         postObject = {
                 "type": "post",
                 "title": 'ETHAN TITLE',
-                "id": 'https://FQID/NEW',
+                "id": 'http://github.com/gjohnson/id',
                 "description": 'ETHAN DESCRIPTION',
                 "contentType": 'text/plain',
                 "content": 'This is ethans test post',
                 "author": {
                     "type": "author",
-                    "id": 'https://newest_author/2/2/2',
+                    "id": 'http://github.com/gjohnson',
                     "page": 'fillerdata',
-                    "host": 'https://newest_author/',
+                    "host": 'http://github.com/gjohnson/host',
                     "displayName": 'ETHANAUTHOR',
                     "github": '',
-                    "profileImage": 'fakeimg.png'
+                    "profileImage": 'https://profile.png'
                 },
                 "comments":{
                     "type": "comments",
@@ -346,16 +346,16 @@ class AuthenticationTestCases(TestCase):
                             "type": "like",
                             "author": {
                                 "type": "author",
-                                "id": 'https://newest_author/2/a/3',
+                                "id": 'http://github.com/gjohnson/likeauthor',
                                 "page": 'whateverpage',
-                                "host": 'https://woah',
+                                "host": 'http://github.com/gjohnson/woah',
                                 "displayName": 'ETHANLIKE',
                                 "github": '',
-                                "profileImage": 'testimg.png',
+                                "profileImage": 'https://profile.png',
                             },
                             "published": datetime.now(),
-                            "id": 'https://likeurlid/',
-                            "object": 'https://FQID/NEW'
+                            "id": 'http://github.com/gjohnson/like',
+                            "object": 'http://github.com/gjohnson/id'
                         }
                     ]
                 },
@@ -375,13 +375,13 @@ class AuthenticationTestCases(TestCase):
 
         # check that the new author was added.
 
-        author_queryset = User.objects.filter(url_id='https://newest_author/2/2/2')
+        author_queryset = User.objects.filter(url_id='http://github.com/gjohnson')
         self.assertTrue(author_queryset.exists())
         self.assertEqual(author_queryset.count(),1)
 
         # check that the post was added.
 
-        post_queryset = Post.objects.filter(url_id='https://FQID/NEW')
+        post_queryset = Post.objects.filter(url_id='http://github.com/gjohnson/id')
         self.assertTrue(post_queryset.exists())
         self.assertEqual(post_queryset.count(),1)
 
@@ -394,13 +394,13 @@ class AuthenticationTestCases(TestCase):
         self.assertEqual(new_post.user,author_queryset[0])
 
         # check like and like author got added
-        author_queryset_like = User.objects.filter(url_id='https://newest_author/2/a/3')
+        author_queryset_like = User.objects.filter(url_id='http://github.com/gjohnson/likeauthor')
         self.assertTrue(author_queryset_like.exists())
         self.assertEqual(author_queryset_like.count(),1)
 
         # check that the like got added
 
-        like_queryset = Like.objects.filter(url_id='https://likeurlid/')
+        like_queryset = Like.objects.filter(url_id='http://github.com/gjohnson/like')
         self.assertTrue(like_queryset.exists())
         self.assertEqual(like_queryset.count(),1)
 
@@ -411,18 +411,18 @@ class AuthenticationTestCases(TestCase):
         postObject = {
                 "type": "post",
                 "title": 'ETHAN TITLE',
-                "id": 'https://FQID/NEW',
+                "id": 'http://github.com/gjohnson/id',
                 "description": 'ETHAN DESCRIPTION',
                 "contentType": 'text/plain',
                 "content": 'This is ethans test post',
                 "author": {
                     "type": "author",
-                    "id": 'https://newest_author/2/2/2',
+                    "id": 'http://github.com/gjohnson',
                     "page": 'fillerdata',
-                    "host": 'https://newest_author/',
+                    "host": 'http://github.com/gjohnson/host',
                     "displayName": 'ETHANAUTHOR',
                     "github": '',
-                    "profileImage": 'fakeimg.png'
+                    "profileImage": 'https://profile.png'
                 },
                 "comments":{
                     "type": "comments",
@@ -444,27 +444,27 @@ class AuthenticationTestCases(TestCase):
             "type": "like",
             "author": {
                 "type": "author",
-                "id": 'https://newest_author/2/a/3',
+                "id": 'http://github.com/gjohnson/like',
                 "page": 'whateverpage',
-                "host": 'https://woah',
+                "host": 'http://github.com/gjohnson/host',
                 "displayName": 'ETHANLIKE',
                 "github": '',
-                "profileImage": 'testimg.png',
+                "profileImage": 'https://profile.png',
             },
             "published": datetime.now(),
-            "id": 'https://likeurlid/',
-            "object": 'https://FQID/NEW'
+            "id": 'http://github.com/gjohnson/likeid',
+            "object": 'http://github.com/gjohnson/id'
         }
         self.client.post(reverse('chartreuse:inbox',args=[quote('http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/api/authors/1',safe='')]), like_object, content_type='application/json',headers=self.creds)
 
         # check that the like author got added
-        author_queryset_like = User.objects.filter(url_id='https://newest_author/2/a/3')
+        author_queryset_like = User.objects.filter(url_id='http://github.com/gjohnson/like')
         self.assertTrue(author_queryset_like.exists())
         self.assertEqual(author_queryset_like.count(),1)
 
         # check that the like got added
 
-        like_queryset = Like.objects.filter(url_id='https://likeurlid/')
+        like_queryset = Like.objects.filter(url_id='http://github.com/gjohnson/likeid')
         self.assertTrue(like_queryset.exists())
         self.assertEqual(like_queryset.count(),1)
 
@@ -476,18 +476,18 @@ class AuthenticationTestCases(TestCase):
         postObject = {
                 "type": "post",
                 "title": 'ETHAN TITLE',
-                "id": 'https://FQID/NEW',
+                "id": 'http://github.com/gjohnson/id',
                 "description": 'ETHAN DESCRIPTION',
                 "contentType": 'text/plain',
                 "content": 'This is ethans test post',
                 "author": {
                     "type": "author",
-                    "id": 'https://newest_author/2/2/2',
+                    "id": 'http://github.com/gjohnson',
                     "page": 'fillerdata',
-                    "host": 'https://newest_author/',
+                    "host": 'http://github.com/gjohnson/host',
                     "displayName": 'ETHANAUTHOR',
                     "github": '',
-                    "profileImage": 'fakeimg.png'
+                    "profileImage": 'https://profile.png'
                 },
                 "comments":{
                     "type": "comments",
@@ -508,27 +508,27 @@ class AuthenticationTestCases(TestCase):
                         "type": "comment",
                         "author": {
                             "type": "author",
-                            "id": 'https://newest_author/2/a/3',
+                            "id": 'http://github.com/gjohnson/commentauthor',
                             "page": 'whateverpage',
-                            "host": 'https://woah',
+                            "host": 'http://github.com/gjohnson/host',
                             "displayName": 'comment author',
                             "github": '',
-                            "profileImage": 'testtest.png',
+                            "profileImage": 'https://testtest.png',
                         },
                         "comment": 'NEW COMMENT HI',
                         "contentType": 'text/plain',
                         "published": datetime.now(),
-                        "id": 'http://newcomment/',
-                        "post": 'https://FQID/NEW',
+                        "id": 'http://github.com/gjohnson/idcomment',
+                        "post": 'http://github.com/gjohnson/id',
                     }
         
         self.client.post(reverse('chartreuse:inbox',args=[quote('http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/api/authors/1',safe='')]), comment_obj, content_type='application/json',headers=self.creds)
         
-        author_queryset_comment = User.objects.filter(url_id='https://newest_author/2/a/3')
+        author_queryset_comment = User.objects.filter(url_id='http://github.com/gjohnson/commentauthor')
         self.assertTrue(author_queryset_comment.exists())
         self.assertEqual(author_queryset_comment.count(),1)
         
-        comment_queryset = Comment.objects.filter(url_id='http://newcomment/')
+        comment_queryset = Comment.objects.filter(url_id='http://github.com/gjohnson/idcomment')
 
         self.assertTrue(comment_queryset.exists())
         self.assertEqual(comment_queryset.count(),1)
@@ -537,6 +537,125 @@ class AuthenticationTestCases(TestCase):
         self.assertEqual(comment.comment,'NEW COMMENT HI')
         self.assertEqual(comment.contentType,'text/plain')
         self.assertEqual(comment.user,author_queryset_comment[0])
+    
+    def test_new_post_invalid_author(self):
+        postObject = {
+                "type": "post",
+                "title": 'ETHAN TITLE',
+                "id": 'http://github.com/gjohnson/id',
+                "description": 'ETHAN DESCRIPTION',
+                "contentType": 'text/plain',
+                "content": 'This is ethans test post',
+                "author": {
+                    "type": "author",
+                    "id": 'newest_author/2/2/2',
+                    "page": 'fillerdata',
+                    "host": '  https://host/',
+                    "displayName": 'ETHANAUTHOR',
+                    "github": '',
+                    "profileImage": 'https://profile.png'
+                },
+                "comments":{
+                    "type": "comments",
+                    "src": []
+                },
+                "likes": {
+                    "types": "likes",
+                    "src": []
+                },
+                "published": datetime.now(),
+                "visibility": 'PUBLIC',
+            }
+        
+        
+        response = self.client.post(reverse('chartreuse:inbox',args=[quote('http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/api/authors/1',safe='')]), postObject, content_type='application/json',headers=self.creds)
+        self.assertEqual(response.status_code,400)
+
+    def test_like_no_object(self):
+        
+        like_object = {
+            "type": "like",
+            "author": {
+                "type": "author",
+                "id": 'http://github.com/gjohnson/like',
+                "page": 'whateverpage',
+                "host": 'http://github.com/gjohnson/host',
+                "displayName": 'ETHANLIKE',
+                "github": '',
+                "profileImage": 'https://profile.png',
+            },
+            "published": datetime.now(),
+            "id": 'http://github.com/gjohnson/likeid',
+            "object": 'http://github.com/gjohnson/id'
+        }
+        response = self.client.post(reverse('chartreuse:inbox',args=[quote('http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/api/authors/1',safe='')]), like_object, content_type='application/json',headers=self.creds)
+        self.assertEqual(response.status_code,404)
+
+    def test_invalid_like_keys(self):
+        like_object = {
+            "type": "like",
+            "authoewr": {
+                "type": "author",
+                "id": 'http://github.com/gjohnson/like',
+                "page": 'whateverpage',
+                "host": 'http://github.com/gjohnson/host',
+                "displayName": 'ETHANLIKE',
+                "github": '',
+                "profileImage": 'https://profile.png',
+            },
+            "publisewhed": datetime.now(),
+            "ide": 'http://github.com/gjohnson/likeid',
+            "object": 'http://github.com/gjohnson/id'
+        }
+        response = self.client.post(reverse('chartreuse:inbox',args=[quote('http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/api/authors/1',safe='')]), like_object, content_type='application/json',headers=self.creds)
+        self.assertEqual(response.status_code,400)
+
+    def test_no_type_specified(self):
+        
+        like_object = {
+            "author": {
+                "type": "author",
+                "id": 'http://github.com/gjohnson/like',
+                "page": 'whateverpage',
+                "host": 'http://github.com/gjohnson/host',
+                "displayName": 'ETHANLIKE',
+                "github": '',
+                "profileImage": 'https://profile.png',
+            },
+            "published": datetime.now(),
+            "id": 'http://github.com/gjohnson/likeid',
+            "object": 'http://github.com/gjohnson/id'
+        }
+        response = self.client.post(reverse('chartreuse:inbox',args=[quote('http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/api/authors/1',safe='')]), like_object, content_type='application/json',headers=self.creds)
+        self.assertEqual(response.status_code,400)
+
+    def test_comment_no_post(self):
+
+        comment_obj = {
+                        "type": "comment",
+                        "author": {
+                            "type": "author",
+                            "id": 'http://github.com/gjohnson/commentauthor',
+                            "page": 'whateverpage',
+                            "host": 'http://github.com/gjohnson/host',
+                            "displayName": 'comment author',
+                            "github": '',
+                            "profileImage": 'https://testtest.png',
+                        },
+                        "comment": 'NEW COMMENT HI',
+                        "contentType": 'text/plain',
+                        "published": datetime.now(),
+                        "id": 'http://github.com/gjohnson/idcomment',
+                        "post": 'http://github.com/gjohnson/id',
+                    }
+        
+        response = self.client.post(reverse('chartreuse:inbox',args=[quote('http://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/api/authors/1',safe='')]), comment_obj, content_type='application/json',headers=self.creds)
+        self.assertEqual(response.status_code,404)
+
+
+    
+
+
 
 
   

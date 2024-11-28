@@ -81,15 +81,20 @@
         {% comment %} {% if post.has_image and logged_in and not post.repost%}
             <button class="btn pfp-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">Set pfp</button>
         {% endif %} {% endcomment %}
-            <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">{{ post.likes_count }} likes</button>
+        <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">{{ post.likes_count }} likes</button>
 
-            <!-- This button will redirect the user to the page with the list of authors who liked the post -->
-            <a href="{% url 'chartreuse:users_who_liked' user_url_quoted post.url_id %}"> 
-                <button class="btn likes-list-button" data-post-id="{{post.url_id}}">See Likes</button>
-            </a>
+        <!-- This button will redirect the user to the page with the list of authors who liked the post -->
+        <a href="{% url 'chartreuse:users_who_liked' user_url_quoted post.url_id %}"> 
+            <button class="btn likes-list-button" data-post-id="{{post.url_id}}">See Likes</button>
+        </a>
             
         {% if logged_in and not post.repost and post.visibility == "PUBLIC" %}
-            <button class="btn repost-button" data-post-id="{{post.url_id}}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">Repost</button>
+            <button class="btn repost-button" 
+                    data-post-id="{{post.url_id}}" 
+                    data-user-id="{{ user_details.url_id }}" 
+                    data-host="{{ user_details.host }}">
+                        Repost
+            </button>
         {% endif %}
         
     </div>
@@ -102,7 +107,13 @@
                 <div class="mb-3" style="text-align: left;">
                     <textarea class="form-control" name="comment" id="comment-text" rows="3" placeholder="Add a comment..." required></textarea>
                 </div>
-                <button type="submit" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" class="btn comment-button" style="width: auto; display: block; text-align: left;">Submit Comment</button>
+                <button type="submit" 
+                        data-post-id="{{ post.url_id }}" 
+                        data-user-id="{{ user_details.url_id }}" 
+                        class="btn comment-button" 
+                        style="width: auto; display: block; text-align: left;">
+                            Submit Comment
+                </button>
             {% endif %}
 
             <br></br>
@@ -125,7 +136,11 @@
                                         <img src="{% static 'css/icons/delete-button.svg' %}" alt="Delete" width="30" height="30">
                                     </a>
                                 {% endif %}
-                                <button class="btn like-comment-button ms-2" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-comment-id="{{ comment.url_id }}" data-host="{{ user_details.host }}">
+                                <button class="btn like-comment-button ms-2" 
+                                        data-post-id="{{ post.url_id }}" 
+                                        data-user-id="{{ user_details.url_id }}" 
+                                        data-comment-id="{{ comment.url_id }}" 
+                                        data-host="{{ user_details.host }}">
                                     {{ comment.likes_count }} likes
                                 </button>
                             </div>

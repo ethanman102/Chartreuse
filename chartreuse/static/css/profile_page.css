@@ -268,19 +268,21 @@ i {
     border-radius: 5px;
     border: solid 2px black;
     text-align: center;
-}
-
-.statistic-box-inner{
-    border-radius: 2px solid black;
     background-color:#00356b ;
     transition: box-shadow 0.3s ease;
 }
 
-.statistic-box-inner > h5 h6{
+.statistic-box-inner{
+    border-radius: 2px solid black;
+
+}
+
+.statistic-box-inner > h5,h6{
     color: white;
 }
 
-.statistic-box-inner:hover{
+
+.statistic-box:hover{
     box-shadow: 6px 6px 0px #000000;
 }
 

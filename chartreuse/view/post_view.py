@@ -17,7 +17,7 @@ class PostDetailView(DetailView):
 
     def get(self, request, *args, **kwargs):
       
-        user_id = unquote(self.kwargs['url_id'])
+        user_id = unquote(self.kwargs.get('url_id'))
         post_id = unquote(self.kwargs['post_id'])
 
         post = get_object_or_404(Post,url_id=post_id)

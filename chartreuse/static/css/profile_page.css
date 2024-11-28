@@ -263,8 +263,18 @@ i {
 .statistic-box{
     margin-top: 1ch;
     background-color: #F5F5F5;
-    border: solid black 2px;
     margin-bottom: 1ch;
     padding: 1ch;
-    border: 5px;
+    border-radius: 5px;
+    border: solid 2px black;
+    text-align: center;
+}
+
+.statistic-box-inner{
+   
+    border-radius: 2px solid black;
+}
+
+.statistic-box > h5 h6{
+    color: white;
 }

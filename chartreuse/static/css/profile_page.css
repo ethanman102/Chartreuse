@@ -262,7 +262,7 @@ i {
 
 .statistic-box{
     margin-top: 1ch;
-    background-color: #F5F5F5;
+    
     margin-bottom: 1ch;
     padding: 1ch;
     border-radius: 5px;
@@ -272,8 +272,16 @@ i {
 
 .statistic-box-inner{
     border-radius: 2px solid black;
+    background-color:#00356b ;
+    transition: box-shadow 0.3s ease;
 }
 
-.statistic-box > h5 h6{
+.statistic-box-inner > h5 h6{
     color: white;
 }
+
+.statistic-box-inner:hover{
+    box-shadow: 6px 6px 0px #000000;
+}
+
+

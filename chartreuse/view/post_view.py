@@ -32,7 +32,7 @@ class PostDetailView(DetailView):
 
         is_followed = Follow.objects.filter(follower=post.user, followed=current_user_model).exists()
         friends = (is_followed and is_following)
-        if (friends and (post.visibility == "FRIENDS") and (post_owner != current_user_model)):
+        if (not friends and (post.visibility == "FRIENDS") and (post_owner != current_user_model)):
             return redirect('/chartreuse/homepage')
         
         return super().get(request, *args, **kwargs)

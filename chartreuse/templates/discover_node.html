@@ -31,10 +31,10 @@
             <div class="card" style="overflow-y: scroll;">
                 {% for host in hostnames %}
                     <!-- Create clickable cards to be navigation tools to the other nodes authors... -->
-                    <div class="row">
-                        <div class="col-10 offset-1">
+                    <div class="row w-100 p-1 m-2">
+                        {% comment %} <div class="col-10 offset-1"> {% endcomment %}
                             <button class="node-button" node-host="{{host}}">{{ host|unquote_url }}</button>
-                        </div>
+                        {% comment %} </div> {% endcomment %}
                     </div>
                 {% endfor %}
             </div>

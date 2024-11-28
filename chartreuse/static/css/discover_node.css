@@ -10,7 +10,7 @@ html body{
   
 }
 
-.node-button{
+/* .node-button{
     margin-bottom: 1ch;
     margin-top: 1ch;
     color: black;
@@ -27,6 +27,19 @@ html body{
     color: chartreuse;
     background-color: #00356b;
     border: 2px solid black;
+} */
+
+.node-button{
+    border-radius: 0;
+    background-color: #00356B;
+    color: white;
+    transition: box-shadow 0.3s ease;
+    font-size: 100%;
+}
+
+.node-button:hover{
+    background-color: #00356B;
+    box-shadow: 6px 6px 0px #000000;
 }
 
 .node-container{

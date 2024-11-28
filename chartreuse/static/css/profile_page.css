@@ -260,9 +260,11 @@ i {
     color:#00356b;
 }
 
-.follower-box{
+.statistic-box{
+    margin-top: 1ch;
     background-color: #F5F5F5;
     border: solid black 2px;
     margin-bottom: 1ch;
     padding: 1ch;
+    border: 5px;
 }

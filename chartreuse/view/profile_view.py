@@ -282,6 +282,7 @@ class ProfileDetailView(DetailView):
         # Relationship Counts
         context['followers'] = Follow.objects.filter(followed=user).count()
         context['following'] = Follow.objects.filter(follower=user).count()
+        context['discovered_date'] = user.dateCreated
 
         # posts that can be viewed by the current user visiting.
         # checks to see if the author is a remote author, hence the requirement to check if a follow request has been accepted.

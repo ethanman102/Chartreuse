@@ -184,7 +184,36 @@
                 </div>
 
                 <div class="tab-pane fade" id="nav-statistics" role="tabpanel" aria-labelledby="nav-statistics-tab" tabindex="0">
-                    <h2>This is Where some profile statistics for OUR NODE will be shown</h2>
+                    <div class="statistic-box" id="container-item-box">
+                            <div class="statistic-box-inner">
+                                
+                                <h5 ><strong><u>Posts Made</u>:</strong> {{ post_count }}</h5> 
+                                <!-- <h6>{{ post_count }}</h6>  -->
+                            </div>
+                    </div>
+                    <div class="statistic-box" id="container-item-box">
+                        <div class="statistic-box-inner">
+                            
+                            <h5><strong><u>Comments Made</u>:</strong> {{ comment_count }}</h5>  
+                            <!-- <h6>{{ comment_count }}</h6> -->
+                        </div>
+                    </div>
+                    <div class="statistic-box" id="container-item-box">
+                        <div class="statistic-box-inner">
+                            
+                            <h5><strong><u>Likes Given</u>:</strong> {{ like_count }}</h5>  
+                            <!-- <h6>{{ like_count }}</h6> -->
+                        </div>
+                    </div>
+                    <div class="statistic-box" id="container-item-box">
+                        <div class="statistic-box-inner">
+                           
+                            <h5><strong><u>Author Discovered on</u>:</strong> {{ discovered_date }}</h5>  
+                            <!-- <h6>{{ discovered_date }}</h6> -->
+                        </div>
+                    </div>
+                </div>
+                    
                 </div>
                 {% if owner %}
                     <div class="tab-pane fade" id="nav-requests" role="tabpanel" aria-labelledby="nav-requests-tab" tabindex="0">

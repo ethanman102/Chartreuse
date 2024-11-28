@@ -61,11 +61,14 @@ class FeedDetailView(DetailView):
             # get all posts from the users that the current user follows
             for follower in following:
 
-                
+                if follower.host == current_user_model.host:
+                    confirmed_follows.add(follower.url_id)
+                    unconfirmed_follows.add(follower.url_id)
+
 
                 node_queryset = Node.objects.filter(host=follower.host,follow_status="OUTGOING",status="ENABLED")
 
-                if not node_queryset.exists() and follower.host != current_user_model:
+                if not node_queryset.exists() and follower.host != current_user_model.host:
                     continue # skip showing posts from a non existant node connection!
 
                 if (follower.host != current_user_model.host) and (follower.url_id not in confirmed_follows or follower.url_id not in unconfirmed_follows):
@@ -89,7 +92,7 @@ class FeedDetailView(DetailView):
                     except:
                         unconfirmed_follows.add(follower.url_id)
 
-                elif follower.url_id in unconfirmed_follows:
+                elif follower.url_id in unconfirmed_follows and follower.host != current_user_model.host:
                     continue
 
                 unlisted_posts = get_posts(follower.url_id, 'UNLISTED')

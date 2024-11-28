@@ -15,6 +15,28 @@ class PostDetailView(DetailView):
     template_name = "view_post.html"
     context_object_name = "post"
 
+    def get(self, request, *args, **kwargs):
+      
+        user_id = unquote(self.kwargs['url_id'])
+        post_id = unquote(self.kwargs['post_id'])
+
+        post = get_object_or_404(Post,url_id=post_id)
+
+        if not self.request.user.is_authenticated and post.visibility == 'FRIENDS':
+            return redirect('/chartreuse/homepage')
+        
+        current_auth_user = self.request.user
+        current_user_model = User.objects.get(user=current_auth_user)
+        post_owner = post.user
+        is_following = Follow.objects.filter(follower=current_user_model, followed=post.user).exists()
+
+        is_followed = Follow.objects.filter(follower=post.user, followed=current_user_model).exists()
+        if ((not is_followed) and (not is_following) and (post.visibility == "FRIENDS") and (post_owner != current_user_model)):
+            return redirect('/chartreuse/homepage')
+        
+        return super().get(request, *args, **kwargs)
+
+
     def get_object(self):
         """
         Retrieve the post object based on the URL parameter 'url_id'.
@@ -56,8 +78,9 @@ class PostDetailView(DetailView):
                 post.following_status = "Follow"
 
             is_followed = Follow.objects.filter(follower=post.user, followed=current_user_model).exists()
-            if ((not is_followed) and (not is_following) and (post.visibility == "FRIENDS") and (post_owner != current_user_model)):
-                return redirect('/chartreuse/homepage')
+        
+            #if ((not is_followed) and (not is_following) and (post.visibility == "FRIENDS") and (post_owner != current_user_model)):
+                #return redirect('/chartreuse/homepage')
             
         else:
             post.following_status = "Sign up to follow!"

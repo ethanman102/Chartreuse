@@ -31,7 +31,7 @@ class LikedListDetailView(DetailView):
         current_user_model = get_object_or_404(User,user=current_auth_user)
         
         is_following = Follow.objects.filter(follower=current_user_model, followed=post.user).exists()
-        is_followed = Follow.objects.filter(follower=post.user, followed=current_auth_user).exists()
+        is_followed = Follow.objects.filter(follower=post.user, followed=current_user_model).exists()
         
         if ((not is_followed) and (not is_following) and (post.visibility == "FRIENDS") and (post.user != current_user_model)):
             return redirect('/chartreuse/homepage')

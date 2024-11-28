@@ -157,6 +157,7 @@ def inbox(request, user_id):
                 new_post.save()
                 new_post.full_clean()
             except ValidationError:
+                new_post.delete()
                 return JsonResponse({'error':'Invalid JSON Format'},status=400)
             
 
@@ -190,6 +191,7 @@ def inbox(request, user_id):
                     new_comment.save()
                     new_comment.full_clean()
                 except ValidationError:
+                    new_comment.delete()
                     continue
 
                 
@@ -221,6 +223,7 @@ def inbox(request, user_id):
                         new_like.save()
                         new_like.full_clean()
                     except ValidationError:
+                        new_like.delete()
                         continue
                     
                    
@@ -251,6 +254,7 @@ def inbox(request, user_id):
                     new_like.save()
                     new_like.full_clean()
                 except ValidationError:
+                    new_like.delete()
                     continue
                     
 
@@ -264,6 +268,7 @@ def inbox(request, user_id):
                 post.save()
                 post.full_clean()
             except ValidationError:
+                post.delete()
                 JsonResponse({'error':'Invalid JSON Format'},status=400)
                     
         return JsonResponse({"status": "Post added successfully"},status=200)
@@ -305,6 +310,7 @@ def inbox(request, user_id):
                 comment.save()
                 comment.full_clean()
             except ValidationError:
+                comment.delete()
                 return JsonResponse({'error':'Invalid JSON Format'},status=400)
 
         # add comment likes
@@ -339,6 +345,7 @@ def inbox(request, user_id):
                     new_like.save()
                     new_like.full_clean()
                 except ValidationError:
+                    new_like.delete()
                     continue
 
         return JsonResponse({"status": "Comment added successfully"})
@@ -381,6 +388,7 @@ def inbox(request, user_id):
                     new_like.full_clean()
                     return JsonResponse({"status": "Like added successfully"})
                 except ValidationError:
+                    new_like.delete()
                     return JsonResponse({'error':'Invalid JSON format'},status=400)
 
         else:
@@ -396,6 +404,7 @@ def inbox(request, user_id):
                     new_like.full_clean()
                     return JsonResponse({"status": "Like added successfully"})
                 except ValidationError:
+                    new_like.delete()
                     return JsonResponse({'error':'Invalid JSON format'},status=400)
        
             
@@ -428,6 +437,7 @@ def inbox(request, user_id):
                 )
                 remote_author.full_clean()
             except ValidationError:
+                remote_author.delete()
                 return JsonResponse({'error':'Invalid JSON format'},status=400)
         else:
             remote_author = author_queryset
@@ -472,6 +482,7 @@ def discover_author(url_id,json_obj):
             # To which chat gpt said my test data urls in test_inpox.py were incorrect and that calling full_clean will validate the items.
             current_author.full_clean()
         except ValidationError:
+            current_author.delete()
             return None
     else:
         current_author = author_queryset[0]

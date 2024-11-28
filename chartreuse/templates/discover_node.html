@@ -28,12 +28,12 @@
         <h3>Embark on new nodes and adventures!</h3>
         {% if hostnames %}
             <h4>Discover authors on:<h4>
-            <div class="card" style="overflow-y: scroll;">
+            <div class="card px-3" style="overflow-y: scroll; overflow-x: hidden;">
                 {% for host in hostnames %}
                     <!-- Create clickable cards to be navigation tools to the other nodes authors... -->
                     {% comment %} <div class="row w-100 p-2 mx-3 my-2"> {% endcomment %}
                         {% comment %} <div class="col-10 offset-1"> {% endcomment %}
-                            <button class="row w-100 p-2 mx-3 my-2 node-button text-wrap" node-host="{{host}}">{{ host|unquote_url }}</button>
+                            <button class="row w-100 p-2 my-2 node-button text-wrap" node-host="{{host}}">{{ host|unquote_url }}</button>
                         {% comment %} </div> {% endcomment %}
                     {% comment %} </div> {% endcomment %}
                 {% endfor %}

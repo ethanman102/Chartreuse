@@ -36,7 +36,9 @@ class FeedDetailView(DetailView):
         '''
         if self.request.user.is_authenticated:
             current_user = self.request.user
+            print('debug1')
             current_user_model = get_object_or_404(User, user=current_user)
+            print('debug2')
 
             # Get people that the user follows
             following = get_followed(current_user_model.url_id)

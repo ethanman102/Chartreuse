@@ -268,8 +268,9 @@ i {
     border-radius: 5px;
     border: solid 2px black;
     text-align: center;
-    /* background-color: #bcfc8075; */
-    background-color: rgba(128, 255, 0, 0.80);
+
+    /* Colour for the statistic boxes */
+    background-color: #bcfc80;      
     transition: box-shadow 0.3s ease;
 }
 

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load unquote_url %}
 
 {% block title %}chartreuse.node-connections{% endblock %}
 
@@ -32,7 +33,7 @@
                     <!-- Create clickable cards to be navigation tools to the other nodes authors... -->
                     <div class="row">
                         <div class="col-10 offset-1">
-                            <button class="node-button" node-host="{{host}}">Discover {{host}} authors</button>
+                            <button class="node-button" node-host="{{host}}">{{ host|unquote_url }}</button>
                         </div>
                     </div>
                 {% endfor %}

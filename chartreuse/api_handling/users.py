@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema, inline_serializer
@@ -125,8 +125,14 @@ class UserViewSet(viewsets.ViewSet):
 
         # Paginates users based on the size
         user_paginator = Paginator(users, size)
-
-        page_users = user_paginator.page(page)
+        try:
+            page_users = user_paginator.page(page)
+        except EmptyPage:
+            authors = {
+            "type": "authors",
+            "authors": []
+            }
+            return JsonResponse(authors,safe=False)
 
         # Since we have some additional fields, we only want to return the required ones
         filtered_user_attributes = []

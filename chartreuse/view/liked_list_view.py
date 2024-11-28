@@ -28,11 +28,12 @@ class LikedListDetailView(DetailView):
             return redirect('/chartreuse/homepage')
         
         current_auth_user = self.request.user
+        current_user_model = get_object_or_404(User,user=current_auth_user)
         
-        is_following = Follow.objects.filter(follower=current_auth_user, followed=post.user).exists()
+        is_following = Follow.objects.filter(follower=current_user_model, followed=post.user).exists()
         is_followed = Follow.objects.filter(follower=post.user, followed=current_auth_user).exists()
         
-        if ((not is_followed) and (not is_following) and (post.visibility == "FRIENDS") and (post.user != current_auth_user)):
+        if ((not is_followed) and (not is_following) and (post.visibility == "FRIENDS") and (post.user != current_user_model)):
             return redirect('/chartreuse/homepage')
 
         return super().get(request, *args, **kwargs)

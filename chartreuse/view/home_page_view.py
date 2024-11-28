@@ -26,7 +26,7 @@ class FeedDetailView(DetailView):
         """
         url_id = self.request.session.get('url_id')
         if url_id:
-            return get_object_or_404(User, url_id=url_id)
+            return User.objects.filter(url_id=url_id).first()
         else:
             return None
 

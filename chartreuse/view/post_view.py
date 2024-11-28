@@ -15,6 +15,29 @@ class PostDetailView(DetailView):
     template_name = "view_post.html"
     context_object_name = "post"
 
+    def get(self, request, *args, **kwargs):
+      
+        
+        post_id = unquote(self.kwargs['post_id'])
+
+        post = get_object_or_404(Post,url_id=post_id)
+
+        if not self.request.user.is_authenticated and post.visibility == 'FRIENDS':
+            return redirect('/chartreuse/homepage')
+        
+        current_auth_user = self.request.user
+        current_user_model = User.objects.get(user=current_auth_user)
+        post_owner = post.user
+        is_following = Follow.objects.filter(follower=current_user_model, followed=post.user).exists()
+
+        is_followed = Follow.objects.filter(follower=post.user, followed=current_user_model).exists()
+        friends = (is_followed and is_following)
+        if (not friends and (post.visibility == "FRIENDS") and (post_owner != current_user_model)):
+            return redirect('/chartreuse/homepage')
+        
+        return super().get(request, *args, **kwargs)
+
+
     def get_object(self):
         """
         Retrieve the post object based on the URL parameter 'url_id'.
@@ -56,8 +79,9 @@ class PostDetailView(DetailView):
                 post.following_status = "Follow"
 
             is_followed = Follow.objects.filter(follower=post.user, followed=current_user_model).exists()
-            if ((not is_followed) and (not is_following) and (post.visibility == "FRIENDS") and (post_owner != current_user_model)):
-                return redirect('/chartreuse/homepage')
+        
+            #if ((not is_followed) and (not is_following) and (post.visibility == "FRIENDS") and (post_owner != current_user_model)):
+                #return redirect('/chartreuse/homepage')
             
         else:
             post.following_status = "Sign up to follow!"
@@ -92,7 +116,7 @@ class PostDetailView(DetailView):
         if (repost and post_owner==current_user_model):
             context['repost_author'] = True
         context['user_details'] = current_user_model
-        # context['user_url_quoted'] = quote(current_user_model.url_id, safe='')
+        context['user_url_quoted'] = quote(post.user.url_id, safe='')
 
         return context
     

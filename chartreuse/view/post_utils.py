@@ -211,7 +211,7 @@ def update_post(request, post_id):
 
         send_post_to_inbox(post.url_id)
 
-        return redirect(reverse('chartreuse:profile_view_post',args=[quote(post.url_id,safe=''),quote(post.user.url_id,safe='')]))
+        return redirect(reverse('chartreuse:profile_view_post',args=[quote(post.user.url_id,safe=''),quote(post.url_id,safe='')]))
     return redirect('/chartreuse/error/')
 
 @extend_schema(

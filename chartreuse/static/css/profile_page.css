@@ -259,3 +259,10 @@ p img {
 i {
     color:#00356b;
 }
+
+.follower-box{
+    background-color: #F5F5F5;
+    border: solid black 2px;
+    margin-bottom: 1ch;
+    padding: 1ch;
+}

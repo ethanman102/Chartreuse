@@ -184,7 +184,32 @@
                 </div>
 
                 <div class="tab-pane fade" id="nav-statistics" role="tabpanel" aria-labelledby="nav-statistics-tab" tabindex="0">
-                    <h2>This is Where some profile statistics for OUR NODE will be shown</h2>
+                    <div class="container full-container" id="container-item-box">
+                            <div class="statistic-box">
+                                <img src="{% static 'css/icons/make_post.svg' %}" class="img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
+                                <h5 style="display:inline"><strong><u>Posts Made: </u></strong>{{ post_count }}</h5>  
+                            </div>
+                    </div>
+                    <div class="container full-container" id="container-item-box">
+                        <div class="statistic-box">
+                            <img src="{% static 'css/icons/make_post.svg' %}" class="img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
+                            <h5 style="display:inline"><strong><u>Comments Made: </u></strong>{{ comment_count }}</h5>  
+                        </div>
+                    </div>
+                    <div class="container full-container" id="container-item-box">
+                        <div class="statistic-box">
+                            <img src="{% static 'css/icons/make_post.svg' %}" class="img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
+                            <h5 style="display:inline"><strong><u>Likes Given: </u></strong>{{ like_count }}</h5>  
+                        </div>
+                    </div>
+                    <div class="container full-container" id="container-item-box">
+                        <div class="statistic-box">
+                            <img src="{% static 'css/icons/make_post.svg' %}" class="img-fluid" style="width: 50px; height: 50px; object-fit: cover;">
+                            <h5 style="display:inline"><strong><u>Author Discovered on: </u></strong>{{ discovered_date }}</h5>  
+                        </div>
+                    </div>
+                </div>
+                    
                 </div>
                 {% if owner %}
                     <div class="tab-pane fade" id="nav-requests" role="tabpanel" aria-labelledby="nav-requests-tab" tabindex="0">

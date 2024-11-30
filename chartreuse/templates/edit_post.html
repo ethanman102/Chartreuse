@@ -33,7 +33,7 @@
             </div>
             
             <div class="mx-4 my-3 p-3">
-                <form method="POST" action="/chartreuse/homepage/post/{{ post.url_id }}/update/" id="edit-form-submit" enctype="multipart/form-data">
+                <form method="POST" action="/chartreuse/homepage/post/{{ post.url_id }}/update/" id="edit-post-form" enctype="multipart/form-data">
                     {% csrf_token %}
                     
                 <label for="title" class="form-label">Post Title</label>

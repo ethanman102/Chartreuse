@@ -33,7 +33,7 @@
             </div>
             
             <div class="mx-4 my-3 p-3">
-                <form method="POST" action="/chartreuse/homepage/post/{{ post.url_id }}/update/" enctype="multipart/form-data">
+                <form method="POST" action="/chartreuse/homepage/post/{{ post.url_id }}/update/" id="edit-form-submit" enctype="multipart/form-data">
                     {% csrf_token %}
                     
                 <label for="title" class="form-label">Post Title</label>
@@ -188,7 +188,7 @@
                 <br></br>
     
                 <div class="gap-2 d-flex justify-content-center mb-3">
-                    <button type="submit" class="btn btn-primary" style="color: chartreuse; background-color: #00356b;">Update Post</button>
+                    <button type="submit" class="btn btn-primary" id='edit-post-sumbit' style="color: chartreuse; background-color: #00356b;">Update Post</button>
                     <a href="javascript:history.back()" class="btn btn-secondary">Cancel</a>
                 </div>
                 
@@ -210,6 +210,16 @@
         const textArea = document.getElementById('content');
         const imageInput = document.getElementById('image');
         const imageUrlInput = document.getElementById('image_url');
+        const submitButton = document.getElementById('edit-post-submit');
+        const makePostForm = document.getElementById('edit-post-form');
+
+        // On November 30, 2024 asked OpenAI ChatGPT how to disable a button on form submit when the form is only valid!
+        makePostForm.addEventListener('submit', function(event){
+            if (this.checkValidity()){
+                submitButton.disabled = 'disabled';
+            };
+        })
+
     
         textOption.addEventListener('change', function() {
             if (textOption.checked) {

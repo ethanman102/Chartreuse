@@ -29,7 +29,7 @@
             </div>
 
             <div class="mx-4 my-3 p-3">
-                <form method="POST" action="save/" class='create-post-form' enctype="multipart/form-data">
+                <form method="POST" action="save/" id='create-post-form' enctype="multipart/form-data">
                     {% csrf_token %}
                     
                     <label for="title" class="form-label">Post Title</label>
@@ -109,7 +109,7 @@
                     </div>
     
                     <div class="gap-2 d-flex justify-content-center mb-3">
-                        <button type="submit" class="btn btn-primary make-post-submit" style="color: chartreuse; background-color: #00356b;">Create Post</button>
+                        <button type="submit" class="btn btn-primary" id='make-post-submit' style="color: chartreuse; background-color: #00356b;">Create Post</button>
                         <a href="javascript:history.back()" class="btn btn-secondary">Cancel</a>
                     </div>
                 </form>

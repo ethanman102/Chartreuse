@@ -48,6 +48,7 @@ document.querySelectorAll('.like-button').forEach(button => {
 
 document.querySelectorAll('.follow-button').forEach(button => {
     button.addEventListener('click', function(event) {
+        button.setAttribute('disabled')
         const postId = this.getAttribute('data-post-id');
         const userId = this.getAttribute('data-user-id');
         const url = 'send-follow-request/'; 

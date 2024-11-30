@@ -132,6 +132,7 @@
         const submitButton = document.getElementById('make-post-submit');
         const makePostForm = document.getElementById('create-post-form');
 
+        // On November 30, 2024 asked OpenAI ChatGPT how to disable a button on form submit when the form is only valid!
         makePostForm.addEventListener('submit', function(event){
             if (this.checkValidity()){
                 submitButton.disabled = 'disabled';

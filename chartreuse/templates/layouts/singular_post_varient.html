@@ -173,21 +173,23 @@
     const seeLikesButton = document.getElementById('see-likes-link');
     var deleteClicked = false;
 
-    deleteButton.addEventListener('click',(event)=>{
-        if (deleteClicked){
-            event.preventDefault();
-        }else{
-            deleteClicked = true;
-            commentButton.disabled = 'disabled';
-            likeButton.disabled = 'disabled';
-            repostButton.disabled = 'disabled';
-            seeLikesButton.disabled = 'disabled';
-        }
-    });
+    if (deleteButton !== null){
+        deleteButton.addEventListener('click',(event)=>{
+            if (deleteClicked){
+                event.preventDefault();
+            }else{
+                deleteClicked = true;
+                commentButton.disabled = 'disabled';
+                likeButton.disabled = 'disabled';
+                repostButton.disabled = 'disabled';
+                seeLikesButton.disabled = 'disabled';
+            }
+        });
 
-    editButton.addEventListener('click', (event)=>{
-        if (deleteClicked){
-            event.preventDefault();
-        }
-    });
+        editButton.addEventListener('click', (event)=>{
+            if (deleteClicked){
+                event.preventDefault();
+            }
+        });
+    }
 </script>

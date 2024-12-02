@@ -61,9 +61,9 @@
                             <div class="col-6 ms-auto">
                                 {% if is_following == False and sent_request == False %}
                                     {% url 'chartreuse:profile_follow_request' owner_id viewer_id as follow_request_url %}
-                                    <form action="{{follow_request_url}}" method="POST" class="follow_request_form">
+                                    <form action="{{follow_request_url}}" method="POST" class="follow_request_form" id="follow-request-form">
                                         {% csrf_token %}
-                                        <button class="btn btn-outline-primary btn-lg w-100 follow" type="submit">Follow</button>
+                                        <button class="btn btn-outline-primary btn-lg w-100 follow" type="submit" id="send-follow-button">Follow</button>
                                         {% if remote %}
                                             <input type="hidden" id="remote-follow" name="remote-follow" value="remote">
                                         {% endif %}
@@ -74,7 +74,7 @@
                                     {% url 'chartreuse:profile_unfollow' owner_id viewer_id as unfollow_url %}
                                     <form action="{{unfollow_url}}" method="POST" class="unfollow_form">
                                         {% csrf_token %}
-                                        <button class="btn btn-primary btn-lg w-100 follow" type="submit">{{follow_relationship}}</button>
+                                        <button class="btn btn-primary btn-lg w-100 follow" type="submit" id="send-follow-button">{{follow_relationship}}</button>
                                     </form>
                                 {% endif %}
                             </div>
@@ -250,6 +250,13 @@
 
     <script src="{% static 'javascript/home_page.js' %}"></script>
     <script src="{% static 'javascript/cm_render.js' %}"></script> <!-- JS for commonmark -->
+    <script>
+        const disablingFollowButton= document.getElementById('send-follow-button');
+
+        disablingFollowButton.addEventListener('click',(event)=>{
+            disablingFollowButton.disabled = 'disabled';
+        });
+    </script>
 
 </body>
 {% endblock %}

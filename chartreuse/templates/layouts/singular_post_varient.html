@@ -10,10 +10,10 @@
         <div class="d-flex">
             <!-- The edit + delete buttons -->
             {% if is_author and not post.repost%}
-                <a href="/chartreuse/homepage/post/{{ post.url_id }}/edit/" class="btn btn-link p-0" title="Edit Post">
+                <a href="/chartreuse/homepage/post/{{ post.url_id }}/edit/" class="btn btn-link p-0" id='edit-link' title="Edit Post">
                     <img src="{% static 'css/icons/edit-button.svg' %}" alt="Edit" width="30" height="30">
                 </a>
-                <a href="/chartreuse/homepage/post/{{ post.url_id }}/delete/" class="btn btn-link p-0" title="Delete Post">
+                <a href="/chartreuse/homepage/post/{{ post.url_id }}/delete/" class="btn btn-link p-0" id='delete-link' title="Delete Post">
                     <img src="{% static 'css/icons/delete-button.svg' %}" alt="Delete" width="30" height="30">
                 </a>
             {% endif %}
@@ -81,10 +81,10 @@
         {% comment %} {% if post.has_image and logged_in and not post.repost%}
             <button class="btn pfp-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">Set pfp</button>
         {% endif %} {% endcomment %}
-        <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}">{{ post.likes_count }} likes</button>
+        <button class="btn like-button" data-post-id="{{ post.url_id }}" data-user-id="{{ user_details.url_id }}" data-host="{{ user_details.host }}" id="like-post-button">{{ post.likes_count }} likes</button>
 
         <!-- This button will redirect the user to the page with the list of authors who liked the post -->
-        <a href="{% url 'chartreuse:users_who_liked' user_url_quoted post.url_id %}"> 
+        <a href="{% url 'chartreuse:users_who_liked' user_url_quoted post.url_id %}" id="see-likes-link"> 
             <button class="btn likes-list-button" data-post-id="{{post.url_id}}">See Likes</button>
         </a>
             
@@ -92,7 +92,8 @@
             <button class="btn repost-button" 
                     data-post-id="{{post.url_id}}" 
                     data-user-id="{{ user_details.url_id }}" 
-                    data-host="{{ user_details.host }}">
+                    data-host="{{ user_details.host }}"
+                    id="repost-post-button">
                         Repost
             </button>
         {% endif %}
@@ -111,7 +112,8 @@
                         data-post-id="{{ post.url_id }}" 
                         data-user-id="{{ user_details.url_id }}" 
                         class="btn comment-button" 
-                        style="width: auto; display: block; text-align: left;">
+                        style="width: auto; display: block; text-align: left;"
+                        id="add-comment-button">
                             Submit Comment
                 </button>
             {% endif %}
@@ -140,7 +142,8 @@
                                         data-post-id="{{ post.url_id }}" 
                                         data-user-id="{{ user_details.url_id }}" 
                                         data-comment-id="{{ comment.url_id }}" 
-                                        data-host="{{ user_details.host }}">
+                                        data-host="{{ user_details.host }}"
+                                        id="like-comment-button">
                                     {{ comment.likes_count }} likes
                                 </button>
                             </div>
@@ -156,3 +159,35 @@
         </div>
     {% endif %}
 </div>
+
+<script>
+    // Resource: Stack Overflow post: https://stackoverflow.com/questions/37860903/how-to-disable-href-after-one-click
+    // How to disable href after one click
+    // Reason: wanted to prevent multiple clicks on same delete button clicked! and preventing editting a deleted post!
+    // Answered by: Rahul Tripathi, June 16, 2016
+    const deleteButton = document.getElementById('delete-link');
+    const commentButton = document.getElementById('add-comment-button');
+    const likeButton = document.getElementById('like-post-button');
+    const editButton = document.getElementById('edit-link');
+    const repostButton = document.getElementById('repost-post-button');
+    const seeLikesButton = document.getElementById('see-likes-link');
+    var deleteClicked = false;
+
+    deleteButton.addEventListener('click',(event)=>{
+        if (deleteClicked){
+            event.preventDefault();
+        }else{
+            deleteClicked = true;
+            commentButton.disabled = 'disabled';
+            likeButton.disabled = 'disabled';
+            repostButton.disabled = 'disabled';
+            seeLikesButton.disabled = 'disabled';
+        }
+    });
+
+    editButton.addEventListener('click', (event)=>{
+        if (deleteClicked){
+            event.preventDefault();
+        }
+    });
+</script>

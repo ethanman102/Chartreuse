@@ -61,7 +61,7 @@
                             <div class="col-6 ms-auto">
                                 {% if is_following == False and sent_request == False %}
                                     {% url 'chartreuse:profile_follow_request' owner_id viewer_id as follow_request_url %}
-                                    <form action="{{follow_request_url}}" method="POST" class="follow_request_form">
+                                    <form action="{{follow_request_url}}" method="POST" class="follow_request_form" id="send-follow-form">
                                         {% csrf_token %}
                                         <button class="btn btn-outline-primary btn-lg w-100 follow" type="submit" id="send-follow-button">Follow</button>
                                         {% if remote %}
@@ -72,7 +72,7 @@
                                     <button class="btn btn-secondary btn-lg w-100" id="requested" type="button" disabled>Requested</button>
                                 {% else %}
                                     {% url 'chartreuse:profile_unfollow' owner_id viewer_id as unfollow_url %}
-                                    <form action="{{unfollow_url}}" method="POST" class="unfollow_form">
+                                    <form action="{{unfollow_url}}" method="POST" class="unfollow_form" id="send-follow-form">
                                         {% csrf_token %}
                                         <button class="btn btn-primary btn-lg w-100 follow" type="submit" id="send-follow-button">{{follow_relationship}}</button>
                                     </form>
@@ -254,7 +254,8 @@
         window.addEventListener('load',main);
         function main(){
             const disablingFollowButton= document.getElementById('send-follow-button');
-            if (disablingFollowButton !== null){
+            const followFormDisabling = document.getElementById('send-follow-form');
+            if (followFormDisabling !== null){
                 disablingFollowButton.addEventListener('submit',(event)=>{
                     disablingFollowButton.disabled = 'disabled';
                 });

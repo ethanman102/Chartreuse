@@ -250,7 +250,17 @@
 
     <script src="{% static 'javascript/home_page.js' %}"></script>
     <script src="{% static 'javascript/cm_render.js' %}"></script> <!-- JS for commonmark -->
-
+    <script>
+        window.addEventListener('load',main);
+        function main(){
+            const disablingFollowButton= document.getElementById('send-follow-button');
+            if (disablingFollowButton !== null){
+                disablingFollowButton.addEventListener('submit',(event)=>{
+                    disablingFollowButton.disabled = 'disabled';
+                });
+            }
+        }
+    </script>
 
 </body>
 {% endblock %}

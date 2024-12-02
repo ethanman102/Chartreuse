@@ -256,7 +256,7 @@
             const disablingFollowButton= document.getElementById('send-follow-button');
             const followFormDisabling = document.getElementById('send-follow-form');
             if (followFormDisabling !== null){
-                disablingFollowButton.addEventListener('submit',(event)=>{
+                followFormDisabling.addEventListener('submit',(event)=>{
                     disablingFollowButton.disabled = 'disabled';
                 });
             }

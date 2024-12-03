@@ -49,17 +49,20 @@ async function fetchAuthors() {
             authors.authors.forEach(author => {
                 // check whether the users github url is valid or not with regex
                 const githubUrl = author.github;
-                const githubRegex = /^(https:\/\/github\.com\/)([a-zA-Z0-9-]+)$/;
 
-                // Test the GitHub URL against the regex
-                const match = githubUrl.match(githubRegex);
-                if (match) {
-                    // Extract the username from the matched groups
-                    const githubUsername = match[2];
-                    if (githubUsername) {
-                        fetchStarredReposAndCreatePosts(githubUsername, author.id);
-                        fetchGitHubEventsAndCreatePosts(githubUsername, author.id);
-                        fetchGitHubPullRequestsAndCreatePosts(githubUsername, author.id);
+                if (githubUrl && typeof githubUrl === 'string') { // Validate githubUrl before using it (since it may be null if the user hasnt added one)
+                    const githubRegex = /^(https:\/\/github\.com\/)([a-zA-Z0-9-]+)$/;
+
+                    // Test the GitHub URL against the regex
+                    const match = githubUrl.match(githubRegex);
+                    if (match) {
+                        // Extract the username from the matched groups
+                        const githubUsername = match[2];
+                        if (githubUsername) {
+                            fetchStarredReposAndCreatePosts(githubUsername, author.id);
+                            fetchGitHubEventsAndCreatePosts(githubUsername, author.id);
+                            fetchGitHubPullRequestsAndCreatePosts(githubUsername, author.id);
+                        }
                     }
                 }
             });

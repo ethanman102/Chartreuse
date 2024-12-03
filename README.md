@@ -18,6 +18,23 @@ The authors claiming copyright, if they wish to be known, can list their names h
 
 * 
 
+## Screenshots
+
+### Profile page
+![Screenshot 2024-12-03 142015](https://github.com/user-attachments/assets/44af1e7d-e3a6-4ed3-89ea-1271ae223c80)
+
+### Homepage
+![Screenshot 2024-12-03 141953](https://github.com/user-attachments/assets/ce7b6c7c-aa71-492d-a7f8-52ad1c1ff95d)
+
+### Sign-up page
+![Screenshot 2024-12-03 141923](https://github.com/user-attachments/assets/aa6c2a71-705a-4aa5-94c8-d3297ff4b674)
+
+### Discover page
+![Screenshot 2024-12-03 142033](https://github.com/user-attachments/assets/0c93d743-adae-4b72-b589-2e8088385c28)
+
+## Demo Video
+https://www.youtube.com/watch?v=gfmW2677Xg0
+
 ## Names of Teammates:
 * Bennet Steem
 * Ethan Keys

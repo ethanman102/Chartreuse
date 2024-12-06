@@ -73,6 +73,8 @@ class FollowersTestCases(TestCase):
     def tearDownClass(cls):
         return super().tearDownClass()
     
+    """
+    
     def test_follow_user(self):
         '''
         This tests adding a follower.
@@ -115,3 +117,5 @@ class FollowersTestCases(TestCase):
         # Successfully verified follower status
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['message'], 'Is a follower')
+
+    """

@@ -67,11 +67,15 @@ async function fetchAuthors() {
 
                         // DEBUG 
                         console.log(githubUsername)
-                        
+
                         if (githubUsername) {
-                            fetchStarredReposAndCreatePosts(githubUsername, author.id);
-                            fetchGitHubEventsAndCreatePosts(githubUsername, author.id);
-                            fetchGitHubPullRequestsAndCreatePosts(githubUsername, author.id);
+                            try {
+                                fetchStarredReposAndCreatePosts(githubUsername, author.id);
+                                fetchGitHubEventsAndCreatePosts(githubUsername, author.id);
+                                fetchGitHubPullRequestsAndCreatePosts(githubUsername, author.id);
+                            } catch (error){
+                                console.error(`Failed to fetch github activity for: ${githubUsername}`, error);
+                            }
                         }
                     }
                 }

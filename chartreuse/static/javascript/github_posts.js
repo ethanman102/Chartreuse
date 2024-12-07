@@ -45,10 +45,16 @@ async function fetchAuthors() {
                 type: "authors",
                 authors: allAuthors
             };
+            
+            // DEBUG
+            console.log(authors)
 
             authors.authors.forEach(author => {
                 // check whether the users github url is valid or not with regex
                 const githubUrl = author.github;
+
+                // DEBUG
+                console.log(githubUrl)
 
                 if (githubUrl && typeof githubUrl === 'string') { // Validate githubUrl before using it (since it may be null if the user hasnt added one)
                     const githubRegex = /^(https:\/\/github\.com\/)([a-zA-Z0-9-]+)$/;
@@ -58,6 +64,10 @@ async function fetchAuthors() {
                     if (match) {
                         // Extract the username from the matched groups
                         const githubUsername = match[2];
+
+                        // DEBUG 
+                        console.log(githubUsername)
+                        
                         if (githubUsername) {
                             fetchStarredReposAndCreatePosts(githubUsername, author.id);
                             fetchGitHubEventsAndCreatePosts(githubUsername, author.id);

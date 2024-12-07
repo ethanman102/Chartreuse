@@ -89,17 +89,6 @@ h1.page-header {
     box-shadow: 6px 6px 0px #000000;
 }
 
-.comment-button {
-    color: #000000;
-    background-color: #ffffff;
-    border-color: black;
-}
-
-.comment-button:hover {
-    color: #ffffff;
-    background-color: #000000;
-}
-
 .comment-card {
     border-color: black;
     transition: box-shadow 0.3s ease;
@@ -167,14 +156,16 @@ img {
     background-color: #000000;
 }
   
-.follow-button {
+.follow-button, 
+.comment-button {
     background-color: #ffffff;
     border-width: 1px;
     border-color: #00356b;
     border-radius: 0%;
 }
 
-.follow-button:hover {
+.follow-button:hover, 
+.comment-button:hover {
     color: chartreuse;
     background-color: #00356b;
     box-shadow: 6px 6px 0px #000000;

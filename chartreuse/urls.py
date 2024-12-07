@@ -13,7 +13,7 @@ urlpatterns = [
     re_path(r'homepage/post/(?P<post_id>https?.+\w)/update/', post_utils.update_post, name='update-post'),
     re_path(r'homepage/post/(?P<post_id>https?.+\w)/', post_view.PostDetailView.as_view(), name='view-post'),
     re_path(r"api/posts/(?P<post_id>https?.+\w)/image$", images.retrieve_from_homepage, name='get_image_post'),
-    re_path(r"api/authors/(?P<author_id>https?.+)/post/(?P<post_id>https?.+\w)/image$", images.retrieve_from_profile, name='get_image_post_profile'),
+    re_path(r"api/authors/(?P<author_id>(https?)?.+)/post(s)?/(?P<post_id>(https?)?.+\w)/image$", images.retrieve_from_profile, name='get_image_post_profile'),
 
     # Post Comment URLs
     re_path(r"comment/$",comment_utils.add_comment,name="add_comment"),
@@ -116,7 +116,7 @@ urlpatterns = [
     re_path(r'.+/repost/', post_utils.repost,name='repost'),
 
     # URL to view the users who liked a post
-    # re_path(r"authors/(?P<url_id>https?.+)/post/liked-users/(?P<post_id>https?.+\w)/$", liked_list_view.LikedListDetailView.as_view(),name="users_who_liked"),
+    re_path(r"authors/(?P<url_id>https?.+)/post/liked-users/(?P<post_id>https?.+\w)/$", liked_list_view.LikedListDetailView.as_view(),name="users_who_liked"),
 
     # Follow Request URLs
     re_path(r"authors/(?P<url_id>https?.+)/post/(?P<post_id>https?.+\w)/$",post_view.PostDetailView.as_view(),name="profile_view_post"),

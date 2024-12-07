@@ -259,3 +259,33 @@ p img {
 i {
     color:#00356b;
 }
+
+.statistic-box{
+    margin-top: 1ch;
+    
+    margin-bottom: 1ch;
+    padding: 1ch;
+    border-radius: 5px;
+    border: solid 2px black;
+    text-align: center;
+
+    /* Colour for the statistic boxes */
+    background-color: #bcfc80;      
+    transition: box-shadow 0.3s ease;
+}
+
+.statistic-box-inner{
+    border-radius: 2px solid black;
+
+}
+
+.statistic-box-inner > h5,h6{
+    color: black;
+}
+
+
+.statistic-box:hover{
+    box-shadow: 6px 6px 0px #000000;
+}
+
+

@@ -33,7 +33,7 @@
             </div>
             
             <div class="mx-4 my-3 p-3">
-                <form method="POST" action="/chartreuse/homepage/post/{{ post.url_id }}/update/" enctype="multipart/form-data">
+                <form method="POST" action="/chartreuse/homepage/post/{{ post.url_id }}/update/" id="edit-post-form" enctype="multipart/form-data">
                     {% csrf_token %}
                     
                 <label for="title" class="form-label">Post Title</label>
@@ -93,7 +93,7 @@
                 </div>
     
                 <article style="font-weight: 500; font-size: small;">
-                    If you're making a commonmark post with an image post url from our site, please make sure the URL ends with "/image". <br> 
+                    If you're making a commonmark post with an image post url from our site, please make sure the URL has "chartreuse/api/" and ends with "/image". <br> 
                     For more information about commonmark syntax, check out this <a href="https://commonmark.org/help/">link</a>. <br> 
                 </article>
 
@@ -188,7 +188,7 @@
                 <br></br>
     
                 <div class="gap-2 d-flex justify-content-center mb-3">
-                    <button type="submit" class="btn btn-primary" style="color: chartreuse; background-color: #00356b;">Update Post</button>
+                    <button type="submit" class="btn btn-primary" id='edit-post-submit' style="color: chartreuse; background-color: #00356b;">Update Post</button>
                     <a href="javascript:history.back()" class="btn btn-secondary">Cancel</a>
                 </div>
                 
@@ -210,6 +210,16 @@
         const textArea = document.getElementById('content');
         const imageInput = document.getElementById('image');
         const imageUrlInput = document.getElementById('image_url');
+        const submitButton = document.getElementById('edit-post-submit');
+        const makePostForm = document.getElementById('edit-post-form');
+
+        // On November 30, 2024 asked OpenAI ChatGPT how to disable a button on form submit when the form is only valid!
+        makePostForm.addEventListener('submit', function(event){
+            if (this.checkValidity()){
+                submitButton.disabled = 'disabled';
+            };
+        })
+
     
         textOption.addEventListener('change', function() {
             if (textOption.checked) {

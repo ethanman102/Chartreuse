@@ -17,6 +17,7 @@ const csrftoken = getCookie('csrftoken');
 
 document.querySelectorAll('.like-button').forEach(button => {
     button.addEventListener('click', function(event) {
+        button.disabled = 'disabled';
         const postId = this.getAttribute('data-post-id');
         const userId = this.getAttribute('data-user-id');
         const url = `like-post/`;
@@ -48,6 +49,7 @@ document.querySelectorAll('.like-button').forEach(button => {
 
 document.querySelectorAll('.follow-button').forEach(button => {
     button.addEventListener('click', function(event) {
+        button.disabled = 'disabled';
         const postId = this.getAttribute('data-post-id');
         const userId = this.getAttribute('data-user-id');
         const url = 'send-follow-request/'; 
@@ -124,6 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 document.querySelectorAll('.comment-button').forEach(button => {
     button.addEventListener('click', function() {
+        button.disabled = 'disabled';
         const postId = this.getAttribute('data-post-id');
         const userId = this.getAttribute('data-user-id');
         const commentText = document.getElementById('comment-text').value;
@@ -157,6 +160,7 @@ document.querySelectorAll('.comment-button').forEach(button => {
 
 document.querySelectorAll('.like-comment-button').forEach(button => {
     button.addEventListener('click', function(event) {
+        button.disabled = 'disabled';
         const postId = this.getAttribute('data-post-id');
         const userId = this.getAttribute('data-user-id');
         const commentId = this.getAttribute('data-comment-id');

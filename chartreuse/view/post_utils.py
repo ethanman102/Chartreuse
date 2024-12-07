@@ -15,6 +15,7 @@ from rest_framework.decorators import action, api_view
 import requests
 from requests.auth import HTTPBasicAuth
 from requests.exceptions import ChunkedEncodingError
+from django.urls import reverse
 
 def get_post_likes(post_id):
     """
@@ -210,7 +211,7 @@ def update_post(request, post_id):
 
         send_post_to_inbox(post.url_id)
 
-        return redirect('/chartreuse/homepage/post/' + post_id + '/')
+        return redirect(reverse('chartreuse:profile_view_post',args=[quote(post.user.url_id,safe=''),quote(post.url_id,safe='')]))
     return redirect('/chartreuse/error/')
 
 @extend_schema(
@@ -664,7 +665,10 @@ def prepare_posts(posts):
 
             post.repost = True
             post.repost_user = repost_user
-            post.repost_url = repost_url
+            # On November 25, 2024 Asked OpenAI's ChatGpt why our repost button in profile.html wasn't mapping to the correct URL. It instead mapped to an API 
+            # ChatGpt said after the link of the request was shared to the agent that one url was double encoded. After trying template tags |urlencode and nothing
+            # fixing the issue, We noticed that the url below was not encoded in the request url and tried quoting it ourself, and it matched to the right URL.
+            post.repost_url = quote(repost_url,safe='')
             post.likes_count = Like.objects.filter(post=original_post).count()
             post.repost_time = repost_time
             post.user.profileImage = get_image_post(post.user.profileImage)

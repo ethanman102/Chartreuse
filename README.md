@@ -18,6 +18,26 @@ The authors claiming copyright, if they wish to be known, can list their names h
 
 * 
 
+## Screenshots
+
+### Profile page
+![profile](https://github.com/user-attachments/assets/9d59c280-3465-4c45-913e-9c8db2ca8b88)
+
+
+### Homepage
+![homepag3](https://github.com/user-attachments/assets/24eae1d5-8b50-43d7-acac-c6727fd3a70c)
+
+
+### Sign-up page
+![signup](https://github.com/user-attachments/assets/1ce67b59-b137-4906-aac2-5ddf8c45ce6e)
+
+### Discover page
+![discover](https://github.com/user-attachments/assets/cd75c512-e974-4272-90b2-5b90be155c48)
+
+
+## Demo Video
+https://www.youtube.com/watch?v=gfmW2677Xg0
+
 ## Names of Teammates:
 * Bennet Steem
 * Ethan Keys
@@ -69,4 +89,5 @@ If you would like to clone our wiki to your local machine, you can use the line 
 ```
 https://github.com/uofa-cmput404/f24-project-chartreuse.wiki.git
 ```
+
 

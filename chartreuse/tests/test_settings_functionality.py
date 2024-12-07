@@ -198,7 +198,7 @@ class TestSettingsViews(TestCase):
             'file':image
         })
 
-        encoded_image = base64.b64encode(b'file_content').decode('utf-8') 
+        encoded_image = 'data:image/png;base64,' + base64.b64encode(b'file_content').decode('utf-8') 
 
         self.assertEqual(response.status_code,200)
         data = response.json()

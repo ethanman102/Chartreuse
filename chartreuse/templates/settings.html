@@ -215,7 +215,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-6 current-github-text">
+                        <div class="col-3 current-github-text">
                             <h5>Current Github:</h5>
                         </div>
                         <div class="col-6">
@@ -223,20 +223,20 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-3 offset-6" id="github-remove-div">
+                        <div class="col-3 offset-3" id="github-remove-div">
                             <button type="button" class="btn btn-primary w-100" id="github-remove-button">Remove</button>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-6 offset-3">
                             <p id="github-remove-message" style="visibility: hidden;">remove message</p>
                         </div>
                     </div>
                     <div class="row" id="github-add-section">
-                        <div class="col-2 offset-3">
+                        <div class="col-1 offset-2">
                             <label for="github-input">URL:</label>
                         </div>
-                        <div class="col-4">
+                        <div class="col-6">
                             <form method="POST">
                                 {% csrf_token %}
                                 <input id="github-input" name="github-input" type="text" class="form-control" required placeholder="Your GITHUB"/>
@@ -347,7 +347,7 @@
                 // Learned how to construct the correct src for base 64 images through author Hemant Metalia's post on December 14, 2011 
                 if (response.status === 200){
                     let imageBytes = data.image;
-                    let srcString = `data:${file.type};charset=utf-8;base64, ${imageBytes}`;
+                    let srcString = `${imageBytes}`;
                     imageUploadMessage.style.color = 'chartreuse';
                     imageUploadMessage.innerText = data.success;
                     imageUploadMessage.style.visibility = 'visible';

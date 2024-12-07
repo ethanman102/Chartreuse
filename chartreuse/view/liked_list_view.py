@@ -16,21 +16,28 @@ class LikedListDetailView(DetailView):
     context_object_name = 'user'
     model = User
 
-    # Because get_context_data can not return anything other than a dict, must override get method to return a 401 since it does not have an exception form!
-    # Used this Stack Overflow reference on how to properly override the get method of detail view: https://stackoverflow.com/questions/57645928/django-overriding-detail-view-get-method
-    # Answer Author: Harold Holsappel on June 15, 2023.
-    # Also used this reference for returning HTTP errors because get_context_data can only return a DICT: https://stackoverflow.com/questions/67263268/django-class-based-view-to-return-httpresponse-such-as-httpresponsebadrequest
-    # Answered by: Abdul Aziz Barkat on April 26 2021
-    # def get(self, request, *args, **kwargs):
-    #     '''
-    #     Purpose: Overriden DetailView method to be able to handle serving 401 unauthorized requests!
-    #     '''
-    #     path = self.request.path.lower().split("/")
-    #     if "friends" in path and not self.request.user.is_authenticated:
-    #         return HttpResponse("Unauthorized",status=401)
+
+    def get(self, request, *args, **kwargs):
+        post_id = self.kwargs.get('post_id')
+        post_id = unquote(post_id)
+        post = get_object_or_404(Post,url_id=post_id)
         
 
-    #     return super().get(request, *args, **kwargs)
+
+        if not self.request.user.is_authenticated:
+            return redirect('/chartreuse/homepage')
+        
+        current_auth_user = self.request.user
+        current_user_model = get_object_or_404(User,user=current_auth_user)
+        
+        is_following = Follow.objects.filter(follower=current_user_model, followed=post.user).exists()
+        is_followed = Follow.objects.filter(follower=post.user, followed=current_user_model).exists()
+        friends = (is_following and is_followed)
+        
+        if (not friends and (post.visibility == "FRIENDS") and (post.user != current_user_model)):
+            return redirect('/chartreuse/homepage')
+
+        return super().get(request, *args, **kwargs)
 
     def get_object(self):
         """
@@ -55,13 +62,6 @@ class LikedListDetailView(DetailView):
             current_user = self.request.user
             current_user_model = get_object_or_404(User, user=current_user)
 
-            # Ensure the request user has access to view the post details
-            is_following = Follow.objects.filter(follower=current_user_model, followed=post.user).exists()
-            is_followed = Follow.objects.filter(follower=post.user, followed=current_user_model).exists()
-            post_owner = post.user
-            if ((not is_followed) and (not is_following) and (post.visibility == "FRIENDS") and (post_owner != current_user_model)):
-                return redirect('/chartreuse/homepage')
-
             # Get the list of likes on the post
             likes = Like.objects.filter(post=post)
 
@@ -74,10 +74,6 @@ class LikedListDetailView(DetailView):
 
             # Add the list of authors to the context
             context["liked"] = users_that_liked
-       
-        else:
-            # Redirect if not authenticated
-            return redirect('/chartreuse/homepage')
         
         return context
         

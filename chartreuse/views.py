@@ -1,7 +1,9 @@
 from django.http import JsonResponse
-from .models import Node
+from .models import Node, User
 from django.shortcuts import render
 import base64
+import json
+from urllib.parse import unquote,quote
 
 class Host:
     _instance = None  # Class-level variable to hold the singleton instance
@@ -29,7 +31,25 @@ def checkIfRequestAuthenticated(request):
     authentication = request.headers.get('Authorization')
     
     if not authentication or not authentication.startswith('Basic'):
-        return JsonResponse({"error": "Missing or invalid Authorization header"}, status=401)
+        # DEBUG
+        csrf_token = request.headers.get('csrfToken')
+        try:
+            if request.user.is_authenticated and csrf_token:
+                body = json.loads(request.body)
+                user_id = body["author_id"]
+
+                user = User.objects.get(url_id=unquote(user_id))
+
+                node_queryset = Node.objects.filter(host=user.host,status='ENABLED',follow_status='OUTGOING')
+
+                if node_queryset.exists():
+                    JsonResponse({"success": "Authorized"}, status=200)                    
+
+        except Exception as e:
+            return JsonResponse({"error": f"Missing or invalid Authorization header: {e}"}, status=401)
+        
+        finally: 
+            return JsonResponse({"error": "Missing or invalid Authorization header"}, status=401)
 
     try:
         # Decode the Base64-encoded credentials

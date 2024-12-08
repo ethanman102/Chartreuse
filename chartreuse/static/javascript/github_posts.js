@@ -152,7 +152,7 @@ async function fetchStarredReposAndCreatePosts(githubUsername, authorId) {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'X-CSRFToken': csrfToken,
                     // Debug
-                    'Authorization': base64.b64encode(b`abc:123`).decode('utf-8')
+                    //'Authorization': base64.b64encode(b`abc:123`).decode('utf-8')
                 },
                 body: postData.toString(),
             });

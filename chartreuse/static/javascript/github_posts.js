@@ -48,6 +48,7 @@ async function fetchAuthors() {
             
             // DEBUG
             console.log(authors)
+            let count = 0;
 
             authors.authors.forEach(author => {
                 // check whether the users github url is valid or not with regex
@@ -61,7 +62,8 @@ async function fetchAuthors() {
 
                     // Test the GitHub URL against the regex
                     const match = githubUrl.match(githubRegex);
-                    if (match) {
+                    // DEBUG --> count part
+                    if (match && count === 0) {
                         // Extract the username from the matched groups
                         const githubUsername = match[2];
 
@@ -72,6 +74,9 @@ async function fetchAuthors() {
                                 fetchStarredReposAndCreatePosts(githubUsername, author.id);
                                 fetchGitHubEventsAndCreatePosts(githubUsername, author.id);
                                 fetchGitHubPullRequestsAndCreatePosts(githubUsername, author.id);
+                                
+                                // DEBUG
+                                count += 1;
                         }
                     }
                 }

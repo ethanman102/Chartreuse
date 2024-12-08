@@ -138,12 +138,20 @@ async function fetchStarredReposAndCreatePosts(githubUsername, authorId) {
             const isDuplicate = await duplicateCheckResponse.json();
 
             //DEBUG
-            console.log(isDuplicate)
+            console.log(isDuplicate);
 
             if (isDuplicate.exists) {
                 console.log(`Duplicate post exists for: ${postTitle}. Skipping creation.`);
                 continue;
             }
+
+            //DEBUG
+            // function encodeBase64Unicode(str) {
+            //     return btoa(new TextEncoder().encode(str).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+            // }
+            
+            // const encoded = encodeBase64Unicode('abc:123');
+            // console.log(encoded);
 
             const postApiUrl = `/chartreuse/api/authors/${encodedAuthorId}/posts/`;
             const postResponse = await fetch(postApiUrl, {
@@ -151,8 +159,6 @@ async function fetchStarredReposAndCreatePosts(githubUsername, authorId) {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'X-CSRFToken': csrfToken,
-                    // Debug
-                    //'Authorization': base64.b64encode(b`abc:123`).decode('utf-8')
                 },
                 body: postData.toString(),
             });

@@ -32,24 +32,33 @@ def checkIfRequestAuthenticated(request):
     
     if not authentication or not authentication.startswith('Basic'):
         # DEBUG
-        csrf_token = request.headers.get('csrfToken')
-        try:
-            if request.user.is_authenticated and csrf_token:
-                body = json.loads(request.body)
-                user_id = body["author_id"]
+        # csrf_token = request.headers.get('csrfToken')
+        # try:
+            # if request.user.is_authenticated and csrf_token:
+            #     body = json.loads(request.body)
+            #     user_id = body["author_id"]
 
-                user = User.objects.get(url_id=unquote(user_id))
+            #     user = User.objects.get(url_id=unquote(user_id))
 
-                node_queryset = Node.objects.filter(host=user.host,status='ENABLED',follow_status='OUTGOING')
+            #     node_queryset = Node.objects.filter(host=user.host,status='ENABLED',follow_status='OUTGOING')
 
-                if node_queryset.exists():
-                    JsonResponse({"success": "Authorized"}, status=200)                    
+            #     if node_queryset.exists():
+            #         JsonResponse({"success": "Authorized"}, status=200) 
 
-        except Exception as e:
-            return JsonResponse({"error": f"Missing or invalid Authorization header: {e}"}, status=401)
+            #     else:
+            #         # DEBUG
+            #         JsonResponse({"error": f"Query set does not exist, User: {user}... user_id: {user_id}"}, status=401)
+
+
+            # else:
+            #     # DEBUG
+            #     JsonResponse({"error": f"csrfToken: {csrf_token}, is authenticated: {request.user.is_authenticated}"}, status=401)         
+
+        # except Exception as e:
+        #     return JsonResponse({"error": f"Missing or invalid Authorization header: {e}"}, status=401)
         
-        finally: 
-            return JsonResponse({"error": "Missing or invalid Authorization header"}, status=401)
+        # finally: 
+        return JsonResponse({"error": "Missing or invalid Authorization header"}, status=401)
 
     try:
         # Decode the Base64-encoded credentials

@@ -58,7 +58,11 @@ def checkIfRequestAuthenticated(request):
         #     return JsonResponse({"error": f"Missing or invalid Authorization header: {e}"}, status=401)
         
         # finally: 
-        return JsonResponse({"error": "Missing or invalid Authorization header"}, status=401)
+        # DEBUG in the user.host host.host
+        user_id = request.POST.get("author_id")
+        user = User.objects.filter(url_id=user_id).first()
+
+        return JsonResponse({"error": f"Missing or invalid Authorization header: user_id = {user_id} user.host = {user.host} host.host = {Host.host}"}, status=401)
 
     try:
         # Decode the Base64-encoded credentials

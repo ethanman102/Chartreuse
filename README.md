@@ -89,5 +89,3 @@ If you would like to clone our wiki to your local machine, you can use the line 
 ```
 https://github.com/uofa-cmput404/f24-project-chartreuse.wiki.git
 ```
-
-

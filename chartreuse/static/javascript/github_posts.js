@@ -197,7 +197,7 @@ async function fetchGitHubEventsAndCreatePosts(githubUsername, authorId) {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'X-CSRFToken': csrfToken,
                     },
-                    body: postData.toString()
+                    body: postData.toString(),
                 });
 
                 if (!postResponse.ok) {
@@ -235,9 +235,10 @@ async function fetchGitHubPullRequestsAndCreatePosts(githubUsername, authorId) {
         for (const item of pullRequests.items) {
             if (item.pull_request) {
                 const postData = new URLSearchParams();
-
-                postData.append('title', `🔧 ${item.user.login} opened a pull request`);
-                postData.append('description', `🕙 Opened at ${item.pull_request.merged_at}`);
+                const postTitle = `🔧 ${item.user.login} opened a pull request`;
+                const postDescription = `🕙 Opened at ${item.pull_request.merged_at}`;
+                postData.append('title', postTitle);
+                postData.append('description', postDescription);
                 postData.append('contentType', "text/plain");
                 postData.append('author_id', authorId);
                 postData.append('content', `View the Pull Request at ${item.pull_request.html_url}`);
@@ -267,7 +268,7 @@ async function fetchGitHubPullRequestsAndCreatePosts(githubUsername, authorId) {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'X-CSRFToken': csrfToken,
                     },
-                    body: postData.toString()
+                    body: postData.toString(),
                 });
 
                 if (!postResponse.ok) {

@@ -121,14 +121,17 @@ class PostViewSet(viewsets.ViewSet):
             JsonResponce containing the new post    
         """ 
         # DEBUG 
-        print(user_id)
+        print("Debug", user_id)
 
         user = User.objects.filter(url_id=user_id).first()
 
         # DEBUG
-        print(user, user.host, Host.host)
+        print("Debug", user, user.host, Host.host)
 
         host = Host()
+
+        # DEBUG
+        print("Debug", host)
 
         if user is None:
             return JsonResponse({"error": "User not found."}, status=404)

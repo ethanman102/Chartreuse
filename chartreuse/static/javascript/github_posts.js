@@ -46,16 +46,12 @@ async function fetchAuthors() {
                 authors: allAuthors
             };
             
-            // DEBUG
-            console.log(authors)
 
             authors.authors.forEach(author => {
                 // check whether the users github url is valid or not with regex
                 const githubUrl = author.github;
 
-                // DEBUG
-                console.log(githubUrl)
-
+                
                 if (githubUrl && typeof githubUrl === 'string') { // Validate githubUrl before using it (since it may be null if the user hasnt added one)
                     const githubRegex = /^(https:\/\/github\.com\/)([a-zA-Z0-9-]+)$/;
 
@@ -66,13 +62,11 @@ async function fetchAuthors() {
                         // Extract the username from the matched groups
                         const githubUsername = match[2];
 
-                        // DEBUG 
-                        console.log(githubUsername)
 
-                        if (githubUsername === 'b-steem') { // DEBUG && githubUsername != "404") {
+                        if (githubUsername) {
                                 fetchStarredReposAndCreatePosts(githubUsername, author.id);
-                                //fetchGitHubEventsAndCreatePosts(githubUsername, author.id);
-                                //fetchGitHubPullRequestsAndCreatePosts(githubUsername, author.id);
+                                fetchGitHubEventsAndCreatePosts(githubUsername, author.id);
+                                fetchGitHubPullRequestsAndCreatePosts(githubUsername, author.id);
                                 
                             
                         }
@@ -88,15 +82,7 @@ async function fetchAuthors() {
 
 async function fetchStarredReposAndCreatePosts(githubUsername, authorId) {
     try {
-        // DEBUG
-        console.log("Fetching Stars started")
-        console.log(githubUsername)
-        console.log(authorId)
-
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token
-
-        //DEBUG
-        console.log(`csrfToken: ${csrfToken}`)
 
         const githubApiUrl = `https://api.github.com/users/${githubUsername}/starred`;
         const response = await fetch(githubApiUrl);
@@ -107,9 +93,6 @@ async function fetchStarredReposAndCreatePosts(githubUsername, authorId) {
         }
 
         const starredRepos = await response.json();
-
-        //DEBUG
-        console.log(`starred repos: ${starredRepos}`)
 
         for (const repo of starredRepos) {
             // Prepare the post data
@@ -137,21 +120,11 @@ async function fetchStarredReposAndCreatePosts(githubUsername, authorId) {
 
             const isDuplicate = await duplicateCheckResponse.json();
 
-            //DEBUG
-            console.log(isDuplicate);
-
             if (isDuplicate.exists) {
                 console.log(`Duplicate post exists for: ${postTitle}. Skipping creation.`);
                 continue;
             }
 
-            //DEBUG
-            // function encodeBase64Unicode(str) {
-            //     return btoa(new TextEncoder().encode(str).reduce((data, byte) => data + String.fromCharCode(byte), ''));
-            // }
-            
-            // const encoded = encodeBase64Unicode('abc:123');
-            // console.log(encoded);
 
             const postApiUrl = `/chartreuse/api/authors/${encodedAuthorId}/posts/`;
             const postResponse = await fetch(postApiUrl, {

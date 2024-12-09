@@ -31,38 +31,7 @@ def checkIfRequestAuthenticated(request):
     authentication = request.headers.get('Authorization')
     
     if not authentication or not authentication.startswith('Basic'):
-        # DEBUG
-        # csrf_token = request.headers.get('csrfToken')
-        # try:
-            # if request.user.is_authenticated and csrf_token:
-            #     body = json.loads(request.body)
-            #     user_id = body["author_id"]
-
-            #     user = User.objects.get(url_id=unquote(user_id))
-
-            #     node_queryset = Node.objects.filter(host=user.host,status='ENABLED',follow_status='OUTGOING')
-
-            #     if node_queryset.exists():
-            #         JsonResponse({"success": "Authorized"}, status=200) 
-
-            #     else:
-            #         # DEBUG
-            #         JsonResponse({"error": f"Query set does not exist, User: {user}... user_id: {user_id}"}, status=401)
-
-
-            # else:
-            #     # DEBUG
-            #     JsonResponse({"error": f"csrfToken: {csrf_token}, is authenticated: {request.user.is_authenticated}"}, status=401)         
-
-        # except Exception as e:
-        #     return JsonResponse({"error": f"Missing or invalid Authorization header: {e}"}, status=401)
-        
-        # finally: 
-        # DEBUG in the user.host host.host
-        user_id = request.POST.get("author_id")
-        user = User.objects.filter(url_id=user_id).first()
-
-        return JsonResponse({"error": f"Missing or invalid Authorization header: user_id = {user_id} user.host = {user.host} host.host = {Host.host}"}, status=401)
+        return JsonResponse({"error": f"Missing or invalid Authorization header"}, status=401)
 
     try:
         # Decode the Base64-encoded credentials

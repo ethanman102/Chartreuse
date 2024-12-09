@@ -120,22 +120,9 @@ class PostViewSet(viewsets.ViewSet):
         Returns:
             JsonResponce containing the new post    
         """ 
-        # DEBUG 
-        print("Debug", user_id)
-
         user = User.objects.filter(url_id=user_id).first()
 
-        # DEBUG
-        print("Debug", user, user.host, Host.host)
-
-        print(request.get_host())
-
-        host = Host(request.get_host()) # Host("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/api")
-
-        # DEBUG
-        print("Debug", host.host)
-
-        print("Debug user host", user.host)
+        host = Host(request.get_host())
 
         if user is None:
             return JsonResponse({"error": "User not found."}, status=404)

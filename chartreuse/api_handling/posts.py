@@ -128,7 +128,7 @@ class PostViewSet(viewsets.ViewSet):
         # DEBUG
         print("Debug", user, user.host, Host.host)
 
-        host = Host()
+        host = Host(request.get_host())
 
         # DEBUG
         print("Debug", host)

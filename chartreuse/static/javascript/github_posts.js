@@ -45,20 +45,31 @@ async function fetchAuthors() {
                 type: "authors",
                 authors: allAuthors
             };
+            
 
             authors.authors.forEach(author => {
                 // check whether the users github url is valid or not with regex
                 const githubUrl = author.github;
-                const githubRegex = /^(https:\/\/github\.com\/)([a-zA-Z0-9-]+)$/;
 
-                // Test the GitHub URL against the regex
-                const match = githubUrl.match(githubRegex);
-                if (match) {
-                    // Extract the username from the matched groups
-                    const githubUsername = match[2];
-                    if (githubUsername) {
-                        fetchStarredReposAndCreatePosts(githubUsername, author.id);
-                        fetchGitHubEventsAndCreatePosts(githubUsername, author.id);
+                
+                if (githubUrl && typeof githubUrl === 'string') { // Validate githubUrl before using it (since it may be null if the user hasnt added one)
+                    const githubRegex = /^(https:\/\/github\.com\/)([a-zA-Z0-9-]+)$/;
+
+                    // Test the GitHub URL against the regex
+                    const match = githubUrl.match(githubRegex);
+                    
+                    if (match) {
+                        // Extract the username from the matched groups
+                        const githubUsername = match[2];
+
+
+                        if (githubUsername) {
+                                fetchStarredReposAndCreatePosts(githubUsername, author.id);
+                                fetchGitHubEventsAndCreatePosts(githubUsername, author.id);
+                                fetchGitHubPullRequestsAndCreatePosts(githubUsername, author.id);
+                                
+                            
+                        }
                     }
                 }
             });
@@ -75,7 +86,8 @@ async function fetchStarredReposAndCreatePosts(githubUsername, authorId) {
 
         const githubApiUrl = `https://api.github.com/users/${githubUsername}/starred`;
         const response = await fetch(githubApiUrl);
-
+        
+        
         if (!response.ok) {
             throw new Error(`Failed to fetch starred repos for ${githubUsername}`);
         }
@@ -107,10 +119,12 @@ async function fetchStarredReposAndCreatePosts(githubUsername, authorId) {
             });
 
             const isDuplicate = await duplicateCheckResponse.json();
+
             if (isDuplicate.exists) {
                 console.log(`Duplicate post exists for: ${postTitle}. Skipping creation.`);
                 continue;
             }
+
 
             const postApiUrl = `/chartreuse/api/authors/${encodedAuthorId}/posts/`;
             const postResponse = await fetch(postApiUrl, {
@@ -183,7 +197,7 @@ async function fetchGitHubEventsAndCreatePosts(githubUsername, authorId) {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'X-CSRFToken': csrfToken,
                     },
-                    body: postData.toString()
+                    body: postData.toString(),
                 });
 
                 if (!postResponse.ok) {
@@ -198,5 +212,76 @@ async function fetchGitHubEventsAndCreatePosts(githubUsername, authorId) {
         }
     } catch (error) {
         console.error(`Error fetching GitHub events for ${githubUsername}:`, error);
+    }
+}
+
+async function fetchGitHubPullRequestsAndCreatePosts(githubUsername, authorId) {
+    try {
+        console.log("Started Github Pull Requests")
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token
+
+        // https://swarajpure.medium.com/github-apis-fetching-pull-requests-issues-by-a-user-organisation-repository-84ae934a106b accessed 2024-11-14
+        const githubPullRequestsUrl = `https://api.github.com/search/issues?q=author:${githubUsername}+type:pr`;
+        
+        const response = await fetch(githubPullRequestsUrl);
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch GitHub Pull Requests for ${githubUsername}`);
+        }
+
+        const pullRequests = await response.json();
+
+        console.log(pullRequests.items);
+        for (const item of pullRequests.items) {
+            if (item.pull_request) {
+                const postData = new URLSearchParams();
+                const postTitle = `🔧 ${item.user.login} opened a pull request`;
+                const postDescription = `🕙 Opened at ${item.pull_request.merged_at}`;
+                postData.append('title', postTitle);
+                postData.append('description', postDescription);
+                postData.append('contentType', "text/plain");
+                postData.append('author_id', authorId);
+                postData.append('content', `View the Pull Request at ${item.pull_request.html_url}`);
+                postData.append('visibility', "PUBLIC");
+
+                const encodedAuthorId = encodeURIComponent(authorId);
+                const checkDuplicateUrl = `/chartreuse/api/post-exists/`;
+                const duplicateCheckResponse = await fetch(checkDuplicateUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: postData.toString(),
+                });
+    
+                const isDuplicate = await duplicateCheckResponse.json();
+                if (isDuplicate.exists) {
+                    console.log(`Duplicate post exists for: ${postTitle}. Skipping creation.`);
+                    continue;
+                }
+
+                const postApiUrl = `/chartreuse/api/authors/${encodedAuthorId}/posts/`;
+                const postResponse = await fetch(postApiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: postData.toString(),
+                });
+
+                if (!postResponse.ok) {
+                    const errorData = await postResponse.json();
+                    console.error(`Failed to create post for PullRequestEvent:`, errorData);
+                    continue;
+                }
+
+                const createdPost = await postResponse.json();
+                console.log(`Post created for PullRequestEvent:`, createdPost);
+            }
+        }
+    } catch (error) {
+        console.error(`Error fetching GitHub pull requests for ${githubUsername}:`, error);
     }
 }

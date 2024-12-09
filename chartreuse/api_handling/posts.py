@@ -128,7 +128,9 @@ class PostViewSet(viewsets.ViewSet):
         # DEBUG
         print("Debug", user, user.host, Host.host)
 
-        host = Host(request.get_host())
+        print(request.get_host())
+
+        host = Host("https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/api")
 
         # DEBUG
         print("Debug", host)

@@ -17,7 +17,7 @@ from .comments import CommentsSerializer
 from urllib.parse import unquote
 from rest_framework.permissions import AllowAny
 from rest_framework.authentication import SessionAuthentication
-from ..views import checkIfRequestAuthenticated
+from ..views import checkIfRequestAuthenticated, Host
 from ..view import post_utils
 
 def create_user_url_id(request, id):
@@ -119,11 +119,19 @@ class PostViewSet(viewsets.ViewSet):
             
         Returns:
             JsonResponce containing the new post    
-        """        
-        response = checkIfRequestAuthenticated(request)
-        if response.status_code == 401:
-            return response
-        
+        """ 
+        user = User.objects.filter(url_id=user_id).first()
+
+        host = Host(request.get_host())
+
+        if user is None:
+            return JsonResponse({"error": "User not found."}, status=404)
+
+        elif user.host != f"https://{host.host}/chartreuse/api/":
+            response = checkIfRequestAuthenticated(request)
+            if response.status_code == 401:
+                return response
+            
         decoded_user_id = unquote(user_id)
 
         # Ensure the user creating the post is the current user

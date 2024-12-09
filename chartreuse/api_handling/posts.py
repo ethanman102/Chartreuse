@@ -140,7 +140,7 @@ class PostViewSet(viewsets.ViewSet):
         if user is None:
             return JsonResponse({"error": "User not found."}, status=404)
 
-        elif user.host != "https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/api":
+        elif user.host != f"https://{host.host}/chartreuse/api/":
             response = checkIfRequestAuthenticated(request)
             if response.status_code == 401:
                 return response

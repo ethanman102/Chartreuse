@@ -81,7 +81,7 @@ python3 manage.py test --pattern="test_comments.py" --verbosity=0
 To view the API documentation, go to the following link: https://f24-project-chartreuse-b4b2bcc83d87.herokuapp.com/chartreuse/schema/swagger-ui/
 
 ## Citations
-We created a couple of pages on our wiki to hold all the resources we referred to while working on this project. To see our citations, [please click here](https://github.com/uofa-cmput404/f24-project-chartreuse/wiki/Citations-Main-Page) to visit our Citation Main Page on our Wiki. 
+We created a couple of pages on our wiki to hold all the resources we referred to while working on this project. To see our citations, [please click here](https://github.com/ethanman102/Chartreuse/wiki/Citations-Main-Page) to visit our Citation Main Page on our Wiki. 
 
 <br>
 
